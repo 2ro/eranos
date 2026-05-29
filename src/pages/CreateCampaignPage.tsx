@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { nip19 } from 'nostr-tools';
 import {
@@ -12,13 +12,13 @@ import {
   HandHeart,
   HelpCircle,
   Loader2,
-  MapPin,
   Wallet,
-  X,
 } from 'lucide-react';
 
 import { CoverImageField } from '@/components/CoverImageField';
-import { CountryFlag } from '@/components/CountryFlag';
+import { CountrySelect } from '@/components/CountrySelect';
+import { CategoryPicker } from '@/components/CategoryPicker';
+import { Wizard } from '@/components/Wizard';
 import { FormSection } from '@/components/FormSection';
 import { OrganizationContextChip } from '@/components/OrganizationContextChip';
 import { LoginArea } from '@/components/auth/LoginArea';
@@ -54,8 +54,9 @@ import { genUserName } from '@/lib/genUserName';
 import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
-import { getCountryInfo, searchCountries, type CountryEntry } from '@/lib/countries';
-import { getEditableContentTags, parseContentTagInput } from '@/lib/contentTags';
+import { getCountryInfo } from '@/lib/countries';
+import { getEditableContentTags } from '@/lib/contentTags';
+import { CAMPAIGN_CATEGORIES, CAMPAIGN_CATEGORY_SLUGS } from '@/lib/campaignCategories';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { cn } from '@/lib/utils';
 
@@ -174,7 +175,15 @@ export function CreateCampaignPage() {
   const [deadline, setDeadline] = useState('');
   const [countryQuery, setCountryQuery] = useState('');
   const [countryCode, setCountryCode] = useState('');
-  const [tagInput, setTagInput] = useState('');
+  /**
+   * Selected category slugs. Stored as a Set for O(1) toggle, but
+   * persisted to the event as ordinary `t` tags (one per slug) so the
+   * categories are indistinguishable from any other content tag at
+   * the protocol layer — that's deliberate, since a curated picker is
+   * just a UX shortcut on top of the same field that's always backed
+   * campaign tags.
+   */
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(() => new Set());
   const [organizationATag, setOrganizationATag] = useState('');
   const [formError, setFormError] = useState('');
   const [prepopulatedEventId, setPrepopulatedEventId] = useState<string | null>(null);
@@ -292,7 +301,16 @@ export function CreateCampaignPage() {
     const editCountryCode = editCampaign.countryCode ?? '';
     setCountryCode(editCountryCode);
     setCountryQuery(editCountryCode ? (getCountryInfo(editCountryCode)?.subdivisionName ?? getCountryInfo(editCountryCode)?.name ?? editCountryCode) : '');
-    setTagInput(getEditableContentTags(editCampaign.event.tags).join(', '));
+    // Pull the existing `t` tags and intersect with the known
+    // category slugs — unknown tags (legacy free-form values written
+    // by older builds, or anything outside the curated picker) are
+    // currently dropped on edit. Once the picker is the only path to
+    // setting tags, every event going forward will only carry slugs
+    // the picker can round-trip.
+    const existingContentTags = getEditableContentTags(editCampaign.event.tags);
+    setSelectedCategories(
+      new Set(existingContentTags.filter((tag) => CAMPAIGN_CATEGORY_SLUGS.has(tag))),
+    );
     const existingOrgATag = editCampaign.event.tags.find(
       ([n, v]) => n === 'A' && typeof v === 'string' && v.startsWith('34550:'),
     )?.[1] ?? '';
@@ -395,7 +413,12 @@ export function CreateCampaignPage() {
       }
 
       const resolvedCountryCode = countryCode;
-      const contentTags = parseContentTagInput(tagInput);
+      // Iterate the canonical category list (not the Set) so the tag
+      // order on the event is stable and matches the picker's display
+      // order — easier to reason about in cross-client renderers.
+      const contentTags = CAMPAIGN_CATEGORIES
+        .map((c) => c.slug)
+        .filter((slug) => selectedCategories.has(slug));
 
       let prev: NostrEvent | null = null;
       if (isEditMode) {
@@ -695,11 +718,19 @@ export function CreateCampaignPage() {
 
   const tagsSection = (
     <FormSection title={t('forms.tags')} requirement="Optional">
-      <Input
-        id="campaign-tags"
-        value={tagInput}
-        onChange={(e) => setTagInput(e.target.value)}
-        placeholder={t('campaignsCreate.tagsPlaceholder')}
+      <CategoryPicker
+        selected={selectedCategories}
+        onToggle={(slug) => {
+          setSelectedCategories((prev) => {
+            const next = new Set(prev);
+            if (next.has(slug)) {
+              next.delete(slug);
+            } else {
+              next.add(slug);
+            }
+            return next;
+          });
+        }}
       />
     </FormSection>
   );
@@ -906,8 +937,9 @@ export function CreateCampaignPage() {
   const titleProvided = title.trim().length > 0;
 
   return (
-    <CampaignWizard
-      orgChip={orgChip}
+    <Wizard
+      headingAriaLabel={t('campaignsCreate.headingCreate')}
+      step1Lead={orgChip}
       steps={[
         {
           title: t('campaignsCreate.wizard.titleStepTitle'),
@@ -937,7 +969,12 @@ export function CreateCampaignPage() {
         {
           title: t('campaignsCreate.wizard.tagsStepTitle'),
           subtitle: t('campaignsCreate.wizard.tagsStepSubtitle'),
-          body: <>{countrySection}{tagsSection}</>,
+          body: (
+            <>
+              {countrySection}
+              {tagsSection}
+            </>
+          ),
         },
       ]}
       canAdvanceFromStep={(s) => (s === 1 ? titleProvided : true)}
@@ -946,6 +983,7 @@ export function CreateCampaignPage() {
       // even render the button because the wallet picker hasn't been
       // shown yet — publishing without it would be a confusing error.
       launchAvailableFromStep={3}
+      launchNowLabel={t('campaignsCreate.wizard.launchNow')}
       errorAlert={errorAlert}
       submitButtonContent={submitButtonContent}
       submitting={submitMutation.isPending || coverUploading}
@@ -955,223 +993,6 @@ export function CreateCampaignPage() {
   );
 }
 
-// ─── Wizard wrapper ──────────────────────────────────────────────────────────
-
-interface WizardStep {
-  /** Centered heading at the top of the step. Concise — one short phrase. */
-  title: string;
-  /** Muted single-line subtitle beneath the heading. Optional. */
-  subtitle?: string;
-  /** The form fields for this step. */
-  body: ReactNode;
-}
-
-/**
- * Multi-step layout for creating a new campaign.
- *
- * Rendered as a **fullscreen captive overlay** (`fixed inset-0 z-50`)
- * so it sits above the persistent TopNav — the same treatment Chad's
- * {@link OnboardingGate} uses for the signup flow. From the user's
- * perspective creating a campaign is a focused, distraction-free task,
- * not "another page in the app."
- *
- * Visually it mirrors the captive onboarding: a sticky single-bar
- * progress fill across the top, a top-right X to escape, a top-left
- * back arrow from step 2 onward, a centered narrow column for each
- * step, and a big rounded-full primary CTA.
- *
- * Step 1 holds the **required** title field; step 2 holds the
- * **required** wallet picker. Once both are filled in, every step from
- * {@link launchAvailableFromStep} onward surfaces a ghost "Skip Next &
- * Launch" shortcut beneath the primary Next button so the rest of the
- * wizard is opt-in. The last step is terminal: its only forward action
- * is the primary launch button.
- *
- * The form lives in this wrapper (not the parent) so the publish
- * button — wherever it ends up in the wizard — submits the same form
- * and reuses the parent's `handleSubmit`.
- */
-function CampaignWizard({
-  orgChip,
-  steps,
-  errorAlert,
-  submitButtonContent,
-  submitting,
-  canAdvanceFromStep,
-  launchAvailableFromStep,
-  onSubmit,
-  onClose,
-}: {
-  orgChip: ReactNode;
-  /** 1-indexed list of steps. Length determines the total. */
-  steps: WizardStep[];
-  errorAlert: ReactNode;
-  submitButtonContent: ReactNode;
-  submitting: boolean;
-  /**
-   * Predicate gating forward progress from a given (1-indexed) step.
-   * Return `false` to disable Next on that step. Steps not gated by
-   * this fn are always allowed to advance.
-   */
-  canAdvanceFromStep: (step: number) => boolean;
-  /**
-   * 1-indexed step from which the "Skip Next & Launch" shortcut
-   * appears. Earlier steps render only the Next button — the user
-   * shouldn't be able to publish before the required fields are
-   * collected.
-   */
-  launchAvailableFromStep: number;
-  onSubmit: (e: FormEvent) => void;
-  onClose: () => void;
-}) {
-  const { t } = useTranslation();
-  const [step, setStep] = useState(1);
-  const totalSteps = steps.length;
-  const current = steps[step - 1];
-  const isTerminal = step === totalSteps;
-  const progress = (step / totalSteps) * 100;
-
-  const launchVisible = step >= launchAvailableFromStep;
-  const canAdvance = canAdvanceFromStep(step);
-  const canSubmit = launchVisible && !submitting;
-
-  return (
-    <div
-      className="fixed inset-0 z-50 bg-background overflow-y-auto flex flex-col"
-      role="dialog"
-      aria-modal="true"
-      aria-label={t('campaignsCreate.headingCreate')}
-    >
-      {/* Sticky single-bar progress indicator, mirroring the captive
-          onboarding flow. */}
-      <div className="sticky top-0 z-10 h-1 bg-muted">
-        <div
-          className="h-full bg-primary transition-all duration-500 ease-out"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
-      {/* Top-right close. Lets users escape if they truly don't want to
-          continue — deliberately unobtrusive so casual taps don't drop
-          them out of the flow. */}
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label={t('common.goBack')}
-        className="absolute right-4 top-4 sm:right-6 sm:top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-      >
-        <X className="h-5 w-5" />
-      </button>
-
-      {/* Top-left back. Mirrors the close button so the user can step
-          back through the wizard without scrolling to the footer. Only
-          rendered from step 2 onward — step 1's escape route is the X. */}
-      {step > 1 && (
-        <button
-          type="button"
-          onClick={() => setStep((s) => Math.max(s - 1, 1))}
-          disabled={submitting}
-          aria-label={t('campaignsCreate.wizard.back')}
-          className="absolute left-4 top-4 sm:left-6 sm:top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
-        >
-          <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
-        </button>
-      )}
-
-      <form
-        className="flex-1 flex items-start sm:items-center justify-center px-6 pt-16 pb-12"
-        onSubmit={onSubmit}
-        // Hitting Enter inside an <input> normally triggers the
-        // form's default submit — and on a non-terminal wizard step
-        // that would silently publish the campaign. Intercept Enter
-        // on non-terminal steps and treat it as "advance" instead, so
-        // keyboard users get the same flow as clicking Next.
-        //
-        // Textarea Enter (story step) is left alone — that's a
-        // legitimate newline character inside the field.
-        onKeyDown={(e) => {
-          if (e.key !== 'Enter') return;
-          if (isTerminal) return;
-          const target = e.target as HTMLElement;
-          if (target.tagName === 'TEXTAREA') return;
-          // IME composition still in progress — don't hijack.
-          if (e.nativeEvent.isComposing) return;
-          e.preventDefault();
-          if (submitting || !canAdvance) return;
-          setStep((s) => Math.min(s + 1, totalSteps));
-        }}
-      >
-        <div
-          key={step}
-          className="w-full max-w-md mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300"
-        >
-          {/* Centered title block — captive-onboarding cadence: large
-              heading + muted subtitle, no progress eyebrow (the
-              top-of-page bar carries that signal). */}
-          <div className="space-y-2 text-center">
-            <h2 className="text-2xl font-bold tracking-tight">{current.title}</h2>
-            {current.subtitle && (
-              <p className="text-sm text-muted-foreground">{current.subtitle}</p>
-            )}
-          </div>
-
-          {/* Step body. The org chip rides along on step 1 so the
-              "publishing under <org>" context is the first thing the
-              user sees. No card chrome — onboarding keeps the content
-              area visually quiet so the focus stays on the fields. */}
-          <div className="space-y-3">
-            {step === 1 && orgChip}
-            {current.body}
-          </div>
-
-          {errorAlert}
-
-          {/* Footer.
-            - Non-terminal steps: primary "Next" advances the wizard.
-              From `launchAvailableFromStep` onward a ghost "Skip Next
-              & Launch" shortcut sits beneath it so the rest of the
-              wizard is opt-in.
-            - Terminal step: primary "Launch campaign" is the only
-              forward action.
-            - Back navigation lives in the top-left header chrome, not
-              here. */}
-          <div className="space-y-3 pt-1">
-            {isTerminal ? (
-              <Button
-                type="submit"
-                disabled={!canSubmit}
-                className="w-full h-12 text-base rounded-full"
-              >
-                {submitButtonContent}
-              </Button>
-            ) : (
-              <>
-                <Button
-                  type="button"
-                  onClick={() => setStep((s) => Math.min(s + 1, totalSteps))}
-                  disabled={submitting || !canAdvance}
-                  className="w-full h-12 text-base rounded-full"
-                >
-                  {t('campaignsCreate.wizard.next')}
-                </Button>
-                {launchVisible && (
-                  <Button
-                    type="submit"
-                    variant="ghost"
-                    disabled={!canSubmit}
-                    className="w-full"
-                  >
-                    {submitting ? submitButtonContent : t('campaignsCreate.wizard.launchNow')}
-                  </Button>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-      </form>
-    </div>
-  );
-}
 
 // ─── Layout helpers ──────────────────────────────────────────────────────────
 
@@ -1488,129 +1309,6 @@ function CustomWalletInput({
         />
       </div>
       {hasError && <p className="text-xs text-destructive">{errorMessage}</p>}
-    </div>
-  );
-}
-
-function CountrySelect({
-  query,
-  selectedCode,
-  onQueryChange,
-  onSelect,
-  onClear,
-}: {
-  query: string;
-  selectedCode: string;
-  onQueryChange: (value: string) => void;
-  onSelect: (country: CountryEntry) => void;
-  onClear: () => void;
-}) {
-  const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const selectedCountry = selectedCode ? getCountryInfo(selectedCode) : undefined;
-  const results = useMemo(() => searchCountries(query), [query]);
-  const showResults = open && results.length > 0;
-
-  const selectCountry = (country: CountryEntry) => {
-    onSelect(country);
-    setOpen(false);
-    setSelectedIndex(0);
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="relative">
-        <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          id="campaign-country"
-          value={query}
-          onChange={(e) => {
-            onQueryChange(e.target.value);
-            setOpen(true);
-            setSelectedIndex(0);
-          }}
-          onFocus={() => setOpen(true)}
-          onBlur={() => window.setTimeout(() => setOpen(false), 120)}
-          onKeyDown={(e) => {
-            if (!showResults) return;
-            if (e.key === 'ArrowDown') {
-              e.preventDefault();
-              setSelectedIndex((prev) => (prev + 1) % results.length);
-            } else if (e.key === 'ArrowUp') {
-              e.preventDefault();
-              setSelectedIndex((prev) => (prev - 1 + results.length) % results.length);
-            } else if (e.key === 'Enter') {
-              e.preventDefault();
-              selectCountry(results[selectedIndex]);
-            } else if (e.key === 'Escape') {
-              setOpen(false);
-            }
-          }}
-          className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-base md:text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
-          placeholder={t('forms.countrySearchPlaceholder')}
-          autoComplete="off"
-          role="combobox"
-          aria-expanded={showResults}
-          aria-controls="campaign-country-results"
-        />
-        {(query || selectedCode) && (
-          <button
-            type="button"
-            onClick={onClear}
-            className="absolute right-2 top-1/2 rounded-full p-1 -translate-y-1/2 text-muted-foreground hover:bg-muted hover:text-foreground motion-safe:transition-colors"
-            aria-label={t('campaignsCreate.countryClearAria')}
-          >
-            <X className="size-4" />
-          </button>
-        )}
-
-        {showResults && (
-          <div
-            id="campaign-country-results"
-            role="listbox"
-            className="absolute z-20 mt-2 max-h-[200px] w-full overflow-y-auto rounded-xl border border-border bg-popover py-1 shadow-lg"
-          >
-            {results.map((country, index) => (
-              <button
-                key={country.code}
-                type="button"
-                role="option"
-                aria-selected={index === selectedIndex}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => selectCountry(country)}
-                className={cn(
-                  'flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-secondary/60',
-                  index === selectedIndex && 'bg-secondary/60',
-                )}
-              >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary leading-none">
-                  <CountryFlag
-                    code={country.code}
-                    emoji={country.flag}
-                    label={t('campaignsCreate.flagOfAria', { name: country.name })}
-                    className="text-lg"
-                  />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold">{country.name}</span>
-                  <span className="block text-xs text-muted-foreground">{country.code}</span>
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {selectedCountry && (
-        <p className="text-xs text-muted-foreground">
-          <Trans
-            i18nKey="campaignsCreate.countryHint"
-            values={{ code: selectedCode }}
-            components={{ 0: <span className="font-mono text-foreground" /> }}
-          />
-        </p>
-      )}
     </div>
   );
 }

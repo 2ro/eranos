@@ -1,38 +1,76 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { MapPin, X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
-import { Input } from '@/components/ui/input';
 import { CountryFlag } from '@/components/CountryFlag';
+import { Input } from '@/components/ui/input';
 import { getCountryInfo, searchCountries, type CountryEntry } from '@/lib/countries';
 import { cn } from '@/lib/utils';
 
-interface CountrySelectProps {
-  id: string;
+export interface CountrySelectProps {
+  /** Current free-text query in the input. */
   query: string;
+  /** Currently-selected ISO 3166 code (e.g. "US"). Empty string when none. */
   selectedCode: string;
   onQueryChange: (value: string) => void;
   onSelect: (country: CountryEntry) => void;
   onClear: () => void;
+  /**
+   * Explicit DOM `id` for the input. Optional — a stable `useId()`
+   * value is generated when not provided. Callers that already wire
+   * their own form labels (e.g. a `<label htmlFor={…}>` outside the
+   * picker) should pass a known id; the wizard flows leave it
+   * auto-generated.
+   */
+  id?: string;
+  /** Override the localized "Search countries" placeholder. */
   placeholder?: string;
+  /**
+   * Hide the i18n hint that explains the `i: iso3166:<code>` tag
+   * we publish. Default `false` — the creation flows show it; the
+   * event-detail dialog hides it because the surrounding card already
+   * documents the behavior.
+   */
+  hideHint?: boolean;
 }
 
+/**
+ * Combobox-style country picker used across Agora's creation flows
+ * (campaigns, groups, calendar events, …). Shows a `MapPin` icon, a
+ * clear button when a value is present, and a dropdown of
+ * `searchCountries(query)` results with full keyboard support
+ * (ArrowUp/Down/Enter/Escape).
+ *
+ * The selection produces a country code (`onSelect(country.code)`)
+ * that the parent serializes as `['i', 'iso3166:<CC>']` + `['k',
+ * 'iso3166']` on its event.
+ *
+ * All i18n strings live under the shared `forms.*` namespace so the
+ * picker drops into any flow without per-page key duplication.
+ */
 export function CountrySelect({
-  id,
   query,
   selectedCode,
   onQueryChange,
   onSelect,
   onClear,
+  id,
   placeholder,
+  hideHint = false,
 }: CountrySelectProps) {
   const { t } = useTranslation();
+  // `useId` gives us a stable, unique pair of ids for the
+  // combobox/listbox association without forcing the caller to pass
+  // a name — important when the wizard mounts the picker multiple
+  // times across step navigations.
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
+  const listboxId = `${inputId}-results`;
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedCountry = selectedCode ? getCountryInfo(selectedCode) : undefined;
   const results = useMemo(() => searchCountries(query), [query]);
   const showResults = open && results.length > 0;
-  const resultsId = `${id}-results`;
 
   const selectCountry = (country: CountryEntry) => {
     onSelect(country);
@@ -45,7 +83,7 @@ export function CountrySelect({
       <div className="relative">
         <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          id={id}
+          id={inputId}
           value={query}
           onChange={(e) => {
             onQueryChange(e.target.value);
@@ -74,14 +112,14 @@ export function CountrySelect({
           autoComplete="off"
           role="combobox"
           aria-expanded={showResults}
-          aria-controls={resultsId}
+          aria-controls={listboxId}
         />
         {(query || selectedCode) && (
           <button
             type="button"
             onClick={onClear}
             className="absolute right-2 top-1/2 rounded-full p-1 -translate-y-1/2 text-muted-foreground hover:bg-muted hover:text-foreground motion-safe:transition-colors"
-            aria-label="Clear country"
+            aria-label={t('forms.countryClearAria')}
           >
             <X className="size-4" />
           </button>
@@ -89,7 +127,7 @@ export function CountrySelect({
 
         {showResults && (
           <div
-            id={resultsId}
+            id={listboxId}
             role="listbox"
             className="absolute z-20 mt-2 max-h-[200px] w-full overflow-y-auto rounded-xl border border-border bg-popover py-1 shadow-lg"
           >
@@ -110,7 +148,7 @@ export function CountrySelect({
                   <CountryFlag
                     code={country.code}
                     emoji={country.flag}
-                    label={`Flag of ${country.name}`}
+                    label={t('forms.flagOfAria', { name: country.name })}
                     className="text-lg"
                   />
                 </span>
@@ -124,9 +162,13 @@ export function CountrySelect({
         )}
       </div>
 
-      {selectedCountry && (
+      {selectedCountry && !hideHint && (
         <p className="text-xs text-muted-foreground">
-          Publishes <span className="font-mono text-foreground">i: iso3166:{selectedCode}</span> for country sorting.
+          <Trans
+            i18nKey="forms.countryHint"
+            values={{ code: selectedCode }}
+            components={{ 0: <span className="font-mono text-foreground" /> }}
+          />
         </p>
       )}
     </div>
