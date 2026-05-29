@@ -22,9 +22,9 @@ import { LoginArea } from '@/components/auth/LoginArea';
 import { LogoIcon } from '@/components/icons/LogoIcon';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
+import { useHdBtcPrice } from '@/hooks/useHdBtcPrice';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { satsToUSD } from '@/lib/bitcoin';
 import { cn } from '@/lib/utils';
@@ -184,7 +184,7 @@ export function TopNav() {
 /**
  * Compact USD balance pill in the top-nav right cluster, replacing the
  * previous search icon. Reads the HD-wallet sats balance via {@link useHdWallet}
- * and converts to USD via {@link useBtcPrice}. Renders nothing when the wallet
+ * and converts to USD via {@link useHdBtcPrice}. Renders nothing when the wallet
  * isn't available (logged out, extension/bunker login, still loading, or no
  * price yet) so the chrome stays quiet rather than flashing placeholder text.
  */
@@ -201,7 +201,7 @@ function DeferredWalletBalancePill() {
 function WalletBalancePill() {
   const { t } = useTranslation();
   const { availability, totalBalance, isLoading, error } = useHdWallet();
-  const { data: btcPrice } = useBtcPrice();
+  const { data: btcPrice } = useHdBtcPrice();
 
   if (availability.status !== 'available') return null;
   if (isLoading || error || !btcPrice) return null;
