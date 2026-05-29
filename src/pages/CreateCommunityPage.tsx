@@ -824,10 +824,12 @@ export function CreateCommunityPage() {
       // d-tag. Every other step is optional and advances freely.
       canAdvanceFromStep={(s) => (s === 1 ? nameProvided : true)}
       // Once name is provided (step 1 cleared) the user has everything
-      // we need to publish. Surface a "Skip Next & Launch" shortcut
-      // from step 2 onward so the remaining three steps — cover,
-      // moderators, country/categories — are explicitly opt-in.
-      launchAvailableFromStep={2}
+      // we need to publish. Surface a "Skip Next & Launch" shortcut on
+      // step 1 itself so the remaining three steps — cover, moderators,
+      // country/categories — are explicitly opt-in. The shortcut shares
+      // its disabled state with Next via `canAdvanceFromStep`, so it
+      // only lights up once the name field is non-empty.
+      launchAvailableFromStep={1}
       launchNowLabel={t('groups.create.wizard.launchNow')}
       errorAlert={errorAlert}
       submitButtonContent={submitButtonContent}

@@ -110,7 +110,16 @@ export function Wizard({
 
   const launchVisible = !!launchNowLabel && step >= launchAvailableFromStep;
   const canAdvance = canAdvanceFromStep(step);
-  const canSubmit = (launchVisible || isTerminal) && !submitting;
+  // The terminal step's own submit honors only `submitting` — its
+  // required fields have already been cleared by the gates on
+  // previous steps. The mid-wizard shortcut, on the other hand,
+  // sits *on* a potentially-gated step, so it must respect the
+  // same `canAdvance` check the Next button does — otherwise a
+  // user could click "Skip Next & Launch" with a still-empty
+  // required field and trip a server-side validation error.
+  const canSubmit = isTerminal
+    ? !submitting
+    : launchVisible && canAdvance && !submitting;
 
   return (
     <div
