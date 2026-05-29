@@ -857,7 +857,17 @@
       "errorNameInvalid": "Name must include letters or numbers so a group URL can be created.",
       "errorEditLatestMissing": "Could not find the latest version of this group to update.",
       "errorCoverInvalid": "Cover image must be a valid https:// URL.",
-      "errorSlugCollision": "You already have a group with the identifier \"{{slug}}\". Choose another name."
+      "errorSlugCollision": "You already have a group with the identifier \"{{slug}}\". Choose another name.",
+      "wizard": {
+        "nameStepTitle": "Name your group",
+        "nameStepSubtitle": "A short, clear name members will recognize.",
+        "coverStepTitle": "Add a cover image",
+        "coverStepSubtitle": "One image carries the group on every card.",
+        "moderatorsStepTitle": "Invite moderators",
+        "moderatorsStepSubtitle": "Optional — they can approve content and remove members alongside you.",
+        "tagsStepTitle": "Country and categories",
+        "tagsStepSubtitle": "Help the right people find your group."
+      }
     },
     "detail": {
       "by": "by",

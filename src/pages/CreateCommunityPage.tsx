@@ -1,24 +1,25 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+} from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { nip19 } from 'nostr-tools';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
-import {
-  AlertTriangle,
-  ArrowLeft,
-  Loader2,
-  MapPin,
-  Users,
-  X,
-} from 'lucide-react';
+import { AlertTriangle, Loader2, Users, X } from 'lucide-react';
 
-import { PersonSearch } from '@/components/PersonSearch';
+import { CategoryPicker } from '@/components/CategoryPicker';
+import { CountrySelect } from '@/components/CountrySelect';
 import { CoverImageField } from '@/components/CoverImageField';
-import { CountryFlag } from '@/components/CountryFlag';
 import { FormSection } from '@/components/FormSection';
+import { PersonSearch } from '@/components/PersonSearch';
+import { Wizard } from '@/components/Wizard';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -39,12 +40,15 @@ import {
   type ParsedCommunity,
 } from '@/lib/communityUtils';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
-import { getCountryInfo, searchCountries, type CountryEntry } from '@/lib/countries';
-import { parseContentTagInput } from '@/lib/contentTags';
+import { getCountryInfo } from '@/lib/countries';
+import { getEditableContentTags } from '@/lib/contentTags';
+import {
+  CAMPAIGN_CATEGORIES,
+  CAMPAIGN_CATEGORY_SLUGS,
+} from '@/lib/campaignCategories';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { genUserName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
-import { cn } from '@/lib/utils';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 /**
@@ -141,7 +145,9 @@ export function CreateCommunityPage() {
   const [imageUrl, setImageUrl] = useState('');
   const [countryCode, setCountryCode] = useState('');
   const [countryQuery, setCountryQuery] = useState('');
-  const [tagInput, setTagInput] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [coverUploading, setCoverUploading] = useState(false);
   // Additional moderators on top of the founder. The founder is implicit —
   // they're always pubkey #0 in the published moderator list and are not
@@ -152,8 +158,15 @@ export function CreateCommunityPage() {
 
   // Fetch the existing community when editing.
   const editCommunityQuery = useQuery({
-    queryKey: ['community', editTarget?.pubkey ?? '', editTarget?.identifier ?? '', editTarget?.relays ?? []],
-    queryFn: async ({ signal }): Promise<{ event: NostrEvent; community: ParsedCommunity } | null> => {
+    queryKey: [
+      'community',
+      editTarget?.pubkey ?? '',
+      editTarget?.identifier ?? '',
+      editTarget?.relays ?? [],
+    ],
+    queryFn: async ({
+      signal,
+    }): Promise<{ event: NostrEvent; community: ParsedCommunity } | null> => {
       if (!editTarget) return null;
       const relayPool = editTarget.relays?.length ? nostr.group(editTarget.relays) : nostr;
       const events = await relayPool.query(
@@ -195,10 +208,10 @@ export function CreateCommunityPage() {
       const missingPubkeys: string[] = [];
 
       for (const pubkey of editModeratorPubkeys) {
-        const cachedAuthor = queryClient.getQueryData<{ event?: NostrEvent; metadata?: NostrMetadata }>([
-          'author',
-          pubkey,
-        ]);
+        const cachedAuthor = queryClient.getQueryData<{
+          event?: NostrEvent;
+          metadata?: NostrMetadata;
+        }>(['author', pubkey]);
         if (cachedAuthor?.event) {
           cachedProfiles.set(pubkey, makeProfileFromAuthor(pubkey, cachedAuthor));
         } else {
@@ -244,7 +257,9 @@ export function CreateCommunityPage() {
   const activeSlug = editCommunity?.community.dTag ?? derivedSlug;
 
   useSeoMeta({
-    title: `${isEditMode ? t('groups.create.seoTitleEdit') : t('groups.create.seoTitleCreate')} | ${config.appName}`,
+    title: `${
+      isEditMode ? t('groups.create.seoTitleEdit') : t('groups.create.seoTitleCreate')
+    } | ${config.appName}`,
     description: isEditMode
       ? t('groups.create.seoDescriptionEdit', { appName: config.appName })
       : t('groups.create.seoDescriptionCreate', { appName: config.appName }),
@@ -258,8 +273,23 @@ export function CreateCommunityPage() {
     setImageUrl(editCommunity.community.image ?? '');
     const editCountryCode = editCommunity.community.countryCode ?? '';
     setCountryCode(editCountryCode);
-    setCountryQuery(editCountryCode ? (getCountryInfo(editCountryCode)?.subdivisionName ?? getCountryInfo(editCountryCode)?.name ?? editCountryCode) : '');
-    setTagInput(editCommunity.community.topicTags.join(', '));
+    setCountryQuery(
+      editCountryCode
+        ? getCountryInfo(editCountryCode)?.subdivisionName ??
+            getCountryInfo(editCountryCode)?.name ??
+            editCountryCode
+        : '',
+    );
+    // Only pre-select categories that exist in the curated set. Any other
+    // `t` tags the old free-form input may have published (e.g.
+    // "mutual-aid") are intentionally dropped from the picker — the user
+    // would have no way to re-select them, and saving the edit would
+    // silently re-publish stale tags they can't see. Same posture the
+    // campaign wizard adopted when its tag input was replaced.
+    const existingContentTags = getEditableContentTags(editCommunity.event.tags);
+    setSelectedCategories(
+      new Set(existingContentTags.filter((tag) => CAMPAIGN_CATEGORY_SLUGS.has(tag))),
+    );
     setModerators(editCommunity.community.moderatorPubkeys.map(makeProfileFromPubkey));
     setPrepopulatedEventId(editCommunity.event.id);
   }, [editCommunity, prepopulatedEventId]);
@@ -299,6 +329,18 @@ export function CreateCommunityPage() {
     setModerators((prev) => prev.filter((m) => m.pubkey !== pubkey));
   }, []);
 
+  const toggleCategory = useCallback((slug: string) => {
+    setSelectedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(slug)) {
+        next.delete(slug);
+      } else {
+        next.add(slug);
+      }
+      return next;
+    });
+  }, []);
+
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error(t('groups.create.errorLoginRequired'));
@@ -326,7 +368,14 @@ export function CreateCommunityPage() {
       if (trimmedImageUrl && !sanitizedImage) {
         throw new Error(t('groups.create.errorCoverInvalid'));
       }
-      const contentTags = parseContentTagInput(tagInput);
+
+      // Emit categories in CAMPAIGN_CATEGORIES order — the curated list
+      // is the canonical ordering, easier to reason about in
+      // cross-client renderers than an alphabetized/insertion-order
+      // dump.
+      const contentTags = CAMPAIGN_CATEGORIES
+        .map((c) => c.slug)
+        .filter((slug) => selectedCategories.has(slug));
 
       // ── Edit branch ────────────────────────────────────────────────────
       if (isEditMode && editCommunity) {
@@ -450,7 +499,11 @@ export function CreateCommunityPage() {
         queryKey: ['community-activity-feed'],
         exact: false,
       });
-      toast({ title: edited ? t('groups.create.successEdit') : t('groups.create.successCreate') });
+      toast({
+        title: edited
+          ? t('groups.create.successEdit')
+          : t('groups.create.successCreate'),
+      });
       navigate(`/${naddr}`);
     },
     onError: (error: unknown) => {
@@ -463,6 +516,15 @@ export function CreateCommunityPage() {
       });
     },
   });
+
+  const submitting = submitMutation.isPending || coverUploading;
+  const nameProvided = name.trim().length > 0;
+
+  // ─── Pre-wizard guards ─────────────────────────────────────────────────
+  // The login gate, invalid-edit guard, loading state, and non-owner
+  // guard render their own page chrome — they're not wizard steps. The
+  // wizard only mounts once the user is signed in and (in edit mode) we
+  // have a community they actually own.
 
   if (!user) {
     return (
@@ -495,9 +557,7 @@ export function CreateCommunityPage() {
             <CardContent className="py-12 px-8 text-center space-y-4">
               <AlertTriangle className="size-10 text-muted-foreground mx-auto" />
               <h2 className="text-xl font-semibold">{t('groups.create.invalidEditTitle')}</h2>
-              <p className="text-muted-foreground">
-                {t('groups.create.invalidEditBody')}
-              </p>
+              <p className="text-muted-foreground">{t('groups.create.invalidEditBody')}</p>
               <Button type="button" onClick={() => navigate('/groups/new')}>
                 {t('groups.create.startNewGroup')}
               </Button>
@@ -534,9 +594,7 @@ export function CreateCommunityPage() {
             <CardContent className="py-12 px-8 text-center space-y-4">
               <AlertTriangle className="size-10 text-muted-foreground mx-auto" />
               <h2 className="text-xl font-semibold">{t('groups.create.cannotEditTitle')}</h2>
-              <p className="text-muted-foreground">
-                {t('groups.create.cannotEditBody')}
-              </p>
+              <p className="text-muted-foreground">{t('groups.create.cannotEditBody')}</p>
               <Button type="button" onClick={() => navigate(-1)}>
                 {t('common.goBack')}
               </Button>
@@ -547,296 +605,196 @@ export function CreateCommunityPage() {
     );
   }
 
-  return (
-    <main className="min-h-screen pb-16">
-      <form
-        className="max-w-3xl mx-auto px-4 sm:px-6 py-8 lg:py-10 space-y-5"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setFormError('');
-          submitMutation.mutate();
-        }}
-      >
-        <div>
-          <div className="flex items-center gap-2 -ml-2">
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="p-2 rounded-full hover:bg-secondary motion-safe:transition-colors text-muted-foreground hover:text-foreground"
-              aria-label={t('common.goBack')}
-            >
-              <ArrowLeft className="size-5 rtl:rotate-180" />
-            </button>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              {isEditMode ? t('groups.create.headingEdit') : t('groups.create.headingCreate')}
-            </h1>
-          </div>
-        </div>
+  // ─── Wizard step bodies ────────────────────────────────────────────────
+  // Each section is constructed once and slotted into the wizard's step
+  // body below. Keeping the JSX up here (rather than inline in the
+  // `steps` array) makes the wizard call read like a table of contents.
 
-        <div className="rounded-2xl bg-card/50 p-2">
-          {/* Name */}
-          <FormSection title={t('groups.create.name')} requirement="Required">
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={t('groups.create.namePlaceholder')}
-              maxLength={100}
-              required
-            />
-            <p className="text-xs text-muted-foreground">
-              {t('groups.create.urlPreview')}{' '}
-              <span className="font-mono text-foreground">
-                /{activeSlug || t('groups.create.urlPlaceholder')}
-              </span>
-              {isEditMode && ` ${t('groups.create.urlKeptOriginal')}`}
-            </p>
-          </FormSection>
+  const nameDescriptionSection = (
+    <>
+      <FormSection title={t('groups.create.name')} requirement="Required">
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder={t('groups.create.namePlaceholder')}
+          maxLength={100}
+          required
+        />
+        <p className="text-xs text-muted-foreground">
+          {t('groups.create.urlPreview')}{' '}
+          <span className="font-mono text-foreground">
+            /{activeSlug || t('groups.create.urlPlaceholder')}
+          </span>
+          {isEditMode && ` ${t('groups.create.urlKeptOriginal')}`}
+        </p>
+      </FormSection>
 
-          {/* Description */}
-          <FormSection title={t('groups.create.description')} requirement="Recommended">
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={t('groups.create.descriptionPlaceholder')}
-              rows={3}
-            />
-          </FormSection>
+      <FormSection title={t('groups.create.description')} requirement="Recommended">
+        <Textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder={t('groups.create.descriptionPlaceholder')}
+          rows={4}
+        />
+      </FormSection>
+    </>
+  );
 
-          {/* Country */}
-          <FormSection title={t('groups.create.country')} requirement="Optional">
-            <CountrySelect
-              query={countryQuery}
-              selectedCode={countryCode}
-              onQueryChange={(value) => {
-                setCountryQuery(value);
-                const selectedCountry = countryCode ? getCountryInfo(countryCode) : undefined;
-                const selectedName = selectedCountry?.subdivisionName ?? selectedCountry?.name;
-                if (selectedCountry && value !== selectedName && value.toUpperCase() !== countryCode) {
-                  setCountryCode('');
-                }
-              }}
-              onSelect={(country) => {
-                setCountryCode(country.code);
-                setCountryQuery(country.name);
-              }}
-              onClear={() => {
-                setCountryCode('');
-                setCountryQuery('');
-              }}
-            />
-          </FormSection>
+  const coverSection = (
+    <FormSection title={t('groups.create.coverImage')} requirement="Recommended">
+      <CoverImageField
+        value={imageUrl}
+        onChange={setImageUrl}
+        onUploadingChange={setCoverUploading}
+      />
+    </FormSection>
+  );
 
-          {/* Tags */}
-          <FormSection title={t('groups.create.tags')} requirement="Optional">
-            <Input
-              id="group-tags"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              placeholder={t('groups.create.tagsPlaceholder')}
-            />
-          </FormSection>
+  const moderatorsSection = (
+    <FormSection title={t('groups.create.moderators')} requirement="Optional">
+      <div className="space-y-3">
+        <PersonSearch
+          onAdd={addModerator}
+          onAddMany={addModerators}
+          // Hide the founder and anyone already queued from search
+          // results so they can't be added twice. The founder isn't
+          // shown as a chip — they're always implicit.
+          excludePubkeys={[user.pubkey, ...moderators.map((m) => m.pubkey)]}
+        />
 
-          {/* Cover image */}
-          <FormSection title={t('groups.create.coverImage')} requirement="Recommended">
-            <CoverImageField
-              value={imageUrl}
-              onChange={setImageUrl}
-              onUploadingChange={setCoverUploading}
-            />
-          </FormSection>
-
-          {/* Moderators */}
-          <FormSection title={t('groups.create.moderators')} requirement="Optional">
-            <div className="space-y-3">
-              <PersonSearch
-                onAdd={addModerator}
-                onAddMany={addModerators}
-                // Hide the founder and anyone already queued from search
-                // results so they can't be added twice. The founder isn't
-                // shown as a chip — they're always implicit.
-                excludePubkeys={[user.pubkey, ...moderators.map((m) => m.pubkey)]}
-              />
-
-              {moderators.length > 0 && (
-                <>
-                  <Label className="text-xs text-muted-foreground">
-                    {t('groups.create.moderatorsCount', { count: moderators.length })}
-                  </Label>
-                  <div className="space-y-1.5">
-                    {moderators.map((moderator) => (
-                      <ModeratorRow
-                        key={moderator.pubkey}
-                        profile={moderator}
-                        onRemove={() => removeModerator(moderator.pubkey)}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
+        {moderators.length > 0 && (
+          <>
+            <Label className="text-xs text-muted-foreground">
+              {t('groups.create.moderatorsCount', { count: moderators.length })}
+            </Label>
+            <div className="space-y-1.5">
+              {moderators.map((moderator) => (
+                <ModeratorRow
+                  key={moderator.pubkey}
+                  profile={moderator}
+                  onRemove={() => removeModerator(moderator.pubkey)}
+                />
+              ))}
             </div>
-          </FormSection>
-        </div>
-
-        {formError && (
-          <Alert variant="destructive">
-            <AlertTriangle className="size-4" />
-            <AlertDescription>{formError}</AlertDescription>
-          </Alert>
+          </>
         )}
+      </div>
+    </FormSection>
+  );
 
-        <div className="pt-1">
-          <Button
-            type="submit"
-            disabled={submitMutation.isPending || coverUploading || !name.trim() || !activeSlug}
-            className="w-full"
-          >
-            {submitMutation.isPending ? (
-              <>
-                <Loader2 className="size-4 mr-2 animate-spin" />
-                {isEditMode ? t('groups.create.updating') : t('groups.create.creating')}
-              </>
-            ) : coverUploading ? (
-              <>
-                <Loader2 className="size-4 mr-2 animate-spin" />
-                {t('groups.create.uploadingCover')}
-              </>
-            ) : (
-              <>
-                <Users className="size-4 mr-2" />
-                {isEditMode ? t('groups.create.submitEdit') : t('groups.create.submitCreate')}
-              </>
-            )}
-          </Button>
-        </div>
-      </form>
-    </main>
+  const countryCategoriesSection = (
+    <>
+      <FormSection title={t('groups.create.country')} requirement="Optional">
+        <CountrySelect
+          query={countryQuery}
+          selectedCode={countryCode}
+          onQueryChange={(value) => {
+            setCountryQuery(value);
+            const selectedCountry = countryCode ? getCountryInfo(countryCode) : undefined;
+            const selectedName =
+              selectedCountry?.subdivisionName ?? selectedCountry?.name;
+            if (
+              selectedCountry &&
+              value !== selectedName &&
+              value.toUpperCase() !== countryCode
+            ) {
+              setCountryCode('');
+            }
+          }}
+          onSelect={(country) => {
+            setCountryCode(country.code);
+            setCountryQuery(country.name);
+          }}
+          onClear={() => {
+            setCountryCode('');
+            setCountryQuery('');
+          }}
+        />
+      </FormSection>
+
+      <FormSection title={t('groups.create.tags')} requirement="Optional">
+        <CategoryPicker selected={selectedCategories} onToggle={toggleCategory} />
+      </FormSection>
+    </>
+  );
+
+  // ─── Submit + error chrome ─────────────────────────────────────────────
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setFormError('');
+    submitMutation.mutate();
+  };
+
+  const submitButtonContent = submitMutation.isPending ? (
+    <>
+      <Loader2 className="size-4 mr-2 animate-spin" />
+      {isEditMode ? t('groups.create.updating') : t('groups.create.creating')}
+    </>
+  ) : coverUploading ? (
+    <>
+      <Loader2 className="size-4 mr-2 animate-spin" />
+      {t('groups.create.uploadingCover')}
+    </>
+  ) : (
+    <>
+      <Users className="size-4 mr-2" />
+      {isEditMode ? t('groups.create.submitEdit') : t('groups.create.submitCreate')}
+    </>
+  );
+
+  const errorAlert = formError ? (
+    <Alert variant="destructive">
+      <AlertTriangle className="size-4" />
+      <AlertDescription>{formError}</AlertDescription>
+    </Alert>
+  ) : null;
+
+  return (
+    <Wizard
+      headingAriaLabel={
+        isEditMode ? t('groups.create.headingEdit') : t('groups.create.headingCreate')
+      }
+      steps={[
+        {
+          title: t('groups.create.wizard.nameStepTitle'),
+          subtitle: t('groups.create.wizard.nameStepSubtitle'),
+          body: nameDescriptionSection,
+        },
+        {
+          title: t('groups.create.wizard.coverStepTitle'),
+          subtitle: t('groups.create.wizard.coverStepSubtitle'),
+          body: coverSection,
+        },
+        {
+          title: t('groups.create.wizard.moderatorsStepTitle'),
+          subtitle: t('groups.create.wizard.moderatorsStepSubtitle'),
+          body: moderatorsSection,
+        },
+        {
+          title: t('groups.create.wizard.tagsStepTitle'),
+          subtitle: t('groups.create.wizard.tagsStepSubtitle'),
+          body: countryCategoriesSection,
+        },
+      ]}
+      // The name field on step 1 is the only required gate — the slug
+      // is derived from it, and we can't submit without a non-empty
+      // d-tag. Every other step is optional and advances freely.
+      canAdvanceFromStep={(s) => (s === 1 ? nameProvided : true)}
+      // No "Skip Next & Launch" shortcut for groups — the flow is only
+      // four steps and three of them are optional, so the marginal
+      // value of a mid-wizard submit shortcut isn't worth the extra
+      // affordance.
+      errorAlert={errorAlert}
+      submitButtonContent={submitButtonContent}
+      submitting={submitting}
+      onSubmit={handleSubmit}
+      onClose={() => navigate(-1)}
+    />
   );
 }
 
 // ─── Layout helpers ──────────────────────────────────────────────────────────
-
-function CountrySelect({
-  query,
-  selectedCode,
-  onQueryChange,
-  onSelect,
-  onClear,
-}: {
-  query: string;
-  selectedCode: string;
-  onQueryChange: (value: string) => void;
-  onSelect: (country: CountryEntry) => void;
-  onClear: () => void;
-}) {
-  const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const selectedCountry = selectedCode ? getCountryInfo(selectedCode) : undefined;
-  const results = useMemo(() => searchCountries(query), [query]);
-  const showResults = open && results.length > 0;
-
-  const selectCountry = (country: CountryEntry) => {
-    onSelect(country);
-    setOpen(false);
-    setSelectedIndex(0);
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="relative">
-        <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          id="group-country"
-          value={query}
-          onChange={(e) => {
-            onQueryChange(e.target.value);
-            setOpen(true);
-            setSelectedIndex(0);
-          }}
-          onFocus={() => setOpen(true)}
-          onBlur={() => window.setTimeout(() => setOpen(false), 120)}
-          onKeyDown={(e) => {
-            if (!showResults) return;
-            if (e.key === 'ArrowDown') {
-              e.preventDefault();
-              setSelectedIndex((prev) => (prev + 1) % results.length);
-            } else if (e.key === 'ArrowUp') {
-              e.preventDefault();
-              setSelectedIndex((prev) => (prev - 1 + results.length) % results.length);
-            } else if (e.key === 'Enter') {
-              e.preventDefault();
-              selectCountry(results[selectedIndex]);
-            } else if (e.key === 'Escape') {
-              setOpen(false);
-            }
-          }}
-          className="h-9 rounded-full border-0 bg-secondary pl-10 pr-10 text-base md:text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
-          placeholder={t('forms.countrySearchPlaceholder')}
-          autoComplete="off"
-          role="combobox"
-          aria-expanded={showResults}
-          aria-controls="group-country-results"
-        />
-        {(query || selectedCode) && (
-          <button
-            type="button"
-            onClick={onClear}
-            className="absolute right-2 top-1/2 rounded-full p-1 -translate-y-1/2 text-muted-foreground hover:bg-muted hover:text-foreground motion-safe:transition-colors"
-            aria-label={t('groups.create.countryClearAria')}
-          >
-            <X className="size-4" />
-          </button>
-        )}
-
-        {showResults && (
-          <div
-            id="group-country-results"
-            role="listbox"
-            className="absolute z-20 mt-2 max-h-[200px] w-full overflow-y-auto rounded-xl border border-border bg-popover py-1 shadow-lg"
-          >
-            {results.map((country, index) => (
-              <button
-                key={country.code}
-                type="button"
-                role="option"
-                aria-selected={index === selectedIndex}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => selectCountry(country)}
-                className={cn(
-                  'flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-secondary/60',
-                  index === selectedIndex && 'bg-secondary/60',
-                )}
-              >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary leading-none">
-                  <CountryFlag
-                    code={country.code}
-                    emoji={country.flag}
-                    label={t('groups.create.flagOfAria', { name: country.name })}
-                    className="text-lg"
-                  />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold">{country.name}</span>
-                  <span className="block text-xs text-muted-foreground">{country.code}</span>
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {selectedCountry && (
-        <p className="text-xs text-muted-foreground">
-          <Trans
-            i18nKey="groups.create.countryHint"
-            values={{ code: selectedCode }}
-            components={{ 0: <span className="font-mono text-foreground" /> }}
-          />
-        </p>
-      )}
-    </div>
-  );
-}
 
 function ModeratorRow({
   profile,
