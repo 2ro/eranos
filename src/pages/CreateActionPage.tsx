@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, Clock, Loader2, Megaphone, Plus } from 'lucide-react';
 
+import { CategoryPicker } from '@/components/CategoryPicker';
 import { CountrySelect } from '@/components/CountrySelect';
 import { CoverImageField } from '@/components/CoverImageField';
 import { FormSection } from '@/components/FormSection';
@@ -23,8 +24,8 @@ import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
 import { usdToSats } from '@/lib/bitcoin';
+import { CAMPAIGN_CATEGORIES } from '@/lib/campaignCategories';
 import { getCountryInfo } from '@/lib/countries';
-import { parseContentTagInput } from '@/lib/contentTags';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
 import { getTodayDateInput } from '@/lib/dateInput';
 import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
@@ -71,7 +72,9 @@ export function CreateActionPage() {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [tagInput, setTagInput] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [pledgeUsd, setPledgeUsd] = useState('');
   const [deadline, setDeadline] = useState('');
   const [deadlineTime, setDeadlineTime] = useState('');
@@ -97,6 +100,18 @@ export function CreateActionPage() {
   }, [authorizedOrgFromParam]);
 
   const minDeadline = useMemo(() => getTodayDateInput(), []);
+
+  const toggleCategory = useCallback((slug: string) => {
+    setSelectedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(slug)) {
+        next.delete(slug);
+      } else {
+        next.add(slug);
+      }
+      return next;
+    });
+  }, []);
 
   useSeoMeta({
     title: `${t('pledges.create.seoTitle')} | ${config.appName}`,
@@ -135,7 +150,14 @@ export function CreateActionPage() {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
       const dTag = `${slug || 'pledge'}-${now}`;
-      const pledgeTags = parseContentTagInput(tagInput);
+      // Emit categories in CAMPAIGN_CATEGORIES order — the curated
+      // list is the canonical ordering, easier to reason about in
+      // cross-client renderers than insertion order. Same posture
+      // campaigns and groups adopted when their tag inputs were
+      // swapped for the picker.
+      const pledgeTags = CAMPAIGN_CATEGORIES
+        .map((c) => c.slug)
+        .filter((s) => selectedCategories.has(s));
 
       const tags: string[][] = [
         ['d', dTag],
@@ -257,38 +279,31 @@ export function CreateActionPage() {
   );
 
   const pledgeAmountSection = (
-    <FormSection title={t('pledges.create.pledge')} requirement="Required">
-      <div className="relative">
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-          $
-        </span>
-        <Input
-          type="text"
-          inputMode="decimal"
-          placeholder={t('pledges.create.pledgeAmountPlaceholder')}
-          value={pledgeUsd}
-          onChange={(e) => setPledgeUsd(e.target.value)}
-          className="pl-7 pr-14"
-        />
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
-          USD
-        </span>
-      </div>
-    </FormSection>
-  );
-
-  const coverSection = (
-    <FormSection title={t('forms.coverImage')} requirement="Optional">
-      <CoverImageField
-        value={coverImage}
-        onChange={setCoverImage}
-        onUploadingChange={setCoverUploading}
-      />
-    </FormSection>
-  );
-
-  const deadlineSection = (
     <>
+      <FormSection title={t('pledges.create.pledge')} requirement="Required">
+        <div className="relative">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+            $
+          </span>
+          <Input
+            type="text"
+            inputMode="decimal"
+            placeholder={t('pledges.create.pledgeAmountPlaceholder')}
+            value={pledgeUsd}
+            onChange={(e) => setPledgeUsd(e.target.value)}
+            className="pl-7 pr-14"
+          />
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
+            USD
+          </span>
+        </div>
+      </FormSection>
+
+      {/* Deadline sits on the same step as the pledge amount —
+          they answer the same question ("how much, and by when?"),
+          and a dedicated deadline step felt like padding given how
+          rarely it's filled in. The timezone subsection still
+          reveals only once a date is chosen. */}
       <FormSection title={t('pledges.create.deadline')} requirement="Optional">
         <Input
           type="date"
@@ -323,6 +338,16 @@ export function CreateActionPage() {
     </>
   );
 
+  const coverSection = (
+    <FormSection title={t('forms.coverImage')} requirement="Optional">
+      <CoverImageField
+        value={coverImage}
+        onChange={setCoverImage}
+        onUploadingChange={setCoverUploading}
+      />
+    </FormSection>
+  );
+
   const countryTagsSection = (
     <>
       <FormSection title={t('forms.country')} requirement="Optional">
@@ -354,12 +379,7 @@ export function CreateActionPage() {
       </FormSection>
 
       <FormSection title={t('forms.tags')} requirement="Optional">
-        <Input
-          id="pledge-tags"
-          value={tagInput}
-          onChange={(e) => setTagInput(e.target.value)}
-          placeholder={t('pledges.create.tagsPlaceholder')}
-        />
+        <CategoryPicker selected={selectedCategories} onToggle={toggleCategory} />
       </FormSection>
     </>
   );
@@ -440,11 +460,6 @@ export function CreateActionPage() {
           body: coverSection,
         },
         {
-          title: t('pledges.create.wizard.deadlineStepTitle'),
-          subtitle: t('pledges.create.wizard.deadlineStepSubtitle'),
-          body: deadlineSection,
-        },
-        {
           title: t('pledges.create.wizard.tagsStepTitle'),
           subtitle: t('pledges.create.wizard.tagsStepSubtitle'),
           body: countryTagsSection,
@@ -452,8 +467,9 @@ export function CreateActionPage() {
       ]}
       // Step 1 gates on title + description (both required), step 2
       // gates on the pledge amount (required, and must resolve to a
-      // positive sats value once the BTC/USD price is known). Every
-      // step after that is opt-in.
+      // positive sats value once the BTC/USD price is known). The
+      // deadline lives on step 2 alongside the amount but isn't
+      // gated — it's optional. Every step after that is opt-in.
       canAdvanceFromStep={(s) => {
         if (s === 1) return titleProvided && descriptionProvided;
         if (s === 2) return pledgeProvided;
@@ -462,9 +478,9 @@ export function CreateActionPage() {
       // The shortcut appears once the user has cleared both required
       // gates (title+description @ 1, pledge amount @ 2). Steps 1 and
       // 2 hide it because publishing without their fields would fail
-      // validation; once the user is on step 3, cover / deadline /
-      // country+tags are all explicitly optional and a one-click
-      // launch is the desired escape hatch.
+      // validation; once the user is on step 3, cover and
+      // country+tags are explicitly optional and a one-click launch
+      // is the desired escape hatch.
       launchAvailableFromStep={3}
       launchNowLabel={t('pledges.create.wizard.launchNow')}
       errorAlert={errorAlert}

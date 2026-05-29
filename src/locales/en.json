@@ -707,7 +707,6 @@
       "country": "Country",
       "countryPlaceholder": "Search countries",
       "tags": "Tags",
-      "tagsPlaceholder": "beach-cleanup, protest-documentation, internet-blackout",
       "coverImage": "Cover image",
       "description": "Description",
       "descriptionPlaceholder": "Explain the action, evidence, or outcome you want to inspire, what submissions should include, and how you plan to evaluate them...",
@@ -732,12 +731,10 @@
         "titleStepTitle": "Name your pledge",
         "titleStepSubtitle": "A clear ask and a short explanation of what you'll fund.",
         "pledgeStepTitle": "Set your pledge",
-        "pledgeStepSubtitle": "How much you'll pay out for verified submissions, in USD.",
+        "pledgeStepSubtitle": "How much you'll pay, in USD, and an optional deadline.",
         "coverStepTitle": "Add a cover image",
         "coverStepSubtitle": "One image carries the pledge on every card.",
-        "deadlineStepTitle": "Set a deadline",
-        "deadlineStepSubtitle": "Optional — leave blank for an open-ended pledge.",
-        "tagsStepTitle": "Country and tags",
+        "tagsStepTitle": "Country and categories",
         "tagsStepSubtitle": "Help the right people find your pledge.",
         "launchNow": "Skip Next & Launch"
       }
