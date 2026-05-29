@@ -1672,12 +1672,13 @@ function CategoryPicker({
 }) {
   const { t } = useTranslation();
   return (
-    // Three columns matches the captive wizard's narrow column width
-    // (max-w-md ≈ 448px). Shorter labels live on one line; the two
-    // long ones ("First Responders", "Current Events") wrap to two
-    // lines. `min-h-[3rem]` keeps every cell the same height so the
-    // grid reads as an even matrix even when only some chips wrap.
-    <div className="grid grid-cols-3 gap-2">
+    // Free-flowing pill row: each chip sizes to its own text, the row
+    // wraps to a new line whenever the next chip wouldn't fit. Some
+    // rows naturally land at three pills, others at four — driven by
+    // the labels' intrinsic widths rather than a fixed column count.
+    // Each pill is fully rounded with generous horizontal padding so
+    // it reads as a tag, not a grid cell.
+    <div className="flex flex-wrap gap-2">
       {CAMPAIGN_CATEGORIES.map(({ slug, labelKey, Icon }) => {
         const isSelected = selected.has(slug);
         return (
@@ -1687,7 +1688,7 @@ function CategoryPicker({
             onClick={() => onToggle(slug)}
             aria-pressed={isSelected}
             className={cn(
-              'group inline-flex min-h-[3rem] items-center justify-start gap-1.5 rounded-xl border px-2.5 py-2 text-left text-xs leading-tight transition-colors motion-safe:transition-shadow',
+              'inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm whitespace-nowrap transition-colors motion-safe:transition-shadow',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
               isSelected
                 ? 'border-primary bg-primary/10 text-foreground shadow-sm'
@@ -1697,11 +1698,11 @@ function CategoryPicker({
             <Icon
               className={cn(
                 'size-4 shrink-0',
-                isSelected ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground',
+                isSelected ? 'text-primary' : 'text-muted-foreground',
               )}
               aria-hidden="true"
             />
-            <span className="min-w-0 break-words">{t(labelKey)}</span>
+            <span>{t(labelKey)}</span>
           </button>
         );
       })}
