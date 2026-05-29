@@ -981,7 +981,23 @@
     "errorHdDeriveFailed": "आपके वॉलेट से नया ऑन-चेन एड्रेस derive नहीं कर सके।",
     "errorHdDeriveInvalid": "Derive किया गया वॉलेट एड्रेस सत्यापन में विफल। कृपया एक कस्टम एड्रेस जोड़ें।",
     "errorWalletRequiredFallback": "वॉलेट endpoint ज़रूरी है।",
-    "errorPublishedInvalid": "पब्लिश किया गया event सत्यापन में विफल। कृपया रिफ्रेश करके दोबारा कोशिश करें।"
+    "errorPublishedInvalid": "पब्लिश किया गया event सत्यापन में विफल। कृपया रिफ्रेश करके दोबारा कोशिश करें।",
+    "wizard": {
+      "titleStepTitle": "अपने कैंपेन को नाम दें",
+      "titleStepSubtitle": "एक छोटा, स्पष्ट नाम जिसे डोनर पहचान सकें।",
+      "walletStepTitle": "डोनेशन कहाँ जाएँगे?",
+      "walletStepSubtitle": "अपना Agora वॉलेट चुनें या अपना एड्रेस पेस्ट करें।",
+      "bannerStepTitle": "एक बैनर जोड़ें",
+      "bannerStepSubtitle": "एक प्रभावशाली इमेज हर कार्ड पर कैंपेन को आगे बढ़ाती है।",
+      "storyStepTitle": "अपनी कहानी बताएँ",
+      "storyStepSubtitle": "किसे फ़ायदा होगा और फंड का इस्तेमाल कैसे होगा।",
+      "detailsStepTitle": "लक्ष्य, अंतिम तारीख़ और टैग",
+      "detailsStepSubtitle": "बाक़ी सब वैकल्पिक है — सही लोगों को आपका कैंपेन ढूँढने में मदद करें।",
+      "next": "आगे",
+      "back": "पीछे",
+      "skip": "छोड़ें",
+      "launchNow": "छोड़ें और लॉन्च करें"
+    }
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | {{appName}} फंडरेज़र",

@@ -549,7 +549,23 @@
     "errorHdDeriveFailed": "Hatina kukwanisa kuwana kero itsva yepa-chain kubva muchikwama chako.",
     "errorHdDeriveInvalid": "Kero yakatorwa yatadza chenjedzo. Tapota wedzera kero yenyu.",
     "errorWalletRequiredFallback": "Chinangwa chechikwama chinodikanwa.",
-    "errorPublishedInvalid": "Chiitiko chakaburitswa chatadza chenjedzo. Tapota refresh moedza zvakare."
+    "errorPublishedInvalid": "Chiitiko chakaburitswa chatadza chenjedzo. Tapota refresh moedza zvakare.",
+    "wizard": {
+      "titleStepTitle": "Tumidza campaign yako",
+      "titleStepSubtitle": "Zita pfupi, riri pachena, ravapi vachaziva.",
+      "walletStepTitle": "Zvipo zvinoenda kupi?",
+      "walletStepSubtitle": "Sarudza chikwama chako cheAgora kana unamatire kero yako.",
+      "bannerStepTitle": "Wedzera bhana",
+      "bannerStepSubtitle": "Mufananidzo mumwe chete unotapira unotakura campaign pakadhi rega rega.",
+      "storyStepTitle": "Taura nyaya yako",
+      "storyStepSubtitle": "Vanobatsirwa ndivanaani uye mari ichashandiswa sei.",
+      "detailsStepTitle": "Chinangwa, mugumo, nematag",
+      "detailsStepSubtitle": "Zvimwe zvose hazvimanikidzwi — batsira vanhu vakakodzera kuti vawane campaign yako.",
+      "next": "Inotevera",
+      "back": "Dzokera",
+      "skip": "Darika",
+      "launchNow": "Darika Inotevera & Vhura"
+    }
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | Macampaign e{{appName}}",

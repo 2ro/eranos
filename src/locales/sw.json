@@ -980,7 +980,23 @@
     "errorHdDeriveFailed": "Haikuweza kupata anwani mpya ya katika-mnyororo kutoka kwa pochi yako.",
     "errorHdDeriveInvalid": "Anwani ya pochi iliyotolewa imeshindwa uthibitishaji. Tafadhali ongeza anwani maalum badala yake.",
     "errorWalletRequiredFallback": "Ncha ya pochi inahitajika.",
-    "errorPublishedInvalid": "Tukio lililochapishwa limeshindwa uthibitishaji. Tafadhali onyesha upya na ujaribu tena."
+    "errorPublishedInvalid": "Tukio lililochapishwa limeshindwa uthibitishaji. Tafadhali onyesha upya na ujaribu tena.",
+    "wizard": {
+      "titleStepTitle": "Ipe kampeni yako jina",
+      "titleStepSubtitle": "Jina fupi na wazi ambalo wafadhili watalitambua.",
+      "walletStepTitle": "Michango itaenda wapi?",
+      "walletStepSubtitle": "Chagua pochi yako ya Agora au bandika anwani yako mwenyewe.",
+      "bannerStepTitle": "Ongeza bango",
+      "bannerStepSubtitle": "Picha moja yenye mvuto hubeba kampeni kwenye kila kadi.",
+      "storyStepTitle": "Eleza hadithi yako",
+      "storyStepSubtitle": "Nani atafaidika na jinsi fedha zitakavyotumika.",
+      "detailsStepTitle": "Lengo, tarehe ya mwisho, na lebo",
+      "detailsStepSubtitle": "Mengine yote ni ya hiari — saidia watu sahihi kuipata kampeni yako.",
+      "next": "Inayofuata",
+      "back": "Rudi",
+      "skip": "Ruka",
+      "launchNow": "Ruka Inayofuata na Uzindue"
+    }
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | Kampeni za {{appName}}",

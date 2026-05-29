@@ -981,7 +981,23 @@
     "errorHdDeriveFailed": "Não foi possível derivar um novo endereço on-chain da sua carteira.",
     "errorHdDeriveInvalid": "O endereço de carteira derivado falhou na validação. Por favor, adicione um endereço personalizado.",
     "errorWalletRequiredFallback": "Endpoint de carteira é obrigatório.",
-    "errorPublishedInvalid": "O evento publicado falhou na validação. Por favor, atualize e tente novamente."
+    "errorPublishedInvalid": "O evento publicado falhou na validação. Por favor, atualize e tente novamente.",
+    "wizard": {
+      "titleStepTitle": "Dê um nome à sua campanha",
+      "titleStepSubtitle": "Um nome curto e claro que os doadores reconhecerão.",
+      "walletStepTitle": "Para onde vão as doações?",
+      "walletStepSubtitle": "Escolha sua carteira Agora ou cole seu próprio endereço.",
+      "bannerStepTitle": "Adicione um banner",
+      "bannerStepSubtitle": "Uma imagem marcante representa a campanha em cada card.",
+      "storyStepTitle": "Conte sua história",
+      "storyStepSubtitle": "Quem se beneficia e como os recursos serão usados.",
+      "detailsStepTitle": "Meta, prazo e tags",
+      "detailsStepSubtitle": "Tudo o mais é opcional — ajude as pessoas certas a encontrar sua campanha.",
+      "next": "Próximo",
+      "back": "Voltar",
+      "skip": "Pular",
+      "launchNow": "Pular Próximo e Lançar"
+    }
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | Arrecadações {{appName}}",

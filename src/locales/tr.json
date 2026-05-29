@@ -980,7 +980,23 @@
     "errorHdDeriveFailed": "Cüzdanınızdan yeni bir zincir üstü adres türetilemedi.",
     "errorHdDeriveInvalid": "Türetilen cüzdan adresi doğrulamadan geçemedi. Lütfen bunun yerine özel bir adres ekleyin.",
     "errorWalletRequiredFallback": "Cüzdan uç noktası zorunludur.",
-    "errorPublishedInvalid": "Yayımlanan event doğrulamadan geçemedi. Lütfen yenileyin ve tekrar deneyin."
+    "errorPublishedInvalid": "Yayımlanan event doğrulamadan geçemedi. Lütfen yenileyin ve tekrar deneyin.",
+    "wizard": {
+      "titleStepTitle": "Kampanyanıza isim verin",
+      "titleStepSubtitle": "Bağışçıların tanıyacağı kısa ve net bir ad.",
+      "walletStepTitle": "Bağışlar nereye gidecek?",
+      "walletStepSubtitle": "Agora cüzdanınızı seçin ya da kendi adresinizi yapıştırın.",
+      "bannerStepTitle": "Bir pankart ekleyin",
+      "bannerStepSubtitle": "Çarpıcı tek bir görsel, kampanyayı her kartta öne çıkarır.",
+      "storyStepTitle": "Hikâyenizi anlatın",
+      "storyStepSubtitle": "Kimin yararlanacağını ve fonların nasıl kullanılacağını anlatın.",
+      "detailsStepTitle": "Hedef, son tarih ve etiketler",
+      "detailsStepSubtitle": "Geri kalan her şey isteğe bağlı — doğru kişilerin kampanyanızı bulmasına yardımcı olun.",
+      "next": "İleri",
+      "back": "Geri",
+      "skip": "Atla",
+      "launchNow": "Atla ve Yayınla"
+    }
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | {{appName}} Fon Toplama",

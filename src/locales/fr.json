@@ -971,7 +971,23 @@
     "errorHdDeriveFailed": "Impossible de dériver une nouvelle adresse on-chain depuis votre portefeuille.",
     "errorHdDeriveInvalid": "L'adresse de portefeuille dérivée a échoué à la validation. Veuillez ajouter une adresse personnalisée à la place.",
     "errorWalletRequiredFallback": "Le point de terminaison du portefeuille est obligatoire.",
-    "errorPublishedInvalid": "L'événement publié a échoué à la validation. Veuillez actualiser et réessayer."
+    "errorPublishedInvalid": "L'événement publié a échoué à la validation. Veuillez actualiser et réessayer.",
+    "wizard": {
+      "titleStepTitle": "Nommez votre campagne",
+      "titleStepSubtitle": "Un nom court et clair que les donateurs reconnaîtront.",
+      "walletStepTitle": "Où vont les dons ?",
+      "walletStepSubtitle": "Choisissez votre portefeuille Agora ou collez votre propre adresse.",
+      "bannerStepTitle": "Ajoutez une bannière",
+      "bannerStepSubtitle": "Une image marquante porte la campagne sur chaque carte.",
+      "storyStepTitle": "Racontez votre histoire",
+      "storyStepSubtitle": "À qui profitent les fonds et comment ils seront utilisés.",
+      "detailsStepTitle": "Objectif, échéance et étiquettes",
+      "detailsStepSubtitle": "Tout le reste est facultatif — aidez les bonnes personnes à trouver votre campagne.",
+      "next": "Suivant",
+      "back": "Retour",
+      "skip": "Passer",
+      "launchNow": "Passer et lancer"
+    }
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | Collectes de fonds {{appName}}",

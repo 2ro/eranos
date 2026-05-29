@@ -549,7 +549,23 @@
     "errorHdDeriveFailed": "نشانی روی زنجیرهٔ تازه از کیف پولت استخراج نشد.",
     "errorHdDeriveInvalid": "نشانی استخراج‌شده اعتبارسنجی نشد. لطفاً یک نشانی سفارشی اضافه کن.",
     "errorWalletRequiredFallback": "نقطهٔ کیف پول الزامی است.",
-    "errorPublishedInvalid": "رویداد منتشرشده اعتبارسنجی نشد. لطفاً صفحه را به‌روز کن و دوباره تلاش کن."
+    "errorPublishedInvalid": "رویداد منتشرشده اعتبارسنجی نشد. لطفاً صفحه را به‌روز کن و دوباره تلاش کن.",
+    "wizard": {
+      "titleStepTitle": "به کمپینت نام بده",
+      "titleStepSubtitle": "نامی کوتاه و روشن که اهداکنندگان به‌یاد بسپارند.",
+      "walletStepTitle": "اهدا‌ها کجا بروند؟",
+      "walletStepSubtitle": "کیف پول آگورای خودت را انتخاب کن یا نشانی دلخواهت را وارد کن.",
+      "bannerStepTitle": "یک بنر اضافه کن",
+      "bannerStepSubtitle": "یک تصویر گیرا، کمپین را روی هر کارت همراهی می‌کند.",
+      "storyStepTitle": "داستانت را تعریف کن",
+      "storyStepSubtitle": "چه کسانی بهره‌مند می‌شوند و این مبالغ چگونه خرج خواهند شد.",
+      "detailsStepTitle": "هدف، مهلت و برچسب‌ها",
+      "detailsStepSubtitle": "بقیه چیزها اختیاری است — کمک کن آدم‌های درست کمپینت را پیدا کنند.",
+      "next": "بعدی",
+      "back": "بازگشت",
+      "skip": "رد کردن",
+      "launchNow": "رد کن و راه‌اندازی کن"
+    }
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | کمپین‌های {{appName}}",

@@ -537,7 +537,23 @@
     "errorHdDeriveFailed": "تعذّر اشتقاق عنوان على السلسلة جديد من محفظتك.",
     "errorHdDeriveInvalid": "فشل التحقق من العنوان المشتق. الرجاء إضافة عنوان مخصص.",
     "errorWalletRequiredFallback": "نقطة محفظة مطلوبة.",
-    "errorPublishedInvalid": "فشل التحقق من الحدث المنشور. الرجاء التحديث والمحاولة مرة أخرى."
+    "errorPublishedInvalid": "فشل التحقق من الحدث المنشور. الرجاء التحديث والمحاولة مرة أخرى.",
+    "wizard": {
+      "titleStepTitle": "سمِّ حملتك",
+      "titleStepSubtitle": "اسم قصير وواضح يتعرّف عليه المتبرعون.",
+      "walletStepTitle": "أين تذهب التبرعات؟",
+      "walletStepSubtitle": "اختر محفظة Agora أو ألصق عنوانك الخاص.",
+      "bannerStepTitle": "أضف صورة بانر",
+      "bannerStepSubtitle": "صورة واحدة لافتة تُمثّل الحملة في كل بطاقة.",
+      "storyStepTitle": "احكِ قصتك",
+      "storyStepSubtitle": "من المستفيد وكيف ستُستخدم الأموال.",
+      "detailsStepTitle": "الهدف والموعد النهائي والوسوم",
+      "detailsStepSubtitle": "كل ما تبقّى اختياري — ساعد الأشخاص المناسبين على إيجاد حملتك.",
+      "next": "التالي",
+      "back": "رجوع",
+      "skip": "تخطٍّ",
+      "launchNow": "تخطّي التالي والإطلاق"
+    }
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | حملات {{appName}}",

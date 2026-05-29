@@ -981,7 +981,23 @@
     "errorHdDeriveFailed": "Tidak dapat menurunkan alamat on-chain baru dari dompet Anda.",
     "errorHdDeriveInvalid": "Alamat dompet turunan gagal validasi. Silakan tambahkan alamat kustom sebagai gantinya.",
     "errorWalletRequiredFallback": "Titik dompet wajib diisi.",
-    "errorPublishedInvalid": "Event yang dipublikasikan gagal validasi. Silakan muat ulang dan coba lagi."
+    "errorPublishedInvalid": "Event yang dipublikasikan gagal validasi. Silakan muat ulang dan coba lagi.",
+    "wizard": {
+      "titleStepTitle": "Beri nama kampanye Anda",
+      "titleStepSubtitle": "Nama singkat dan jelas yang mudah dikenali donatur.",
+      "walletStepTitle": "Ke mana donasi akan masuk?",
+      "walletStepSubtitle": "Pilih dompet Agora Anda atau tempel alamat Anda sendiri.",
+      "bannerStepTitle": "Tambahkan banner",
+      "bannerStepSubtitle": "Satu gambar menarik membawa kampanye di setiap kartu.",
+      "storyStepTitle": "Ceritakan kisah Anda",
+      "storyStepSubtitle": "Siapa yang terbantu dan bagaimana dana akan digunakan.",
+      "detailsStepTitle": "Target, tenggat, dan tag",
+      "detailsStepSubtitle": "Sisanya opsional — bantu orang yang tepat menemukan kampanye Anda.",
+      "next": "Berikutnya",
+      "back": "Kembali",
+      "skip": "Lewati",
+      "launchNow": "Lewati Berikutnya & Luncurkan"
+    }
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | Penggalangan Dana {{appName}}",

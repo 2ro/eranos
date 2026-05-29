@@ -549,7 +549,23 @@
     "errorHdDeriveFailed": "無法從你的錢包派生新的鏈上地址。",
     "errorHdDeriveInvalid": "派生的錢包地址未通過驗證。請改為新增自定義地址。",
     "errorWalletRequiredFallback": "需要錢包端點。",
-    "errorPublishedInvalid": "已釋出的事件未通過驗證。請重新整理並重試。"
+    "errorPublishedInvalid": "已釋出的事件未通過驗證。請重新整理並重試。",
+    "wizard": {
+      "titleStepTitle": "為你的活動命名",
+      "titleStepSubtitle": "簡短、清晰,讓捐贈者一眼就能認出。",
+      "walletStepTitle": "捐款要送到哪裡?",
+      "walletStepSubtitle": "選擇你的 Agora 錢包,或貼上自己的地址。",
+      "bannerStepTitle": "新增橫幅",
+      "bannerStepSubtitle": "一張搶眼的圖片,讓你的活動在每張卡片上脫穎而出。",
+      "storyStepTitle": "說說你的故事",
+      "storyStepSubtitle": "誰是受益者,以及這些資金將如何運用。",
+      "detailsStepTitle": "目標、截止日期與標籤",
+      "detailsStepSubtitle": "其餘皆為選填 — 讓對的人找到你的活動。",
+      "next": "下一步",
+      "back": "返回",
+      "skip": "跳過",
+      "launchNow": "跳過後續並啟動"
+    }
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | {{appName}} 募款",

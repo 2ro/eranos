@@ -549,7 +549,23 @@
     "errorHdDeriveFailed": "ستاسو له پاکټ څخه نوې پر چین پته ونشوه استخراج.",
     "errorHdDeriveInvalid": "استخراج شوې پته اعتبار نه ولاره. مهرباني وکړئ یوه ګمرکي پته اضافه کړئ.",
     "errorWalletRequiredFallback": "د پاکټ نقطه اړینه ده.",
-    "errorPublishedInvalid": "خپره شوې پیښه اعتبار نه ولاره. مهرباني وکړئ پاڼه تازه کړئ او بیا هڅه وکړئ."
+    "errorPublishedInvalid": "خپره شوې پیښه اعتبار نه ولاره. مهرباني وکړئ پاڼه تازه کړئ او بیا هڅه وکړئ.",
+    "wizard": {
+      "titleStepTitle": "خپل کمپاین ته نوم ورکړئ",
+      "titleStepSubtitle": "لنډ او روښانه نوم چې بسپنه ورکوونکي یې وپېژني.",
+      "walletStepTitle": "بسپنې چېرته ورځي؟",
+      "walletStepSubtitle": "خپل د اګورا پاکټ وټاکئ یا خپله پته ورپېسټ کړئ.",
+      "bannerStepTitle": "بنر اضافه کړئ",
+      "bannerStepSubtitle": "یو زړه‌راښکونکی انځور په هر کارت کې کمپاین ښیي.",
+      "storyStepTitle": "خپله کیسه ووایاست",
+      "storyStepSubtitle": "څوک ګټه اخلي او بسپنې به څنګه ولګول شي.",
+      "detailsStepTitle": "هدف، وروستۍ نېټه، او ټاګونه",
+      "detailsStepSubtitle": "نور هر څه اختیاري دي — سمو خلکو سره مرسته وکړئ چې ستاسو کمپاین ومومي.",
+      "next": "بل",
+      "back": "شاته",
+      "skip": "تېرول",
+      "launchNow": "تېر شئ او اوس یې پیل کړئ"
+    }
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | د {{appName}} کمپاینونه",

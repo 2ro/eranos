@@ -549,7 +549,23 @@
     "errorHdDeriveFailed": "No se pudo derivar una dirección on-chain nueva desde tu cartera.",
     "errorHdDeriveInvalid": "La dirección derivada no pasó la validación. Por favor agrega una dirección personalizada.",
     "errorWalletRequiredFallback": "Se requiere un punto de cartera.",
-    "errorPublishedInvalid": "El evento publicado falló la validación. Recarga e inténtalo de nuevo."
+    "errorPublishedInvalid": "El evento publicado falló la validación. Recarga e inténtalo de nuevo.",
+    "wizard": {
+      "titleStepTitle": "Nombra tu campaña",
+      "titleStepSubtitle": "Un nombre corto y claro que los donantes reconocerán.",
+      "walletStepTitle": "¿Adónde van las donaciones?",
+      "walletStepSubtitle": "Elige tu cartera de Agora o pega tu propia dirección.",
+      "bannerStepTitle": "Añade una portada",
+      "bannerStepSubtitle": "Una imagen impactante acompaña a la campaña en cada tarjeta.",
+      "storyStepTitle": "Cuenta tu historia",
+      "storyStepSubtitle": "Quién se beneficia y cómo se usarán los fondos.",
+      "detailsStepTitle": "Meta, fecha límite y etiquetas",
+      "detailsStepSubtitle": "Todo lo demás es opcional — ayuda a que las personas adecuadas encuentren tu campaña.",
+      "next": "Siguiente",
+      "back": "Atrás",
+      "skip": "Omitir",
+      "launchNow": "Omitir y Publicar"
+    }
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | Recaudaciones de {{appName}}",
