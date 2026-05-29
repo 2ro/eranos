@@ -944,15 +944,12 @@
     "tagsPlaceholder": "legal-defense, mutual-aid, local-news",
     "categories": {
       "adoption": "Adoption",
-      "animals": "Animals / Pets",
-      "business": "Business",
+      "animals": "Animals",
       "church": "Church",
       "community": "Community",
-      "creative": "Creative",
       "currentEvents": "Current Events",
       "education": "Education",
       "emergency": "Emergency",
-      "evangelism": "Evangelism",
       "event": "Event",
       "family": "Family",
       "firstResponders": "First Responders",
@@ -961,8 +958,7 @@
       "memorial": "Memorial",
       "mission": "Mission",
       "nonProfit": "Non-Profit",
-      "political": "Political",
-      "competitive": "Competitive"
+      "political": "Political"
     },
     "banner": "Banner image",
     "story": "Story",

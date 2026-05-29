@@ -1,10 +1,8 @@
 import {
   Baby,
-  Briefcase,
   CalendarDays,
   Church,
   Dog,
-  Fish,
   Flower2,
   GraduationCap,
   HandHeart,
@@ -13,10 +11,8 @@ import {
   Scale,
   Shield,
   Siren,
-  Sparkles,
   Stethoscope,
   Target,
-  Trophy,
   Users,
   Vote,
   type LucideIcon,
@@ -45,14 +41,11 @@ export interface CampaignCategory {
 export const CAMPAIGN_CATEGORIES: readonly CampaignCategory[] = [
   { slug: 'adoption', labelKey: 'campaignsCreate.categories.adoption', Icon: Baby },
   { slug: 'animals', labelKey: 'campaignsCreate.categories.animals', Icon: Dog },
-  { slug: 'business', labelKey: 'campaignsCreate.categories.business', Icon: Briefcase },
   { slug: 'church', labelKey: 'campaignsCreate.categories.church', Icon: Church },
   { slug: 'community', labelKey: 'campaignsCreate.categories.community', Icon: HeartHandshake },
-  { slug: 'creative', labelKey: 'campaignsCreate.categories.creative', Icon: Sparkles },
   { slug: 'current-events', labelKey: 'campaignsCreate.categories.currentEvents', Icon: Newspaper },
   { slug: 'education', labelKey: 'campaignsCreate.categories.education', Icon: GraduationCap },
   { slug: 'emergency', labelKey: 'campaignsCreate.categories.emergency', Icon: Siren },
-  { slug: 'evangelism', labelKey: 'campaignsCreate.categories.evangelism', Icon: Fish },
   { slug: 'event', labelKey: 'campaignsCreate.categories.event', Icon: CalendarDays },
   { slug: 'family', labelKey: 'campaignsCreate.categories.family', Icon: Users },
   { slug: 'first-responders', labelKey: 'campaignsCreate.categories.firstResponders', Icon: Shield },
@@ -62,7 +55,6 @@ export const CAMPAIGN_CATEGORIES: readonly CampaignCategory[] = [
   { slug: 'mission', labelKey: 'campaignsCreate.categories.mission', Icon: Target },
   { slug: 'non-profit', labelKey: 'campaignsCreate.categories.nonProfit', Icon: HandHeart },
   { slug: 'political', labelKey: 'campaignsCreate.categories.political', Icon: Vote },
-  { slug: 'competitive', labelKey: 'campaignsCreate.categories.competitive', Icon: Trophy },
 ] as const;
 
 /** Set of valid category slugs for O(1) lookup. */

@@ -1672,7 +1672,12 @@ function CategoryPicker({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+    // Three columns matches the captive wizard's narrow column width
+    // (max-w-md ≈ 448px). Shorter labels live on one line; the two
+    // long ones ("First Responders", "Current Events") wrap to two
+    // lines. `min-h-[3rem]` keeps every cell the same height so the
+    // grid reads as an even matrix even when only some chips wrap.
+    <div className="grid grid-cols-3 gap-2">
       {CAMPAIGN_CATEGORIES.map(({ slug, labelKey, Icon }) => {
         const isSelected = selected.has(slug);
         return (
@@ -1682,7 +1687,7 @@ function CategoryPicker({
             onClick={() => onToggle(slug)}
             aria-pressed={isSelected}
             className={cn(
-              'group inline-flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm transition-colors motion-safe:transition-shadow',
+              'group inline-flex min-h-[3rem] items-center justify-start gap-1.5 rounded-xl border px-2.5 py-2 text-left text-xs leading-tight transition-colors motion-safe:transition-shadow',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
               isSelected
                 ? 'border-primary bg-primary/10 text-foreground shadow-sm'
@@ -1696,7 +1701,7 @@ function CategoryPicker({
               )}
               aria-hidden="true"
             />
-            <span className="truncate">{t(labelKey)}</span>
+            <span className="min-w-0 break-words">{t(labelKey)}</span>
           </button>
         );
       })}
