@@ -866,7 +866,8 @@
         "moderatorsStepTitle": "Invite moderators",
         "moderatorsStepSubtitle": "Optional — they can approve content and remove members alongside you.",
         "tagsStepTitle": "Country and categories",
-        "tagsStepSubtitle": "Help the right people find your group."
+        "tagsStepSubtitle": "Help the right people find your group.",
+        "launchNow": "Skip Next & Launch"
       }
     },
     "detail": {

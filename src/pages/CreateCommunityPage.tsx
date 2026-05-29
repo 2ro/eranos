@@ -12,7 +12,7 @@ import { useNostr } from '@nostrify/react';
 import { useTranslation } from 'react-i18next';
 import { nip19 } from 'nostr-tools';
 import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
-import { AlertTriangle, Loader2, Users, X } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Loader2, Users, X } from 'lucide-react';
 
 import { CategoryPicker } from '@/components/CategoryPicker';
 import { CountrySelect } from '@/components/CountrySelect';
@@ -750,11 +750,53 @@ export function CreateCommunityPage() {
     </Alert>
   ) : null;
 
+  // Edit mode keeps the original single-page form — pre-populated fields
+  // need to be visible and editable in one place, and the multi-step
+  // wizard is optimized for a linear first-time flow. Mirrors the same
+  // create-vs-edit split the campaign flow uses.
+  if (isEditMode) {
+    return (
+      <main className="min-h-screen pb-16">
+        <form
+          className="max-w-3xl mx-auto px-4 sm:px-6 py-8 lg:py-10 space-y-5"
+          onSubmit={handleSubmit}
+        >
+          <div className="flex items-center gap-2 -ml-2">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="p-2 rounded-full hover:bg-secondary motion-safe:transition-colors text-muted-foreground hover:text-foreground"
+              aria-label={t('common.goBack')}
+            >
+              <ArrowLeft className="size-5 rtl:rotate-180" />
+            </button>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              {t('groups.create.headingEdit')}
+            </h1>
+          </div>
+
+          <div className="rounded-2xl bg-card/50 p-2">
+            {nameDescriptionSection}
+            {countryCategoriesSection}
+            {coverSection}
+            {moderatorsSection}
+          </div>
+
+          {errorAlert}
+
+          <div className="pt-1">
+            <Button type="submit" disabled={submitting || !nameProvided} className="w-full">
+              {submitButtonContent}
+            </Button>
+          </div>
+        </form>
+      </main>
+    );
+  }
+
   return (
     <Wizard
-      headingAriaLabel={
-        isEditMode ? t('groups.create.headingEdit') : t('groups.create.headingCreate')
-      }
+      headingAriaLabel={t('groups.create.headingCreate')}
       steps={[
         {
           title: t('groups.create.wizard.nameStepTitle'),
@@ -781,10 +823,12 @@ export function CreateCommunityPage() {
       // is derived from it, and we can't submit without a non-empty
       // d-tag. Every other step is optional and advances freely.
       canAdvanceFromStep={(s) => (s === 1 ? nameProvided : true)}
-      // No "Skip Next & Launch" shortcut for groups — the flow is only
-      // four steps and three of them are optional, so the marginal
-      // value of a mid-wizard submit shortcut isn't worth the extra
-      // affordance.
+      // Once name is provided (step 1 cleared) the user has everything
+      // we need to publish. Surface a "Skip Next & Launch" shortcut
+      // from step 2 onward so the remaining three steps — cover,
+      // moderators, country/categories — are explicitly opt-in.
+      launchAvailableFromStep={2}
+      launchNowLabel={t('groups.create.wizard.launchNow')}
       errorAlert={errorAlert}
       submitButtonContent={submitButtonContent}
       submitting={submitting}
