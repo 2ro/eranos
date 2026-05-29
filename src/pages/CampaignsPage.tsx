@@ -6,24 +6,23 @@ import { ArrowRight, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { HeroLightningMap } from '@/components/HeroLightningMap';
 import { CampaignsDiscoverySection } from '@/components/discovery/CampaignsDiscoverySection';
-import { GroupsDiscoverySection } from '@/components/discovery/GroupsDiscoverySection';
-import { PledgesDiscoverySection } from '@/components/discovery/PledgesDiscoverySection';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 /**
  * Home page (`/`).
  *
- * Hero on top, then the three discovery sections back-to-back —
- * Campaigns, Groups, Pledges — each with the same title, tagline,
- * and search/sort/country toolbar as its dedicated page. Filter
- * state is purely local here (`filterPersistence="local"`):
- * persisting three sets of `?q=&sort=&country=` would either
- * collide (three sections want `?q=`) or pollute the URL with
- * prefixed variants on every keystroke. Refreshing `/` always
- * lands on the curated idle view, which matches what we want
- * anyway. Users who want shareable / persistent filters go to
- * `/campaigns/all`, `/groups`, or `/pledges`.
+ * Hero on top, then the campaigns discovery section — with the same
+ * title, tagline, and search/sort/country toolbar as the dedicated
+ * `/campaigns/all` page. Filter state is purely local here
+ * (`filterPersistence="local"`): persisting `?q=&sort=&country=`
+ * would pollute the URL on every keystroke, and refreshing `/`
+ * should always land on the curated idle view. Users who want
+ * shareable / persistent filters go to `/campaigns/all`.
+ *
+ * Groups and Pledges have their own dedicated browse pages
+ * (`/groups`, `/pledges`); the home page intentionally surfaces
+ * only campaigns so it stays focused and scannable.
  *
  * The home page intentionally omits the moderator-only Hidden
  * collapsibles and per-viewer "My X" shelves — those live on the
@@ -48,8 +47,6 @@ export function CampaignsPage() {
         id="discover"
       >
         <CampaignsDiscoverySection filterPersistence="local" />
-        <GroupsDiscoverySection filterPersistence="local" />
-        <PledgesDiscoverySection filterPersistence="local" />
       </div>
     </main>
   );
