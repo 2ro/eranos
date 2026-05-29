@@ -358,6 +358,35 @@ function getETagValue(filter: NostrFilter): string {
 }
 
 /**
+ * A filter that queries by a single `#a` (addressable coordinate) tag with
+ * kinds and limit. e.g. `{ kinds: [8333], '#a': [aTag], limit: 500 }`.
+ * Must NOT have `authors` — that's a different pattern.
+ *
+ * Used by per-card hooks like `useCampaignDonations` (one card → one REQ),
+ * which fan out to N REQs when N cards mount in the same render. Batching
+ * collapses them into a single `'#a': [aTag1, aTag2, …]` REQ.
+ */
+function isATagFilter(filter: NostrFilter): boolean {
+  const keys = Object.keys(filter);
+  return (
+    keys.every((k) => k === 'kinds' || k === '#a' || k === 'limit') &&
+    Array.isArray(filter.kinds) &&
+    filter.kinds.length > 0 &&
+    !filter.authors &&
+    (filter as Record<string, unknown>)['#a'] !== undefined &&
+    Array.isArray((filter as Record<string, unknown>)['#a']) &&
+    ((filter as Record<string, unknown>)['#a'] as string[]).length === 1
+  );
+}
+
+/**
+ * Extract the single `#a` value from a filter known to have one.
+ */
+function getATagValue(filter: NostrFilter): string {
+  return ((filter as Record<string, unknown>)['#a'] as string[])[0];
+}
+
+/**
  * Check if a multi-filter array can be batched: every filter must be an
  * e-tag or q-tag filter referencing the same single event ID.
  * e.g. [{ kinds: [7, 9735], '#e': [id], limit: 10 }, { kinds: [1], '#q': [id], limit: 5 }]
@@ -434,6 +463,8 @@ export class NostrBatcher {
   private dTagCollectors = new Map<string, BatchCollector<NostrEvent | undefined>>();
   /** Keyed by sorted kinds string for #e-tag batching. Returns arrays. */
   private eTagCollectors = new Map<string, BatchCollector<NostrEvent[]>>();
+  /** Keyed by sorted kinds string for #a-tag batching. Returns arrays. */
+  private aTagCollectors = new Map<string, BatchCollector<NostrEvent[]>>();
   /** Keyed by serialized filter shapes for multi-filter #e/#q batching. */
   private multiFilterCollectors = new Map<string, BatchCollector<NostrEvent[]>>();
 
@@ -514,6 +545,26 @@ export class NostrBatcher {
           this.eTagCollectors.set(collectorKey, collector);
         }
         return collector.request(eventId, opts?.signal);
+      }
+
+      // { kinds: [...], '#a': [aTag] } (no authors)
+      // The dominant feed-page leak: each CampaignCard's `useCampaignDonations`
+      // fires `{ kinds: [8333], '#a': [aTag], limit: 500 }` independently,
+      // so 25 cards = 25 REQs. Batching collapses them per (kinds, limit)
+      // shape into one REQ.
+      if (isATagFilter(filter)) {
+        const aTag = getATagValue(filter);
+        const kindsKey = [...filter.kinds!].sort().join(',');
+        const limit = filter.limit ?? 50;
+        const collectorKey = `${kindsKey}:${limit}`;
+        let collector = this.aTagCollectors.get(collectorKey);
+        if (!collector) {
+          collector = new BatchCollector((aTags, signal) =>
+            this.executeATagBatch(filter.kinds!, aTags, limit, signal),
+          );
+          this.aTagCollectors.set(collectorKey, collector);
+        }
+        return collector.request(aTag, opts?.signal);
       }
 
       // { kinds: [k], authors: [a], '#d': [d] }
@@ -737,6 +788,46 @@ export class NostrBatcher {
     } catch {
       for (const eventId of eventIds) {
         results.set(eventId, []);
+      }
+    }
+    return results;
+  }
+
+  private async executeATagBatch(
+    kinds: number[],
+    aTags: string[],
+    perItemLimit: number,
+    signal: AbortSignal,
+  ): Promise<Map<string, NostrEvent[]>> {
+    const results = new Map<string, NostrEvent[]>();
+    try {
+      const events = await this.pool.query(
+        [{ kinds, '#a': aTags, limit: aTags.length * perItemLimit }],
+        { signal },
+      );
+
+      // Group results by which addressable coordinate they reference via a-tag.
+      // A single event may reference multiple coordinates (e.g. a zap receipt
+      // tagging both a campaign and a pledge); attribute it to each matching
+      // coord so every caller waiting on those aTags receives it.
+      const byATag = new Map<string, NostrEvent[]>();
+      const aTagSet = new Set(aTags);
+      for (const event of events) {
+        for (const tag of event.tags) {
+          if (tag[0] === 'a' && aTagSet.has(tag[1])) {
+            const existing = byATag.get(tag[1]) ?? [];
+            existing.push(event);
+            byATag.set(tag[1], existing);
+          }
+        }
+      }
+
+      for (const aTag of aTags) {
+        results.set(aTag, byATag.get(aTag) ?? []);
+      }
+    } catch {
+      for (const aTag of aTags) {
+        results.set(aTag, []);
       }
     }
     return results;
