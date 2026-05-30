@@ -1174,7 +1174,8 @@
       "bitcoinAddress": "د بټکوین پته",
       "silentPayment": "د چوپې ورکړې پته",
       "toLabel": "ته",
-      "clear": "ترلاسه‌کوونکی پاک کړئ"
+      "clear": "ترلاسه‌کوونکی پاک کړئ",
+      "choosePaymentMethod": "د دوام لپاره د ورکړې طریقه وټاکئ"
     },
     "feeSpeed": {
       "fastest": "~۱۰ دقیقې",

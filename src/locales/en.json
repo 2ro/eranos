@@ -1672,7 +1672,8 @@
       "bitcoinAddress": "Bitcoin address",
       "silentPayment": "Silent payment address",
       "toLabel": "To",
-      "clear": "Clear recipient"
+      "clear": "Clear recipient",
+      "choosePaymentMethod": "Choose a payment method to continue"
     },
     "feeSpeed": {
       "fastest": "~10 min",

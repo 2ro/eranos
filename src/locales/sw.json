@@ -1502,7 +1502,8 @@
       "bitcoinAddress": "Anwani ya Bitcoin",
       "silentPayment": "Anwani ya malipo ya kimya",
       "toLabel": "Kwa",
-      "clear": "Futa mpokeaji"
+      "clear": "Futa mpokeaji",
+      "choosePaymentMethod": "Chagua njia ya malipo ili kuendelea"
     },
     "feeSpeed": {
       "fastest": "~dakika 10",

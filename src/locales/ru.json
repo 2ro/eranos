@@ -1607,7 +1607,8 @@
       "bitcoinAddress": "Bitcoin-адрес",
       "silentPayment": "Адрес тихого платежа",
       "toLabel": "Кому",
-      "clear": "Очистить получателя"
+      "clear": "Очистить получателя",
+      "choosePaymentMethod": "Выберите способ оплаты, чтобы продолжить"
     },
     "feeSpeed": {
       "fastest": "~10 мин",

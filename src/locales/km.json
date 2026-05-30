@@ -1174,7 +1174,8 @@
       "bitcoinAddress": "អាសយដ្ឋាន Bitcoin",
       "silentPayment": "អាសយដ្ឋានទូទាត់ស្ងាត់",
       "toLabel": "ជូន",
-      "clear": "សម្អាតអ្នកទទួល"
+      "clear": "សម្អាតអ្នកទទួល",
+      "choosePaymentMethod": "ជ្រើសរើសវិធីសាស្ត្រទូទាត់ដើម្បីបន្ត"
     },
     "feeSpeed": {
       "fastest": "~១០ នាទី",

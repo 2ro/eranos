@@ -1542,7 +1542,8 @@
       "bitcoinAddress": "Bitcoin adresi",
       "silentPayment": "Sessiz ödeme adresi",
       "toLabel": "Alıcı",
-      "clear": "Alıcıyı temizle"
+      "clear": "Alıcıyı temizle",
+      "choosePaymentMethod": "Devam etmek için bir ödeme yöntemi seçin"
     },
     "feeSpeed": {
       "fastest": "~10 dk",

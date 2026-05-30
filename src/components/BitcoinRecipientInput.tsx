@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ClipboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bitcoin, EyeOff, QrCode, X } from 'lucide-react';
+import { AlertTriangle, Bitcoin, EyeOff, QrCode, X } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
 import {
@@ -150,6 +150,11 @@ export function BitcoinRecipientInput({
   // prefill.
   const [query, setQuery] = useState<string>(initialInput ?? '');
   const [open, setOpen] = useState(false);
+  // Tracks whether the popover has been opened at least once for the
+  // current query. The "choose a payment method" hint suppresses on the
+  // very first render so callers prefilling the input don't see the hint
+  // flash for one frame before the auto-open effect runs.
+  const [hasOpenedForQuery, setHasOpenedForQuery] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -175,10 +180,19 @@ export function BitcoinRecipientInput({
   useEffect(() => {
     if (trimmed.length === 0) {
       setOpen(false);
+      setHasOpenedForQuery(false);
       return;
     }
     if (hasSp || hasBtc) setOpen(true);
   }, [trimmed, hasSp, hasBtc]);
+
+  // Track the first time the popover opens for the current query, so the
+  // "choose a payment method" hint only appears after the donor has had a
+  // chance to see (and dismiss) the dropdown — not flash for one paint
+  // frame between mount and the auto-open effect above.
+  useEffect(() => {
+    if (open) setHasOpenedForQuery(true);
+  }, [open]);
 
   // ── Selection callbacks ───────────────────────────────────────────────
   const selectBtc = useCallback(
@@ -417,6 +431,32 @@ export function BitcoinRecipientInput({
           </div>
         </PopoverContent>
       </Popover>
+
+      {/* Picker-closed reminder. When the input holds parseable candidates
+          but the donor hasn't actually picked one yet — typically because
+          they tapped an amount preset, which counts as an outside-click
+          and dismisses the popover — the Send button is disabled with no
+          visible reason. Surface an actionable hint that re-opens the
+          dropdown so the donor doesn't have to guess that they're meant
+          to tap the recipient input again.
+
+          Gated on `hasOpenedForQuery` so the hint doesn't flash for one
+          paint frame between mount and the auto-open effect on prefilled
+          inputs (campaign donate flow). */}
+      {hasOpenedForQuery && !popoverOpen && totalItems > 0 && (
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            setOpen(true);
+            inputRef.current?.focus();
+          }}
+          className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-500 hover:text-amber-700 dark:hover:text-amber-400 motion-safe:transition-colors text-left"
+        >
+          <AlertTriangle className="size-3.5 shrink-0" />
+          <span>{t('walletSend.recipient.choosePaymentMethod')}</span>
+        </button>
+      )}
 
       <QrScannerDialog
         isOpen={scannerOpen}

@@ -1607,7 +1607,8 @@
       "bitcoinAddress": "Endereço Bitcoin",
       "silentPayment": "Endereço de pagamento silencioso",
       "toLabel": "Para",
-      "clear": "Limpar destinatário"
+      "clear": "Limpar destinatário",
+      "choosePaymentMethod": "Escolha um método de pagamento para continuar"
     },
     "feeSpeed": {
       "fastest": "~10 min",
