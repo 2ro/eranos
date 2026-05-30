@@ -17,7 +17,7 @@ import { useAppContext } from '@/hooks/useAppContext';
 import type { ParsedCampaign } from '@/lib/campaign';
 
 /** Cap on how many featured campaigns we render in the home-page row. */
-const MAX_FEATURED = 4;
+const MAX_FEATURED = 12;
 
 /**
  * Home page (`/`).
