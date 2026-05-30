@@ -51,14 +51,12 @@ function buildQrPayload(wallets: CampaignWallets): string {
  * Inline panel rendering the campaign's wallet endpoints as a scannable
  * QR code, a copyable string, and an "Open in wallet" button.
  *
- * Behavior:
+ * Behavior — the QR and the copyable row always carry a `bitcoin:`
+ * BIP-21 URI, regardless of which endpoints the campaign exposes:
  *
- * - **on-chain only** (`bc1q…` / `bc1p…`) — BIP-21 QR with the address
- *   and a copyable row for the raw address.
- * - **silent payment only** (`sp1…`) — raw silent-payment code QR and a
- *   copyable row for the raw SP code.
- * - **both** — combined BIP-21 URI in the QR and a single copyable row
- *   containing the same `bitcoin:<addr>?sp=<sp>` URI; BIP-352-aware
+ * - **on-chain only** (`bc1q…` / `bc1p…`) — `bitcoin:<bc1>`.
+ * - **silent payment only** (`sp1…`) — `bitcoin:?sp=<sp1>`.
+ * - **both** — combined `bitcoin:<bc1>?sp=<sp1>` URI; BIP-352-aware
  *   wallets pick the SP path automatically, legacy wallets fall back to
  *   the on-chain address.
  *
@@ -72,17 +70,13 @@ export function CampaignWalletDonatePanel({
 }: CampaignWalletDonatePanelProps) {
   const { t } = useTranslation();
   const qrPayload = buildQrPayload(wallets);
-  const { onchain, sp } = wallets;
 
-  // When both endpoints are present, donors copy the same BIP-21 URI
-  // that the QR encodes — modern wallets parse it in their recipient
-  // field. When only one endpoint exists, the raw value is friendlier.
-  const copyValue = onchain && sp ? qrPayload : (onchain?.value ?? sp?.value ?? '');
-  const copyLabel = onchain && sp
-    ? 'Payment URI'
-    : sp
-      ? 'Silent-payment code'
-      : 'Bitcoin address';
+  // Donors always copy the same BIP-21 URI that the QR encodes — modern
+  // wallets parse it in their recipient field, and a `bitcoin:` URI
+  // round-trips through any wallet whether the campaign exposes an
+  // on-chain address, a silent-payment code, or both.
+  const copyValue = qrPayload;
+  const copyLabel = 'Payment URI';
 
   return (
     <div className="space-y-5">
