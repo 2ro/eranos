@@ -347,13 +347,14 @@ export function BitcoinRecipientInput({
           className="p-0 w-[--radix-popover-trigger-width] max-h-none rounded-xl border border-border bg-popover shadow-lg overflow-hidden"
         >
           <div role="listbox" className="max-h-[280px] overflow-y-auto py-1">
-            {/* SP comes before BTC so the privacy-preserving option is
-                the user's first scan target when both are present. */}
-            {hasSp && (
-              <SpAddressRow address={spCandidate} onClick={selectSp} />
-            )}
+            {/* BTC comes before SP — the on-chain address is the
+                broadly-compatible default; the silent-payment option
+                follows for donors who want privacy. */}
             {hasBtc && (
               <BtcAddressRow address={btcCandidate} onClick={selectBtc} />
+            )}
+            {hasSp && (
+              <SpAddressRow address={spCandidate} onClick={selectSp} />
             )}
           </div>
         </PopoverContent>
