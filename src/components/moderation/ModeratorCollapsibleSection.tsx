@@ -39,6 +39,17 @@ interface ModeratorCollapsibleSectionProps {
    *  pages render this inside an already-padded `<main>` and pass no
    *  override. */
   triggerPaddingClassName?: string;
+  /**
+   * Explicit initial open state. When omitted, the section auto-opens
+   * for short queues (`count <= 6`) and collapses for long ones —
+   * the legacy heuristic.
+   *
+   * Pass `false` to force the section closed on first render
+   * regardless of count (e.g. the Hidden queue on the home page,
+   * where mods want to scan Pending first and only dig into Hidden
+   * when needed).
+   */
+  defaultOpen?: boolean;
 }
 
 /**
@@ -61,8 +72,9 @@ export function ModeratorCollapsibleSection({
   children,
   size = 'default',
   triggerPaddingClassName,
+  defaultOpen,
 }: ModeratorCollapsibleSectionProps) {
-  const [open, setOpen] = useState(count <= 6);
+  const [open, setOpen] = useState(defaultOpen ?? count <= 6);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen} asChild>
