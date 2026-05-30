@@ -533,15 +533,15 @@ Surfacing rules (hide always wins):
 
 **Campaigns**
 
-- **Featured row on `/`** — iff the latest featured label is `featured` AND the latest hide label is not `hidden`. Ordered newest-`created_at`-of-`featured`-label first. Featured is independent of Approved at the protocol level; a campaign may be featured without being approved (the home page treats Featured and Approved as deduplicated bins, with Featured taking precedence).
-- **Community Campaigns grid on `/`** — iff approved, not hidden, and not featured (featured campaigns get their own row above). Ordered newest-`created_at`-of-`approved`-label first (same mechanic as the Featured row, with `approved` as the order axis instead of `featured`).
+- **Featured row on `/`** — iff the latest featured label is `featured` AND the latest hide label is not `hidden`. Ordered by the featured label's effective rank (see Moderator-driven Ordering), descending. Featured is independent of Approved at the protocol level; a campaign may be featured without being approved (the home page treats Featured and Approved as deduplicated bins, with Featured taking precedence).
+- **Community Campaigns grid on `/`** — iff approved, not hidden, and not featured (featured campaigns get their own row above). Ordered by the approved label's effective rank, descending (same mechanic as the Featured row, with `approved` as the order axis instead of `featured`).
 - **Discover shelf** — iff approved AND not hidden.
 - **Moderator-only "Pending"** — iff neither approved nor hidden.
 - **Moderator-only "Hidden"** — iff hidden.
 
 **Organizations**
 
-- **Featured shelf on `/communities`** — iff the latest featured label is `featured` AND the latest hide label is not `hidden`. Ordered newest-`created_at`-of-`featured`-label first.
+- **Featured shelf on `/communities`** — iff the latest featured label is `featured` AND the latest hide label is not `hidden`. Ordered by the featured label's effective rank, descending (see Moderator-driven Ordering).
 - **"My organizations" shelf on `/communities`** — intentionally ignores all moderation labels. A user's own founded, moderated, or followed organizations always render regardless of label state.
 - **Moderator-only "Needs review"** — iff `t:agora` AND not featured AND not hidden. Surfaces orgs minted through Agora's create flow that haven't been triaged into Featured or Hidden yet.
 - **Moderator-only "Hidden"** — iff hidden.
@@ -556,19 +556,23 @@ Surfacing rules (hide always wins):
 
 #### Moderator-driven Ordering
 
-The Featured row and Community Campaigns grid are sorted by the `created_at` of the moderator's latest label on the relevant axis (`featured` for the Featured row, `approved` for the Community grid), newest first. This is intentional: it doubles as the protocol-level reordering mechanism, with no new tags or kinds required.
+The Featured row and Community Campaigns grid are sorted by the **effective rank** of the moderator's latest label on the relevant axis (`featured` for the Featured row, `approved` for the Community grid), descending.
 
-A moderator MAY reorder either list by republishing the same axis label for a campaign with a chosen `created_at`. Three operations cover the common cases:
+A label's effective rank is the numeric value of its `["rank", "<number>"]` tag if present, falling back to the label's `created_at` when no rank tag is set. Labels published before this feature existed — and any normal approve / hide / feature actions that don't carry a rank — surface with their `created_at` as the effective rank, so newer feature/approval actions naturally float to the top, exactly as if no ordering scheme existed.
 
-- **Move to top** — publish with `created_at = max(now, currentTopLabel.created_at + 1)`. The `max` guard handles a (rare) clock-skewed existing label whose `created_at` is already at or beyond `now`.
-- **Move up by one** — publish with `created_at = neighborAbove.created_at + 1`, where `neighborAbove` is the label sorted directly above the campaign being moved.
-- **Move down by one** — publish with `created_at = neighborBelow.created_at - 1`. Only the moved campaign's label is republished; the neighbor below is untouched, it simply ends up sorted above the moved campaign because its `created_at` is now larger.
+The fold rule per `(coord, axis)` is unchanged: the newest event by `created_at` wins. Encoding order in the `created_at` itself would conflict with that rule the moment a moderator tried to lower a campaign's position — the new label would have an older `created_at` than the existing one and lose the fold. The rank tag decouples sort key from event recency so reorder publishes always use `created_at = now` and the fold always picks them up.
 
-A general "drop at index `j`" (e.g. drag-and-drop in a moderator UI) is implemented by computing the two new neighbors of the moved campaign in the rearranged list and choosing any `created_at` strictly between their timestamps. When the gap is too tight (`prev.created_at - next.created_at < 2`), clients SHOULD pick `next.created_at + 1` and accept that the rendered list may briefly be off by sub-second until the new label propagates — refetching the labels resolves the sort.
+A moderator MAY reorder either list by republishing the same axis label for a campaign with a `rank` tag carrying a chosen integer. Three operations cover the common cases:
+
+- **Move to top** — publish with `rank = max(freshRank, currentTopRank + 1)`, where `freshRank` is a strictly-monotonic integer the client SHOULD source from current wall-clock time at sub-second resolution (Agora uses `Date.now() * 1000`). The `max` guard handles a (rare) clock-skewed existing rank that's already above `freshRank`.
+- **Move up by one** — publish with `rank = neighborAbove.rank + 1`, where `neighborAbove` is the label sorted directly above the campaign being moved.
+- **Move down by one** — publish with `rank = neighborBelow.rank - 1`. Only the moved campaign's label is republished; the neighbor below is untouched.
+
+A general "drop at index `j`" (e.g. drag-and-drop in a moderator UI) is implemented by computing the two new neighbors of the moved campaign in the rearranged list and choosing any integer rank strictly between their ranks. When the gap is too tight (`prev.rank - next.rank < 2`), clients SHOULD pick `next.rank + 1` and accept that the rendered list may briefly be off by one until the next reorder leaves a wider gap. Using a sub-second-resolution `freshRank` keeps inter-rank gaps wide enough for many midpoint inserts before any renumbering is needed.
 
 The conflict model matches the rest of the moderation namespace: the newest label per `(coord, axis)` from any moderator wins. Concurrent reorders by two moderators resolve to whoever's publish lands later; clients SHOULD refetch labels after a reorder publish to surface the authoritative order.
 
-This scheme is unobservable to non-moderation clients. Anyone reading the labels — including non-Agora clients — sees only the axis state (approved / hidden / featured); the ordering is a property of how Agora's UI consumes the timestamps.
+Reorder labels remain valid moderation labels in every other respect. Clients that don't recognize the `rank` tag simply read the label's axis state and ignore the rank — the labels are not a separate kind, not a separate namespace, and not a new tag namespace. Non-Agora clients see exactly the same approve / hide / feature state they always have.
 
 #### Event Structure
 
@@ -621,6 +625,26 @@ Required tags:
 - `l` with the label value as the 2nd element and `agora.moderation` as the 3rd.
 - `a` referencing the target coordinate (`33863:<pubkey>:<d>` for a campaign, `34550:<pubkey>:<d>` for an organization, `36639:<pubkey>:<d>` for a pledge).
 - `alt` (NIP-31) — clients without label support will display this string. The `alt` value SHOULD identify the surface (e.g. `Campaign moderation: featured`, `Organization moderation: featured`, or `Pledge moderation: hidden`) so non-Agora clients can read it.
+
+Optional tags:
+
+- `rank` — single string element parsed as an integer. Used only on `approved` and `featured` labels to position the target within Agora's moderator-curated ordered lists; see Moderator-driven Ordering above. Labels without this tag sort by `created_at` (descending), which is the correct behavior for all non-reorder uses.
+
+A label with a rank tag looks like:
+
+```json
+{
+  "kind": 1985,
+  "content": "",
+  "tags": [
+    ["L", "agora.moderation"],
+    ["l", "featured", "agora.moderation"],
+    ["a", "33863:<author-pubkey>:<campaign-d-tag>"],
+    ["rank", "1700000000123000"],
+    ["alt", "Campaign moderation: featured"]
+  ]
+}
+```
 
 #### Trust Model
 

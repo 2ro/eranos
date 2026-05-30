@@ -6,7 +6,10 @@ import type { ModerationLabel } from '@/lib/agoraModeration';
 /**
  * Reordering axis. Featured uses the `featured` axis; the Community
  * Campaigns grid uses the `approval` axis. Both surfaces sort by the
- * `created_at` of the latest label on their axis, newest first.
+ * effective rank of the latest label on their axis, descending — see
+ * `useCampaignModeration` / `foldModerationLabels` for the rank
+ * extraction (explicit `["rank", N]` tag falling back to
+ * `created_at`).
  */
 export type ReorderAxis = 'featured' | 'approval';
 
@@ -16,96 +19,105 @@ function axisToLabel(axis: ReorderAxis): ModerationLabel {
 }
 
 /**
- * Reordering implemented entirely on top of the existing kind-1985
- * moderation labels (no new tags, no new kind). The sort key is the
- * label's `created_at` newest-first; "moving" a campaign means
- * republishing its label with a chosen `created_at` that lands the
- * campaign at the desired position in the displayed list.
+ * Multiplier that lifts a freshly-stamped rank into the
+ * microseconds-since-epoch range. Reorder publishes start from
+ * `Date.now() * RANK_SCALE`, which is several orders of magnitude
+ * above any legacy `created_at` fallback (seconds-since-epoch) — so
+ * a newly-reordered campaign always sits above un-reordered legacy
+ * neighbors when they share the same axis state. The fine-grained
+ * sub-second resolution also leaves ample room for inserting
+ * midpoint ranks during drag-to-position without exhausting the
+ * integer gap.
  *
- * All operations take the **currently displayed ordered list** as
- * input and reference it to compute the new `created_at`:
+ * Headroom check: `Date.now() * 1000 ≈ 1.7e15`; `Number.MAX_SAFE_INTEGER
+ * ≈ 9e15`. ~150 years before overflow concerns.
+ */
+const RANK_SCALE = 1_000;
+
+/** A fresh "place at the top" rank, in the scaled space. */
+function freshRank(): number {
+  return Date.now() * RANK_SCALE;
+}
+
+/**
+ * Reordering is implemented via a `["rank", "<number>"]` tag on
+ * kind 1985 moderation labels. The fold reads the rank as the sort
+ * key (descending), falling back to `created_at` when the rank tag
+ * is absent — so labels published before this feature existed (and
+ * any normal approve / hide / feature actions that don't carry a
+ * rank) continue to sort sensibly.
  *
- * - `moveToTop` — publish with `now`, or `max(orderTimestamps) + 1` if
- *   any existing label is somehow already at `now` or beyond.
- * - `moveUp` — publish with `prevNeighbor.t + 1`. The "+1" is what
- *   crosses the boundary; the previous neighbor's timestamp is the
- *   smallest one strictly greater than ours, so beating it by one
- *   second is sufficient.
- * - `moveDown` — publish with `nextNeighbor.t - 1`. Same logic
- *   inverted; we want to fall just below the item directly beneath us.
- * - `moveTo(toIndex)` — generalizes the three: figures out the new
- *   neighbors after the move, picks a timestamp between them, and
- *   publishes once.
+ * Why a tag and not the label's `created_at` directly: the fold
+ * always picks the newest-`created_at` event per `(coord, axis)`.
+ * If we encoded order in `created_at`, "move down" — which needs a
+ * lower sort key than the existing label — would have to publish a
+ * label with an *older* `created_at`. That label would lose the
+ * fold to the existing one and the move would silently revert.
+ * Decoupling the sort key from `created_at` lets reorders always
+ * publish with `created_at = now` so the fold always picks them up.
  *
- * **Conflict model** matches the rest of the axis: the newest label
- * per `(coord, axis)` wins regardless of moderator. If two mods
- * reorder concurrently, whoever's publish lands later "wins" — same
- * trust model the rest of the moderation system already uses.
+ * Operations:
  *
- * **Why timestamps and not a rank tag.** Encoding the order in the
- * label's `created_at` keeps the protocol surface unchanged: every
- * relay, every reader, every existing label cache already sorts
- * correctly without learning a new tag. The downside is that we burn
- * 1-second resolution per reorder operation; for a moderator-driven
- * UI with handful-of-items lists this is comfortably below the rate
- * at which reorders happen.
+ * - `moveToTop` — publish with `rank = max(now_scaled, topRank + 1)`.
+ *   The `max` guard handles the (rare) clock-skewed neighbor whose
+ *   stored rank is somehow already above `now_scaled`.
+ * - `moveUp` — publish with `rank = aboveNeighbor.rank + 1`. The
+ *   "+1" is what crosses the boundary; the neighbor above already
+ *   has the smallest rank strictly greater than ours so beating it
+ *   by one is sufficient.
+ * - `moveDown` — publish with `rank = belowNeighbor.rank - 1`.
+ *   Inverse of moveUp.
+ * - `moveTo(toIndex)` — pick a rank between the new neighbors. With
+ *   millisecond-scaled ranks there's almost always plenty of gap;
+ *   for legacy seconds-scaled neighbors the gap is still wide
+ *   enough for many midpoint inserts.
+ *
+ * Conflict model: identical to the rest of the moderation
+ * namespace. The newest label per `(coord, axis)` from any
+ * moderator wins. Concurrent reorders resolve to whoever's publish
+ * lands later.
  */
 export function useReorderCampaign() {
   const { moderate, data: moderation } = useCampaignModeration();
 
-  /**
-   * Returns the `created_at` of the latest label on `axis` for `coord`,
-   * or `undefined` if no such label exists yet (the campaign was never
-   * approved / featured before).
-   */
-  const orderTimestamp = useCallback(
-    (coord: string, axis: ReorderAxis): number | undefined => {
-      const map = axis === 'featured' ? moderation.featuredOrder : moderation.approvedOrder;
-      return map.get(coord);
-    },
+  const orderMap = useCallback(
+    (axis: ReorderAxis) =>
+      axis === 'featured' ? moderation.featuredOrder : moderation.approvedOrder,
     [moderation],
   );
 
   /**
-   * Publishes a label on `axis` for `coord` with an explicit
-   * `created_at`. We piggyback on `useCampaignModeration().moderate`
-   * which already handles the relay invalidation and the campaign
-   * coord prefix check.
+   * Publishes a label on `axis` for `coord` carrying an explicit
+   * rank. `useCampaignModeration().moderate` handles the relay
+   * invalidations and the campaign coord-prefix check; the rank is
+   * written into a `["rank", "<number>"]` tag on the label event.
    */
-  const publishAt = useCallback(
-    async (coord: string, axis: ReorderAxis, createdAt: number) => {
+  const publishWithRank = useCallback(
+    async (coord: string, axis: ReorderAxis, rank: number) => {
       await moderate.mutateAsync({
         coord,
         action: axisToLabel(axis),
-        createdAt,
+        rank,
       });
     },
     [moderate],
   );
 
-  /**
-   * Move `coord` to the top of the displayed list.
-   *
-   * `displayedList` is the ordered coords currently rendered to the
-   * user. We need it to defend against a clock-skewed label that's
-   * somehow already in the future — we always end up strictly above
-   * the current top.
-   */
+  /** Move `coord` to position 0 of the displayed list. */
   const moveToTop = useCallback(
     async (coord: string, axis: ReorderAxis, displayedList: readonly string[]) => {
-      const now = Math.floor(Date.now() / 1000);
-      const map = axis === 'featured' ? moderation.featuredOrder : moderation.approvedOrder;
+      const map = orderMap(axis);
       const topCoord = displayedList[0];
-      const topTs = topCoord && topCoord !== coord ? map.get(topCoord) ?? 0 : 0;
-      const newTs = Math.max(now, topTs + 1);
-      await publishAt(coord, axis, newTs);
+      const topRank = topCoord && topCoord !== coord ? map.get(topCoord) ?? 0 : 0;
+      const newRank = Math.max(freshRank(), topRank + 1);
+      await publishWithRank(coord, axis, newRank);
     },
-    [moderation, publishAt],
+    [orderMap, publishWithRank],
   );
 
   /**
-   * Move `coord` up by one position in the displayed list. No-op when
-   * the item is already at the top.
+   * Move `coord` up by one position. No-op when the item is already
+   * at the top.
    */
   const moveUp = useCallback(
     async (coord: string, axis: ReorderAxis, displayedList: readonly string[]) => {
@@ -116,53 +128,38 @@ export function useReorderCampaign() {
         await moveToTop(coord, axis, displayedList);
         return;
       }
-      const map = axis === 'featured' ? moderation.featuredOrder : moderation.approvedOrder;
+      const map = orderMap(axis);
       const aboveCoord = displayedList[idx - 1];
-      const aboveTs = map.get(aboveCoord);
-      if (aboveTs === undefined) {
+      const aboveRank = map.get(aboveCoord);
+      if (aboveRank === undefined) {
         // Shouldn't happen for items currently in the displayed list,
         // but degrade to "move to top" rather than throw.
         await moveToTop(coord, axis, displayedList);
         return;
       }
-      await publishAt(coord, axis, aboveTs + 1);
+      await publishWithRank(coord, axis, aboveRank + 1);
     },
-    [moderation, publishAt, moveToTop],
+    [orderMap, publishWithRank, moveToTop],
   );
 
-  /**
-   * Move `coord` down by one position. No-op when already at the
-   * bottom.
-   */
+  /** Move `coord` down by one position. */
   const moveDown = useCallback(
     async (coord: string, axis: ReorderAxis, displayedList: readonly string[]) => {
       const idx = displayedList.indexOf(coord);
       if (idx < 0 || idx >= displayedList.length - 1) return;
-      const map = axis === 'featured' ? moderation.featuredOrder : moderation.approvedOrder;
+      const map = orderMap(axis);
       const belowCoord = displayedList[idx + 1];
-      const belowTs = map.get(belowCoord);
-      if (belowTs === undefined) return;
-      // Subtract 1s to land strictly below the next item. The next
-      // item's existing neighbor timestamp is some other value (or
-      // nothing) — we don't need to touch it because we're only
-      // crossing one boundary.
-      await publishAt(coord, axis, belowTs - 1);
+      const belowRank = map.get(belowCoord);
+      if (belowRank === undefined) return;
+      await publishWithRank(coord, axis, belowRank - 1);
     },
-    [moderation, publishAt],
+    [orderMap, publishWithRank],
   );
 
   /**
-   * General-purpose move: relocate `coord` to `toIndex` in the
-   * displayed list. Used by drag-and-drop. Computes a timestamp
-   * between the new neighbors (if any) and publishes a single label.
-   *
-   * The chosen timestamp is `min(prev.t, now) - 1` when there's no
-   * `next`, or `next.t + 1` when there's no `prev`, or
-   * `Math.floor((prev.t + next.t) / 2)` when both exist and the gap
-   * is at least 2 seconds. If the gap is too tight (< 2s) we fall
-   * back to `prev.t + 1` and accept the off-by-one (only the moved
-   * item ends up out of position by sub-second, which the next render
-   * fixes when the new label arrives).
+   * Generalized move: relocate `coord` to `toIndex` in the displayed
+   * list. Used by drag-and-drop. Picks a rank between the new
+   * neighbors and publishes once.
    */
   const moveTo = useCallback(
     async (
@@ -177,38 +174,43 @@ export function useReorderCampaign() {
       if (clamped === fromIndex) return;
 
       // Build the list without `coord`, then identify the items that
-      // will sit directly above and below `coord` after insertion at
-      // `clamped`.
+      // sit directly above and below `coord` after insertion.
       const without = displayedList.filter((c) => c !== coord);
       const prevCoord = clamped > 0 ? without[clamped - 1] : undefined;
       const nextCoord = clamped < without.length ? without[clamped] : undefined;
 
-      const map = axis === 'featured' ? moderation.featuredOrder : moderation.approvedOrder;
-      const now = Math.floor(Date.now() / 1000);
-      const prevTs = prevCoord ? map.get(prevCoord) : undefined;
-      const nextTs = nextCoord ? map.get(nextCoord) : undefined;
+      const map = orderMap(axis);
+      const prevRank = prevCoord ? map.get(prevCoord) : undefined;
+      const nextRank = nextCoord ? map.get(nextCoord) : undefined;
 
-      let newTs: number;
-      if (prevTs === undefined && nextTs === undefined) {
-        newTs = now;
-      } else if (prevTs === undefined) {
+      let newRank: number;
+      if (prevRank === undefined && nextRank === undefined) {
+        newRank = freshRank();
+      } else if (prevRank === undefined) {
         // Moving to position 0: stay above current top.
-        newTs = Math.max(now, (nextTs ?? 0) + 1);
-      } else if (nextTs === undefined) {
-        // Moving to bottom: stay below current bottom but ≥ 1.
-        newTs = Math.max(1, prevTs - 1);
-      } else if (prevTs - nextTs >= 2) {
-        newTs = Math.floor((prevTs + nextTs) / 2);
+        newRank = Math.max(freshRank(), (nextRank ?? 0) + 1);
+      } else if (nextRank === undefined) {
+        // Moving to last slot: stay below current bottom but keep
+        // headroom — `prevRank - 1` is safe because ranks are
+        // milliseconds-of-publish-time (so a 1-unit step is a
+        // sub-millisecond fraction of the typical inter-rank gap).
+        newRank = prevRank - 1;
+      } else if (prevRank - nextRank >= 2) {
+        // Pick the midpoint. With millisecond-scaled ranks the
+        // typical gap is millions; midpoint is exact integer
+        // arithmetic with plenty of room for future inserts.
+        newRank = Math.floor((prevRank + nextRank) / 2);
       } else {
-        // Tight gap: nudge above next. The displayed list refreshes
-        // from the new label, so any sub-second mis-ordering self-
-        // corrects on the next render.
-        newTs = nextTs + 1;
+        // Tight gap (1 unit). Nudge above next and accept the
+        // off-by-one — the fold's refetch will surface the new
+        // ordering and any subsequent moves recompute from the
+        // refreshed map.
+        newRank = nextRank + 1;
       }
 
-      await publishAt(coord, axis, newTs);
+      await publishWithRank(coord, axis, newRank);
     },
-    [moderation, publishAt],
+    [orderMap, publishWithRank],
   );
 
   return {
@@ -216,7 +218,6 @@ export function useReorderCampaign() {
     moveUp,
     moveDown,
     moveTo,
-    orderTimestamp,
     isPending: moderate.isPending,
   };
 }

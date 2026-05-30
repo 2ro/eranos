@@ -36,6 +36,21 @@ interface AxisDecision {
   pubkey: string;
   /** Created-at of the latest label. */
   createdAt: number;
+  /**
+   * Optional explicit rank from a `["rank", "<number>"]` tag on the
+   * event. Reorder operations publish this so the sort key is
+   * independent of `created_at` — the fold's "newest event per
+   * (coord, axis)" rule would otherwise reject a label that
+   * attempts to move a campaign downward (lower `created_at` than
+   * the current label).
+   *
+   * `undefined` for labels published before the reorder feature
+   * shipped, or for normal approve / hide / feature actions that
+   * don't carry a rank. Callers compute an effective sort key with
+   * `rank ?? createdAt`, giving legacy labels a sensible default
+   * while letting reorder labels override.
+   */
+  rank?: number;
 }
 
 /** Per-coordinate rollup of approval + hide + featured state. */
@@ -60,20 +75,26 @@ export interface ModerationData {
   /** Coordinates where the latest featured label is `featured`. */
   featuredCoords: Set<string>;
   /**
-   * Map of `coord` -> `created_at` of the latest `featured` label. Used to
-   * sort featured rows newest-first.
+   * Map of `coord` -> sort key for the featured row, descending.
    *
-   * Moderators reorder a featured campaign by republishing its `featured`
-   * label with a chosen `created_at` (see `useReorderCampaign`) — the
-   * sort key is the label's timestamp, not the campaign's own, so
-   * re-featuring an old campaign bumps it to the top.
+   * The value is the rank carried by the latest `featured` label's
+   * `["rank", "<number>"]` tag, falling back to the label's
+   * `created_at` when no rank tag is present. Moderators reorder
+   * featured campaigns by republishing the `featured` label with a
+   * chosen rank (see `useReorderCampaign`); the fold always picks
+   * the newest-`created_at` label per `(coord, axis)`, so reorder
+   * publishes carry both a fresh `created_at = now` AND an explicit
+   * rank that controls the sort.
+   *
+   * The fallback to `created_at` makes legacy labels (published
+   * before the rank tag existed) sort sensibly — newer features
+   * float to the top, exactly as before the rank tag landed.
    */
   featuredOrder: Map<string, number>;
   /**
-   * Map of `coord` -> `created_at` of the latest `approved` label. Used
-   * to sort the Community Campaigns grid newest-approved first, so
-   * moderators can promote a campaign within the grid by re-approving
-   * it (same mechanic as `featuredOrder` on the featured axis).
+   * Map of `coord` -> sort key for the Community Campaigns grid.
+   * Same shape and rules as `featuredOrder`, but tracks the
+   * `approved` axis.
    */
   approvedOrder: Map<string, number>;
   /** Pubkeys that were considered moderators when the query ran. */
@@ -100,6 +121,21 @@ function isHideLabel(value: string): value is 'hidden' | 'unhidden' {
 
 function isFeaturedLabel(value: string): value is 'featured' | 'unfeatured' {
   return value === 'featured' || value === 'unfeatured';
+}
+
+/**
+ * Extract the rank value from a `["rank", "<number>"]` tag if present,
+ * otherwise `undefined`. The value is parsed as a finite Number — a
+ * non-numeric rank tag is treated as if it wasn't there so callers can
+ * fall back to `created_at` cleanly.
+ */
+function extractRank(event: NostrEvent): number | undefined {
+  const tag = event.tags.find(([n]) => n === 'rank');
+  if (!tag) return undefined;
+  const raw = tag[1];
+  if (typeof raw !== 'string') return undefined;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : undefined;
 }
 
 /**
@@ -131,18 +167,19 @@ export function foldModerationLabels(
     )?.[1];
     if (!aTag) continue;
 
+    const rank = extractRank(event);
     const state = byCoord.get(aTag) ?? {};
     if (isApprovalLabel(value)) {
       if (!state.approval || event.created_at > state.approval.createdAt) {
-        state.approval = { label: value, pubkey: event.pubkey, createdAt: event.created_at };
+        state.approval = { label: value, pubkey: event.pubkey, createdAt: event.created_at, rank };
       }
     } else if (isHideLabel(value)) {
       if (!state.hide || event.created_at > state.hide.createdAt) {
-        state.hide = { label: value, pubkey: event.pubkey, createdAt: event.created_at };
+        state.hide = { label: value, pubkey: event.pubkey, createdAt: event.created_at, rank };
       }
     } else if (isFeaturedLabel(value)) {
       if (!state.featured || event.created_at > state.featured.createdAt) {
-        state.featured = { label: value, pubkey: event.pubkey, createdAt: event.created_at };
+        state.featured = { label: value, pubkey: event.pubkey, createdAt: event.created_at, rank };
       }
     }
     byCoord.set(aTag, state);
@@ -156,12 +193,15 @@ export function foldModerationLabels(
   for (const [coord, state] of byCoord) {
     if (state.approval?.label === 'approved') {
       approvedCoords.add(coord);
-      approvedOrder.set(coord, state.approval.createdAt);
+      // Effective sort key: explicit rank tag wins, falling back to
+      // the label's created_at so labels published before the rank
+      // tag existed still sort correctly (newest-approved first).
+      approvedOrder.set(coord, state.approval.rank ?? state.approval.createdAt);
     }
     if (state.hide?.label === 'hidden') hiddenCoords.add(coord);
     if (state.featured?.label === 'featured') {
       featuredCoords.add(coord);
-      featuredOrder.set(coord, state.featured.createdAt);
+      featuredOrder.set(coord, state.featured.rank ?? state.featured.createdAt);
     }
   }
 

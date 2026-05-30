@@ -87,37 +87,48 @@ export function useCampaignModeration() {
     mutationFn: async ({
       coord,
       action,
-      createdAt,
+      rank,
     }: {
       coord: string;
       action: ModerationLabel;
       /**
-       * Optional explicit `created_at` for the label event. Used by
+       * Optional explicit rank for the label, written into a
+       * `["rank", "<number>"]` tag on the event. Used by
        * `useReorderCampaign` to position a campaign within the
-       * featured row or Community grid — both sort by the latest
-       * label's `created_at` on the relevant axis, newest first, so
-       * picking a timestamp between two neighbors lands the item
-       * between them.
+       * featured row or Community grid — the moderation fold uses
+       * the rank as the sort key (descending), falling back to
+       * `created_at` when no rank tag is present.
        *
-       * Omit for normal approve / hide / feature actions and the
-       * publisher will stamp `now` as usual.
+       * The event itself is always signed with `created_at = now`
+       * so the fold's "newest event per (coord, axis)" rule picks
+       * up the reorder publish even when the chosen rank is lower
+       * than the current label's rank — without that, moving a
+       * campaign downward would be silently rejected by the fold.
+       *
+       * Omit for normal approve / hide / feature actions.
        */
-      createdAt?: number;
+      rank?: number;
     }) => {
       // Quick parse-check on the coord so we don't sign garbage.
       if (!coord.startsWith(`${CAMPAIGN_KIND}:`)) {
         throw new Error(`Coordinate must start with ${CAMPAIGN_KIND}:`);
       }
+      const tags: string[][] = [
+        ['L', AGORA_MODERATION_NAMESPACE],
+        ['l', action, AGORA_MODERATION_NAMESPACE],
+        ['a', coord],
+        ['alt', `Campaign moderation: ${action}`],
+      ];
+      if (rank !== undefined && Number.isFinite(rank)) {
+        // Store as a plain integer string. The fold parses with
+        // `Number(...)` so a non-numeric value would degrade to the
+        // `created_at` fallback rather than throwing.
+        tags.push(['rank', String(Math.trunc(rank))]);
+      }
       return publishEvent({
         kind: LABEL_KIND,
         content: '',
-        tags: [
-          ['L', AGORA_MODERATION_NAMESPACE],
-          ['l', action, AGORA_MODERATION_NAMESPACE],
-          ['a', coord],
-          ['alt', `Campaign moderation: ${action}`],
-        ],
-        ...(createdAt !== undefined ? { created_at: createdAt } : {}),
+        tags,
       });
     },
     onSuccess: () => {
