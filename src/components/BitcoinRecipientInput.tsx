@@ -62,9 +62,8 @@ interface BitcoinRecipientInputProps {
    * pre-fill a `bitcoin:…` URI or bare address so the donor only needs to
    * pick from the dropdown.
    *
-   * Re-applied each time the value transitions from non-null → null while
-   * `initialInput` is set, so a "clear chip" inside a prefilled flow
-   * restores the prefilled text instead of leaving the field empty.
+   * Applied on mount only. Clearing a selected chip (value → null) returns
+   * to an empty input rather than restoring the prefill.
    */
   initialInput?: string;
 }
@@ -105,24 +104,13 @@ export function BitcoinRecipientInput({
   // Local input state. Independent of `value` so the user can keep typing
   // after dismissing the dropdown without losing their query, and so the
   // chip-cleared view starts blank instead of repopulating the previous
-  // selection.
+  // selection. `initialInput` only seeds the field on first mount —
+  // clearing the chip (value → null) returns to an empty input, not the
+  // prefill.
   const [query, setQuery] = useState<string>(initialInput ?? '');
   const [open, setOpen] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Re-apply `initialInput` whenever the picker returns to the input view
-  // (value !== null → null) AND there is no active query the user might be
-  // editing. This restores the prefilled URI after a "clear chip" in flows
-  // like the campaign donate page, without clobbering a fresh edit.
-  const prevValueRef = useRef<ResolvedRecipient | null>(value);
-  useEffect(() => {
-    const justCleared = prevValueRef.current !== null && value === null;
-    if (justCleared && initialInput && query.length === 0) {
-      setQuery(initialInput);
-    }
-    prevValueRef.current = value;
-  }, [value, initialInput, query]);
 
   // ── Candidate extraction ──────────────────────────────────────────────
   //
