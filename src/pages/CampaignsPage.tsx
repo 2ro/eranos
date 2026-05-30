@@ -1,17 +1,17 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { Trans, useTranslation } from 'react-i18next';
-import { ArrowRight, EyeOff, HandHeart, Hourglass, PlusCircle, ShieldCheck } from 'lucide-react';
+import { ArrowRight, HandHeart, PlusCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { HeroLightningMap } from '@/components/HeroLightningMap';
-import { ModeratorCollapsibleSection } from '@/components/moderation';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
-import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
 import type { ParsedCampaign } from '@/lib/campaign';
@@ -23,9 +23,10 @@ const MAX_FEATURED = 4;
  * Home page (`/`).
  *
  * The canonical browse view for campaigns: hero, then a featured row,
- * the full Community Campaigns grid (with a "Browse all" link out to
- * `/campaigns/all`), moderator-only Pending / Hidden collapsibles, and
- * a per-viewer "Your campaigns" shelf.
+ * and the full Community Campaigns grid (chronological, every campaign
+ * on the network minus the ones currently hidden by moderators). A
+ * toggle in the section header reveals the hidden set when a viewer
+ * wants to see it; off by default so the page stays clean.
  *
  * Campaigns are the home page's sole focus. Groups and Pledges each
  * have their own dedicated browse pages (`/groups`, `/pledges`), so
@@ -36,12 +37,14 @@ export function CampaignsPage() {
   const { config } = useAppContext();
   const { user } = useCurrentUser();
 
-  // Moderator pack + per-campaign label state. The label query is gated on
-  // moderators arriving, so during a cold load we render skeleton cards
-  // until both resolve. Avoids flashing the full unmoderated grid.
-  const { data: moderators, isLoading: moderatorsLoading } = useCampaignModerators();
+  // Moderation labels drive the Featured row and the Hidden filter.
+  // Public — every viewer fetches them so non-mods can also flip the
+  // "Show hidden" toggle and see what moderators have suppressed.
   const { data: moderation, isReady: moderationReady } = useCampaignModeration();
-  const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
+
+  // Toggle the Hidden bucket on/off in the community grid. Off by
+  // default — viewers shouldn't have to opt out of suppressed content.
+  const [showHidden, setShowHidden] = useState(false);
 
   // Featured slot list — derived from moderation labels. Sorted newest-
   // featured first, capped at MAX_FEATURED, and hidden coords removed so a
@@ -74,37 +77,12 @@ export function CampaignsPage() {
 
   const featuredCoordSet = useMemo(() => new Set(featuredCoords), [featuredCoords]);
 
-  // The community grid is the approved-and-not-hidden set, minus featured
-  // (which gets its own row above). We fetch by coordinate (one filter per
-  // author, bundled in one REQ) to avoid pulling the entire kind-33863
-  // stream when only a handful are surfaced.
-  const approvedNotHidden = useMemo(() => {
-    if (!moderation) return [] as string[];
-    return Array.from(moderation.approvedCoords).filter((c) => !moderation.hiddenCoords.has(c));
-  }, [moderation]);
-
-  // Pass `coordinates: []` only once moderation is ready and the allowlist is
-  // empty; before that, pass `undefined` so the query is enabled but doesn't
-  // discriminate. We block render of the grid on `moderationReady` anyway.
-  const { data: approvedCampaigns, isLoading: approvedLoading } = useCampaigns(
-    moderationReady
-      ? { coordinates: approvedNotHidden, limit: 60 }
-      : { limit: 60 },
-  );
-
-  // For moderators we also pull the *entire* recent kind-33863 stream so we
-  // can populate the Pending and Hidden sections. This second query only
-  // runs for mods and reuses TanStack's cache on identical keys.
-  const { data: allCampaignsForMods, isLoading: allLoading } = useCampaigns({
+  // Community grid: every kind-33863 campaign on the network. We fetch
+  // unfiltered (no coordinate allowlist) so pending and previously-
+  // unapproved campaigns appear chronologically alongside approved ones.
+  // The Featured row dedupes its picks out of this grid.
+  const { data: allCampaigns, isLoading: allCampaignsLoading } = useCampaigns({
     limit: 200,
-  });
-
-  // For non-mod creators: their own campaigns regardless of moderation state,
-  // so the "Your campaigns" shelf can explain why theirs aren't on the home
-  // page. Skip the query entirely for mods and logged-out viewers.
-  const { data: ownCampaigns } = useCampaigns({
-    authors: user && !isMod ? [user.pubkey] : undefined,
-    limit: 30,
   });
 
   useSeoMeta({
@@ -112,43 +90,32 @@ export function CampaignsPage() {
     description: t('campaigns.home.seoDescription'),
   });
 
-  // Main grid excludes featured (they're shown above) and excludes any
-  // hidden coord just in case approvedCoords/hiddenCoords overlap (a mod can
-  // approve, another can hide — hide wins).
-  const mainGridCampaigns = useMemo(
-    () =>
-      (approvedCampaigns ?? []).filter(
-        (c) => !featuredCoordSet.has(c.aTag) && !moderation?.hiddenCoords.has(c.aTag),
-      ),
-    [approvedCampaigns, featuredCoordSet, moderation],
-  );
+  // Main grid: chronological all-but-hidden, minus featured (which has
+  // its own row above). When the viewer toggles "Show hidden" on, the
+  // hidden bucket flows back in — still chronological, still minus
+  // featured. `useCampaigns` already sorts newest-first; we don't
+  // re-sort here.
+  const mainGridCampaigns = useMemo(() => {
+    if (!allCampaigns) return [] as ParsedCampaign[];
+    const hiddenCoords = moderation?.hiddenCoords ?? new Set<string>();
+    return allCampaigns.filter((c) => {
+      if (featuredCoordSet.has(c.aTag)) return false;
+      if (hiddenCoords.has(c.aTag) && !showHidden) return false;
+      return true;
+    });
+  }, [allCampaigns, featuredCoordSet, moderation, showHidden]);
 
-  // Pending (mod-only): campaigns that exist on the network but lack an
-  // approval AND aren't hidden.
-  const pendingCampaigns = useMemo(() => {
-    if (!isMod || !moderation) return [] as ParsedCampaign[];
-    return (allCampaignsForMods ?? []).filter(
-      (c) => !moderation.approvedCoords.has(c.aTag) && !moderation.hiddenCoords.has(c.aTag),
-    );
-  }, [isMod, moderation, allCampaignsForMods]);
-
-  // Hidden (mod-only): campaigns where the latest hide-axis label is `hidden`.
-  const hiddenCampaigns = useMemo(() => {
-    if (!isMod || !moderation) return [] as ParsedCampaign[];
-    return (allCampaignsForMods ?? []).filter((c) => moderation.hiddenCoords.has(c.aTag));
-  }, [isMod, moderation, allCampaignsForMods]);
-
-  // "Your campaigns" (non-mod creators only): the logged-in user's own
-  // campaigns that aren't yet surfaced — i.e. not approved, or hidden.
-  // We exclude already-approved ones so we don't double-render the same
-  // card in two sections; if their own campaign is in the main grid they
-  // already know it's live.
-  const yourPendingCampaigns = useMemo(() => {
-    if (isMod || !user || !moderation) return [] as ParsedCampaign[];
-    return (ownCampaigns ?? []).filter(
-      (c) => !moderation.approvedCoords.has(c.aTag) || moderation.hiddenCoords.has(c.aTag),
-    );
-  }, [isMod, user, moderation, ownCampaigns]);
+  // Hidden count drives the toggle's helper text — "Show hidden (3)".
+  // Only counts hidden coords present in our current network sample.
+  const hiddenCount = useMemo(() => {
+    if (!allCampaigns || !moderation) return 0;
+    const hiddenCoords = moderation.hiddenCoords;
+    let n = 0;
+    for (const c of allCampaigns) {
+      if (hiddenCoords.has(c.aTag) && !featuredCoordSet.has(c.aTag)) n += 1;
+    }
+    return n;
+  }, [allCampaigns, moderation, featuredCoordSet]);
 
   return (
     <main className="min-h-screen pb-16">
@@ -176,26 +143,49 @@ export function CampaignsPage() {
           </section>
         )}
 
-        {/* Community Campaigns — approved-and-not-hidden, minus featured.
-            Skeletons until the moderator pack + label state both resolve,
-            so we never flash an unmoderated grid. */}
+        {/* Community Campaigns — every campaign on the network, chronological,
+            minus those currently hidden by moderators (unless the viewer
+            opts in via the toggle). Skeletons until the moderation labels
+            and the campaign stream both resolve so we never flash the grid
+            with hidden coords still in it. */}
         <section className="space-y-5">
-          <div className="flex items-end justify-between gap-4">
+          <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('campaigns.home.community')}</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 {t('campaigns.home.communityDesc')}
               </p>
             </div>
-            <Button asChild variant="outline" className="hidden sm:inline-flex">
-              <Link to="/campaigns/new">
-                <PlusCircle className="size-4 mr-2" />
-                {t('campaigns.home.startCampaign')}
-              </Link>
-            </Button>
+            <div className="flex items-center gap-3 ms-auto">
+              {/* Show-hidden toggle. Visible to everyone — moderation is
+                  transparent on Agora. The count badge only renders when
+                  there's something hidden to reveal. */}
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="show-hidden-campaigns"
+                  checked={showHidden}
+                  onCheckedChange={setShowHidden}
+                />
+                <Label
+                  htmlFor="show-hidden-campaigns"
+                  className="text-sm text-muted-foreground cursor-pointer"
+                >
+                  {t('common.showHidden')}
+                  {hiddenCount > 0 && (
+                    <span className="ms-1 text-xs">({hiddenCount})</span>
+                  )}
+                </Label>
+              </div>
+              <Button asChild variant="outline" className="hidden sm:inline-flex">
+                <Link to="/campaigns/new">
+                  <PlusCircle className="size-4 mr-2" />
+                  {t('campaigns.home.startCampaign')}
+                </Link>
+              </Button>
+            </div>
           </div>
 
-          {moderatorsLoading || !moderationReady || approvedLoading ? (
+          {!moderationReady || allCampaignsLoading ? (
             <CampaignGridSkeleton />
           ) : mainGridCampaigns.length === 0 ? (
             <EmptyState />
@@ -207,74 +197,14 @@ export function CampaignsPage() {
             </div>
           )}
 
-          {/* "Browse all campaigns" link — reveals the page that includes
-              campaigns not yet moderated (and, optionally, hidden ones). */}
+          {/* "Browse all campaigns" link — reveals the page with search,
+              sort, and country filters for the full network. */}
           <div className="pt-2 text-center sm:text-left">
             <Button asChild variant="ghost" size="sm">
               <Link to="/campaigns/all">{t('campaigns.home.browseAll')}</Link>
             </Button>
           </div>
         </section>
-
-        {/* Moderator-only: campaigns awaiting an approval decision. */}
-        {isMod && (
-          <ModeratorCollapsibleSection
-            icon={<Hourglass className="size-4" />}
-            title={t('campaigns.home.pending')}
-            description={t('campaigns.home.pendingDesc')}
-            count={pendingCampaigns.length}
-            isLoading={allLoading}
-            emptyText={t('campaigns.home.pendingEmpty')}
-            skeleton={<CampaignGridSkeleton />}
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {pendingCampaigns.map((campaign) => (
-                <CampaignCard key={campaign.aTag} campaign={campaign} />
-              ))}
-            </div>
-          </ModeratorCollapsibleSection>
-        )}
-
-        {/* Moderator-only: campaigns currently hidden. */}
-        {isMod && (
-          <ModeratorCollapsibleSection
-            icon={<EyeOff className="size-4" />}
-            title={t('campaigns.home.hidden')}
-            description={t('campaigns.home.hiddenDesc')}
-            count={hiddenCampaigns.length}
-            isLoading={allLoading}
-            emptyText={t('campaigns.home.hiddenEmpty')}
-            skeleton={<CampaignGridSkeleton />}
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {hiddenCampaigns.map((campaign) => (
-                <CampaignCard key={campaign.aTag} campaign={campaign} />
-              ))}
-            </div>
-          </ModeratorCollapsibleSection>
-        )}
-
-        {/* Non-mod creator: surface their own not-yet-approved campaigns
-            so they understand the campaign is live on the network but
-            isn't on the homepage yet. */}
-        {!isMod && user && yourPendingCampaigns.length > 0 && (
-          <section className="space-y-5">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight inline-flex items-center gap-2">
-                <ShieldCheck className="size-6 text-primary/70" />
-                {t('campaigns.home.yourCampaigns')}
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-                {t('campaigns.home.yourCampaignsDesc')}
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {yourPendingCampaigns.map((campaign) => (
-                <CampaignCard key={campaign.aTag} campaign={campaign} />
-              ))}
-            </div>
-          </section>
-        )}
       </div>
     </main>
   );
