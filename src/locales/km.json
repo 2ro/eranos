@@ -804,6 +804,11 @@
       "ariaPledge": "សម្របសម្រួលការសន្យា",
       "ariaGroup": "សម្របសម្រួលក្រុម",
       "failedAction": "បរាជ័យក្នុងការ {{action}}",
+      "failedReorder": "បរាជ័យក្នុងការរៀបចំឡើងវិញ",
+      "moveToTop": "ផ្លាស់ទីទៅកំពូល",
+      "moveUp": "ផ្លាស់ទីឡើងលើ",
+      "moveDown": "ផ្លាស់ទីចុះក្រោម",
+      "dragHandle": "អូសដើម្បីរៀបចំឡើងវិញ (ទីតាំង {{index}})",
       "approve": "អនុម័ត",
       "unapprove": "ដកការអនុម័ត",
       "approvedState": "បានអនុម័ត",
@@ -818,7 +823,12 @@
       "toastHidden": "បានលាក់",
       "toastUnhidden": "បានឈប់លាក់",
       "toastFeatured": "បានលេចធ្លោ",
-      "toastUnfeatured": "បានដកចេញពីការលេចធ្លោ"
+      "toastUnfeatured": "បានដកចេញពីការលេចធ្លោ",
+      "toast": {
+        "movedToTop": "បានផ្លាស់ទីទៅកំពូល",
+        "movedUp": "បានផ្លាស់ទីឡើងលើ",
+        "movedDown": "បានផ្លាស់ទីចុះក្រោម"
+      }
     }
   },
   "settings": {

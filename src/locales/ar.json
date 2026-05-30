@@ -788,6 +788,7 @@
       "ariaPledge": "إدارة التعهد",
       "ariaGroup": "إدارة المجموعة",
       "failedAction": "فشل {{action}}",
+      "failedReorder": "فشل إعادة الترتيب",
       "approve": "اعتماد",
       "unapprove": "إلغاء الاعتماد",
       "approvedState": "معتمدة",
@@ -797,12 +798,21 @@
       "feature": "تمييز",
       "unfeature": "إلغاء التمييز",
       "featuredState": "مميّزة",
+      "moveToTop": "نقل إلى الأعلى",
+      "moveUp": "تحريك للأعلى",
+      "moveDown": "تحريك للأسفل",
+      "dragHandle": "اسحب لإعادة الترتيب (الموضع {{index}})",
       "toastApproved": "تم الاعتماد للصفحة الرئيسية",
       "toastUnapproved": "أُزيلت من الصفحة الرئيسية",
       "toastHidden": "تم الإخفاء",
       "toastUnhidden": "تم إلغاء الإخفاء",
       "toastFeatured": "تم التمييز",
-      "toastUnfeatured": "أُزيلت من المميزة"
+      "toastUnfeatured": "أُزيلت من المميزة",
+      "toast": {
+        "movedToTop": "تم النقل إلى الأعلى",
+        "movedUp": "تم التحريك للأعلى",
+        "movedDown": "تم التحريك للأسفل"
+      }
     }
   },
   "settings": {

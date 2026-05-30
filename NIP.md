@@ -534,7 +534,7 @@ Surfacing rules (hide always wins):
 **Campaigns**
 
 - **Featured row on `/`** — iff the latest featured label is `featured` AND the latest hide label is not `hidden`. Ordered newest-`created_at`-of-`featured`-label first. Featured is independent of Approved at the protocol level; a campaign may be featured without being approved (the home page treats Featured and Approved as deduplicated bins, with Featured taking precedence).
-- **Community Campaigns grid on `/`** — iff approved, not hidden, and not featured (featured campaigns get their own row above).
+- **Community Campaigns grid on `/`** — iff approved, not hidden, and not featured (featured campaigns get their own row above). Ordered newest-`created_at`-of-`approved`-label first (same mechanic as the Featured row, with `approved` as the order axis instead of `featured`).
 - **Discover shelf** — iff approved AND not hidden.
 - **Moderator-only "Pending"** — iff neither approved nor hidden.
 - **Moderator-only "Hidden"** — iff hidden.
@@ -553,6 +553,22 @@ Surfacing rules (hide always wins):
 - **Author-own surfaces** — a pledge author's own pledges in their profile always render regardless of moderation state. Moderation governs public discovery, not authorship.
 - **Direct-URL access** — a pledge's detail page (`/<naddr>`) renders regardless of moderation state. Hidden pledges remain reachable by anyone who has the link; moderation only governs which surfaces enumerate them.
 - **Featured** — reserved for a future curated pledge shelf. The `featured` axis is defined for symmetry with campaigns/organizations, and clients MAY use it when implementing such a shelf.
+
+#### Moderator-driven Ordering
+
+The Featured row and Community Campaigns grid are sorted by the `created_at` of the moderator's latest label on the relevant axis (`featured` for the Featured row, `approved` for the Community grid), newest first. This is intentional: it doubles as the protocol-level reordering mechanism, with no new tags or kinds required.
+
+A moderator MAY reorder either list by republishing the same axis label for a campaign with a chosen `created_at`. Three operations cover the common cases:
+
+- **Move to top** — publish with `created_at = max(now, currentTopLabel.created_at + 1)`. The `max` guard handles a (rare) clock-skewed existing label whose `created_at` is already at or beyond `now`.
+- **Move up by one** — publish with `created_at = neighborAbove.created_at + 1`, where `neighborAbove` is the label sorted directly above the campaign being moved.
+- **Move down by one** — publish with `created_at = neighborBelow.created_at - 1`. Only the moved campaign's label is republished; the neighbor below is untouched, it simply ends up sorted above the moved campaign because its `created_at` is now larger.
+
+A general "drop at index `j`" (e.g. drag-and-drop in a moderator UI) is implemented by computing the two new neighbors of the moved campaign in the rearranged list and choosing any `created_at` strictly between their timestamps. When the gap is too tight (`prev.created_at - next.created_at < 2`), clients SHOULD pick `next.created_at + 1` and accept that the rendered list may briefly be off by sub-second until the new label propagates — refetching the labels resolves the sort.
+
+The conflict model matches the rest of the moderation namespace: the newest label per `(coord, axis)` from any moderator wins. Concurrent reorders by two moderators resolve to whoever's publish lands later; clients SHOULD refetch labels after a reorder publish to surface the authoritative order.
+
+This scheme is unobservable to non-moderation clients. Anyone reading the labels — including non-Agora clients — sees only the axis state (approved / hidden / featured); the ordering is a property of how Agora's UI consumes the timestamps.
 
 #### Event Structure
 

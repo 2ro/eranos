@@ -1251,7 +1251,17 @@
       "toastHidden": "Ocultado",
       "toastUnhidden": "Reexibido",
       "toastFeatured": "Destacado",
-      "toastUnfeatured": "Removido dos destaques"
+      "toastUnfeatured": "Removido dos destaques",
+      "moveToTop": "Mover para o topo",
+      "moveUp": "Mover para cima",
+      "moveDown": "Mover para baixo",
+      "dragHandle": "Arraste para reordenar (posição {{index}})",
+      "failedReorder": "Falha ao reordenar",
+      "toast": {
+        "movedToTop": "Movido para o topo",
+        "movedUp": "Movido para cima",
+        "movedDown": "Movido para baixo"
+      }
     }
   },
   "settings": {

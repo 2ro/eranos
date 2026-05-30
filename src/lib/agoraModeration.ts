@@ -62,8 +62,20 @@ export interface ModerationData {
   /**
    * Map of `coord` -> `created_at` of the latest `featured` label. Used to
    * sort featured rows newest-first.
+   *
+   * Moderators reorder a featured campaign by republishing its `featured`
+   * label with a chosen `created_at` (see `useReorderCampaign`) — the
+   * sort key is the label's timestamp, not the campaign's own, so
+   * re-featuring an old campaign bumps it to the top.
    */
   featuredOrder: Map<string, number>;
+  /**
+   * Map of `coord` -> `created_at` of the latest `approved` label. Used
+   * to sort the Community Campaigns grid newest-approved first, so
+   * moderators can promote a campaign within the grid by re-approving
+   * it (same mechanic as `featuredOrder` on the featured axis).
+   */
+  approvedOrder: Map<string, number>;
   /** Pubkeys that were considered moderators when the query ran. */
   moderators: string[];
 }
@@ -74,6 +86,7 @@ export const EMPTY_MODERATION_DATA: ModerationData = {
   hiddenCoords: new Set(),
   featuredCoords: new Set(),
   featuredOrder: new Map(),
+  approvedOrder: new Map(),
   moderators: [],
 };
 
@@ -139,8 +152,12 @@ export function foldModerationLabels(
   const hiddenCoords = new Set<string>();
   const featuredCoords = new Set<string>();
   const featuredOrder = new Map<string, number>();
+  const approvedOrder = new Map<string, number>();
   for (const [coord, state] of byCoord) {
-    if (state.approval?.label === 'approved') approvedCoords.add(coord);
+    if (state.approval?.label === 'approved') {
+      approvedCoords.add(coord);
+      approvedOrder.set(coord, state.approval.createdAt);
+    }
     if (state.hide?.label === 'hidden') hiddenCoords.add(coord);
     if (state.featured?.label === 'featured') {
       featuredCoords.add(coord);
@@ -148,5 +165,5 @@ export function foldModerationLabels(
     }
   }
 
-  return { byCoord, approvedCoords, hiddenCoords, featuredCoords, featuredOrder, moderators };
+  return { byCoord, approvedCoords, hiddenCoords, featuredCoords, featuredOrder, approvedOrder, moderators };
 }

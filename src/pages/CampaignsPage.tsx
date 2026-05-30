@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { HeroLightningMap } from '@/components/HeroLightningMap';
-import { ModeratorCollapsibleSection } from '@/components/moderation';
+import { ModeratorCollapsibleSection, ReorderableCampaignGrid } from '@/components/moderation';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
@@ -137,15 +137,29 @@ export function CampaignsPage() {
     return Array.from(byCoord.values()).sort((a, b) => b.createdAt - a.createdAt);
   }, [recentCampaigns, labeledCampaigns]);
 
-  // Community Campaigns: approved, not hidden, not featured.
+  // Community Campaigns: approved, not hidden, not featured. Sorted
+  // by the `created_at` of the latest `approved` label, newest first
+  // — mirroring the featured row's `featuredOrder` sort. Moderators
+  // can reorder the grid by re-approving (or dragging) a campaign;
+  // see `useReorderCampaign`. Campaigns missing from `approvedOrder`
+  // (which shouldn't happen — every coord in `approvedCoords` has an
+  // entry) fall back to the campaign's own `createdAt` so the sort
+  // is total.
   const communityCampaigns = useMemo<ParsedCampaign[]>(() => {
     if (!moderation) return [];
-    return allKnownCampaigns.filter(
-      (c) =>
-        moderation.approvedCoords.has(c.aTag) &&
-        !moderation.hiddenCoords.has(c.aTag) &&
-        !featuredCoordSet.has(c.aTag),
-    );
+    const approvedOrder = moderation.approvedOrder;
+    return allKnownCampaigns
+      .filter(
+        (c) =>
+          moderation.approvedCoords.has(c.aTag) &&
+          !moderation.hiddenCoords.has(c.aTag) &&
+          !featuredCoordSet.has(c.aTag),
+      )
+      .sort((a, b) => {
+        const ta = approvedOrder.get(a.aTag) ?? a.createdAt;
+        const tb = approvedOrder.get(b.aTag) ?? b.createdAt;
+        return tb - ta;
+      });
   }, [allKnownCampaigns, moderation, featuredCoordSet]);
 
   // Pending: not approved, not hidden. Featured-but-unapproved is treated
@@ -204,7 +218,14 @@ export function CampaignsPage() {
             featured (featured rides above). The grid is fed by the union
             of the recent-stream query and a coord-targeted query keyed
             on every approved coord, so approved campaigns older than
-            the 200-event window still surface. */}
+            the 200-event window still surface.
+
+            For moderators the grid is wrapped in `ReorderableCampaignGrid`
+            which adds drag-and-drop on desktop and Move up / Move down
+            kebab rows on mobile. Reordering republishes the campaign's
+            `approved` label with a chosen `created_at`, which is the
+            sort key for this grid (`approvedOrder` on the moderation
+            rollup). */}
         <section className="space-y-5">
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
@@ -226,11 +247,11 @@ export function CampaignsPage() {
           ) : communityCampaigns.length === 0 ? (
             <EmptyState />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {communityCampaigns.map((campaign) => (
-                <CampaignCard key={campaign.aTag} campaign={campaign} />
-              ))}
-            </div>
+            <ReorderableCampaignGrid
+              campaigns={communityCampaigns}
+              axis="approval"
+              gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
+            />
           )}
 
           {/* "Browse all campaigns" link — reveals the page with search,
@@ -460,16 +481,22 @@ function FeaturedRow({
   // 2-4 use the regular compact card sized to the dynamic grid.
   const useFeaturedVariant = campaigns.length === 1;
 
+  // Moderators get drag-and-drop / kebab reorder on the featured
+  // row; non-mods get a plain grid through the same component (it
+  // branches internally). `axis="featured"` selects the
+  // `featured` label as the order axis.
   return (
-    <div className={featuredGridClass(campaigns.length)}>
-      {campaigns.map((campaign) => (
+    <ReorderableCampaignGrid
+      campaigns={campaigns}
+      axis="featured"
+      gridClassName={featuredGridClass(campaigns.length)}
+      renderCard={(campaign) => (
         <CampaignCard
-          key={campaign.aTag}
           campaign={campaign}
           variant={useFeaturedVariant ? 'featured' : 'compact'}
         />
-      ))}
-    </div>
+      )}
+    />
   );
 }
 

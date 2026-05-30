@@ -1237,6 +1237,7 @@
       "ariaPledge": "Модерировать обещание",
       "ariaGroup": "Модерировать группу",
       "failedAction": "Не удалось выполнить действие: {{action}}",
+      "failedReorder": "Не удалось изменить порядок",
       "approve": "Одобрить",
       "unapprove": "Отозвать одобрение",
       "approvedState": "Одобрено",
@@ -1246,12 +1247,21 @@
       "feature": "Выделить",
       "unfeature": "Убрать из избранного",
       "featuredState": "Избранное",
+      "moveToTop": "Переместить наверх",
+      "moveUp": "Переместить вверх",
+      "moveDown": "Переместить вниз",
+      "dragHandle": "Перетащите для изменения порядка (позиция {{index}})",
       "toastApproved": "Одобрено для главной страницы",
       "toastUnapproved": "Удалено с главной страницы",
       "toastHidden": "Скрыто",
       "toastUnhidden": "Показано",
       "toastFeatured": "Добавлено в избранное",
-      "toastUnfeatured": "Удалено из избранного"
+      "toastUnfeatured": "Удалено из избранного",
+      "toast": {
+        "movedToTop": "Перемещено наверх",
+        "movedUp": "Перемещено вверх",
+        "movedDown": "Перемещено вниз"
+      }
     }
   },
   "settings": {

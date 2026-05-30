@@ -1251,7 +1251,17 @@
       "toastHidden": "छुपा दिया गया",
       "toastUnhidden": "अनहाइड कर दिया गया",
       "toastFeatured": "फ़ीचर कर दिया गया",
-      "toastUnfeatured": "फ़ीचर से हटाया गया"
+      "toastUnfeatured": "फ़ीचर से हटाया गया",
+      "failedReorder": "क्रम बदलने में विफल",
+      "moveToTop": "सबसे ऊपर ले जाएँ",
+      "moveUp": "ऊपर ले जाएँ",
+      "moveDown": "नीचे ले जाएँ",
+      "dragHandle": "क्रम बदलने के लिए खींचें (स्थिति {{index}})",
+      "toast": {
+        "movedToTop": "सबसे ऊपर ले जाया गया",
+        "movedUp": "ऊपर ले जाया गया",
+        "movedDown": "नीचे ले जाया गया"
+      }
     }
   },
   "settings": {

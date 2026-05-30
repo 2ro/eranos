@@ -818,7 +818,17 @@
       "toastHidden": "已隱藏",
       "toastUnhidden": "已取消隱藏",
       "toastFeatured": "已加入精選",
-      "toastUnfeatured": "已自精選移除"
+      "toastUnfeatured": "已自精選移除",
+      "failedReorder": "無法重新排序",
+      "moveToTop": "移至頂端",
+      "moveUp": "上移",
+      "moveDown": "下移",
+      "dragHandle": "拖曳以重新排序（位置 {{index}}）",
+      "toast": {
+        "movedToTop": "已移至頂端",
+        "movedUp": "已上移",
+        "movedDown": "已下移"
+      }
     }
   },
   "settings": {

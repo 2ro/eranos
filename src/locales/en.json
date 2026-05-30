@@ -1235,6 +1235,7 @@
       "ariaPledge": "Moderate pledge",
       "ariaGroup": "Moderate group",
       "failedAction": "Failed to {{action}}",
+      "failedReorder": "Failed to reorder",
       "approve": "Approve",
       "unapprove": "Unapprove",
       "approvedState": "Approved",
@@ -1244,12 +1245,21 @@
       "feature": "Feature",
       "unfeature": "Unfeature",
       "featuredState": "Featured",
+      "moveToTop": "Move to top",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "dragHandle": "Drag to reorder (position {{index}})",
       "toastApproved": "Approved for homepage",
       "toastUnapproved": "Removed from homepage",
       "toastHidden": "Hidden",
       "toastUnhidden": "Unhidden",
       "toastFeatured": "Featured",
-      "toastUnfeatured": "Removed from featured"
+      "toastUnfeatured": "Removed from featured",
+      "toast": {
+        "movedToTop": "Moved to top",
+        "movedUp": "Moved up",
+        "movedDown": "Moved down"
+      }
     }
   },
   "settings": {

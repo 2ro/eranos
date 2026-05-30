@@ -1250,7 +1250,17 @@
       "toastHidden": "Imefichwa",
       "toastUnhidden": "Imeonyeshwa",
       "toastFeatured": "Imeangaziwa",
-      "toastUnfeatured": "Imeondolewa kwenye maarufu"
+      "toastUnfeatured": "Imeondolewa kwenye maarufu",
+      "failedReorder": "Imeshindikana kupanga upya",
+      "moveToTop": "Hamisha juu kabisa",
+      "moveUp": "Hamisha juu",
+      "moveDown": "Hamisha chini",
+      "dragHandle": "Buruta ili kupanga upya (nafasi {{index}})",
+      "toast": {
+        "movedToTop": "Imehamishwa juu kabisa",
+        "movedUp": "Imehamishwa juu",
+        "movedDown": "Imehamishwa chini"
+      }
     }
   },
   "settings": {

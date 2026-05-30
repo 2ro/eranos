@@ -818,7 +818,17 @@
       "toastHidden": "پټ شوی",
       "toastUnhidden": "بېرته ښودل شوی",
       "toastFeatured": "ځانګړی شوی",
-      "toastUnfeatured": "د ځانګړو څخه لرې شوی"
+      "toastUnfeatured": "د ځانګړو څخه لرې شوی",
+      "failedReorder": "د بیا ترتیب کولو په کې پاتې راغی",
+      "moveToTop": "سر ته انتقال",
+      "moveUp": "پورته انتقال",
+      "moveDown": "ښکته انتقال",
+      "dragHandle": "د بیا ترتیب لپاره کش کړئ (موقعیت {{index}})",
+      "toast": {
+        "movedToTop": "سر ته انتقال شو",
+        "movedUp": "پورته انتقال شو",
+        "movedDown": "ښکته انتقال شو"
+      }
     }
   },
   "settings": {

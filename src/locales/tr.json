@@ -1236,6 +1236,11 @@
       "ariaPledge": "Taahhüdü modere et",
       "ariaGroup": "Grubu modere et",
       "failedAction": "{{action}} başarısız oldu",
+      "failedReorder": "Yeniden sıralama başarısız oldu",
+      "moveToTop": "En üste taşı",
+      "moveUp": "Yukarı taşı",
+      "moveDown": "Aşağı taşı",
+      "dragHandle": "Yeniden sıralamak için sürükleyin (konum {{index}})",
       "approve": "Onayla",
       "unapprove": "Onayı kaldır",
       "approvedState": "Onaylandı",
@@ -1250,7 +1255,12 @@
       "toastHidden": "Gizlendi",
       "toastUnhidden": "Gizleme kaldırıldı",
       "toastFeatured": "Öne çıkarıldı",
-      "toastUnfeatured": "Öne çıkanlardan kaldırıldı"
+      "toastUnfeatured": "Öne çıkanlardan kaldırıldı",
+      "toast": {
+        "movedToTop": "En üste taşındı",
+        "movedUp": "Yukarı taşındı",
+        "movedDown": "Aşağı taşındı"
+      }
     }
   },
   "settings": {

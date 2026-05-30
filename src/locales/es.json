@@ -804,6 +804,7 @@
       "ariaPledge": "Moderar promesa",
       "ariaGroup": "Moderar grupo",
       "failedAction": "No se pudo {{action}}",
+      "failedReorder": "No se pudo reordenar",
       "approve": "Aprobar",
       "unapprove": "Desaprobar",
       "approvedState": "Aprobado",
@@ -813,12 +814,21 @@
       "feature": "Destacar",
       "unfeature": "Quitar de destacados",
       "featuredState": "Destacado",
+      "moveToTop": "Mover al principio",
+      "moveUp": "Subir",
+      "moveDown": "Bajar",
+      "dragHandle": "Arrastra para reordenar (posición {{index}})",
       "toastApproved": "Aprobado para la página de inicio",
       "toastUnapproved": "Eliminado de la página de inicio",
       "toastHidden": "Ocultado",
       "toastUnhidden": "Restaurado",
       "toastFeatured": "Destacado",
-      "toastUnfeatured": "Eliminado de destacados"
+      "toastUnfeatured": "Eliminado de destacados",
+      "toast": {
+        "movedToTop": "Movido al principio",
+        "movedUp": "Movido hacia arriba",
+        "movedDown": "Movido hacia abajo"
+      }
     }
   },
   "settings": {

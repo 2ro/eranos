@@ -818,7 +818,17 @@
       "toastHidden": "Zvavanzwa",
       "toastUnhidden": "Zvabviswa pakuvanzwa",
       "toastFeatured": "Zvasarudzwa",
-      "toastUnfeatured": "Zvabviswa pakusarudzwa"
+      "toastUnfeatured": "Zvabviswa pakusarudzwa",
+      "moveToTop": "Endesa kumusoro",
+      "moveUp": "Endesa kumusoro",
+      "moveDown": "Endesa pasi",
+      "dragHandle": "Kweva kuti uchinje chinzvimbo (chinzvimbo {{index}})",
+      "failedReorder": "Hazvina kubudirira kurongedza patsva",
+      "toast": {
+        "movedToTop": "Zvaendeswa kumusoro",
+        "movedUp": "Zvaendeswa kumusoro",
+        "movedDown": "Zvaendeswa pasi"
+      }
     }
   },
   "settings": {

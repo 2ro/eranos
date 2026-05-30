@@ -1251,7 +1251,17 @@
       "toastHidden": "Disembunyikan",
       "toastUnhidden": "Ditampilkan kembali",
       "toastFeatured": "Diunggulkan",
-      "toastUnfeatured": "Dihapus dari unggulan"
+      "toastUnfeatured": "Dihapus dari unggulan",
+      "failedReorder": "Gagal mengurutkan ulang",
+      "moveToTop": "Pindahkan ke atas",
+      "moveUp": "Naikkan",
+      "moveDown": "Turunkan",
+      "dragHandle": "Seret untuk mengurutkan ulang (posisi {{index}})",
+      "toast": {
+        "movedToTop": "Dipindahkan ke atas",
+        "movedUp": "Dinaikkan",
+        "movedDown": "Diturunkan"
+      }
     }
   },
   "settings": {

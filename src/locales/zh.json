@@ -804,6 +804,11 @@
       "ariaPledge": "管理悬赏",
       "ariaGroup": "管理群组",
       "failedAction": "操作失败：{{action}}",
+      "failedReorder": "重新排序失败",
+      "moveToTop": "移到顶部",
+      "moveUp": "上移",
+      "moveDown": "下移",
+      "dragHandle": "拖动以重新排序（位置 {{index}}）",
       "approve": "批准",
       "unapprove": "取消批准",
       "approvedState": "已批准",
@@ -818,7 +823,12 @@
       "toastHidden": "已隐藏",
       "toastUnhidden": "已取消隐藏",
       "toastFeatured": "已精选",
-      "toastUnfeatured": "已从精选移除"
+      "toastUnfeatured": "已从精选移除",
+      "toast": {
+        "movedToTop": "已移到顶部",
+        "movedUp": "已上移",
+        "movedDown": "已下移"
+      }
     }
   },
   "settings": {

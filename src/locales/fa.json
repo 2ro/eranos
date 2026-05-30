@@ -813,12 +813,22 @@
       "feature": "ویژه کردن",
       "unfeature": "لغو ویژه‌سازی",
       "featuredState": "ویژه",
+      "moveToTop": "انتقال به بالا",
+      "moveUp": "جابجایی به بالا",
+      "moveDown": "جابجایی به پایین",
+      "dragHandle": "برای تغییر ترتیب بکشید (موقعیت {{index}})",
+      "failedReorder": "تغییر ترتیب ناموفق بود",
       "toastApproved": "برای صفحه اصلی تأیید شد",
       "toastUnapproved": "از صفحه اصلی حذف شد",
       "toastHidden": "پنهان شد",
       "toastUnhidden": "آشکار شد",
       "toastFeatured": "ویژه شد",
-      "toastUnfeatured": "از فهرست ویژه‌ها حذف شد"
+      "toastUnfeatured": "از فهرست ویژه‌ها حذف شد",
+      "toast": {
+        "movedToTop": "به بالا منتقل شد",
+        "movedUp": "به بالا جابجا شد",
+        "movedDown": "به پایین جابجا شد"
+      }
     }
   },
   "settings": {

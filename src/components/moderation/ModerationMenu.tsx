@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  ArrowUp, ArrowDown, ArrowUpToLine,
   Check, EyeOff, Eye, MoreHorizontal,
   ShieldCheck, ShieldOff, Sparkles, SparklesIcon,
 } from 'lucide-react';
@@ -47,6 +48,27 @@ interface ModerationItemsProps {
   surface: ModerationSurface;
   /** Which axes to render. */
   axes: readonly ModerationAxis[];
+  /**
+   * Optional reorder controls. Present when this entity sits inside a
+   * moderator-curated ordered list (the Featured row and Community
+   * Campaigns grid on the home page). When present, three rows render
+   * between the standard axis controls and the trailing rule:
+   *
+   *  - Move to top (skipped when already at index 0)
+   *  - Move up    (skipped when already at index 0)
+   *  - Move down  (skipped when already at the last index)
+   *
+   * Callers compute `canMoveUp` / `canMoveDown` themselves from the
+   * displayed list so the dropdown stays purely presentational and
+   * doesn't need to know about list state.
+   */
+  reorder?: {
+    canMoveUp: boolean;
+    canMoveDown: boolean;
+    onMoveToTop: () => Promise<void> | void;
+    onMoveUp: () => Promise<void> | void;
+    onMoveDown: () => Promise<void> | void;
+  };
 }
 
 interface ModerationMenuProps extends ModerationItemsProps {
@@ -89,18 +111,24 @@ function ModerationItemsShell({
   coord,
   entityTitle,
   axes,
+  reorder,
   moderation,
   moderate,
 }: {
   coord: string;
   entityTitle: string;
   axes: readonly ModerationAxis[];
+  reorder?: ModerationItemsProps['reorder'];
   moderation: ReturnType<typeof useCampaignModeration>['data'];
   moderate: ReturnType<typeof useCampaignModeration>['moderate'];
 }) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [busy, setBusy] = useState<ModerationLabel | null>(null);
+  // Separate busy flag for reorder operations — they share the same
+  // mutate hook but we want the menu to remain interactive for axis
+  // actions while a reorder is in flight (and vice-versa).
+  const [reordering, setReordering] = useState(false);
 
   const isApproved = moderation.approvedCoords.has(coord);
   const isHidden = moderation.hiddenCoords.has(coord);
@@ -125,6 +153,33 @@ function ModerationItemsShell({
       });
     } finally {
       setBusy(null);
+    }
+  };
+
+  /**
+   * Wraps a reorder callback with the shared toast + busy-flag UX. The
+   * caller passes the actual move (a thunk returned from
+   * `useReorderCampaign`); we surface success / failure here so every
+   * site that mounts the menu gets the same feedback for free.
+   */
+  const runReorder = async (
+    op: () => Promise<void> | void,
+    toastKey: 'movedUp' | 'movedDown' | 'movedToTop',
+  ) => {
+    if (reordering) return;
+    setReordering(true);
+    try {
+      await op();
+      toast({ title: t(`moderation.menu.toast.${toastKey}`), description: entityTitle });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      toast({
+        title: t('moderation.menu.failedReorder'),
+        description: message,
+        variant: 'destructive',
+      });
+    } finally {
+      setReordering(false);
     }
   };
 
@@ -191,6 +246,43 @@ function ModerationItemsShell({
           </DropdownMenuItem>
         )
       )}
+
+      {/* Reorder section — only rendered when the host passes the
+          reorder prop (i.e. the entity lives in a moderator-curated
+          ordered list). Individual rows are gated on canMoveUp /
+          canMoveDown so the menu doesn't show dead-end actions. */}
+      {reorder && (reorder.canMoveUp || reorder.canMoveDown) && (
+        <>
+          <DropdownMenuSeparator />
+          {reorder.canMoveUp && (
+            <DropdownMenuItem
+              onClick={() => runReorder(reorder.onMoveToTop, 'movedToTop')}
+              disabled={reordering}
+            >
+              <ArrowUpToLine className="h-4 w-4 mr-2" />
+              {t('moderation.menu.moveToTop')}
+            </DropdownMenuItem>
+          )}
+          {reorder.canMoveUp && (
+            <DropdownMenuItem
+              onClick={() => runReorder(reorder.onMoveUp, 'movedUp')}
+              disabled={reordering}
+            >
+              <ArrowUp className="h-4 w-4 mr-2" />
+              {t('moderation.menu.moveUp')}
+            </DropdownMenuItem>
+          )}
+          {reorder.canMoveDown && (
+            <DropdownMenuItem
+              onClick={() => runReorder(reorder.onMoveDown, 'movedDown')}
+              disabled={reordering}
+            >
+              <ArrowDown className="h-4 w-4 mr-2" />
+              {t('moderation.menu.moveDown')}
+            </DropdownMenuItem>
+          )}
+        </>
+      )}
     </>
   );
 }
@@ -199,17 +291,32 @@ function ModerationItemsShell({
 // hook so a pledge card never subscribes to the campaign label query
 // (and vice versa).
 
-function CampaignItemsInner(props: { coord: string; entityTitle: string; axes: readonly ModerationAxis[] }) {
+function CampaignItemsInner(props: {
+  coord: string;
+  entityTitle: string;
+  axes: readonly ModerationAxis[];
+  reorder?: ModerationItemsProps['reorder'];
+}) {
   const { data, moderate } = useCampaignModeration();
   return <ModerationItemsShell {...props} moderation={data} moderate={moderate} />;
 }
 
-function PledgeItemsInner(props: { coord: string; entityTitle: string; axes: readonly ModerationAxis[] }) {
+function PledgeItemsInner(props: {
+  coord: string;
+  entityTitle: string;
+  axes: readonly ModerationAxis[];
+  reorder?: ModerationItemsProps['reorder'];
+}) {
   const { data, moderate } = usePledgeModeration({ coordinates: [props.coord] });
   return <ModerationItemsShell {...props} moderation={data} moderate={moderate} />;
 }
 
-function GroupItemsInner(props: { coord: string; entityTitle: string; axes: readonly ModerationAxis[] }) {
+function GroupItemsInner(props: {
+  coord: string;
+  entityTitle: string;
+  axes: readonly ModerationAxis[];
+  reorder?: ModerationItemsProps['reorder'];
+}) {
   const { data, moderate } = useOrganizationModeration();
   return <ModerationItemsShell {...props} moderation={data} moderate={moderate} />;
 }
@@ -246,7 +353,12 @@ export function ModerationMenuItems(props: ModerationItemsProps) {
 
   if (!isMod) return null;
 
-  const inner = { coord: props.coord, entityTitle: props.entityTitle, axes: props.axes };
+  const inner = {
+    coord: props.coord,
+    entityTitle: props.entityTitle,
+    axes: props.axes,
+    reorder: props.reorder,
+  };
   switch (props.surface) {
     case 'campaign': return <CampaignItemsInner {...inner} />;
     case 'pledge': return <PledgeItemsInner {...inner} />;

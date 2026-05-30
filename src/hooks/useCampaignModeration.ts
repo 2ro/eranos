@@ -84,7 +84,26 @@ export function useCampaignModeration() {
   });
 
   const moderate = useMutation({
-    mutationFn: async ({ coord, action }: { coord: string; action: ModerationLabel }) => {
+    mutationFn: async ({
+      coord,
+      action,
+      createdAt,
+    }: {
+      coord: string;
+      action: ModerationLabel;
+      /**
+       * Optional explicit `created_at` for the label event. Used by
+       * `useReorderCampaign` to position a campaign within the
+       * featured row or Community grid — both sort by the latest
+       * label's `created_at` on the relevant axis, newest first, so
+       * picking a timestamp between two neighbors lands the item
+       * between them.
+       *
+       * Omit for normal approve / hide / feature actions and the
+       * publisher will stamp `now` as usual.
+       */
+      createdAt?: number;
+    }) => {
       // Quick parse-check on the coord so we don't sign garbage.
       if (!coord.startsWith(`${CAMPAIGN_KIND}:`)) {
         throw new Error(`Coordinate must start with ${CAMPAIGN_KIND}:`);
@@ -98,6 +117,7 @@ export function useCampaignModeration() {
           ['a', coord],
           ['alt', `Campaign moderation: ${action}`],
         ],
+        ...(createdAt !== undefined ? { created_at: createdAt } : {}),
       });
     },
     onSuccess: () => {
