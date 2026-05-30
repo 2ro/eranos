@@ -1003,8 +1003,6 @@
     "errorTitleRequired": "Başlık zorunludur.",
     "errorTitleInvalid": "Kampanya URL'inin oluşturulabilmesi için başlığın harf veya rakam içermesi gerekir.",
     "errorSlugInvalid": "Tanımlayıcı yalnızca küçük harf, rakam ve tire içermelidir.",
-    "slugPreview": "Kampanya URL'iniz şu tanımlayıcıyı kullanacak",
-    "slugFallbackNotice": "Başlığınızı bir URL tanımlayıcısına dönüştüremedik, bu yüzden rastgele bir tane oluşturacağız. Başlığınız yazdığınız şekliyle aynen kalacak.",
     "errorHdUnavailable": "Bu giriş türü için yerleşik cüzdan kullanılamıyor.",
     "errorSpUnavailable": "Bu giriş türü için sessiz ödeme adresi kullanılamıyor.",
     "errorOnchainInvalid": "Zincir üstü adres tanınan bir mainnet bech32(m) adresi değil (bc1q… / bc1p…).",

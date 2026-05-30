@@ -1004,8 +1004,6 @@
     "errorTitleRequired": "Judul wajib diisi.",
     "errorTitleInvalid": "Judul harus mengandung huruf atau angka agar URL kampanye bisa dibuat.",
     "errorSlugInvalid": "Pengenal harus berupa huruf kecil, angka, dan tanda hubung.",
-    "slugPreview": "URL kampanye Anda akan menggunakan pengenal ini",
-    "slugFallbackNotice": "Kami tidak dapat mengubah judul Anda menjadi pengenal URL, jadi kami akan membuatkan pengenal acak. Judul Anda tetap persis seperti yang Anda tulis.",
     "errorHdUnavailable": "Dompet bawaan tidak tersedia untuk login ini.",
     "errorSpUnavailable": "Alamat silent-payment tidak tersedia untuk login ini.",
     "errorOnchainInvalid": "Alamat on-chain bukan alamat bech32(m) mainnet yang dikenal (bc1q… / bc1p…).",

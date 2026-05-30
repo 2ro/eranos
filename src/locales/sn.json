@@ -572,8 +572,6 @@
     "errorTitleRequired": "Musoro unodiwa.",
     "errorTitleInvalid": "Musoro unofanira kuva nemavara kana manhamba kuti URL yecampaign igadzirike.",
     "errorSlugInvalid": "Kupiwa zita kunofanira kunge kune mavara madiki, manhamba, uye dashes.",
-    "slugPreview": "URL yecampaign yako ichashandisa kupiwa zita uku",
-    "slugFallbackNotice": "Hatina kukwanisa kushandura musoro wako kuita kupiwa zita kweURL, saka tichagadzira imwe nemazvirokwazvo. Musoro wako unoramba wakangoita sezvawakaunyora.",
     "errorHdUnavailable": "Chikwama chakavakirwa hachiwanikwi pakupinda uku.",
     "errorSpUnavailable": "Kero yemubhadharo unyararo haiwanikwi pakupinda uku.",
     "errorOnchainInvalid": "Kero yepa-chain haisi kero yebech32(m) mainnet inozivikanwa (bc1q… / bc1p…).",
