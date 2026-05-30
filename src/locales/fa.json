@@ -530,21 +530,9 @@
     "tags": "برچسب‌ها",
     "tagsPlaceholder": "دفاع-حقوقی، کمک-متقابل، اخبار-محلی",
     "categories": {
-      "adoption": "فرزندخواندگی",
-      "animals": "حیوانات",
-      "church": "کلیسا",
       "community": "اجتماع",
       "education": "آموزش",
-      "emergency": "اضطراری",
-      "event": "رویداد",
-      "family": "خانواده",
-      "firstResponders": "نیروهای امدادی",
-      "legal": "حقوقی",
-      "medical": "پزشکی",
-      "memorial": "یادبود",
-      "mission": "مأموریت",
-      "nonProfit": "غیرانتفاعی",
-      "political": "سیاسی"
+      "medical": "پزشکی"
     },
     "banner": "تصویر بنر",
     "story": "داستان",

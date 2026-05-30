@@ -530,21 +530,9 @@
     "tags": "Marebhuro",
     "tagsPlaceholder": "dziviriro-yekutonga, rubatsiro, nhau-dzomuno",
     "categories": {
-      "adoption": "Kutora mwana",
-      "animals": "Mhuka",
-      "church": "Chechi",
       "community": "Nharaunda",
       "education": "Dzidzo",
-      "emergency": "Njodzi",
-      "event": "Chiitiko",
-      "family": "Mhuri",
-      "firstResponders": "Vatanga kupindura",
-      "legal": "Zvomutemo",
-      "medical": "Zveutano",
-      "memorial": "Chirangaridzo",
-      "mission": "Mishoni",
-      "nonProfit": "Isina kutsvaga purofiti",
-      "political": "Zvematongerwo enyika"
+      "medical": "Zveutano"
     },
     "banner": "Mufananidzo webhana",
     "story": "Nyaya",

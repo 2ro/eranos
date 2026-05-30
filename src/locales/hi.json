@@ -962,21 +962,9 @@
     "tags": "टैग",
     "tagsPlaceholder": "legal-defense, mutual-aid, local-news",
     "categories": {
-      "adoption": "गोद लेना",
-      "animals": "पशु",
-      "church": "चर्च",
       "community": "कम्युनिटी",
       "education": "शिक्षा",
-      "emergency": "आपातकाल",
-      "event": "इवेंट",
-      "family": "परिवार",
-      "firstResponders": "प्रथम प्रत्युत्तरकर्ता",
-      "legal": "क़ानूनी",
-      "medical": "चिकित्सा",
-      "memorial": "स्मारक",
-      "mission": "मिशन",
-      "nonProfit": "ग़ैर-लाभकारी",
-      "political": "राजनीतिक"
+      "medical": "चिकित्सा"
     },
     "banner": "बैनर इमेज",
     "story": "कहानी",

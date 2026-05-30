@@ -962,21 +962,9 @@
     "tags": "Теги",
     "tagsPlaceholder": "правовая-защита, взаимопомощь, местные-новости",
     "categories": {
-      "adoption": "Усыновление",
-      "animals": "Животные",
-      "church": "Церковь",
       "community": "Сообщество",
       "education": "Образование",
-      "emergency": "Чрезвычайная ситуация",
-      "event": "Событие",
-      "family": "Семья",
-      "firstResponders": "Спасатели",
-      "legal": "Юридическая помощь",
-      "medical": "Медицина",
-      "memorial": "Память",
-      "mission": "Миссия",
-      "nonProfit": "Некоммерческое",
-      "political": "Политическое"
+      "medical": "Медицина"
     },
     "banner": "Баннер",
     "story": "История",

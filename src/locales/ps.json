@@ -530,21 +530,9 @@
     "tags": "ټګونه",
     "tagsPlaceholder": "حقوقي-دفاع، ګډه-مرسته، محلي-خبرونه",
     "categories": {
-      "adoption": "غېږې ته اخیستنه",
-      "animals": "څاروي",
-      "church": "کلیسا",
       "community": "ټولنه",
       "education": "زده‌کړه",
-      "emergency": "بیړنی حالت",
-      "event": "پېښه",
-      "family": "کورنۍ",
-      "firstResponders": "لومړني ځواب‌ویونکي",
-      "legal": "قانوني",
-      "medical": "طبي",
-      "memorial": "یادګار",
-      "mission": "ماموریت",
-      "nonProfit": "غیر انتفاعي",
-      "political": "سیاسي"
+      "medical": "طبي"
     },
     "banner": "د بنر انځور",
     "story": "کیسه",

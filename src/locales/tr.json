@@ -961,21 +961,9 @@
     "tags": "Etiketler",
     "tagsPlaceholder": "yasal-savunma, dayanisma, yerel-haber",
     "categories": {
-      "adoption": "Evlat edinme",
-      "animals": "Hayvanlar",
-      "church": "Kilise",
       "community": "Topluluk",
       "education": "Eğitim",
-      "emergency": "Acil durum",
-      "event": "Etkinlik",
-      "family": "Aile",
-      "firstResponders": "İlk müdahale ekipleri",
-      "legal": "Hukuk",
-      "medical": "Sağlık",
-      "memorial": "Anma",
-      "mission": "Misyon",
-      "nonProfit": "Kâr amacı gütmeyen",
-      "political": "Politik"
+      "medical": "Sağlık"
     },
     "banner": "Pankart resmi",
     "story": "Hikaye",

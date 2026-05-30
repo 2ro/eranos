@@ -961,21 +961,9 @@
     "tags": "Lebo",
     "tagsPlaceholder": "utetezi-wa-kisheria, msaada-wa-pamoja, habari-za-ndani",
     "categories": {
-      "adoption": "Kuasili",
-      "animals": "Wanyama",
-      "church": "Kanisa",
       "community": "Jumuiya",
       "education": "Elimu",
-      "emergency": "Dharura",
-      "event": "Tukio",
-      "family": "Familia",
-      "firstResponders": "Wajibu wa Kwanza",
-      "legal": "Kisheria",
-      "medical": "Matibabu",
-      "memorial": "Kumbukumbu",
-      "mission": "Misheni",
-      "nonProfit": "Isiyo ya Faida",
-      "political": "Kisiasa"
+      "medical": "Matibabu"
     },
     "banner": "Picha ya bango",
     "story": "Hadithi",

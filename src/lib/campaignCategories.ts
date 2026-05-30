@@ -1,18 +1,19 @@
 import {
-  Baby,
-  CalendarDays,
-  Church,
-  Dog,
-  Flower2,
+  Gavel,
   GraduationCap,
-  HandHeart,
+  Heart,
   HeartHandshake,
-  Scale,
-  Shield,
+  KeyRound,
+  Megaphone,
+  Newspaper,
+  PawPrint,
+  Plane,
+  ShieldAlert,
+  ShieldCheck,
   Siren,
   Stethoscope,
-  Target,
-  Users,
+  Tent,
+  Venus,
   Vote,
   type LucideIcon,
 } from 'lucide-react';
@@ -27,6 +28,18 @@ import {
  * icon. Categories are stored as ordinary `t` tags, indistinguishable
  * from any other content tag at the protocol level; the picker is
  * just a curated UI on top of the same field.
+ *
+ * **Editorial focus.** Agora's mission is funding the kinds of
+ * activism HRF and the World Liberty Congress champion — human
+ * rights, democracy, press freedom, political prisoners — so the
+ * preset list leads with those themes. Everyday humanitarian needs
+ * (emergency relief, medical, education, community) round out the
+ * grid so the picker still covers the breadth of legitimate
+ * fundraising. Categories that used to ship here but didn't match
+ * the editorial focus (adoption, church, family, memorial, event,
+ * mission) were dropped pre-launch; campaigns published before the
+ * drop keep their on-chain `t` tags intact but no longer light up a
+ * pill in the editor.
  */
 export interface CampaignCategory {
   /** Lowercase, hyphenated slug persisted as a `t` tag on the event. */
@@ -38,21 +51,22 @@ export interface CampaignCategory {
 }
 
 export const CAMPAIGN_CATEGORIES: readonly CampaignCategory[] = [
-  { slug: 'adoption', labelKey: 'campaignsCreate.categories.adoption', Icon: Baby },
-  { slug: 'animals', labelKey: 'campaignsCreate.categories.animals', Icon: Dog },
-  { slug: 'church', labelKey: 'campaignsCreate.categories.church', Icon: Church },
-  { slug: 'community', labelKey: 'campaignsCreate.categories.community', Icon: HeartHandshake },
+  { slug: 'human-rights', labelKey: 'campaignsCreate.categories.humanRights', Icon: Heart },
+  { slug: 'democracy', labelKey: 'campaignsCreate.categories.democracy', Icon: Vote },
+  { slug: 'press-freedom', labelKey: 'campaignsCreate.categories.pressFreedom', Icon: Newspaper },
+  { slug: 'political-prisoners', labelKey: 'campaignsCreate.categories.politicalPrisoners', Icon: KeyRound },
+  { slug: 'humanitarian-aid', labelKey: 'campaignsCreate.categories.humanitarianAid', Icon: Tent },
+  { slug: 'civil-resistance', labelKey: 'campaignsCreate.categories.civilResistance', Icon: Megaphone },
+  { slug: 'digital-rights', labelKey: 'campaignsCreate.categories.digitalRights', Icon: ShieldCheck },
+  { slug: 'anti-corruption', labelKey: 'campaignsCreate.categories.antiCorruption', Icon: ShieldAlert },
+  { slug: 'women-girls', labelKey: 'campaignsCreate.categories.womenGirls', Icon: Venus },
+  { slug: 'refugees', labelKey: 'campaignsCreate.categories.refugees', Icon: Plane },
+  { slug: 'legal-aid', labelKey: 'campaignsCreate.categories.legalAid', Icon: Gavel },
+  { slug: 'emergency-relief', labelKey: 'campaignsCreate.categories.emergencyRelief', Icon: Siren },
+  { slug: 'animal-rights', labelKey: 'campaignsCreate.categories.animalRights', Icon: PawPrint },
   { slug: 'education', labelKey: 'campaignsCreate.categories.education', Icon: GraduationCap },
-  { slug: 'emergency', labelKey: 'campaignsCreate.categories.emergency', Icon: Siren },
-  { slug: 'event', labelKey: 'campaignsCreate.categories.event', Icon: CalendarDays },
-  { slug: 'family', labelKey: 'campaignsCreate.categories.family', Icon: Users },
-  { slug: 'first-responders', labelKey: 'campaignsCreate.categories.firstResponders', Icon: Shield },
-  { slug: 'legal', labelKey: 'campaignsCreate.categories.legal', Icon: Scale },
   { slug: 'medical', labelKey: 'campaignsCreate.categories.medical', Icon: Stethoscope },
-  { slug: 'memorial', labelKey: 'campaignsCreate.categories.memorial', Icon: Flower2 },
-  { slug: 'mission', labelKey: 'campaignsCreate.categories.mission', Icon: Target },
-  { slug: 'non-profit', labelKey: 'campaignsCreate.categories.nonProfit', Icon: HandHeart },
-  { slug: 'political', labelKey: 'campaignsCreate.categories.political', Icon: Vote },
+  { slug: 'community', labelKey: 'campaignsCreate.categories.community', Icon: HeartHandshake },
 ] as const;
 
 /** Set of valid category slugs for O(1) lookup. */

@@ -530,21 +530,9 @@
     "tags": "Etiquetas",
     "tagsPlaceholder": "defensa-legal, ayuda-mutua, noticias-locales",
     "categories": {
-      "adoption": "Adopción",
-      "animals": "Animales",
-      "church": "Iglesia",
       "community": "Comunidad",
       "education": "Educación",
-      "emergency": "Emergencia",
-      "event": "Evento",
-      "family": "Familia",
-      "firstResponders": "Servicios de emergencia",
-      "legal": "Legal",
-      "medical": "Médico",
-      "memorial": "Memorial",
-      "mission": "Misión",
-      "nonProfit": "Sin fines de lucro",
-      "political": "Político"
+      "medical": "Médico"
     },
     "banner": "Imagen de portada",
     "story": "Historia",

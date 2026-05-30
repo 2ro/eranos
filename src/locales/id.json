@@ -962,21 +962,9 @@
     "tags": "Tag",
     "tagsPlaceholder": "pembelaan-hukum, bantuan-bersama, berita-lokal",
     "categories": {
-      "adoption": "Adopsi",
-      "animals": "Hewan",
-      "church": "Gereja",
       "community": "Komunitas",
       "education": "Pendidikan",
-      "emergency": "Darurat",
-      "event": "Acara",
-      "family": "Keluarga",
-      "firstResponders": "Petugas Tanggap Darurat",
-      "legal": "Hukum",
-      "medical": "Medis",
-      "memorial": "Peringatan",
-      "mission": "Misi",
-      "nonProfit": "Nirlaba",
-      "political": "Politik"
+      "medical": "Medis"
     },
     "banner": "Gambar banner",
     "story": "Cerita",

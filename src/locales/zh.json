@@ -530,21 +530,9 @@
     "tags": "标签",
     "tagsPlaceholder": "法律辩护, 互助, 本地新闻",
     "categories": {
-      "adoption": "领养",
-      "animals": "动物",
-      "church": "教会",
       "community": "社区",
       "education": "教育",
-      "emergency": "紧急救助",
-      "event": "活动",
-      "family": "家庭",
-      "firstResponders": "急救人员",
-      "legal": "法律",
-      "medical": "医疗",
-      "memorial": "纪念",
-      "mission": "使命",
-      "nonProfit": "非营利",
-      "political": "政治"
+      "medical": "医疗"
     },
     "banner": "横幅图片",
     "story": "故事",

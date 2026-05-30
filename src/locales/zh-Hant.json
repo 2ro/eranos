@@ -530,21 +530,9 @@
     "tags": "標籤",
     "tagsPlaceholder": "法律辯護, 互助, 本地新聞",
     "categories": {
-      "adoption": "領養",
-      "animals": "動物",
-      "church": "教會",
       "community": "社群",
       "education": "教育",
-      "emergency": "緊急救助",
-      "event": "活動",
-      "family": "家庭",
-      "firstResponders": "緊急應變人員",
-      "legal": "法律",
-      "medical": "醫療",
-      "memorial": "紀念",
-      "mission": "宣教",
-      "nonProfit": "非營利",
-      "political": "政治"
+      "medical": "醫療"
     },
     "banner": "橫幅圖片",
     "story": "故事",

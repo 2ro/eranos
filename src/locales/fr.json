@@ -952,21 +952,9 @@
     "tags": "Étiquettes",
     "tagsPlaceholder": "défense-juridique, entraide, actus-locales",
     "categories": {
-      "adoption": "Adoption",
-      "animals": "Animaux",
-      "church": "Église",
       "community": "Communauté",
       "education": "Éducation",
-      "emergency": "Urgence",
-      "event": "Événement",
-      "family": "Famille",
-      "firstResponders": "Premiers secours",
-      "legal": "Juridique",
-      "medical": "Médical",
-      "memorial": "Mémorial",
-      "mission": "Mission",
-      "nonProfit": "À but non lucratif",
-      "political": "Politique"
+      "medical": "Médical"
     },
     "banner": "Image de bannière",
     "story": "Histoire",

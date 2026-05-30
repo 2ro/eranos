@@ -518,21 +518,9 @@
     "tags": "الوسوم",
     "tagsPlaceholder": "دفاع-قانوني، تعاضد، أخبار-محلية",
     "categories": {
-      "adoption": "التبنّي",
-      "animals": "الحيوانات",
-      "church": "الكنيسة",
       "community": "المجتمع",
       "education": "التعليم",
-      "emergency": "طوارئ",
-      "event": "فعالية",
-      "family": "العائلة",
-      "firstResponders": "المستجيبون الأوائل",
-      "legal": "قانوني",
-      "medical": "طبي",
-      "memorial": "تأبين",
-      "mission": "إرسالية",
-      "nonProfit": "غير ربحي",
-      "political": "سياسي"
+      "medical": "طبي"
     },
     "banner": "صورة البانر",
     "story": "القصة",
