@@ -16,16 +16,23 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
 import type { ParsedCampaign } from '@/lib/campaign';
 
-/** Cap on how many featured campaigns we render in the home-page row. */
-const MAX_FEATURED = 12;
+/**
+ * Maximum number of skeleton cards to render in the Featured row
+ * while the campaigns are loading. Featured campaigns themselves
+ * are uncapped (moderators can promote as many as they like) but
+ * a wall of skeletons hurts perceived performance, so the
+ * placeholder is bounded.
+ */
+const FEATURED_SKELETON_CAP = 8;
 
 /**
  * Home page (`/`).
  *
  * Four sections, top-to-bottom:
  *
- *  1. **Featured** — moderator-curated, sorted newest-featured first,
- *     capped at MAX_FEATURED. Visible to everyone.
+ *  1. **Featured** — moderator-curated, sorted newest-featured first.
+ *     No cap — moderators can feature any number of campaigns and the
+ *     grid expands. Visible to everyone.
  *  2. **Community Campaigns** — every campaign approved by a Team
  *     Soapbox moderator, minus hidden and minus featured (featured
  *     dedupes into the row above). Sorted newest first. Visible to
@@ -59,20 +66,22 @@ export function CampaignsPage() {
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
   // Featured slot list — derived from moderation labels. Sorted newest-
-  // featured first, capped at MAX_FEATURED, and hidden coords removed so a
-  // featured-then-hidden campaign disappears from the row.
+  // featured first; hidden coords removed so a featured-then-hidden
+  // campaign disappears from the row. No cap: every campaign a
+  // moderator features renders.
   const featuredCoords = useMemo(() => {
     if (!moderation) return [] as string[];
     return Array.from(moderation.featuredCoords)
       .filter((c) => !moderation.hiddenCoords.has(c))
-      .sort((a, b) => (moderation.featuredOrder.get(b) ?? 0) - (moderation.featuredOrder.get(a) ?? 0))
-      .slice(0, MAX_FEATURED);
+      .sort((a, b) => (moderation.featuredOrder.get(b) ?? 0) - (moderation.featuredOrder.get(a) ?? 0));
   }, [moderation]);
 
+  // `useCampaigns` ignores `limit` when `coordinates` is set (it fans
+  // out into one #d-filter per author), so we don't need to pass one.
   const { data: featuredCampaigns, isLoading: featuredLoading } = useCampaigns(
     moderationReady && featuredCoords.length > 0
-      ? { coordinates: featuredCoords, limit: MAX_FEATURED }
-      : { coordinates: [], limit: MAX_FEATURED },
+      ? { coordinates: featuredCoords }
+      : { coordinates: [] },
   );
 
   // Sort the fetched featured campaigns to match the newest-label order.
@@ -83,8 +92,7 @@ export function CampaignsPage() {
     const order = moderation.featuredOrder;
     return [...featuredCampaigns]
       .filter((c) => featuredCoords.includes(c.aTag))
-      .sort((a, b) => (order.get(b.aTag) ?? 0) - (order.get(a.aTag) ?? 0))
-      .slice(0, MAX_FEATURED);
+      .sort((a, b) => (order.get(b.aTag) ?? 0) - (order.get(a.aTag) ?? 0));
   }, [featuredCampaigns, featuredCoords, moderation]);
 
   const featuredCoordSet = useMemo(() => new Set(featuredCoords), [featuredCoords]);
@@ -460,7 +468,10 @@ function FeaturedRow({
   expectedCount: number;
 }) {
   if (isLoading && campaigns.length === 0) {
-    const skeletonCount = Math.max(1, Math.min(MAX_FEATURED, expectedCount || 2));
+    // The skeleton mirrors how many cards we expect, but bounded so a
+    // moderator who's featured 50+ campaigns doesn't get a screenful
+    // of grey placeholders before the real cards arrive.
+    const skeletonCount = Math.max(1, Math.min(FEATURED_SKELETON_CAP, expectedCount || 2));
     return (
       <div className={featuredGridClass(skeletonCount)}>
         {Array.from({ length: skeletonCount }).map((_, i) => (
