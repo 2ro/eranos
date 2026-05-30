@@ -70,7 +70,7 @@ Clients filter both case variants (`agora` and `Agora`) because Nostr `t` tags a
 
 #### Backward compatibility
 
-Events published before this marker was adopted do not carry `t:agora` and therefore do not appear in the Agora activity feed. They remain reachable by direct link and via kind-specific directories (e.g. the moderator-curated `/campaigns/all`). Authors who wish to surface a legacy event in the feed can republish it (any edit through the Agora UI will add the marker automatically).
+Events published before this marker was adopted do not carry `t:agora` and therefore do not appear in the Agora activity feed. They remain reachable by direct link and via kind-specific directories (e.g. the moderator-curated `/campaigns`). Authors who wish to surface a legacy event in the feed can republish it (any edit through the Agora UI will add the marker automatically).
 
 ### Community Chat
 
@@ -498,7 +498,7 @@ The `pinnedEvents` array is ordered newest pin first. Pinning an already-pinned 
 
 ### Agora Moderation Labels
 
-Agora curates which kind 33863 campaigns appear on the homepage (`/`) and on the Support directory (`/campaigns/all`), which kind 34550 organizations appear in the Featured shelf on `/communities`, and which kind 36639 pledges appear in the discovery surfaces on `/pledges`, via moderator-signed NIP-32 label events (kind 1985) in a dedicated label namespace. The labeled event itself is never modified — surfacing is purely a client-side rollup of label events.
+Agora curates which kind 33863 campaigns appear on the homepage (`/`) and on the Support directory (`/campaigns`), which kind 34550 organizations appear in the Featured shelf on `/communities`, and which kind 36639 pledges appear in the discovery surfaces on `/pledges`, via moderator-signed NIP-32 label events (kind 1985) in a dedicated label namespace. The labeled event itself is never modified — surfacing is purely a client-side rollup of label events.
 
 Campaigns, organizations, and pledges share a single label namespace and a single moderator pack (Team Soapbox); the only thing distinguishing the three streams is the kind prefix on the `a` tag of each label:
 

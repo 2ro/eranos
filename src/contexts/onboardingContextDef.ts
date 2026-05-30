@@ -3,7 +3,7 @@ import { createContext, useContext } from 'react';
 /**
  * The two top-level roles a new user can pick during onboarding. Drives
  * downstream copy (creator vs. donor framing) and the role-pick CTA target
- * (creator → /campaigns/new, donor → /campaigns/all).
+ * (creator → /campaigns/new, donor → /campaigns).
  *
  * `null` before the user has answered the role-picker step.
  */

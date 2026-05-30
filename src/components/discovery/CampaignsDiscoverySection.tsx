@@ -18,7 +18,7 @@ interface CampaignsDiscoverySectionProps {
    * Where this section's filter state lives:
    *
    *   • `'url'` — flat URL params (`?q=&sort=&country=`). Used by the
-   *     dedicated `/campaigns/all` page so search results are
+   *     dedicated `/campaigns` page so search results are
    *     shareable and survive refresh.
    *   • `'local'` — local-only state. Used by `/` where three
    *     discovery sections coexist and can't all own `?q=`.

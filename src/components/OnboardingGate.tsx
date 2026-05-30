@@ -132,7 +132,7 @@ function CaptiveOverlay() {
   // Role pick is the final step. Picking a role both records the choice
   // (used by the role-pick CTA labels) and navigates to the matching
   // surface: creator → campaign-creation form, donor → full campaign grid
-  // (`/campaigns/all`, not `/`, so they land on the browse-everything view
+  // (`/campaigns`, not `/`, so they land on the browse-everything view
   // rather than the curated home with its own marketing hero). No separate
   // outro / celebration screen.
   const handleRolePick = useCallback(
@@ -142,7 +142,7 @@ function CaptiveOverlay() {
       if (next === 'creator') {
         navigate('/campaigns/new');
       } else {
-        navigate('/campaigns/all');
+        navigate('/campaigns');
       }
     },
     [setContextRole, cancel, navigate],

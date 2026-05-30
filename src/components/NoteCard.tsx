@@ -1867,7 +1867,7 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
     icon: HandHeart,
     action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.campaignLaunched", updated: "noteCard.kindHeader.campaignUpdated", fallback: "noteCard.kindHeader.campaignFallback" }),
     noun: "noteCard.kindHeader.campaignNoun",
-    nounRoute: "/campaigns/all",
+    nounRoute: "/campaigns",
   },
   8: {
     icon: Award,

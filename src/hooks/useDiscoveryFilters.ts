@@ -12,7 +12,7 @@ import type { Nip50Sort } from '@/hooks/useNip50Search';
  * - Anything else (missing, empty, legacy values) collapses to
  *   `'default'`, the curated featured-first idle state.
  *
- * Exported because the dedicated discovery pages (`/campaigns/all`,
+ * Exported because the dedicated discovery pages (`/campaigns`,
  * `/pledges`) read `?sort=` independently from the section's hook to
  * thread the value into ancillary derivations (hidden-list cache
  * lookups, create-X href country prefills). One canonical parser
@@ -52,7 +52,7 @@ interface UseDiscoveryFiltersOptions {
    * state.
    *
    *   • `''` — flat URL params (`?q=…&sort=…&country=…`). The dedicated
-   *     browse pages (`/campaigns/all`, `/groups`, `/pledges`) want
+   *     browse pages (`/campaigns`, `/groups`, `/pledges`) want
    *     this so search results are shareable / linkable and survive
    *     refresh.
    *
@@ -84,8 +84,8 @@ interface UseDiscoveryFiltersOptions {
  * Owns three pieces of state — search input (debounced), sort mode,
  * country code — and (optionally) mirrors them to URL params so deep
  * links and browser back/forward work. Defaults are stripped on write
- * so the canonical URL stays clean (`/campaigns/all`, not
- * `/campaigns/all?q=&sort=`).
+ * so the canonical URL stays clean (`/campaigns`, not
+ * `/campaigns?q=&sort=`).
  *
  * Debouncing lives inside this hook (300ms) so consumers don't have
  * to thread the debounced value back in — that would create a

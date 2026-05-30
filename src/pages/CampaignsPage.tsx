@@ -239,7 +239,7 @@ export function CampaignsPage() {
               hidden. */}
           <div className="pt-2 text-center sm:text-left">
             <Button asChild variant="ghost" size="sm">
-              <Link to="/campaigns/all">{t('campaigns.home.browseAll')}</Link>
+              <Link to="/campaigns">{t('campaigns.home.browseAll')}</Link>
             </Button>
           </div>
         </section>

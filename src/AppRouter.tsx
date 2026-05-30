@@ -187,9 +187,12 @@ export function AppRouter() {
             constraints. */}
         <Route element={<FundraiserLayout narrow={false} />}>
           <Route path="/" element={<CampaignsPage />} />
-          <Route path="/campaigns" element={<Navigate to="/" replace />} />
+          <Route path="/campaigns" element={<AllCampaignsPage />} />
           <Route path="/campaigns/new" element={<CreateCampaignPage />} />
-          <Route path="/campaigns/all" element={<AllCampaignsPage />} />
+          {/* Legacy URL: the all-campaigns directory lived at
+              `/campaigns/all` for a while. Keep it as a redirect so
+              external links and bookmarks still resolve. */}
+          <Route path="/campaigns/all" element={<Navigate to="/campaigns" replace />} />
           <Route path="/groups" element={<CommunitiesPage />} />
           <Route path="/groups/new" element={<CreateCommunityPage />} />
           <Route path="/events/new" element={<CreateEventPage />} />
