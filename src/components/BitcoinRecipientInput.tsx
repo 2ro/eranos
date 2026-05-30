@@ -187,6 +187,35 @@ export function BitcoinRecipientInput({
     [onChange, query],
   );
 
+  // ── Mount-time auto-select for single-endpoint prefills ────────────────
+  //
+  // When the picker mounts pre-filled (e.g. the campaign "Pay with Agora"
+  // flow) and `initialInput` resolves to exactly one valid candidate, skip
+  // the dropdown and select it directly so it lands as a chip. When the
+  // prefill carries *both* an on-chain address and an sp1 code we leave it
+  // in the input and let the dropdown surface both rows — that's a genuine
+  // choice the donor must make (privacy vs. compatibility).
+  //
+  // Guarded by a ref so it fires once per mount and never overrides a
+  // selection the user has already made or a `clear chip → restore prefill`
+  // transition (the picker is keyed on each open in the dialog, so a fresh
+  // mount is the right granularity).
+  const autoSelectedRef = useRef(false);
+  useEffect(() => {
+    if (autoSelectedRef.current) return;
+    autoSelectedRef.current = true;
+    if (value || !initialInput) return;
+    if (totalItems !== 1) return;
+    if (hasSp) {
+      selectSp(spCandidate);
+    } else if (hasBtc) {
+      selectBtc(btcCandidate);
+    }
+    // Intentionally mount-only: candidates are derived from `initialInput`
+    // (via the initial `query`), so reading them here reflects the prefill.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ── QR scan handling ──────────────────────────────────────────────────
   /**
    * Interpret a freshly-scanned QR code.
