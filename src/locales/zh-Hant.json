@@ -1155,6 +1155,29 @@
     "toast": {
       "failedTitle": "交易失敗"
     },
+    "broadcastError": {
+      "feeTooLowTitle": "網路費用過低",
+      "feeTooLowBodyWithMin": "Bitcoin 網路正在拒絕此費用。目前的最低費率約為 {{min}} sat/vB。",
+      "feeTooLowBody": "Bitcoin 網路正在拒絕此費用。請選擇更快的費率等級或提高你的自訂費率。",
+      "rbfTitle": "替換交易需要更高的費用",
+      "rbfBody": "替換交易支付的費用必須高於原交易。請提高費用後再試一次。",
+      "mempoolFullTitle": "Bitcoin 網路擁塞",
+      "mempoolFullBody": "mempool 已滿，你的費用沒有競爭力。請提高費用以順利通過。",
+      "networkTitle": "無法連線至 Bitcoin 網路",
+      "networkBody": "請檢查你的網路連線後再試一次。",
+      "mempoolConflictTitle": "交易衝突",
+      "mempoolConflictBody": "其中一個輸入已被花費，或正在被另一筆交易花費。",
+      "tooLongChainTitle": "未確認交易過多",
+      "tooLongChainBody": "你有一長串未確認的交易。請等待其中一筆確認後再試一次。",
+      "badInputsTitle": "交易已被拒絕",
+      "badInputsBody": "網路拒絕了此交易。請調整金額或收件人後再試一次。",
+      "absurdlyHighFeeTitle": "費用異常偏高",
+      "absurdlyHighFeeBody": "估算的費用高得可疑。請重新載入費率後再試一次。",
+      "unknownTitle": "交易失敗",
+      "useHigherFee": "使用更高費用",
+      "tryAgain": "再試一次",
+      "atMaxFeeTier": "你已處於最快的費率等級。"
+    },
     "success": {
       "title": "比特幣已傳送",
       "satsAmount": "{{sats}} sats",

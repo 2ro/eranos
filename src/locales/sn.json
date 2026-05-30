@@ -1215,6 +1215,29 @@
     "toast": {
       "failedTitle": "Chinoitwa chakundikana"
     },
+    "broadcastError": {
+      "feeTooLowTitle": "Muripo wenetwork wakaderera kwazvo",
+      "feeTooLowBodyWithMin": "Network yeBitcoin iri kuramba muripo uyu. Muripo mudikidiki parizvino unenge {{min}} sat/vB.",
+      "feeTooLowBody": "Network yeBitcoin iri kuramba muripo uyu. Sarudza mutsara unokurumidza kana usimudze mutengo wako wakasarudzwa.",
+      "rbfTitle": "Kutsiviwa kunoda muripo wakakwirira",
+      "rbfBody": "Chinoitwa chinotsiva chinofanira kubhadhara kupfuura chekutanga. Simudza muripo wozoedza zvakare.",
+      "mempoolFullTitle": "Network yeBitcoin yakazara",
+      "mempoolFullBody": "Mempool yakazara uye muripo wako haukwanisi kupikisana. Simudza muripo kuti upinde.",
+      "networkTitle": "Hatina kukwanisa kusvika kunetwork yeBitcoin",
+      "networkBody": "Tarisa kubatana kwako wozoedza zvakare.",
+      "mempoolConflictTitle": "Chinoitwa chinopikisana",
+      "mempoolConflictBody": "Imwe yezvinopinda yatoshandiswa kana iri kushandiswa nechimwe chinoitwa.",
+      "tooLongChainTitle": "Zvinoitwa zvisina kusimbiswa zvakawanda",
+      "tooLongChainBody": "Une cheni refu yezvinoitwa zvisina kusimbiswa. Mirira chimwe chisimbiswe wozoedza zvakare.",
+      "badInputsTitle": "Chinoitwa charambwa",
+      "badInputsBody": "Network yaramba chinoitwa ichi. Chinja huwandu kana mugamuchiri wozoedza zvakare.",
+      "absurdlyHighFeeTitle": "Muripo wakakwirira zvisina kujairika",
+      "absurdlyHighFeeBody": "Muripo wakatariswa wakakwirira nenzira inonetsa. Loadha mitengo yemiripo zvakare wozoedza.",
+      "unknownTitle": "Chinoitwa chakundikana",
+      "useHigherFee": "Shandisa muripo wakakwirira",
+      "tryAgain": "Edza zvakare",
+      "atMaxFeeTier": "Watove pamutsara unokurumidza kupfuura yose."
+    },
     "success": {
       "title": "Bitcoin yatumirwa",
       "satsAmount": "{{sats}} sats",

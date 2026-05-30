@@ -1583,6 +1583,29 @@
     "toast": {
       "failedTitle": "İşlem başarısız"
     },
+    "broadcastError": {
+      "feeTooLowTitle": "Ağ ücreti çok düşük",
+      "feeTooLowBodyWithMin": "Bitcoin ağı bu ücreti reddediyor. Şu an için minimum yaklaşık {{min}} sat/vB.",
+      "feeTooLowBody": "Bitcoin ağı bu ücreti reddediyor. Daha hızlı bir kademe seçin ya da özel oranınızı yükseltin.",
+      "rbfTitle": "Yerine geçen işlem daha yüksek bir ücret gerektiriyor",
+      "rbfBody": "Yerine geçen işlemin orijinalinden daha fazla ödemesi gerekir. Ücreti yükseltip tekrar deneyin.",
+      "mempoolFullTitle": "Bitcoin ağı tıkanmış",
+      "mempoolFullBody": "Mempool dolu ve ücretiniz rekabetçi değil. Geçebilmek için ücreti yükseltin.",
+      "networkTitle": "Bitcoin ağına ulaşılamadı",
+      "networkBody": "Bağlantınızı kontrol edip tekrar deneyin.",
+      "mempoolConflictTitle": "Çakışan işlem",
+      "mempoolConflictBody": "Girdilerden biri zaten harcanmış ya da başka bir işlem tarafından harcanıyor.",
+      "tooLongChainTitle": "Çok fazla onaylanmamış işlem",
+      "tooLongChainBody": "Uzun bir onaylanmamış işlem zinciriniz var. Birinin onaylanmasını bekleyip tekrar deneyin.",
+      "badInputsTitle": "İşlem reddedildi",
+      "badInputsBody": "Ağ bu işlemi reddetti. Tutarı ya da alıcıyı ayarlayıp tekrar deneyin.",
+      "absurdlyHighFeeTitle": "Ücret olağandışı derecede yüksek",
+      "absurdlyHighFeeBody": "Tahmini ücret şüpheli ölçüde yüksek. Ücret oranlarını yeniden yükleyip tekrar deneyin.",
+      "unknownTitle": "İşlem başarısız",
+      "useHigherFee": "Daha yüksek bir ücret kullan",
+      "tryAgain": "Tekrar dene",
+      "atMaxFeeTier": "Zaten en hızlı kademedesiniz."
+    },
     "success": {
       "title": "Bitcoin gönderildi",
       "satsAmount": "{{sats}} sat",

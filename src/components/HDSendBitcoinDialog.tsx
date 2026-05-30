@@ -29,6 +29,7 @@ import {
   BitcoinRecipientInput,
   type ResolvedRecipient,
 } from '@/components/BitcoinRecipientInput';
+import { BroadcastErrorAlert } from '@/components/BroadcastErrorAlert';
 import { HelpTip } from '@/components/HelpTip';
 import { cn } from '@/lib/utils';
 
@@ -43,6 +44,10 @@ import {
   resolveBitcoinFeeRate,
   type BitcoinFeeSpeed,
 } from '@/lib/bitcoinFeeSpeed';
+import {
+  classifyBroadcastError,
+  type BroadcastErrorKind,
+} from '@/lib/bitcoinBroadcastError';
 import { isLargeAmount, satsToUSD } from '@/lib/bitcoin';
 import {
   broadcastBlockbookTx,
@@ -155,6 +160,14 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
   const [error, setError] = useState('');
   const [feePopoverOpen, setFeePopoverOpen] = useState(false);
   const [success, setSuccess] = useState<SendResult | null>(null);
+  /**
+   * Classified failure from the most recent broadcast attempt. Renders as an
+   * inline {@link BroadcastErrorAlert} above the Send button with a recovery
+   * action (typically "Use a higher fee"). Cleared automatically whenever
+   * the user adjusts any field that could plausibly resolve the failure,
+   * and on every successful submit.
+   */
+  const [broadcastError, setBroadcastError] = useState<BroadcastErrorKind | null>(null);
 
   const feeSpeedUserChanged = useRef(false);
 
@@ -352,10 +365,99 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       void refetchWallet();
     },
     onError: (err) => {
-      toast({ title: t('walletSend.toast.failedTitle'), description: err.message, variant: 'destructive' });
+      const classified = classifyBroadcastError(err);
+      setBroadcastError(classified);
+      // Force a re-arm on every failure so the donor explicitly re-confirms
+      // after seeing the error — without this, a second tap of an
+      // already-armed Send would immediately re-broadcast with the same
+      // (rejected) parameters.
+      setConfirmArmed(false);
+      // The inline alert is the primary surface for classified errors;
+      // a toast on top would be noisy. Keep the toast only for the
+      // catch-all `unknown` bucket so something always surfaces even when
+      // we can't recognise the reject reason.
+      if (classified.kind === 'unknown') {
+        toast({
+          title: t('walletSend.toast.failedTitle'),
+          description: err.message,
+          variant: 'destructive',
+        });
+      }
     },
     onSettled: () => setProgress('idle'),
   });
+
+  // Clear the broadcast-error alert as soon as the donor adjusts anything
+  // that could plausibly resolve the failure. Recipient / amount / fee rate
+  // changes are the obvious cases; we don't clear on a btcPrice tick alone
+  // because that's just a passive refresh.
+  useEffect(() => {
+    setBroadcastError(null);
+  }, [recipient?.address, amountSats, feeSpeed, customFeeRate]);
+
+  /**
+   * Recovery action for fee-related broadcast failures.
+   *
+   * Strategy:
+   * - If the user is on a preset and a faster preset exists in the
+   *   *deduped* tier list, jump to it.
+   * - Otherwise (already on the fastest tier, or only one unique tier
+   *   loaded), switch to a custom rate seeded from the strongest hint
+   *   we have: the parsed minRelayFee from the error, the parsed actual
+   *   rate * 1.5, or the current fastest preset + 1. Open the fee popover
+   *   so the donor can see the new rate and tweak it further.
+   *
+   * Either way: refetch fee rates, mark the picker as user-touched (so the
+   * auto-tune effect doesn't override the bump on the next render), clear
+   * the broadcast-error alert, and reset `confirmArmed`.
+   */
+  const bumpFeeForRetry = useCallback(() => {
+    feeSpeedUserChanged.current = true;
+    setConfirmArmed(false);
+    setBroadcastError(null);
+    void refetchFeeRates();
+
+    const uniqueSpeeds = feeRates ? getUniqueBitcoinFeeSpeeds(feeRates) : [];
+    const presetIndex = uniqueSpeeds.indexOf(feeSpeed as Exclude<FeeSpeed, 'custom'>);
+
+    if (feeSpeed !== 'custom' && presetIndex > 0) {
+      // A faster preset exists — jump to it.
+      setFeeSpeed(uniqueSpeeds[presetIndex - 1]);
+      return;
+    }
+
+    // Either at the fastest preset already, or on `custom`. Fall back to
+    // a custom rate using the strongest available hint.
+    const fastestPresetRate = feeRates?.fastestFee ?? 1;
+    const fromError =
+      broadcastError?.kind === 'feeTooLow'
+        ? (broadcastError.minRelayFeeRate ?? broadcastError.actualFeeRate)
+        : undefined;
+    const seed = (() => {
+      if (broadcastError?.kind === 'feeTooLow' && broadcastError.minRelayFeeRate) {
+        // +1 sat/vB over the network minimum so we clear it comfortably.
+        return Math.max(broadcastError.minRelayFeeRate + 1, fastestPresetRate);
+      }
+      if (fromError) {
+        // No minimum surfaced but we know the rejected rate — 1.5× as a
+        // safe escalation step.
+        return Math.max(Math.ceil(fromError * 1.5), fastestPresetRate + 1);
+      }
+      // No usable hint — nudge above the current fastest tier.
+      const current = currentFeeRate ?? fastestPresetRate;
+      return Math.max(current + 1, fastestPresetRate + 1);
+    })();
+
+    setFeeSpeed('custom');
+    setCustomFeeRate(String(Math.max(1, Math.ceil(seed))));
+    setFeePopoverOpen(true);
+  }, [
+    broadcastError,
+    currentFeeRate,
+    feeRates,
+    feeSpeed,
+    refetchFeeRates,
+  ]);
 
   const handleSend = useCallback(() => {
     setError('');
@@ -405,6 +507,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       setCustomFeeRate('');
       setConfirmArmed(false);
       setSuccess(null);
+      setBroadcastError(null);
       feeSpeedUserChanged.current = false;
     }, 200);
   }, [onClose, sendMutation.isPending]);
@@ -501,6 +604,24 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
                   <AlertTriangle className="size-3.5" />
                   <AlertDescription className="text-xs">{error}</AlertDescription>
                 </Alert>
+              )}
+
+              {/* Classified broadcast failure with an actionable recovery.
+                  Replaces the older raw-toast UX so the donor can see why
+                  the network rejected the tx (fee too low, mempool full,
+                  RBF replacement underpriced, etc.) AND act on it without
+                  guessing. Cleared automatically the moment they touch a
+                  field that could resolve the failure. */}
+              {broadcastError && (
+                <BroadcastErrorAlert
+                  error={broadcastError}
+                  currentFeeRate={currentFeeRate}
+                  feeSpeed={feeSpeed}
+                  feeRates={feeRates}
+                  isPending={sendMutation.isPending}
+                  onBumpFee={bumpFeeForRetry}
+                  onRetry={() => sendMutation.mutate()}
+                />
               )}
 
               {/* Send button */}

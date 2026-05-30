@@ -1219,6 +1219,29 @@
     "toast": {
       "failedTitle": "交易失败"
     },
+    "broadcastError": {
+      "feeTooLowTitle": "网络费用过低",
+      "feeTooLowBodyWithMin": "Bitcoin 网络拒绝了该费用。当前最低费率约为 {{min}} sat/vB。",
+      "feeTooLowBody": "Bitcoin 网络拒绝了该费用。请选择更快的档位，或提高你的自定义费率。",
+      "rbfTitle": "替换交易需要更高的费用",
+      "rbfBody": "替换交易支付的费用必须高于原始交易。请提高费用后再试。",
+      "mempoolFullTitle": "Bitcoin 网络拥堵",
+      "mempoolFullBody": "mempool 已满，你的费用没有竞争力。请提高费用以便通过。",
+      "networkTitle": "无法连接到 Bitcoin 网络",
+      "networkBody": "请检查你的网络连接后再试。",
+      "mempoolConflictTitle": "交易冲突",
+      "mempoolConflictBody": "其中一个输入已被花费，或正在被另一笔交易花费。",
+      "tooLongChainTitle": "未确认交易过多",
+      "tooLongChainBody": "你有一长串未确认的交易。请等待其中一笔确认后再试。",
+      "badInputsTitle": "交易被拒绝",
+      "badInputsBody": "网络拒绝了此交易。请调整金额或收款人后再试。",
+      "absurdlyHighFeeTitle": "费用异常偏高",
+      "absurdlyHighFeeBody": "估算的费用高得可疑。请重新加载费率后再试。",
+      "unknownTitle": "交易失败",
+      "useHigherFee": "使用更高的费用",
+      "tryAgain": "重试",
+      "atMaxFeeTier": "你已选择最快的档位。"
+    },
     "success": {
       "title": "比特币已发送",
       "satsAmount": "{{sats}} sats",

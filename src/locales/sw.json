@@ -1547,6 +1547,29 @@
     "toast": {
       "failedTitle": "Muamala umeshindikana"
     },
+    "broadcastError": {
+      "feeTooLowTitle": "Ada ya mtandao ni ndogo sana",
+      "feeTooLowBodyWithMin": "Mtandao wa Bitcoin unakataa ada hii. Kiwango cha chini sasa hivi ni takriban {{min}} sat/vB.",
+      "feeTooLowBody": "Mtandao wa Bitcoin unakataa ada hii. Chagua kiwango cha haraka zaidi au panda kiwango chako maalum.",
+      "rbfTitle": "Ubadilishaji unahitaji ada ya juu zaidi",
+      "rbfBody": "Muamala wa kubadilisha lazima ulipe zaidi ya wa awali. Panda ada na ujaribu tena.",
+      "mempoolFullTitle": "Mtandao wa Bitcoin umejaa msongamano",
+      "mempoolFullBody": "Mempool imejaa na ada yako haishindani. Panda ada ili kupita.",
+      "networkTitle": "Imeshindwa kufikia mtandao wa Bitcoin",
+      "networkBody": "Angalia muunganisho wako na ujaribu tena.",
+      "mempoolConflictTitle": "Muamala unaopingana",
+      "mempoolConflictBody": "Mojawapo ya pembejeo tayari imekwisha tumika au inatumika na muamala mwingine.",
+      "tooLongChainTitle": "Miamala mingi ambayo haijathibitishwa",
+      "tooLongChainBody": "Una mlolongo mrefu wa miamala ambayo haijathibitishwa. Subiri mmoja uthibitishwe kisha ujaribu tena.",
+      "badInputsTitle": "Muamala umekataliwa",
+      "badInputsBody": "Mtandao umekataa muamala huu. Rekebisha kiasi au mpokeaji kisha ujaribu tena.",
+      "absurdlyHighFeeTitle": "Ada iko juu isivyo kawaida",
+      "absurdlyHighFeeBody": "Ada iliyokadiriwa ni ya juu kwa kushuku. Pakia upya viwango vya ada kisha ujaribu tena.",
+      "unknownTitle": "Muamala umeshindikana",
+      "useHigherFee": "Tumia ada ya juu zaidi",
+      "tryAgain": "Jaribu tena",
+      "atMaxFeeTier": "Tayari uko kwenye kiwango cha haraka zaidi."
+    },
     "success": {
       "title": "Bitcoin imetumwa",
       "satsAmount": "sats {{sats}}",

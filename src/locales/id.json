@@ -1588,6 +1588,29 @@
     "toast": {
       "failedTitle": "Transaksi gagal"
     },
+    "broadcastError": {
+      "feeTooLowTitle": "Biaya jaringan terlalu rendah",
+      "feeTooLowBodyWithMin": "Jaringan Bitcoin menolak biaya ini. Minimum saat ini sekitar {{min}} sat/vB.",
+      "feeTooLowBody": "Jaringan Bitcoin menolak biaya ini. Pilih tingkat yang lebih cepat atau naikkan tarif khusus Anda.",
+      "rbfTitle": "Pengganti butuh biaya lebih tinggi",
+      "rbfBody": "Transaksi pengganti harus membayar lebih dari yang asli. Naikkan biayanya dan coba lagi.",
+      "mempoolFullTitle": "Jaringan Bitcoin sedang padat",
+      "mempoolFullBody": "Mempool penuh dan biaya Anda tidak kompetitif. Naikkan biaya agar bisa lolos.",
+      "networkTitle": "Tidak bisa menjangkau jaringan Bitcoin",
+      "networkBody": "Periksa koneksi Anda dan coba lagi.",
+      "mempoolConflictTitle": "Transaksi berbenturan",
+      "mempoolConflictBody": "Salah satu input sudah dibelanjakan atau sedang dibelanjakan oleh transaksi lain.",
+      "tooLongChainTitle": "Terlalu banyak transaksi yang belum terkonfirmasi",
+      "tooLongChainBody": "Anda punya rantai panjang transaksi yang belum terkonfirmasi. Tunggu sampai ada yang terkonfirmasi dan coba lagi.",
+      "badInputsTitle": "Transaksi ditolak",
+      "badInputsBody": "Jaringan menolak transaksi ini. Sesuaikan jumlah atau penerima dan coba lagi.",
+      "absurdlyHighFeeTitle": "Biaya luar biasa tinggi",
+      "absurdlyHighFeeBody": "Estimasi biaya mencurigakan tinggi. Muat ulang tarif biaya dan coba lagi.",
+      "unknownTitle": "Transaksi gagal",
+      "useHigherFee": "Gunakan biaya lebih tinggi",
+      "tryAgain": "Coba lagi",
+      "atMaxFeeTier": "Anda sudah di tingkat tercepat."
+    },
     "success": {
       "title": "Bitcoin terkirim",
       "satsAmount": "{{sats}} sats",

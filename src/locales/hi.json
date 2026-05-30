@@ -1584,6 +1584,29 @@
     "toast": {
       "failedTitle": "Transaction विफल"
     },
+    "broadcastError": {
+      "feeTooLowTitle": "नेटवर्क fee बहुत कम है",
+      "feeTooLowBodyWithMin": "Bitcoin नेटवर्क इस fee को अस्वीकार कर रहा है। अभी न्यूनतम लगभग {{min}} sat/vB है।",
+      "feeTooLowBody": "Bitcoin नेटवर्क इस fee को अस्वीकार कर रहा है। कोई तेज़ tier चुनें या अपना custom rate बढ़ाएँ।",
+      "rbfTitle": "Replacement के लिए ज़्यादा fee चाहिए",
+      "rbfBody": "Replacement transaction को मूल से ज़्यादा fee देनी होगी। Fee बढ़ाकर दोबारा कोशिश करें।",
+      "mempoolFullTitle": "Bitcoin नेटवर्क पर भीड़ है",
+      "mempoolFullBody": "Mempool भरा हुआ है और आपकी fee प्रतिस्पर्धी नहीं है। आगे बढ़ने के लिए fee बढ़ाएँ।",
+      "networkTitle": "Bitcoin नेटवर्क तक नहीं पहुँचा जा सका",
+      "networkBody": "अपना कनेक्शन जाँचें और दोबारा कोशिश करें।",
+      "mempoolConflictTitle": "विरोधाभासी transaction",
+      "mempoolConflictBody": "एक input पहले ही खर्च हो चुका है या किसी दूसरे transaction द्वारा खर्च किया जा रहा है।",
+      "tooLongChainTitle": "बहुत सारे unconfirmed transactions",
+      "tooLongChainBody": "आपके पास unconfirmed transactions की लंबी chain है। किसी एक के confirm होने का इंतज़ार करें और दोबारा कोशिश करें।",
+      "badInputsTitle": "Transaction अस्वीकृत हो गया",
+      "badInputsBody": "नेटवर्क ने इस transaction को अस्वीकार कर दिया। राशि या प्राप्तकर्ता बदलकर दोबारा कोशिश करें।",
+      "absurdlyHighFeeTitle": "Fee असामान्य रूप से ज़्यादा है",
+      "absurdlyHighFeeBody": "अनुमानित fee संदिग्ध रूप से ज़्यादा है। Fee rates दोबारा लोड करें और कोशिश करें।",
+      "unknownTitle": "Transaction विफल",
+      "useHigherFee": "ज़्यादा fee इस्तेमाल करें",
+      "tryAgain": "दोबारा कोशिश करें",
+      "atMaxFeeTier": "आप पहले से सबसे तेज़ tier पर हैं।"
+    },
     "scanError": {
       "title": "वह QR कोड पढ़ा नहीं जा सका",
       "description": "एक Bitcoin एड्रेस, साइलेंट पेमेंट एड्रेस (sp1…), या bitcoin: URI अपेक्षित था।"

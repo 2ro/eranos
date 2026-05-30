@@ -1219,6 +1219,29 @@
     "toast": {
       "failedTitle": "La transacción falló"
     },
+    "broadcastError": {
+      "feeTooLowTitle": "Comisión de red demasiado baja",
+      "feeTooLowBodyWithMin": "La red de Bitcoin está rechazando esta comisión. El mínimo ahora mismo es de unos {{min}} sat/vB.",
+      "feeTooLowBody": "La red de Bitcoin está rechazando esta comisión. Elige un nivel más rápido o sube tu tasa personalizada.",
+      "rbfTitle": "El reemplazo necesita una comisión mayor",
+      "rbfBody": "La transacción de reemplazo debe pagar más que la original. Sube la comisión e inténtalo de nuevo.",
+      "mempoolFullTitle": "La red de Bitcoin está congestionada",
+      "mempoolFullBody": "El mempool está lleno y tu comisión no es competitiva. Súbela para pasar.",
+      "networkTitle": "No se pudo conectar con la red de Bitcoin",
+      "networkBody": "Comprueba tu conexión e inténtalo de nuevo.",
+      "mempoolConflictTitle": "Transacción en conflicto",
+      "mempoolConflictBody": "Una de las entradas ya se gastó o la está gastando otra transacción.",
+      "tooLongChainTitle": "Demasiadas transacciones sin confirmar",
+      "tooLongChainBody": "Tienes una cadena larga de transacciones sin confirmar. Espera a que se confirme una e inténtalo de nuevo.",
+      "badInputsTitle": "La transacción fue rechazada",
+      "badInputsBody": "La red rechazó esta transacción. Ajusta la cantidad o el destinatario e inténtalo de nuevo.",
+      "absurdlyHighFeeTitle": "La comisión es inusualmente alta",
+      "absurdlyHighFeeBody": "La comisión estimada es sospechosamente alta. Recarga las tasas e inténtalo de nuevo.",
+      "unknownTitle": "La transacción falló",
+      "useHigherFee": "Usar una comisión más alta",
+      "tryAgain": "Reintentar",
+      "atMaxFeeTier": "Ya estás en el nivel más rápido."
+    },
     "success": {
       "title": "Bitcoin enviado",
       "satsAmount": "{{sats}} sats",

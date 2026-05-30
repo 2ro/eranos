@@ -37,6 +37,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import AuthDialog from '@/components/auth/AuthDialog';
+import { BroadcastErrorAlert } from '@/components/BroadcastErrorAlert';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useBitcoinSigner } from '@/hooks/useBitcoinSigner';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -53,6 +54,10 @@ import {
   usdToSats,
   type FeeRates,
 } from '@/lib/bitcoin';
+import {
+  classifyBroadcastError,
+  type BroadcastErrorKind,
+} from '@/lib/bitcoinBroadcastError';
 import {
   type ParsedCampaign,
 } from '@/lib/campaign';
@@ -130,14 +135,29 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
   const [comment, setComment] = useState('');
   const [feeSpeed, setFeeSpeed] = useState<DonationFeeSpeed>('fastest');
   const [result, setResult] = useState<DonateCampaignResult | null>(null);
+  /**
+   * Classified failure from the most recent broadcast attempt. Renders as
+   * an inline {@link BroadcastErrorAlert} above the Send button in the
+   * confirm step. Cleared when the donor adjusts the fee speed or returns
+   * to the form step.
+   */
+  const [broadcastError, setBroadcastError] = useState<BroadcastErrorKind | null>(null);
 
   // Reset when the dialog reopens for a fresh donation.
   useEffect(() => {
     if (open) {
       setStep('form');
       setResult(null);
+      setBroadcastError(null);
     }
   }, [open]);
+
+  // Clear the broadcast-error alert whenever the donor adjusts the fee
+  // speed — the explicit recovery action — so the alert disappears when
+  // they engage with the picker.
+  useEffect(() => {
+    setBroadcastError(null);
+  }, [feeSpeed]);
 
   const effectiveUsd = customUsd.trim()
     ? parseUsdInput(customUsd)
@@ -171,12 +191,21 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
       }
     },
     onError: (error: unknown) => {
-      const msg = error instanceof Error ? error.message : String(error);
-      toast({
-        title: 'Donation failed',
-        description: msg,
-        variant: 'destructive',
-      });
+      const classified = classifyBroadcastError(error);
+      setBroadcastError(classified);
+      // Inline `<BroadcastErrorAlert>` in the confirm step is the primary
+      // recovery surface for classified failures; a destructive toast on
+      // top would just be noise. Keep the toast as a fallback for the
+      // catch-all `unknown` bucket so the donor always sees *something*
+      // even when we can't recognise the reject reason.
+      if (classified.kind === 'unknown') {
+        const msg = error instanceof Error ? error.message : String(error);
+        toast({
+          title: 'Donation failed',
+          description: msg,
+          variant: 'destructive',
+        });
+      }
     },
   });
 
@@ -249,8 +278,21 @@ export function DonateDialog({ campaign, open, onOpenChange, btcPrice }: DonateD
             feeSpeed={feeSpeed}
             btcPrice={btcPrice}
             isPending={donateMutation.isPending}
-            onBack={() => setStep('form')}
+            broadcastError={broadcastError}
+            onBack={() => {
+              setBroadcastError(null);
+              setStep('form');
+            }}
             onSubmit={() => donateMutation.mutate()}
+            onBumpFee={() => {
+              // Step toward the fastest preset. BITCOIN_FEE_SPEED_ORDER is
+              // declared fast → slow; index 0 is `fastest`, so "bump" means
+              // moving toward index 0.
+              const order: DonationFeeSpeed[] = ['fastest', 'halfHour', 'hour', 'economy'];
+              const idx = order.indexOf(feeSpeed);
+              if (idx > 0) setFeeSpeed(order[idx - 1]);
+              // `useEffect([feeSpeed])` clears the broadcastError alert.
+            }}
           />
         )}
 
@@ -448,8 +490,12 @@ interface ConfirmViewProps {
   feeSpeed: DonationFeeSpeed;
   btcPrice: number | undefined;
   isPending: boolean;
+  /** Classified failure from the most recent broadcast attempt, if any. */
+  broadcastError: BroadcastErrorKind | null;
   onBack: () => void;
   onSubmit: () => void;
+  /** Steps `feeSpeed` toward the fastest preset; no-op once at `fastest`. */
+  onBumpFee: () => void;
 }
 
 function ConfirmView({
@@ -460,8 +506,10 @@ function ConfirmView({
   feeSpeed,
   btcPrice,
   isPending,
+  broadcastError,
   onBack,
   onSubmit,
+  onBumpFee,
 }: ConfirmViewProps) {
   const { user } = useCurrentUser();
   const { config } = useAppContext();
@@ -551,6 +599,25 @@ function ConfirmView({
           <Row label="Comment" value={<span className="italic">"{comment}"</span>} />
         )}
       </div>
+
+      {/* Classified broadcast failure with an actionable bump-fee recovery.
+          Sits between the donation rows and the Send button so the donor
+          sees the alert in the same visual region they're about to tap.
+          `presetTiersOnly` hides the bump button once they're on the
+          fastest preset — at that point the recommendation is to switch
+          to an external wallet via the panel on the campaign detail page. */}
+      {broadcastError && (
+        <BroadcastErrorAlert
+          error={broadcastError}
+          currentFeeRate={feeRatesQuery.data ? feeRateForSpeed(feeRatesQuery.data, feeSpeed) : undefined}
+          feeSpeed={feeSpeed}
+          feeRates={feeRatesQuery.data}
+          isPending={isPending}
+          onBumpFee={onBumpFee}
+          onRetry={onSubmit}
+          presetTiersOnly
+        />
+      )}
 
       <Button
         size="lg"

@@ -1642,6 +1642,29 @@
     "toast": {
       "failedTitle": "Échec de la transaction"
     },
+    "broadcastError": {
+      "feeTooLowTitle": "Frais de réseau trop bas",
+      "feeTooLowBodyWithMin": "Le réseau Bitcoin rejette ces frais. Le minimum actuel est d'environ {{min}} sat/vB.",
+      "feeTooLowBody": "Le réseau Bitcoin rejette ces frais. Choisissez un palier plus rapide ou augmentez votre taux personnalisé.",
+      "rbfTitle": "Le remplacement exige des frais plus élevés",
+      "rbfBody": "La transaction de remplacement doit payer plus que l'originale. Augmentez les frais et réessayez.",
+      "mempoolFullTitle": "Le réseau Bitcoin est congestionné",
+      "mempoolFullBody": "Le mempool est plein et vos frais ne sont pas compétitifs. Augmentez les frais pour passer.",
+      "networkTitle": "Impossible de joindre le réseau Bitcoin",
+      "networkBody": "Vérifiez votre connexion et réessayez.",
+      "mempoolConflictTitle": "Transaction en conflit",
+      "mempoolConflictBody": "L'une des entrées a déjà été dépensée ou est en train d'être dépensée par une autre transaction.",
+      "tooLongChainTitle": "Trop de transactions non confirmées",
+      "tooLongChainBody": "Vous avez une longue chaîne de transactions non confirmées. Attendez qu'une soit confirmée et réessayez.",
+      "badInputsTitle": "Transaction rejetée",
+      "badInputsBody": "Le réseau a rejeté cette transaction. Ajustez le montant ou le destinataire et réessayez.",
+      "absurdlyHighFeeTitle": "Frais anormalement élevés",
+      "absurdlyHighFeeBody": "Les frais estimés sont étonnamment élevés. Rechargez les taux de frais et réessayez.",
+      "unknownTitle": "Échec de la transaction",
+      "useHigherFee": "Utiliser des frais plus élevés",
+      "tryAgain": "Réessayer",
+      "atMaxFeeTier": "Vous êtes déjà au palier le plus rapide."
+    },
     "success": {
       "title": "Bitcoin envoyé",
       "satsAmount": "{{sats}} sats",

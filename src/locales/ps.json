@@ -1219,6 +1219,29 @@
     "toast": {
       "failedTitle": "معامله ناکامه شوه"
     },
+    "broadcastError": {
+      "feeTooLowTitle": "د شبکې فیس ډېر ټیټ دی",
+      "feeTooLowBodyWithMin": "د Bitcoin شبکه دا فیس ردوي. اوسنی لږ تر لږه نرخ شاوخوا {{min}} sat/vB دی.",
+      "feeTooLowBody": "د Bitcoin شبکه دا فیس ردوي. ګړنده درجه وټاکئ یا خپل دودیز نرخ پورته کړئ.",
+      "rbfTitle": "بدلون ته لوړ فیس په کار دی",
+      "rbfBody": "بدلون معامله باید له اصلي څخه ډېر فیس ورکړي. فیس پورته کړئ او بیا هڅه وکړئ.",
+      "mempoolFullTitle": "د Bitcoin شبکه بنده ده",
+      "mempoolFullBody": "mempool ډک دی او ستاسو فیس سیالۍ ته کافي نه دی. د تېرېدو لپاره فیس پورته کړئ.",
+      "networkTitle": "د Bitcoin شبکې ته لاسرسی ونه شو",
+      "networkBody": "خپله اړیکه وګورئ او بیا هڅه وکړئ.",
+      "mempoolConflictTitle": "ټکرېدونکې معامله",
+      "mempoolConflictBody": "یوه ننوتنه یې لا له مخکې لګول شوې یا د بلې معاملې لخوا لګول کیږي.",
+      "tooLongChainTitle": "ډېرې نا تایید شوې معاملې",
+      "tooLongChainBody": "تاسو د نا تایید شویو معاملو اوږد لړۍ لرئ. انتظار وکړئ تر څو یوه تایید شي او بیا هڅه وکړئ.",
+      "badInputsTitle": "معامله رد شوه",
+      "badInputsBody": "شبکې دا معامله رد کړه. اندازه یا ترلاسه‌کوونکی سم کړئ او بیا هڅه وکړئ.",
+      "absurdlyHighFeeTitle": "فیس په غیر عادي ډول لوړ دی",
+      "absurdlyHighFeeBody": "اټکل شوی فیس په شکمن ډول لوړ دی. د فیس نرخونه بیا لوډ کړئ او بیا هڅه وکړئ.",
+      "unknownTitle": "معامله ناکامه شوه",
+      "useHigherFee": "لوړ فیس وکاروئ",
+      "tryAgain": "بیا هڅه وکړئ",
+      "atMaxFeeTier": "تاسو لا له مخکې پر ګړنده درجه یاست."
+    },
     "success": {
       "title": "بټکوین ولیږل شو",
       "satsAmount": "{{sats}} ساتوشي",

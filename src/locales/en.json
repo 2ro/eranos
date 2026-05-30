@@ -1717,6 +1717,29 @@
     "toast": {
       "failedTitle": "Transaction failed"
     },
+    "broadcastError": {
+      "feeTooLowTitle": "Network fee too low",
+      "feeTooLowBodyWithMin": "The Bitcoin network is rejecting this fee. The minimum right now is about {{min}} sat/vB.",
+      "feeTooLowBody": "The Bitcoin network is rejecting this fee. Pick a faster tier or raise your custom rate.",
+      "rbfTitle": "Replacement needs a higher fee",
+      "rbfBody": "The replacement transaction must pay more than the original. Raise the fee and try again.",
+      "mempoolFullTitle": "Bitcoin network is congested",
+      "mempoolFullBody": "The mempool is full and your fee isn't competitive. Raise the fee to get through.",
+      "networkTitle": "Couldn't reach the Bitcoin network",
+      "networkBody": "Check your connection and try again.",
+      "mempoolConflictTitle": "Conflicting transaction",
+      "mempoolConflictBody": "One of the inputs has already been spent or is being spent by another transaction.",
+      "tooLongChainTitle": "Too many unconfirmed transactions",
+      "tooLongChainBody": "You have a long chain of unconfirmed transactions. Wait for one to confirm and try again.",
+      "badInputsTitle": "Transaction was rejected",
+      "badInputsBody": "The network rejected this transaction. Adjust the amount or recipient and try again.",
+      "absurdlyHighFeeTitle": "Fee is unusually high",
+      "absurdlyHighFeeBody": "The estimated fee is suspiciously high. Reload fee rates and try again.",
+      "unknownTitle": "Transaction failed",
+      "useHigherFee": "Use a higher fee",
+      "tryAgain": "Try again",
+      "atMaxFeeTier": "You're already on the fastest tier."
+    },
     "success": {
       "title": "Bitcoin sent",
       "satsAmount": "{{sats}} sats",

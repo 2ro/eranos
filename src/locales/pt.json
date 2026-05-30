@@ -1648,6 +1648,29 @@
     "toast": {
       "failedTitle": "Transação falhou"
     },
+    "broadcastError": {
+      "feeTooLowTitle": "Taxa de rede muito baixa",
+      "feeTooLowBodyWithMin": "A rede Bitcoin está rejeitando essa taxa. O mínimo agora é de cerca de {{min}} sat/vB.",
+      "feeTooLowBody": "A rede Bitcoin está rejeitando essa taxa. Escolha um nível mais rápido ou aumente sua taxa personalizada.",
+      "rbfTitle": "A substituição precisa de uma taxa maior",
+      "rbfBody": "A transação de substituição precisa pagar mais do que a original. Aumente a taxa e tente novamente.",
+      "mempoolFullTitle": "A rede Bitcoin está congestionada",
+      "mempoolFullBody": "O mempool está cheio e sua taxa não é competitiva. Aumente a taxa para ser processada.",
+      "networkTitle": "Não foi possível acessar a rede Bitcoin",
+      "networkBody": "Verifique sua conexão e tente novamente.",
+      "mempoolConflictTitle": "Transação conflitante",
+      "mempoolConflictBody": "Uma das entradas já foi gasta ou está sendo gasta por outra transação.",
+      "tooLongChainTitle": "Muitas transações não confirmadas",
+      "tooLongChainBody": "Você tem uma longa cadeia de transações não confirmadas. Aguarde uma delas ser confirmada e tente novamente.",
+      "badInputsTitle": "A transação foi rejeitada",
+      "badInputsBody": "A rede rejeitou esta transação. Ajuste o valor ou o destinatário e tente novamente.",
+      "absurdlyHighFeeTitle": "A taxa está extraordinariamente alta",
+      "absurdlyHighFeeBody": "A taxa estimada está suspeitamente alta. Recarregue as taxas e tente novamente.",
+      "unknownTitle": "Transação falhou",
+      "useHigherFee": "Usar uma taxa maior",
+      "tryAgain": "Tentar novamente",
+      "atMaxFeeTier": "Você já está no nível mais rápido."
+    },
     "scanError": {
       "title": "Não foi possível ler esse código QR",
       "description": "Era esperado um endereço Bitcoin, um endereço de pagamento silencioso (sp1…) ou uma URI bitcoin:."
