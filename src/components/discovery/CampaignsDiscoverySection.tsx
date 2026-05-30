@@ -57,12 +57,13 @@ interface CampaignsDiscoverySectionProps {
  *
  * The section has two display modes:
  *
- *   1. **Idle** (no search, no sort, no country picked) — renders the
- *      moderator-curated featured grid. Falls back to the
- *      chronological grid when nothing is featured yet so the section
- *      is never blank.
+ *   1. **Idle** (no search, no sort, no country picked) — renders
+ *      featured campaigns at the top of the grid followed by every
+ *      other non-hidden campaign in chronological order. Featured
+ *      acts as a pinning signal, not as an allowlist; an approved-
+ *      but-not-featured campaign still shows up underneath.
  *   2. **Active** — renders the full ranked / chronological / country-
- *      scoped result set.
+ *      scoped result set with no featured pinning.
  *
  * Hidden campaigns are excluded by default. Any viewer can flip the
  * Show-hidden switch in the toolbar; the section reads that state
@@ -162,14 +163,18 @@ export function CampaignsDiscoverySection({
     );
   }, [featuredCampaigns, moderation]);
 
-  // Idle-mode list: featured first; if nothing is featured, fall back
-  // to the latest chronological grid so the section is never blank
-  // when there's content to show.
+  // Idle-mode list: featured pinned at the top, then every other
+  // non-hidden campaign in chronological order. Featured-only would
+  // hide approved-not-featured campaigns from the default view, which
+  // is the exact bug we used to ship — when mods approved a campaign
+  // without featuring it, it never surfaced here until a viewer
+  // changed the sort or typed a search query. Now the section is
+  // truly a "featured + everything else" shelf.
   const idleCampaigns = useMemo<ParsedCampaign[]>(() => {
-    const list =
-      orderedFeaturedCampaigns.length > 0 ? orderedFeaturedCampaigns : visible;
+    const rest = visible.filter((c) => !moderation?.featuredCoords.has(c.aTag));
+    const list = [...orderedFeaturedCampaigns, ...rest];
     return idleLimit ? list.slice(0, idleLimit) : list;
-  }, [orderedFeaturedCampaigns, visible, idleLimit]);
+  }, [orderedFeaturedCampaigns, visible, moderation, idleLimit]);
 
   const showSkeleton = isLoading || !moderationReady;
   const listForRender = isActive ? visible : idleCampaigns;
