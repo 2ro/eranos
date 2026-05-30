@@ -34,6 +34,15 @@ import type { ParsedCampaign } from '@/lib/campaign';
  * page reads the same params independently to compute the Hidden
  * collapsible's contents — TanStack Query dedupes the underlying
  * `useAllCampaigns` call, so there's no extra network round-trip.
+ *
+ * **Censorship-resistance:** the section's Show-hidden toggle is
+ * available to every viewer here, not just moderators. The campaigns
+ * page is the canonical browseable index, and the moderation labels
+ * sit on public relays anyway, so anyone can flip the toggle to see
+ * what mods have suppressed. The Hidden collapsible below the
+ * section is still mod-only because it's a review workflow for
+ * moderators (one-click hide/unhide affordances), not a discovery
+ * surface.
  */
 export function AllCampaignsPage() {
   const { t } = useTranslation();
@@ -120,15 +129,11 @@ export function AllCampaignsPage() {
 
         <CampaignsDiscoverySection
           filterPersistence="url"
-          showHidden={
-            isMod
-              ? {
-                  value: showHidden,
-                  onChange: setShowHidden,
-                  count: hiddenCount,
-                }
-              : undefined
-          }
+          showHidden={{
+            value: showHidden,
+            onChange: setShowHidden,
+            count: hiddenCount,
+          }}
         />
 
         {/* Moderator-only: every hidden campaign on the network matching
