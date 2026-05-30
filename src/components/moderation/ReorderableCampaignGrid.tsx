@@ -6,7 +6,7 @@ import { CampaignCard } from '@/components/CampaignCard';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { useReorderCampaign, type ReorderAxis } from '@/hooks/useReorderCampaign';
+import { useReorderCampaign } from '@/hooks/useReorderCampaign';
 import { useToast } from '@/hooks/useToast';
 import type { ParsedCampaign } from '@/lib/campaign';
 import { cn } from '@/lib/utils';
@@ -15,12 +15,6 @@ import { ReorderProvider } from './ReorderProvider';
 
 interface ReorderableCampaignGridProps {
   campaigns: ParsedCampaign[];
-  /**
-   * Which moderation axis carries the order. `featured` for the
-   * pinned row, `approval` for the Community grid. Drives which label
-   * the reorder hook republishes.
-   */
-  axis: ReorderAxis;
   /** Grid class. Caller passes the exact `grid grid-cols-…` it needs. */
   gridClassName: string;
   /**
@@ -33,16 +27,16 @@ interface ReorderableCampaignGridProps {
 
 /**
  * Drop-in replacement for a plain grid of `CampaignCard`s that
- * lets moderators reorder the list.
+ * lets moderators reorder the Featured row.
  *
  * - **Non-moderators**: identical to a plain grid. No DnD listeners,
  *   no context provider, no extra DOM. The component is cheap enough
  *   to drop into every campaign grid.
  * - **Moderators on desktop**: each card is wrapped in a native
  *   HTML5 `draggable` div. Dropping on another card publishes a new
- *   label with a timestamp computed from the new neighbors (see
- *   `useReorderCampaign.moveTo`). One label per drop — no batch
- *   publish, no neighbor re-stamping.
+ *   `featured` label with a rank computed from the new neighbors
+ *   (see `useReorderCampaign.moveTo`). One label per drop — no
+ *   batch publish, no neighbor re-stamping.
  * - **Moderators on mobile**: drag is disabled (touch DnD without a
  *   library is unreliable and we don't ship one), but the moderator
  *   kebab gets Move up / Move down / Move to top rows via the
@@ -60,7 +54,6 @@ interface ReorderableCampaignGridProps {
  */
 export function ReorderableCampaignGrid({
   campaigns,
-  axis,
   gridClassName,
   renderCard,
 }: ReorderableCampaignGridProps) {
@@ -144,9 +137,9 @@ export function ReorderableCampaignGrid({
       const idx = displayedCoords.indexOf(coord);
       if (idx <= 0) return;
       const next = [coord, ...displayedCoords.filter((c) => c !== coord)];
-      await applyOptimisticThenPublish(next, () => reorder.moveToTop(coord, axis, displayedCoords));
+      await applyOptimisticThenPublish(next, () => reorder.moveToTop(coord, displayedCoords));
     },
-    [displayedCoords, applyOptimisticThenPublish, reorder, axis],
+    [displayedCoords, applyOptimisticThenPublish, reorder],
   );
 
   const onMoveUp = useCallback(
@@ -155,9 +148,9 @@ export function ReorderableCampaignGrid({
       if (idx <= 0) return;
       const next = [...displayedCoords];
       [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
-      await applyOptimisticThenPublish(next, () => reorder.moveUp(coord, axis, displayedCoords));
+      await applyOptimisticThenPublish(next, () => reorder.moveUp(coord, displayedCoords));
     },
-    [displayedCoords, applyOptimisticThenPublish, reorder, axis],
+    [displayedCoords, applyOptimisticThenPublish, reorder],
   );
 
   const onMoveDown = useCallback(
@@ -166,9 +159,9 @@ export function ReorderableCampaignGrid({
       if (idx < 0 || idx >= displayedCoords.length - 1) return;
       const next = [...displayedCoords];
       [next[idx], next[idx + 1]] = [next[idx + 1], next[idx]];
-      await applyOptimisticThenPublish(next, () => reorder.moveDown(coord, axis, displayedCoords));
+      await applyOptimisticThenPublish(next, () => reorder.moveDown(coord, displayedCoords));
     },
-    [displayedCoords, applyOptimisticThenPublish, reorder, axis],
+    [displayedCoords, applyOptimisticThenPublish, reorder],
   );
 
   // Generic "drop at index" used by drag-and-drop. Success is its
@@ -183,7 +176,7 @@ export function ReorderableCampaignGrid({
       next.splice(toIndex, 0, coord);
       try {
         await applyOptimisticThenPublish(next, () =>
-          reorder.moveTo(coord, axis, displayedCoords, toIndex),
+          reorder.moveTo(coord, displayedCoords, toIndex),
         );
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'Unknown error';
@@ -194,7 +187,7 @@ export function ReorderableCampaignGrid({
         });
       }
     },
-    [displayedCoords, applyOptimisticThenPublish, reorder, axis, toast, t],
+    [displayedCoords, applyOptimisticThenPublish, reorder, toast, t],
   );
 
   const renderItem = useCallback(
@@ -220,7 +213,6 @@ export function ReorderableCampaignGrid({
   // wrapper handles its own dragover/drop styling.
   return (
     <ReorderProvider
-      axis={axis}
       coords={displayedCoords}
       onMoveToTop={onMoveToTop}
       onMoveUp={onMoveUp}

@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import type { ReorderAxis } from '@/hooks/useReorderCampaign';
 import {
   ReorderContext,
   type ReorderContextValue,
@@ -21,14 +20,12 @@ import {
  * publish its own reorder context without touching the card.
  */
 export function ReorderProvider({
-  axis,
   coords,
   onMoveToTop,
   onMoveUp,
   onMoveDown,
   children,
 }: {
-  axis: ReorderAxis;
   coords: readonly string[];
   onMoveToTop: (coord: string) => Promise<void> | void;
   onMoveUp: (coord: string) => Promise<void> | void;
@@ -46,8 +43,8 @@ export function ReorderProvider({
         onMoveDown: () => onMoveDown(coord),
       });
     });
-    return { axis, byCoord };
-  }, [axis, coords, onMoveToTop, onMoveUp, onMoveDown]);
+    return { byCoord };
+  }, [coords, onMoveToTop, onMoveUp, onMoveDown]);
 
   return <ReorderContext.Provider value={value}>{children}</ReorderContext.Provider>;
 }

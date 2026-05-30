@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { Trans, useTranslation } from 'react-i18next';
-import { ArrowRight, EyeOff, HandHeart, Hourglass, PlusCircle } from 'lucide-react';
+import { ArrowRight, EyeOff, HandHeart, PlusCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -28,28 +28,29 @@ const FEATURED_SKELETON_CAP = 8;
 /**
  * Home page (`/`).
  *
- * Four sections, top-to-bottom:
+ * Two public sections plus one moderator-only section:
  *
- *  1. **Featured** — moderator-curated, sorted newest-featured first.
- *     No cap — moderators can feature any number of campaigns and the
- *     grid expands. Visible to everyone.
- *  2. **Community Campaigns** — every campaign approved by a Team
- *     Soapbox moderator, minus hidden and minus featured (featured
- *     dedupes into the row above). Sorted newest first. Visible to
- *     everyone.
- *  3. **Pending** — campaigns on the network that no moderator has
- *     approved or hidden yet. Moderator-only review queue.
- *  4. **Hidden** — campaigns currently suppressed. Moderator-only,
- *     collapsed by default so the page doesn't lead with suppressed
- *     content for the people responsible for it.
+ *  1. **Featured** — moderator-curated, ordered by the moderator's
+ *     chosen rank (newest-by-rank first). No cap. Visible to
+ *     everyone. The empty state replaces the section when no
+ *     campaign is currently featured.
+ *  2. **Browse all** — a single link to `/campaigns`, the full
+ *     discoverable set with search / sort / country filters.
+ *  3. **Hidden** — moderator-only, collapsed by default so the page
+ *     doesn't lead with suppressed content for the people
+ *     responsible for it.
  *
- * Campaign coverage is the failure mode to watch: an approved
- * campaign that's older than the last 200 events would otherwise
- * fall off the recent-stream query and disappear from the Community
- * grid. We mitigate by issuing a second targeted query keyed on
- * every approved/hidden coord, merging both result sets in the
- * grids below. The Featured row already used a coord-targeted query
- * for the same reason.
+ * The previous Community / Pending sections were retired alongside
+ * the approval axis: featuring is now the single positive-curation
+ * mechanism, and `/campaigns` is the censorship-resistant browse
+ * surface.
+ *
+ * Hidden-campaign coverage: a hidden campaign older than the recent
+ * stream window would drop off a `limit:` query, so we issue a
+ * targeted coord-keyed fetch over every hidden coord and feed the
+ * Hidden section from the union of that query and the recent
+ * stream. The Featured row uses the same coord-targeted pattern
+ * keyed on its own coords.
  *
  * Campaigns are the home page's sole focus. Groups and Pledges each
  * have their own dedicated browse pages (`/groups`, `/pledges`).
@@ -59,16 +60,17 @@ export function CampaignsPage() {
   const { config } = useAppContext();
   const { user } = useCurrentUser();
 
-  // Moderation pack + label rollups. We gate the four sections on
-  // `moderationReady` so we never flash an unmoderated grid.
+  // Moderation pack + label rollups. We gate the Featured and Hidden
+  // sections on `moderationReady` so we never flash an unmoderated
+  // grid.
   const { data: moderators, isLoading: moderatorsLoading } = useCampaignModerators();
   const { data: moderation, isReady: moderationReady } = useCampaignModeration();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
-  // Featured slot list — derived from moderation labels. Sorted newest-
-  // featured first; hidden coords removed so a featured-then-hidden
-  // campaign disappears from the row. No cap: every campaign a
-  // moderator features renders.
+  // Featured slot list — derived from moderation labels. Sorted by
+  // the moderator-controlled rank (descending); hidden coords
+  // removed so a featured-then-hidden campaign disappears from the
+  // row. No cap: every campaign a moderator features renders.
   const featuredCoords = useMemo(() => {
     if (!moderation) return [] as string[];
     return Array.from(moderation.featuredCoords)
@@ -84,9 +86,9 @@ export function CampaignsPage() {
       : { coordinates: [] },
   );
 
-  // Sort the fetched featured campaigns to match the newest-label order.
-  // `useCampaigns` returns them in network order; we want the row to match
-  // the moderation-label ordering.
+  // Sort the fetched featured campaigns to match the rank order.
+  // `useCampaigns` returns them in network order; we want the row to
+  // match the moderation-rank ordering.
   const orderedFeatured = useMemo<ParsedCampaign[]>(() => {
     if (!moderation || !featuredCampaigns) return [];
     const order = moderation.featuredOrder;
@@ -95,33 +97,25 @@ export function CampaignsPage() {
       .sort((a, b) => (order.get(b.aTag) ?? 0) - (order.get(a.aTag) ?? 0));
   }, [featuredCampaigns, featuredCoords, moderation]);
 
-  const featuredCoordSet = useMemo(() => new Set(featuredCoords), [featuredCoords]);
-
-  // Recent stream — the latest 200 campaign events on the network. Drives
-  // the Pending list (the only way a not-yet-labeled campaign can surface
-  // is to be in the recent stream), and supplements the targeted approved
-  // query below for fresh data on already-approved campaigns.
+  // Recent stream — the latest 200 campaign events on the network.
+  // Source for the Hidden section (which can also pull from the
+  // targeted hidden-coord query below).
   const { data: recentCampaigns, isLoading: recentLoading } = useCampaigns({
     limit: 200,
   });
 
-  // Targeted query for every approved-or-hidden coord. This guarantees the
-  // Community grid and the Hidden section render correctly even when the
-  // approved/hidden campaign is older than the recent-200 window — the
-  // exact bug that made approved campaigns silently disappear from the
-  // home page once enough new campaigns published.
-  const labeledCoords = useMemo(() => {
+  // Targeted query for every hidden coord. Guarantees the Hidden
+  // section renders correctly even when the hidden campaign is
+  // older than the recent-200 window.
+  const hiddenCoordList = useMemo(() => {
     if (!moderation) return [] as string[];
-    const out = new Set<string>();
-    for (const c of moderation.approvedCoords) out.add(c);
-    for (const c of moderation.hiddenCoords) out.add(c);
-    return Array.from(out);
+    return Array.from(moderation.hiddenCoords);
   }, [moderation]);
 
-  const { data: labeledCampaigns, isLoading: labeledLoading } = useCampaigns(
-    moderationReady && labeledCoords.length > 0
-      ? { coordinates: labeledCoords, limit: labeledCoords.length }
-      : { coordinates: [], limit: 1 },
+  const { data: hiddenCampaignsRaw, isLoading: hiddenLoading } = useCampaigns(
+    moderationReady && hiddenCoordList.length > 0
+      ? { coordinates: hiddenCoordList }
+      : { coordinates: [] },
   );
 
   useSeoMeta({
@@ -129,184 +123,89 @@ export function CampaignsPage() {
     description: t('campaigns.home.seoDescription'),
   });
 
-  // Merge the two streams (recent + labeled), de-dupe by aTag, sort newest
-  // first. The result is the authoritative working set: every campaign
-  // the page needs to render across all four sections.
-  const allKnownCampaigns = useMemo(() => {
+  // Hidden section: union of the recent stream and the targeted
+  // query, deduped by aTag, filtered to coords currently labeled
+  // hidden. Newest-first for stable ordering.
+  const hiddenCampaigns = useMemo<ParsedCampaign[]>(() => {
+    if (!moderation) return [];
     const byCoord = new Map<string, ParsedCampaign>();
     for (const c of recentCampaigns ?? []) byCoord.set(c.aTag, c);
-    for (const c of labeledCampaigns ?? []) {
-      // Prefer whichever revision is newer — the recent stream and the
-      // targeted query can return different revisions of the same
-      // addressable event from different relays.
+    for (const c of hiddenCampaignsRaw ?? []) {
       const prev = byCoord.get(c.aTag);
       if (!prev || c.createdAt > prev.createdAt) byCoord.set(c.aTag, c);
     }
-    return Array.from(byCoord.values()).sort((a, b) => b.createdAt - a.createdAt);
-  }, [recentCampaigns, labeledCampaigns]);
+    return Array.from(byCoord.values())
+      .filter((c) => moderation.hiddenCoords.has(c.aTag))
+      .sort((a, b) => b.createdAt - a.createdAt);
+  }, [recentCampaigns, hiddenCampaignsRaw, moderation]);
 
-  // Community Campaigns: approved, not hidden, not featured. Sorted
-  // by the `created_at` of the latest `approved` label, newest first
-  // — mirroring the featured row's `featuredOrder` sort. Moderators
-  // can reorder the grid by re-approving (or dragging) a campaign;
-  // see `useReorderCampaign`. Campaigns missing from `approvedOrder`
-  // (which shouldn't happen — every coord in `approvedCoords` has an
-  // entry) fall back to the campaign's own `createdAt` so the sort
-  // is total.
-  const communityCampaigns = useMemo<ParsedCampaign[]>(() => {
-    if (!moderation) return [];
-    const approvedOrder = moderation.approvedOrder;
-    return allKnownCampaigns
-      .filter(
-        (c) =>
-          moderation.approvedCoords.has(c.aTag) &&
-          !moderation.hiddenCoords.has(c.aTag) &&
-          !featuredCoordSet.has(c.aTag),
-      )
-      .sort((a, b) => {
-        const ta = approvedOrder.get(a.aTag) ?? a.createdAt;
-        const tb = approvedOrder.get(b.aTag) ?? b.createdAt;
-        return tb - ta;
-      });
-  }, [allKnownCampaigns, moderation, featuredCoordSet]);
+  const featuredEmpty =
+    moderationReady && featuredCoords.length === 0 && !featuredLoading;
 
-  // Pending: not approved, not hidden. Featured-but-unapproved is treated
-  // as pending too — a moderator can feature without explicitly approving
-  // and the queue still needs to surface the approval decision.
-  const pendingCampaigns = useMemo<ParsedCampaign[]>(() => {
-    if (!moderation) return [];
-    return allKnownCampaigns.filter(
-      (c) =>
-        !moderation.approvedCoords.has(c.aTag) &&
-        !moderation.hiddenCoords.has(c.aTag),
-    );
-  }, [allKnownCampaigns, moderation]);
-
-  // Hidden: latest label on the hide axis is `hidden`. Independent of
-  // approval status — hide always wins.
-  const hiddenCampaigns = useMemo<ParsedCampaign[]>(() => {
-    if (!moderation) return [];
-    return allKnownCampaigns.filter((c) => moderation.hiddenCoords.has(c.aTag));
-  }, [allKnownCampaigns, moderation]);
-
-  // The grids share the same readiness gate: moderation labels resolved
-  // AND at least one of the two campaign queries returned. We don't wait
-  // for both because each can fail or take a while; whichever arrives
-  // first starts populating the page.
-  const gridsLoading =
-    moderatorsLoading || !moderationReady || (recentLoading && labeledLoading);
+  // Show the Featured section as long as there's something to show
+  // OR we're still loading the moderation labels on first paint
+  // (avoids a flash of the empty state for first-time visitors).
+  const showFeaturedSection =
+    featuredCoords.length > 0 ||
+    (!moderationReady && (moderatorsLoading || featuredLoading)) ||
+    featuredEmpty;
 
   return (
     <main className="min-h-screen pb-16">
       <Hero loggedIn={!!user} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12" id="campaigns">
-        {/* Featured — only rendered when at least one campaign is featured
-            (or the featured query is still loading on first paint). */}
-        {(featuredCoords.length > 0 || (featuredLoading && !moderationReady)) && (
+        {showFeaturedSection && (
           <section className="space-y-5">
-            <div className="flex items-end justify-between gap-4">
+            <div className="flex items-end justify-between gap-4 flex-wrap">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('campaigns.home.featured')}</h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   {t('campaigns.home.featuredDesc', { appName: config.appName })}
                 </p>
               </div>
+              <Button asChild variant="outline" className="hidden sm:inline-flex">
+                <Link to="/campaigns/new">
+                  <PlusCircle className="size-4 mr-2" />
+                  {t('campaigns.home.startCampaign')}
+                </Link>
+              </Button>
             </div>
 
-            <FeaturedRow
-              campaigns={orderedFeatured}
-              isLoading={featuredLoading || !moderationReady}
-              expectedCount={featuredCoords.length}
-            />
+            {featuredEmpty ? (
+              <EmptyState />
+            ) : (
+              <FeaturedRow
+                campaigns={orderedFeatured}
+                isLoading={featuredLoading || !moderationReady}
+                expectedCount={featuredCoords.length}
+              />
+            )}
+
+            {/* "Browse all campaigns" link — the gateway to the full,
+                censorship-resistant set on /campaigns. Kept inside
+                the Featured section so the home page hierarchy is
+                Featured → Browse all → (mod-only) Hidden. */}
+            <div className="pt-2 text-center sm:text-left">
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/campaigns">{t('campaigns.home.browseAll')}</Link>
+              </Button>
+            </div>
           </section>
         )}
 
-        {/* Community Campaigns — moderator-approved, minus hidden, minus
-            featured (featured rides above). The grid is fed by the union
-            of the recent-stream query and a coord-targeted query keyed
-            on every approved coord, so approved campaigns older than
-            the 200-event window still surface.
-
-            For moderators the grid is wrapped in `ReorderableCampaignGrid`
-            which adds drag-and-drop on desktop and Move up / Move down
-            kebab rows on mobile. Reordering republishes the campaign's
-            `approved` label with a chosen `created_at`, which is the
-            sort key for this grid (`approvedOrder` on the moderation
-            rollup). */}
-        <section className="space-y-5">
-          <div className="flex items-end justify-between gap-4 flex-wrap">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('campaigns.home.community')}</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {t('campaigns.home.communityDesc')}
-              </p>
-            </div>
-            <Button asChild variant="outline" className="hidden sm:inline-flex">
-              <Link to="/campaigns/new">
-                <PlusCircle className="size-4 mr-2" />
-                {t('campaigns.home.startCampaign')}
-              </Link>
-            </Button>
-          </div>
-
-          {gridsLoading ? (
-            <CampaignGridSkeleton />
-          ) : communityCampaigns.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <ReorderableCampaignGrid
-              campaigns={communityCampaigns}
-              axis="approval"
-              gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
-            />
-          )}
-
-          {/* "Browse all campaigns" link — reveals the page with search,
-              sort, country filters, and the censorship-resistant view
-              of campaigns that haven't been approved or that mods have
-              hidden. */}
-          <div className="pt-2 text-center sm:text-left">
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/campaigns">{t('campaigns.home.browseAll')}</Link>
-            </Button>
-          </div>
-        </section>
-
-        {/* Pending — moderator-only review queue. Campaigns the recent
-            stream reported but that have no approval AND no hide label.
-            Mods need to triage these so they show up on the public
-            grid (or get filtered out). */}
-        {isMod && (
-          <ModeratorCollapsibleSection
-            icon={<Hourglass className="size-4" />}
-            title={t('campaigns.home.pending')}
-            description={t('campaigns.home.pendingDesc')}
-            count={pendingCampaigns.length}
-            isLoading={recentLoading && pendingCampaigns.length === 0}
-            emptyText={t('campaigns.home.pendingEmpty')}
-            skeleton={<CampaignGridSkeleton />}
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {pendingCampaigns.map((campaign) => (
-                <CampaignCard key={campaign.aTag} campaign={campaign} />
-              ))}
-            </div>
-          </ModeratorCollapsibleSection>
-        )}
-
-        {/* Hidden — moderator-only, collapsed by default. The Campaigns
-            page is where everyone can transparently flip a switch to
-            view hidden campaigns; on the home page mods get a more
-            structured collapsible review surface, kept closed so the
-            page doesn't lead with suppressed content. */}
+        {/* Hidden — moderator-only, collapsed by default. The
+            Campaigns page is where everyone can transparently flip
+            a switch to view hidden campaigns; on the home page mods
+            get a more structured collapsible review surface, kept
+            closed so the page doesn't lead with suppressed content. */}
         {isMod && (
           <ModeratorCollapsibleSection
             icon={<EyeOff className="size-4" />}
             title={t('campaigns.home.hidden')}
             description={t('campaigns.home.hiddenDesc')}
             count={hiddenCampaigns.length}
-            isLoading={labeledLoading && hiddenCampaigns.length === 0}
+            isLoading={(recentLoading || hiddenLoading) && hiddenCampaigns.length === 0}
             emptyText={t('campaigns.home.hiddenEmpty')}
             skeleton={<CampaignGridSkeleton />}
             defaultOpen={false}
@@ -482,24 +381,22 @@ function FeaturedRow({
   }
 
   if (campaigns.length === 0) {
-    // Defensive — the parent guards on `featuredCoords.length > 0`, but if
-    // a hidden-after-featured race leaves us with no campaigns to render,
-    // collapse silently rather than show an empty card.
+    // Defensive — caller decides whether to render this component
+    // when there are no campaigns; if we get here regardless, fail
+    // quiet rather than show an empty row.
     return null;
   }
 
   // 1 featured campaign gets the hero `variant="featured"` treatment;
-  // 2-4 use the regular compact card sized to the dynamic grid.
+  // 2+ use the regular compact card sized to the dynamic grid.
   const useFeaturedVariant = campaigns.length === 1;
 
   // Moderators get drag-and-drop / kebab reorder on the featured
   // row; non-mods get a plain grid through the same component (it
-  // branches internally). `axis="featured"` selects the
-  // `featured` label as the order axis.
+  // branches internally).
   return (
     <ReorderableCampaignGrid
       campaigns={campaigns}
-      axis="featured"
       gridClassName={featuredGridClass(campaigns.length)}
       renderCard={(campaign) => (
         <CampaignCard

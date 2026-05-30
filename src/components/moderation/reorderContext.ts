@@ -1,7 +1,5 @@
 import { createContext, useContext } from 'react';
 
-import type { ReorderAxis } from '@/hooks/useReorderCampaign';
-
 /**
  * Reorder controls forwarded from a parent grid down to whatever
  * `ModerationOverlay` happens to render the card's moderator kebab.
@@ -20,7 +18,6 @@ export interface ReorderEntry {
 }
 
 export interface ReorderContextValue {
-  axis: ReorderAxis;
   byCoord: Map<string, ReorderEntry>;
 }
 

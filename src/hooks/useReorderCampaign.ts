@@ -1,22 +1,6 @@
 import { useCallback } from 'react';
 
 import { useCampaignModeration } from './useCampaignModeration';
-import type { ModerationLabel } from '@/lib/agoraModeration';
-
-/**
- * Reordering axis. Featured uses the `featured` axis; the Community
- * Campaigns grid uses the `approval` axis. Both surfaces sort by the
- * effective rank of the latest label on their axis, descending — see
- * `useCampaignModeration` / `foldModerationLabels` for the rank
- * extraction (explicit `["rank", N]` tag falling back to
- * `created_at`).
- */
-export type ReorderAxis = 'featured' | 'approval';
-
-/** Maps a reorder axis to the `ModerationLabel` we publish to bump it. */
-function axisToLabel(axis: ReorderAxis): ModerationLabel {
-  return axis === 'featured' ? 'featured' : 'approved';
-}
 
 /**
  * Multiplier that lifts a freshly-stamped rank into the
@@ -24,10 +8,9 @@ function axisToLabel(axis: ReorderAxis): ModerationLabel {
  * `Date.now() * RANK_SCALE`, which is several orders of magnitude
  * above any legacy `created_at` fallback (seconds-since-epoch) — so
  * a newly-reordered campaign always sits above un-reordered legacy
- * neighbors when they share the same axis state. The fine-grained
- * sub-second resolution also leaves ample room for inserting
- * midpoint ranks during drag-to-position without exhausting the
- * integer gap.
+ * neighbors. The fine-grained sub-second resolution also leaves
+ * ample room for inserting midpoint ranks during drag-to-position
+ * without exhausting the integer gap.
  *
  * Headroom check: `Date.now() * 1000 ≈ 1.7e15`; `Number.MAX_SAFE_INTEGER
  * ≈ 9e15`. ~150 years before overflow concerns.
@@ -41,11 +24,11 @@ function freshRank(): number {
 
 /**
  * Reordering is implemented via a `["rank", "<number>"]` tag on
- * kind 1985 moderation labels. The fold reads the rank as the sort
+ * kind 1985 `featured` labels. The fold reads the rank as the sort
  * key (descending), falling back to `created_at` when the rank tag
  * is absent — so labels published before this feature existed (and
- * any normal approve / hide / feature actions that don't carry a
- * rank) continue to sort sensibly.
+ * any normal feature actions that don't carry a rank) continue to
+ * sort sensibly.
  *
  * Why a tag and not the label's `created_at` directly: the fold
  * always picks the newest-`created_at` event per `(coord, axis)`.
@@ -59,7 +42,7 @@ function freshRank(): number {
  * Operations:
  *
  * - `moveToTop` — publish with `rank = max(now_scaled, topRank + 1)`.
- *   The `max` guard handles the (rare) clock-skewed neighbor whose
+ *   The `max` guard handles a (rare) clock-skewed neighbor whose
  *   stored rank is somehow already above `now_scaled`.
  * - `moveUp` — publish with `rank = aboveNeighbor.rank + 1`. The
  *   "+1" is what crosses the boundary; the neighbor above already
@@ -80,23 +63,17 @@ function freshRank(): number {
 export function useReorderCampaign() {
   const { moderate, data: moderation } = useCampaignModeration();
 
-  const orderMap = useCallback(
-    (axis: ReorderAxis) =>
-      axis === 'featured' ? moderation.featuredOrder : moderation.approvedOrder,
-    [moderation],
-  );
-
   /**
-   * Publishes a label on `axis` for `coord` carrying an explicit
+   * Publishes a `featured` label for `coord` carrying an explicit
    * rank. `useCampaignModeration().moderate` handles the relay
    * invalidations and the campaign coord-prefix check; the rank is
    * written into a `["rank", "<number>"]` tag on the label event.
    */
   const publishWithRank = useCallback(
-    async (coord: string, axis: ReorderAxis, rank: number) => {
+    async (coord: string, rank: number) => {
       await moderate.mutateAsync({
         coord,
-        action: axisToLabel(axis),
+        action: 'featured',
         rank,
       });
     },
@@ -105,14 +82,14 @@ export function useReorderCampaign() {
 
   /** Move `coord` to position 0 of the displayed list. */
   const moveToTop = useCallback(
-    async (coord: string, axis: ReorderAxis, displayedList: readonly string[]) => {
-      const map = orderMap(axis);
+    async (coord: string, displayedList: readonly string[]) => {
+      const map = moderation.featuredOrder;
       const topCoord = displayedList[0];
       const topRank = topCoord && topCoord !== coord ? map.get(topCoord) ?? 0 : 0;
       const newRank = Math.max(freshRank(), topRank + 1);
-      await publishWithRank(coord, axis, newRank);
+      await publishWithRank(coord, newRank);
     },
-    [orderMap, publishWithRank],
+    [moderation, publishWithRank],
   );
 
   /**
@@ -120,40 +97,40 @@ export function useReorderCampaign() {
    * at the top.
    */
   const moveUp = useCallback(
-    async (coord: string, axis: ReorderAxis, displayedList: readonly string[]) => {
+    async (coord: string, displayedList: readonly string[]) => {
       const idx = displayedList.indexOf(coord);
       if (idx <= 0) return;
       if (idx === 1) {
         // The neighbor above is the current top; just go to top.
-        await moveToTop(coord, axis, displayedList);
+        await moveToTop(coord, displayedList);
         return;
       }
-      const map = orderMap(axis);
+      const map = moderation.featuredOrder;
       const aboveCoord = displayedList[idx - 1];
       const aboveRank = map.get(aboveCoord);
       if (aboveRank === undefined) {
         // Shouldn't happen for items currently in the displayed list,
         // but degrade to "move to top" rather than throw.
-        await moveToTop(coord, axis, displayedList);
+        await moveToTop(coord, displayedList);
         return;
       }
-      await publishWithRank(coord, axis, aboveRank + 1);
+      await publishWithRank(coord, aboveRank + 1);
     },
-    [orderMap, publishWithRank, moveToTop],
+    [moderation, publishWithRank, moveToTop],
   );
 
   /** Move `coord` down by one position. */
   const moveDown = useCallback(
-    async (coord: string, axis: ReorderAxis, displayedList: readonly string[]) => {
+    async (coord: string, displayedList: readonly string[]) => {
       const idx = displayedList.indexOf(coord);
       if (idx < 0 || idx >= displayedList.length - 1) return;
-      const map = orderMap(axis);
+      const map = moderation.featuredOrder;
       const belowCoord = displayedList[idx + 1];
       const belowRank = map.get(belowCoord);
       if (belowRank === undefined) return;
-      await publishWithRank(coord, axis, belowRank - 1);
+      await publishWithRank(coord, belowRank - 1);
     },
-    [orderMap, publishWithRank],
+    [moderation, publishWithRank],
   );
 
   /**
@@ -164,7 +141,6 @@ export function useReorderCampaign() {
   const moveTo = useCallback(
     async (
       coord: string,
-      axis: ReorderAxis,
       displayedList: readonly string[],
       toIndex: number,
     ) => {
@@ -179,7 +155,7 @@ export function useReorderCampaign() {
       const prevCoord = clamped > 0 ? without[clamped - 1] : undefined;
       const nextCoord = clamped < without.length ? without[clamped] : undefined;
 
-      const map = orderMap(axis);
+      const map = moderation.featuredOrder;
       const prevRank = prevCoord ? map.get(prevCoord) : undefined;
       const nextRank = nextCoord ? map.get(nextCoord) : undefined;
 
@@ -208,9 +184,9 @@ export function useReorderCampaign() {
         newRank = nextRank + 1;
       }
 
-      await publishWithRank(coord, axis, newRank);
+      await publishWithRank(coord, newRank);
     },
-    [orderMap, publishWithRank],
+    [moderation, publishWithRank],
   );
 
   return {

@@ -247,7 +247,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             coord={campaign.aTag}
             entityTitle={campaign.title}
             surface="campaign"
-            axes={['approval', 'hide', 'featured']}
+            axes={['hide', 'featured']}
             badgeSize="default"
             className="absolute top-3 right-3 z-10 flex items-center gap-2"
           />

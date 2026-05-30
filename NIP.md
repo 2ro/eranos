@@ -22,7 +22,7 @@
 |--------------------------|-----------------------------------------|-----------------------------------------------------------------|
 | Flat Communities | 34550, 30009, 8, 1111, 1984 | One-level badge membership with explicit moderators (NIP-72 ext) |
 | Community Chat | 34550, 1311 | Realtime member chat scoped to a NIP-72 community |
-| Campaign Moderation | 33863, 34550, 36639, 1985, 39089 | Discovery curation (approved / hidden / featured axes) via moderator-signed labels in the `agora.moderation` namespace, gated by a follow-pack moderator roster. Covers campaigns (all three axes), organizations (hidden + featured), and pledges (hidden + featured). |
+| Campaign Moderation | 33863, 34550, 36639, 1985, 39089 | Discovery curation (hidden + featured axes) via moderator-signed labels in the `agora.moderation` namespace, gated by a follow-pack moderator roster. Covers campaigns, organizations, and pledges identically. |
 | HD Wallet Derivation | — | BIP-39 mnemonic deterministically derived from the user's nsec via HKDF; seeds a BIP-86 Taproot + BIP-352 silent-payment wallet importable into any BIP-39-compatible wallet (see [Agora HD Wallet](#agora-hd-wallet-derivation) below). |
 
 ### Agora Content Marker
@@ -521,23 +521,22 @@ Each label event carries the namespace twice, per NIP-32:
 
 #### Label values
 
-Three independent axes are defined; the newest moderator-signed label per axis per coordinate wins. **Campaigns** use all three axes (`approval`, `hide`, `featured`). **Organizations** and **pledges** use only two — `hide` and `featured` — because every Agora-tagged organization or pledge is publicly visible by default; there is no approval gate. Moderators MUST NOT publish `approved` or `unapproved` labels against kind 34550 or kind 36639 coordinates, and clients MUST ignore any such labels they receive.
+Two independent axes are defined; the newest moderator-signed label per axis per coordinate wins. All three surfaces (campaigns, organizations, pledges) use the same two axes — every Agora-tagged entity is publicly visible by default, and moderation reduces to suppressing unwanted entries (`hide`) and lifting curated ones into a featured row (`featured`).
 
 | Axis     | Values                    | Surfaces                           | Meaning                                                                 |
 |----------|---------------------------|------------------------------------|-------------------------------------------------------------------------|
-| approval | `approved`, `unapproved`  | campaigns only                     | `approved` allows the campaign on its discovery surfaces. `unapproved` retracts a previous approval. |
 | hide     | `hidden`, `unhidden`      | campaigns, organizations, pledges  | `hidden` suppresses the target everywhere it would otherwise appear. `unhidden` retracts a previous hide. |
 | featured | `featured`, `unfeatured`  | campaigns, organizations, pledges  | `featured` places the target in a hand-picked Featured row. `unfeatured` retracts. |
+
+> **Legacy `approved` / `unapproved` labels.** A previous revision of this spec defined a third axis ("approval") used only by campaigns to gate which campaigns appeared on the home page. The axis was retired once `featured` became the single positive-curation mechanism on the home page. Clients MUST ignore `approved` / `unapproved` labels and SHOULD NOT publish new ones. Existing labels in relay archives are dead data.
 
 Surfacing rules (hide always wins):
 
 **Campaigns**
 
-- **Featured row on `/`** — iff the latest featured label is `featured` AND the latest hide label is not `hidden`. Ordered by the featured label's effective rank (see Moderator-driven Ordering), descending. Featured is independent of Approved at the protocol level; a campaign may be featured without being approved (the home page treats Featured and Approved as deduplicated bins, with Featured taking precedence).
-- **Community Campaigns grid on `/`** — iff approved, not hidden, and not featured (featured campaigns get their own row above). Ordered by the approved label's effective rank, descending (same mechanic as the Featured row, with `approved` as the order axis instead of `featured`).
-- **Discover shelf** — iff approved AND not hidden.
-- **Moderator-only "Pending"** — iff neither approved nor hidden.
-- **Moderator-only "Hidden"** — iff hidden.
+- **Featured row on `/`** — iff the latest featured label is `featured` AND the latest hide label is not `hidden`. Ordered by the featured label's effective rank (see Moderator-driven Ordering), descending.
+- **Discover shelf on `/campaigns`** — iff the latest hide label is not `hidden`. Every non-hidden campaign on the network is enumerable here; the home page's Featured row is a curated subset, not a gate.
+- **Moderator-only "Hidden"** — iff hidden. Surfaces the suppressed set so moderators can unhide.
 
 **Organizations**
 
@@ -556,13 +555,13 @@ Surfacing rules (hide always wins):
 
 #### Moderator-driven Ordering
 
-The Featured row and Community Campaigns grid are sorted by the **effective rank** of the moderator's latest label on the relevant axis (`featured` for the Featured row, `approved` for the Community grid), descending.
+The Featured row is sorted by the **effective rank** of the moderator's latest `featured` label per campaign coordinate, descending.
 
-A label's effective rank is the numeric value of its `["rank", "<number>"]` tag if present, falling back to the label's `created_at` when no rank tag is set. Labels published before this feature existed — and any normal approve / hide / feature actions that don't carry a rank — surface with their `created_at` as the effective rank, so newer feature/approval actions naturally float to the top, exactly as if no ordering scheme existed.
+A label's effective rank is the numeric value of its `["rank", "<number>"]` tag if present, falling back to the label's `created_at` when no rank tag is set. Labels published before this feature existed — and any normal hide / feature actions that don't carry a rank — surface with their `created_at` as the effective rank, so newer feature actions naturally float to the top.
 
 The fold rule per `(coord, axis)` is unchanged: the newest event by `created_at` wins. Encoding order in the `created_at` itself would conflict with that rule the moment a moderator tried to lower a campaign's position — the new label would have an older `created_at` than the existing one and lose the fold. The rank tag decouples sort key from event recency so reorder publishes always use `created_at = now` and the fold always picks them up.
 
-A moderator MAY reorder either list by republishing the same axis label for a campaign with a `rank` tag carrying a chosen integer. Three operations cover the common cases:
+A moderator MAY reorder the row by republishing the `featured` label for a campaign with a `rank` tag carrying a chosen integer. Three operations cover the common cases:
 
 - **Move to top** — publish with `rank = max(freshRank, currentTopRank + 1)`, where `freshRank` is a strictly-monotonic integer the client SHOULD source from current wall-clock time at sub-second resolution (Agora uses `Date.now() * 1000`). The `max` guard handles a (rare) clock-skewed existing rank that's already above `freshRank`.
 - **Move up by one** — publish with `rank = neighborAbove.rank + 1`, where `neighborAbove` is the label sorted directly above the campaign being moved.
@@ -572,7 +571,9 @@ A general "drop at index `j`" (e.g. drag-and-drop in a moderator UI) is implemen
 
 The conflict model matches the rest of the moderation namespace: the newest label per `(coord, axis)` from any moderator wins. Concurrent reorders by two moderators resolve to whoever's publish lands later; clients SHOULD refetch labels after a reorder publish to surface the authoritative order.
 
-Reorder labels remain valid moderation labels in every other respect. Clients that don't recognize the `rank` tag simply read the label's axis state and ignore the rank — the labels are not a separate kind, not a separate namespace, and not a new tag namespace. Non-Agora clients see exactly the same approve / hide / feature state they always have.
+Reorder labels remain valid moderation labels in every other respect. Clients that don't recognize the `rank` tag simply read the label's axis state and ignore the rank — the labels are not a separate kind, not a separate namespace, and not a new tag namespace. Non-Agora clients see exactly the same hide / feature state they always have.
+
+The featured row is the only Agora surface that uses moderator-driven ordering today. The same mechanism MAY be applied to the organization or pledge featured shelves if those grow a curation UI; until then, those shelves sort by `created_at` (the legacy behavior, identical to using a missing rank tag).
 
 #### Event Structure
 
@@ -582,9 +583,9 @@ Reorder labels remain valid moderation labels in every other respect. Clients th
   "content": "",
   "tags": [
     ["L", "agora.moderation"],
-    ["l", "approved", "agora.moderation"],
+    ["l", "featured", "agora.moderation"],
     ["a", "33863:<author-pubkey>:<campaign-d-tag>"],
-    ["alt", "Campaign moderation: approved"]
+    ["alt", "Campaign moderation: featured"]
   ]
 }
 ```
@@ -628,7 +629,7 @@ Required tags:
 
 Optional tags:
 
-- `rank` — single string element parsed as an integer. Used only on `approved` and `featured` labels to position the target within Agora's moderator-curated ordered lists; see Moderator-driven Ordering above. Labels without this tag sort by `created_at` (descending), which is the correct behavior for all non-reorder uses.
+- `rank` — single string element parsed as an integer. Used on `featured` labels to position the target within the moderator-curated Featured row; see Moderator-driven Ordering above. Labels without this tag sort by `created_at` (descending), which is the correct behavior for all non-reorder uses.
 
 A label with a rank tag looks like:
 
@@ -658,8 +659,8 @@ d-tag:      k4p5w0n22suf
 
 The pack `p` tags are the authoritative moderator list. Clients MUST pin `authors:` on their label REQ to the pack `p` tags; events from non-pack authors MUST be ignored. This means:
 
-- Self-approval is impossible unless the pack author has added you.
-- A moderator removed from the pack immediately loses moderation authority — campaigns/organizations kept alive only by their labels return to "pending" until another moderator approves them.
+- Self-promotion is impossible unless the pack author has added you.
+- A moderator removed from the pack immediately loses moderation authority — campaigns kept alive on the Featured row only by their labels fall off the row until another moderator features them.
 - The pack author (single signer) can reset the entire moderator roster by republishing the pack.
 
 The same moderator set governs both campaign and organization labels. Carving out per-surface moderator subsets is out of scope; clients that need that distinction would have to introduce a second follow pack and a second label namespace.
@@ -692,10 +693,9 @@ Step 3 — fold by `(coord, axis)`, latest-`created_at`-wins, filtering to the r
 
 #### Client Behavior
 
-- Clients SHOULD render approve/hide/feature controls only for users whose pubkey appears in the pack.
-- Clients MAY display "Hidden" badges on hidden campaigns/organizations when viewed by a moderator, and SHOULD NOT render them at all to non-moderators.
-- Non-moderator authors viewing the homepage SHOULD see their own pending campaigns in a separate explained section so they understand why their campaign isn't yet on the homepage. The campaign URL remains live and donatable regardless of moderation state.
-- Organization authors are not shown an equivalent "pending" surface today — organizations are visible at their NIP-19 route regardless of moderation, and the only moderation surface is the Featured shelf.
+- Clients SHOULD render hide/feature controls only for users whose pubkey appears in the pack.
+- Clients MAY display "Hidden" badges on hidden campaigns/organizations/pledges when viewed by a moderator, and SHOULD NOT render them at all to non-moderators.
+- Authors' own campaigns, organizations, and pledges are visible at their NIP-19 routes regardless of moderation state. The campaign URL remains live and donatable even when the campaign is not on the home page's Featured row.
 
 ---
 

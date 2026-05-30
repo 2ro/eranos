@@ -2,15 +2,20 @@ import type { NostrEvent } from '@nostrify/nostrify';
 
 /**
  * Shared building blocks for Agora's moderation labels (NIP-32 kind 1985 in
- * the `agora.moderation` namespace). Both campaigns (kind 33863) and
- * organizations (kind 34550) ride the same label stream and the same
- * moderator pack (Team Soapbox); the only thing that varies between them is
- * the kind prefix on the `a` tag.
+ * the `agora.moderation` namespace). Campaigns (kind 33863), organizations
+ * (kind 34550), and pledges (kind 36639) all ride the same label stream and
+ * the same moderator pack (Team Soapbox); the only thing that varies
+ * between them is the kind prefix on the `a` tag.
  *
- * Centralizing the constants, types, and folding logic here keeps the two
- * per-surface hooks (`useCampaignModeration`, `useOrganizationModeration`)
- * from drifting apart on namespace strings, axis semantics, or the
- * surfacing-rule contract documented in NIP.md.
+ * Centralizing the constants, types, and folding logic here keeps the
+ * per-surface hooks (`useCampaignModeration`, `useOrganizationModeration`,
+ * `usePledgeModeration`) from drifting apart on namespace strings, axis
+ * semantics, or the surfacing-rule contract documented in NIP.md.
+ *
+ * Two axes are defined: `hide` (universal) and `featured` (universal).
+ * The approval axis was removed once Featured became the single positive
+ * curation mechanism on the home page — see NIP.md and the project
+ * changelog for the history.
  */
 
 /** NIP-32 label kind. */
@@ -19,10 +24,8 @@ export const LABEL_KIND = 1985;
 /** Label namespace for Agora's moderation labels. */
 export const AGORA_MODERATION_NAMESPACE = 'agora.moderation';
 
-/** The six possible label values in the moderation namespace. */
+/** The four possible label values in the moderation namespace. */
 export type ModerationLabel =
-  | 'approved'
-  | 'unapproved'
   | 'hidden'
   | 'unhidden'
   | 'featured'
@@ -45,17 +48,16 @@ interface AxisDecision {
    * the current label).
    *
    * `undefined` for labels published before the reorder feature
-   * shipped, or for normal approve / hide / feature actions that
-   * don't carry a rank. Callers compute an effective sort key with
+   * shipped, or for normal hide / feature actions that don't carry
+   * a rank. Callers compute an effective sort key with
    * `rank ?? createdAt`, giving legacy labels a sensible default
    * while letting reorder labels override.
    */
   rank?: number;
 }
 
-/** Per-coordinate rollup of approval + hide + featured state. */
+/** Per-coordinate rollup of hide + featured state. */
 export interface ModerationState {
-  approval?: AxisDecision; // `approved` or `unapproved`
   hide?: AxisDecision; // `hidden` or `unhidden`
   featured?: AxisDecision; // `featured` or `unfeatured`
 }
@@ -68,8 +70,6 @@ export interface ModerationState {
 export interface ModerationData {
   /** Map of `<kind>:<pubkey>:<d>` -> rollup. */
   byCoord: Map<string, ModerationState>;
-  /** Coordinates where the latest approval label is `approved`. */
-  approvedCoords: Set<string>;
   /** Coordinates where the latest hide label is `hidden`. */
   hiddenCoords: Set<string>;
   /** Coordinates where the latest featured label is `featured`. */
@@ -91,29 +91,17 @@ export interface ModerationData {
    * float to the top, exactly as before the rank tag landed.
    */
   featuredOrder: Map<string, number>;
-  /**
-   * Map of `coord` -> sort key for the Community Campaigns grid.
-   * Same shape and rules as `featuredOrder`, but tracks the
-   * `approved` axis.
-   */
-  approvedOrder: Map<string, number>;
   /** Pubkeys that were considered moderators when the query ran. */
   moderators: string[];
 }
 
 export const EMPTY_MODERATION_DATA: ModerationData = {
   byCoord: new Map(),
-  approvedCoords: new Set(),
   hiddenCoords: new Set(),
   featuredCoords: new Set(),
   featuredOrder: new Map(),
-  approvedOrder: new Map(),
   moderators: [],
 };
-
-function isApprovalLabel(value: string): value is 'approved' | 'unapproved' {
-  return value === 'approved' || value === 'unapproved';
-}
 
 function isHideLabel(value: string): value is 'hidden' | 'unhidden' {
   return value === 'hidden' || value === 'unhidden';
@@ -147,7 +135,9 @@ function extractRank(event: NostrEvent): number | undefined {
  * into each other even though they share a namespace and signer set.
  *
  * Events with a value outside the moderation namespace, or with no `l` tag
- * in that namespace, are dropped.
+ * in that namespace, are dropped. Legacy `approved` / `unapproved` labels
+ * (from the previous approval axis) are silently ignored — the axis was
+ * retired in favor of Featured-only positive curation.
  */
 export function foldModerationLabels(
   events: NostrEvent[],
@@ -169,11 +159,7 @@ export function foldModerationLabels(
 
     const rank = extractRank(event);
     const state = byCoord.get(aTag) ?? {};
-    if (isApprovalLabel(value)) {
-      if (!state.approval || event.created_at > state.approval.createdAt) {
-        state.approval = { label: value, pubkey: event.pubkey, createdAt: event.created_at, rank };
-      }
-    } else if (isHideLabel(value)) {
+    if (isHideLabel(value)) {
       if (!state.hide || event.created_at > state.hide.createdAt) {
         state.hide = { label: value, pubkey: event.pubkey, createdAt: event.created_at, rank };
       }
@@ -182,28 +168,25 @@ export function foldModerationLabels(
         state.featured = { label: value, pubkey: event.pubkey, createdAt: event.created_at, rank };
       }
     }
+    // Unknown values (including legacy `approved`/`unapproved`) drop out
+    // silently. The approval axis is retired; clients that still see
+    // such labels in their cache simply ignore them.
     byCoord.set(aTag, state);
   }
 
-  const approvedCoords = new Set<string>();
   const hiddenCoords = new Set<string>();
   const featuredCoords = new Set<string>();
   const featuredOrder = new Map<string, number>();
-  const approvedOrder = new Map<string, number>();
   for (const [coord, state] of byCoord) {
-    if (state.approval?.label === 'approved') {
-      approvedCoords.add(coord);
-      // Effective sort key: explicit rank tag wins, falling back to
-      // the label's created_at so labels published before the rank
-      // tag existed still sort correctly (newest-approved first).
-      approvedOrder.set(coord, state.approval.rank ?? state.approval.createdAt);
-    }
     if (state.hide?.label === 'hidden') hiddenCoords.add(coord);
     if (state.featured?.label === 'featured') {
       featuredCoords.add(coord);
+      // Effective sort key: explicit rank tag wins, falling back to
+      // the label's created_at so labels published before the rank
+      // tag existed still sort correctly (newest-featured first).
       featuredOrder.set(coord, state.featured.rank ?? state.featured.createdAt);
     }
   }
 
-  return { byCoord, approvedCoords, hiddenCoords, featuredCoords, featuredOrder, approvedOrder, moderators };
+  return { byCoord, hiddenCoords, featuredCoords, featuredOrder, moderators };
 }

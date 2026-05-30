@@ -25,21 +25,21 @@ type CampaignModerationData = ModerationData;
 
 /**
  * Fetches and folds campaign-moderation label events authored by Team
- * Soapbox members. Returns approval / hide / featured rollups per campaign
+ * Soapbox members. Returns hide / featured rollups per campaign
  * coordinate.
  *
  * **Display rule** consumers should follow:
- * - Featured row on `/` iff `featuredCoords.has(coord) && !hiddenCoords.has(coord)`.
- * - Community Campaigns grid on `/` iff `approvedCoords.has(coord) && !hiddenCoords.has(coord) && !featuredCoords.has(coord)` (featured dedupe).
- * - Discover shelf iff `approvedCoords.has(coord) && !hiddenCoords.has(coord)`.
- * - "Pending" (moderator-only sections) iff `!approvedCoords.has(coord) && !hiddenCoords.has(coord)`.
+ * - Featured row on `/` iff `featuredCoords.has(coord) && !hiddenCoords.has(coord)`, ordered by `featuredOrder` descending.
+ * - Discover shelf on `/campaigns` iff `!hiddenCoords.has(coord)`.
  * - "Hidden" (moderator-only sections) iff `hiddenCoords.has(coord)`.
- * - Featured is independent of Approved at the protocol level; hide always wins.
+ * - Hide always wins over featured.
  *
- * The mutation `moderate({ coord, action })` publishes a single kind 1985
- * event labeling one campaign in the `agora.moderation` namespace. Callers
- * MUST be in the moderator set or the relay-side `authors:` filter on read
- * will silently ignore the new event.
+ * The mutation `moderate({ coord, action, rank? })` publishes a single
+ * kind 1985 event labeling one campaign in the `agora.moderation`
+ * namespace. Callers MUST be in the moderator set or the relay-side
+ * `authors:` filter on read will silently ignore the new event. The
+ * optional `rank` writes a `["rank", "<integer>"]` tag for moderator-
+ * driven ordering of the featured row — see `useReorderCampaign`.
  */
 export function useCampaignModeration() {
   const { nostr } = useNostr();
@@ -95,9 +95,9 @@ export function useCampaignModeration() {
        * Optional explicit rank for the label, written into a
        * `["rank", "<number>"]` tag on the event. Used by
        * `useReorderCampaign` to position a campaign within the
-       * featured row or Community grid — the moderation fold uses
-       * the rank as the sort key (descending), falling back to
-       * `created_at` when no rank tag is present.
+       * featured row — the moderation fold uses the rank as the
+       * sort key (descending), falling back to `created_at` when
+       * no rank tag is present.
        *
        * The event itself is always signed with `created_at = now`
        * so the fold's "newest event per (coord, axis)" rule picks
@@ -105,7 +105,7 @@ export function useCampaignModeration() {
        * than the current label's rank — without that, moving a
        * campaign downward would be silently rejected by the fold.
        *
-       * Omit for normal approve / hide / feature actions.
+       * Omit for normal hide / feature actions.
        */
       rank?: number;
     }) => {
@@ -133,10 +133,10 @@ export function useCampaignModeration() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaign-moderation'] });
-      // Moderation decisions (approve / hide / feature) gate which campaigns
-      // surface on the home page, discover shelf, and community grids — so
-      // the list queries need to refetch too, otherwise the moderator's UI
-      // still shows the old approval state until refresh.
+      // Moderation decisions (hide / feature) gate which campaigns
+      // surface on the home page and discover shelf — so the list
+      // queries need to refetch too, otherwise the moderator's UI
+      // still shows the old state until refresh.
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       queryClient.invalidateQueries({ queryKey: ['campaigns-all'] });
       queryClient.invalidateQueries({ queryKey: ['campaigns-all-scores'] });

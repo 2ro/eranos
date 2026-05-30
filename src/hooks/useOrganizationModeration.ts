@@ -28,15 +28,6 @@ type OrganizationModerationData = ModerationData;
  * to the campaign side (we fetch every namespace-tagged label authored by
  * moderators) — the surface separation is purely client-side.
  *
- * **Two-axis model.** Unlike campaigns, organizations don't have an
- * `approved` axis. Every Agora-tagged organization is publicly visible
- * by default; moderation reduces to `featured` (lift into the curated
- * shelf) and `hidden` (suppress from public discovery). The shared
- * fold helper still tracks `approvedCoords` for type symmetry with the
- * campaign hook, but the org UI never emits or reads it — moderators
- * SHOULD NOT publish `approved` / `unapproved` labels against kind
- * 34550 coordinates.
- *
  * **Display rule** consumers should follow:
  * - Featured shelf on `/communities` iff
  *   `featuredCoords.has(coord) && !hiddenCoords.has(coord)`.
@@ -98,13 +89,6 @@ export function useOrganizationModeration() {
     mutationFn: async ({ coord, action }: { coord: string; action: ModerationLabel }) => {
       if (!coord.startsWith(`${COMMUNITY_DEFINITION_KIND}:`)) {
         throw new Error(`Coordinate must start with ${COMMUNITY_DEFINITION_KIND}:`);
-      }
-      // Organizations use a two-axis model — only `featured` / `unfeatured`
-      // / `hidden` / `unhidden` are valid here. Reject `approved` /
-      // `unapproved` defensively so a stray UI bug can't poison the
-      // label stream with axis-mixed events.
-      if (action === 'approved' || action === 'unapproved') {
-        throw new Error(`Organizations do not support the ${action} label`);
       }
       return publishEvent({
         kind: LABEL_KIND,

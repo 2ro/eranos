@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   ArrowUp, ArrowDown, ArrowUpToLine,
   Check, EyeOff, Eye, MoreHorizontal,
-  ShieldCheck, ShieldOff, Sparkles, SparklesIcon,
+  Sparkles, SparklesIcon,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -31,13 +31,15 @@ import type { ModerationLabel } from '@/lib/agoraModeration';
 export type ModerationSurface = 'campaign' | 'pledge' | 'group';
 
 /**
- * Which axes the menu should render. Campaigns have all three; pledges
- * and groups don't have an approval axis. The order in this array does
- * NOT determine render order — the menu always renders Approve → Hide →
- * Feature top-to-bottom when present, which keeps the three surfaces
- * visually consistent.
+ * Which axes the menu should render. Two are defined: `hide` and
+ * `featured`. Every current surface (campaigns, organizations,
+ * pledges) supports both; the prop exists so future surfaces can
+ * selectively expose one axis if needed. The order in this array
+ * does NOT determine render order — the menu always renders
+ * Hide → Feature top-to-bottom when present, which keeps the
+ * surfaces visually consistent.
  */
-export type ModerationAxis = 'approval' | 'hide' | 'featured';
+export type ModerationAxis = 'hide' | 'featured';
 
 interface ModerationItemsProps {
   /** Addressable coordinate of the entity (`<kind>:<pubkey>:<d>`). */
@@ -130,11 +132,9 @@ function ModerationItemsShell({
   // actions while a reorder is in flight (and vice-versa).
   const [reordering, setReordering] = useState(false);
 
-  const isApproved = moderation.approvedCoords.has(coord);
   const isHidden = moderation.hiddenCoords.has(coord);
   const isFeatured = moderation.featuredCoords.has(coord);
 
-  const hasApproval = axes.includes('approval');
   const hasHide = axes.includes('hide');
   const hasFeatured = axes.includes('featured');
 
@@ -190,23 +190,6 @@ function ModerationItemsShell({
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
 
-      {hasApproval && (
-        isApproved ? (
-          <DropdownMenuItem onClick={() => runAction('unapproved', t('moderation.menu.toastUnapproved'))} disabled={!!busy}>
-            <ShieldOff className="h-4 w-4 mr-2" />
-            {t('moderation.menu.unapprove')}
-            <span className="ml-auto text-xs text-muted-foreground inline-flex items-center gap-1">
-              <Check className="h-3 w-3" /> {t('moderation.menu.approvedState')}
-            </span>
-          </DropdownMenuItem>
-        ) : (
-          <DropdownMenuItem onClick={() => runAction('approved', t('moderation.menu.toastApproved'))} disabled={!!busy}>
-            <ShieldCheck className="h-4 w-4 mr-2" />
-            {t('moderation.menu.approve')}
-          </DropdownMenuItem>
-        )
-      )}
-
       {hasHide && (
         isHidden ? (
           <DropdownMenuItem onClick={() => runAction('unhidden', t('moderation.menu.toastUnhidden'))} disabled={!!busy}>
@@ -228,7 +211,7 @@ function ModerationItemsShell({
         )
       )}
 
-      {hasFeatured && (hasApproval || hasHide) && <DropdownMenuSeparator />}
+      {hasFeatured && hasHide && <DropdownMenuSeparator />}
 
       {hasFeatured && (
         isFeatured ? (
