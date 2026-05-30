@@ -994,6 +994,8 @@
     "errorTitleRequired": "Le titre est obligatoire.",
     "errorTitleInvalid": "Le titre doit contenir des lettres ou des chiffres pour qu'une URL de campagne puisse être créée.",
     "errorSlugInvalid": "L'identifiant doit être composé de lettres minuscules, de chiffres et de traits d'union.",
+    "slugPreview": "L'URL de votre campagne utilisera l'identifiant",
+    "slugFallbackNotice": "Nous n'avons pas pu transformer votre titre en identifiant d'URL, nous en générerons donc un aléatoire. Votre titre est conservé exactement tel que vous l'avez saisi.",
     "errorHdUnavailable": "Le portefeuille intégré n'est pas disponible pour ce mode de connexion.",
     "errorSpUnavailable": "L'adresse de paiement silencieux n'est pas disponible pour ce mode de connexion.",
     "errorOnchainInvalid": "L'adresse on-chain n'est pas une adresse bech32(m) mainnet reconnue (bc1q… / bc1p…).",

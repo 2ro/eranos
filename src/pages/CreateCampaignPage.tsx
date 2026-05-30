@@ -43,9 +43,11 @@ import { useToast } from '@/hooks/useToast';
 import { formatBTC, satsToUSD } from '@/lib/bitcoin';
 import {
   CAMPAIGN_KIND,
+  buildCampaignSlug,
   encodeCampaignNaddr,
   parseCampaign,
   parseCampaignWallet,
+  sanitizeCampaignTitle,
   slugifyCampaignIdentifier,
 } from '@/lib/campaign';
 import { getTodayDateInput } from '@/lib/dateInput';
@@ -254,9 +256,19 @@ export function CreateCampaignPage() {
   const editCampaign = isEditMode ? editCampaignQuery.data : null;
 
   // The slug is protocol plumbing: derive it from the title instead of asking
-  // fundraisers to understand Nostr d-tags.
-  const derivedIdentifier = useMemo(() => slugifyCampaignIdentifier(title), [title]);
-  const activeIdentifier = editCampaign?.identifier ?? derivedIdentifier;
+  // fundraisers to understand Nostr d-tags. `buildCampaignSlug` handles
+  // non-Latin titles via transliteration (Arabic → ASCII, etc.) and falls
+  // back to a random `campaign-XXXXXX` for scripts that can't be
+  // transliterated — so users typing in any language can publish.
+  const derivedSlug = useMemo(() => buildCampaignSlug(title), [title]);
+  /**
+   * Transliteration-only preview shown under the title field. Distinct
+   * from {@link derivedSlug}: this never falls back to a random hex slug,
+   * so the UI can tell the user "we couldn't read your title — your URL
+   * will be a random identifier" when it returns empty.
+   */
+  const previewSlug = useMemo(() => slugifyCampaignIdentifier(title), [title]);
+  const activeIdentifier = editCampaign?.identifier ?? derivedSlug.slug;
   const minDeadline = useMemo(() => getTodayDateInput(), []);
 
   // Live-parsed custom inputs, used to drive disclaimers and inline
@@ -325,7 +337,7 @@ export function CreateCampaignPage() {
       if (editCampaign && editCampaign.pubkey !== user.pubkey) {
         throw new Error(t('campaignsCreate.errorEditNotOwner'));
       }
-      const trimmedTitle = title.trim();
+      const trimmedTitle = sanitizeCampaignTitle(title).trim();
       const slug = activeIdentifier;
 
       if (!trimmedTitle) throw new Error(t('campaignsCreate.errorTitleRequired'));
@@ -664,6 +676,14 @@ export function CreateCampaignPage() {
         placeholder={t('campaignsCreate.titlePlaceholder')}
         maxLength={200}
         required
+        aria-invalid={title.trim().length > 0 && !derivedSlug.slug ? true : undefined}
+        aria-describedby="campaign-title-help"
+      />
+      <TitleSlugHint
+        title={title}
+        previewSlug={previewSlug}
+        isFallback={derivedSlug.isFallback}
+        isEditMode={isEditMode}
       />
     </FormSection>
   );
@@ -995,6 +1015,64 @@ export function CreateCampaignPage() {
 
 
 // ─── Layout helpers ──────────────────────────────────────────────────────────
+
+/**
+ * Inline help / validation text rendered under the title input. Tells the
+ * user, before they reach the submit button:
+ *
+ *  - **Empty title** — nothing rendered (the input's `required` attribute
+ *    handles the empty-state message at submit time; we don't want to
+ *    nag before the user starts typing).
+ *  - **Title fine, preview slug derivable** — green-tinted hint showing
+ *    the URL identifier that will be generated (`your-title-here`). Gives
+ *    instant feedback that what they typed worked.
+ *  - **Title typed, preview slug empty** — amber notice explaining that
+ *    the characters can't be turned into a URL identifier, so the
+ *    campaign will get a random one instead. This is the case for
+ *    emoji-only titles, or scripts not covered by transliteration (CJK,
+ *    Thai, Tamil, etc.). Publishing still succeeds — we want users to
+ *    understand the trade-off, not block them.
+ *
+ * Hidden entirely in edit mode, where the slug is locked to the existing
+ * campaign's d-tag and the title can change without affecting the URL.
+ */
+function TitleSlugHint({
+  title,
+  previewSlug,
+  isFallback,
+  isEditMode,
+}: {
+  title: string;
+  previewSlug: string;
+  isFallback: boolean;
+  isEditMode: boolean;
+}) {
+  const { t } = useTranslation();
+
+  if (isEditMode) return null;
+  if (!title.trim()) return null;
+
+  if (previewSlug && !isFallback) {
+    return (
+      <p id="campaign-title-help" className="text-xs text-muted-foreground">
+        {t('campaignsCreate.slugPreview')}{' '}
+        <code className="rounded bg-muted px-1 py-0.5 font-mono text-[0.7rem] text-foreground">
+          {previewSlug}
+        </code>
+      </p>
+    );
+  }
+
+  // previewSlug empty → the random-hex fallback will kick in at submit.
+  return (
+    <p
+      id="campaign-title-help"
+      className="text-xs text-amber-700 dark:text-amber-400"
+    >
+      {t('campaignsCreate.slugFallbackNotice')}
+    </p>
+  );
+}
 
 /**
  * Wallet picker for the campaign form.

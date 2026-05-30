@@ -1,5 +1,6 @@
 import type { NostrEvent } from '@nostrify/nostrify';
 import { nip19 } from 'nostr-tools';
+import slugify from 'slugify';
 
 import { COUNTRIES } from '@/lib/countries';
 import { parseCountryIdentifier } from '@/lib/countryIdentifiers';
@@ -282,16 +283,97 @@ export function encodeCampaignNaddr(campaign: ParsedCampaign, relays?: string[])
 }
 
 /**
+ * Strip Unicode bidi controls, zero-width characters, and BOMs from a
+ * user-supplied title before it lands in an event tag or feeds the slug
+ * deriver. These code points are invisible in most rendering contexts
+ * but survive copy-paste — they're routinely auto-inserted by RTL
+ * keyboards (RLM/LRM/FSI/PDI), and they're a phishing vector when
+ * preserved in display strings.
+ *
+ * - `\u200B-\u200F` zero-width space / joiner / non-joiner / LRM / RLM
+ * - `\u202A-\u202E` LRE / RLE / PDF / LRO / RLO bidi embedding+override
+ * - `\u2066-\u2069` LRI / RLI / FSI / PDI bidi isolates
+ * - `\uFEFF` zero-width no-break space (BOM)
+ *
+ * Whitespace (including non-breaking variants) is preserved here —
+ * trimming is the caller's job.
+ */
+export function sanitizeCampaignTitle(input: string): string {
+  return input.replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '');
+}
+
+/**
  * Slugifies a free-form string into a `d` tag value. Lowercase, ASCII-only,
  * hyphenated. Returns an empty string if nothing remains after stripping.
+ *
+ * Non-Latin scripts (Arabic, Cyrillic, Greek, Persian, Georgian, etc.) are
+ * transliterated to ASCII via the `slugify` package's built-in charMap
+ * before the strict-ASCII filter runs — so an Arabic title like `حملة`
+ * becomes `hmlh` instead of collapsing to empty. Combining marks (diacritics
+ * on Latin letters) are stripped via NFKD so `café` becomes `cafe`.
+ *
+ * The output is suitable for direct comparison against the strict d-tag
+ * regex `/^[a-z0-9][a-z0-9-]{0,63}$/`; callers that need a guaranteed-
+ * non-empty d-tag should use {@link buildCampaignSlug}, which adds a random
+ * fallback for inputs that don't transliterate to any ASCII alphanumeric.
  */
 export function slugifyCampaignIdentifier(input: string): string {
-  return input
-    .toLowerCase()
+  // Drop bidi/zero-width controls first so they don't affect the slug
+  // (RLM/LRM around a Latin title would otherwise survive into the
+  // transliteration step as `\u200F` → no charMap entry → kept verbatim
+  // → filtered, but only after pinning down the leading-hyphen position).
+  const cleaned = sanitizeCampaignTitle(input);
+
+  // `slugify` runs its charMap (covers Arabic, Persian, Cyrillic, Greek,
+  // Georgian, Armenian, Vietnamese, common Latin diacritics, currency
+  // symbols, smart quotes, etc.) and lowercases. We follow up with our
+  // own NFKD + combining-mark strip to catch any Latin diacritics that
+  // slugify's map missed, then collapse to the strict d-tag charset.
+  const transliterated = slugify(cleaned, {
+    lower: true,
+    // We strip everything outside [a-z0-9] ourselves below, so let
+    // slugify keep punctuation as-is — its `strict` mode would drop
+    // useful separators that we'd rather convert to hyphens.
+    strict: false,
+    trim: true,
+  });
+
+  return transliterated
     .normalize('NFKD')
-    // strip combining marks
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u0300-\u036f]/g, '') // strip combining marks
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
-    .slice(0, 64);
+    .slice(0, 64)
+    // Re-trim trailing hyphens introduced by the 64-char truncation.
+    .replace(/-+$/, '');
+}
+
+/**
+ * Derive a publishable d-tag from a campaign title.
+ *
+ * Returns a `{ slug, isFallback }` pair:
+ * - `slug` — a valid d-tag matching `/^[a-z0-9][a-z0-9-]{0,63}$/`.
+ * - `isFallback` — `true` when the title contained no ASCII-transliterable
+ *   characters (e.g. emoji-only, or scripts not covered by the
+ *   transliteration map), and the slug is a random 10-character
+ *   identifier of the form `campaign-XXXXXX`.
+ *
+ * The fallback exists so users typing titles in scripts like Chinese,
+ * Japanese, Korean, Thai, Tamil, etc. can still publish a campaign —
+ * the human-readable title lives in the `title` tag, so an opaque
+ * d-tag has no user-facing cost beyond an uglier URL.
+ */
+export function buildCampaignSlug(input: string): { slug: string; isFallback: boolean } {
+  const slug = slugifyCampaignIdentifier(input);
+  if (slug && /^[a-z0-9][a-z0-9-]{0,63}$/.test(slug)) {
+    return { slug, isFallback: false };
+  }
+  return { slug: `campaign-${randomHex(6)}`, isFallback: true };
+}
+
+/** Cryptographically-random lowercase hex string of the given byte length. */
+function randomHex(bytes: number): string {
+  const buf = new Uint8Array(bytes);
+  crypto.getRandomValues(buf);
+  return Array.from(buf, (b) => b.toString(16).padStart(2, '0')).join('');
 }

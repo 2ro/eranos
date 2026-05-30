@@ -572,6 +572,8 @@
     "errorTitleRequired": "标题为必填项。",
     "errorTitleInvalid": "标题必须包含字母或数字，才能创建活动 URL。",
     "errorSlugInvalid": "标识符必须是小写字母、数字和连字符。",
+    "slugPreview": "你的活动 URL 将使用此标识符",
+    "slugFallbackNotice": "我们无法将你的标题转换为 URL 标识符，因此将自动生成一个随机标识符。你的标题会原样保留。",
     "errorHdUnavailable": "此登录方式不支持内置钱包。",
     "errorSpUnavailable": "此登录方式不支持静默支付地址。",
     "errorOnchainInvalid": "链上地址不是已识别的主网 bech32(m) 地址（bc1q… / bc1p…）。",

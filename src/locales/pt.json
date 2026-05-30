@@ -1004,6 +1004,8 @@
     "errorTitleRequired": "O título é obrigatório.",
     "errorTitleInvalid": "O título deve incluir letras ou números para que uma URL de campanha possa ser criada.",
     "errorSlugInvalid": "O identificador deve ser composto de letras minúsculas, números e hifens.",
+    "slugPreview": "A URL da sua campanha usará o identificador",
+    "slugFallbackNotice": "Não conseguimos transformar seu título em um identificador de URL, então geraremos um aleatório. Seu título permanece exatamente como você o digitou.",
     "errorHdUnavailable": "A carteira integrada não está disponível para este login.",
     "errorSpUnavailable": "O endereço de pagamento silencioso não está disponível para este login.",
     "errorOnchainInvalid": "O endereço on-chain não é um endereço bech32(m) mainnet reconhecido (bc1q… / bc1p…).",

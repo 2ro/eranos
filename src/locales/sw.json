@@ -1003,6 +1003,8 @@
     "errorTitleRequired": "Kichwa kinahitajika.",
     "errorTitleInvalid": "Kichwa lazima kijumuishe herufi au nambari ili URL ya kampeni iweze kuundwa.",
     "errorSlugInvalid": "Kitambulisho lazima kiwe herufi ndogo, nambari, na vistari.",
+    "slugPreview": "URL ya kampeni yako itatumia kitambulisho hiki",
+    "slugFallbackNotice": "Hatukuweza kubadilisha kichwa chako kuwa kitambulisho cha URL, kwa hivyo tutatengeneza kimoja kibahatishi. Kichwa chako kitabaki kama ulivyokiandika.",
     "errorHdUnavailable": "Pochi iliyojengwa ndani haipatikani kwa kuingia hii.",
     "errorSpUnavailable": "Anwani ya malipo ya kimya haipatikani kwa kuingia hii.",
     "errorOnchainInvalid": "Anwani ya katika-mnyororo si anwani ya mtandao mkuu ya bech32(m) inayotambulika (bc1q… / bc1p…).",

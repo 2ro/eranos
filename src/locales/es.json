@@ -572,6 +572,8 @@
     "errorTitleRequired": "El título es obligatorio.",
     "errorTitleInvalid": "El título debe incluir letras o números para crear una URL de campaña.",
     "errorSlugInvalid": "El identificador debe ser letras minúsculas, números y guiones.",
+    "slugPreview": "La URL de tu campaña usará el identificador",
+    "slugFallbackNotice": "No pudimos convertir tu título en un identificador de URL, así que generaremos uno aleatorio. Tu título se conserva exactamente como lo escribiste.",
     "errorHdUnavailable": "La cartera integrada no está disponible para este inicio de sesión.",
     "errorSpUnavailable": "La dirección de pago silencioso no está disponible para este inicio de sesión.",
     "errorOnchainInvalid": "La dirección on-chain no es una dirección bech32(m) mainnet reconocida (bc1q… / bc1p…).",

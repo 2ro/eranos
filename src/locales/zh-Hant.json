@@ -572,6 +572,8 @@
     "errorTitleRequired": "標題為必填項。",
     "errorTitleInvalid": "標題必須包含字母或數字，才能建立活動 URL。",
     "errorSlugInvalid": "識別符號必須是小寫字母、數字和連字元。",
+    "slugPreview": "你的活動 URL 將使用此識別符號",
+    "slugFallbackNotice": "我們無法將你的標題轉換為 URL 識別符號，因此將自動產生一個隨機識別符號。你的標題會原樣保留。",
     "errorHdUnavailable": "此登入方式不支援內建錢包。",
     "errorSpUnavailable": "此登入方式不支援靜默支付地址。",
     "errorOnchainInvalid": "鏈上地址不是已識別的主網 bech32(m) 地址（bc1q… / bc1p…）。",

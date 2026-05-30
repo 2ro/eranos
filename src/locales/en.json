@@ -998,6 +998,8 @@
     "errorTitleRequired": "Title is required.",
     "errorTitleInvalid": "Title must include letters or numbers so a campaign URL can be created.",
     "errorSlugInvalid": "Identifier must be lowercase letters, numbers, and hyphens.",
+    "slugPreview": "Your campaign URL will use the identifier",
+    "slugFallbackNotice": "We couldn't turn your title into a URL identifier, so we'll generate a random one. Your title stays exactly as you typed it.",
     "errorHdUnavailable": "Built-in wallet is unavailable for this login.",
     "errorSpUnavailable": "Silent-payment address is unavailable for this login.",
     "errorOnchainInvalid": "The on-chain address is not a recognized mainnet bech32(m) address (bc1q… / bc1p…).",
