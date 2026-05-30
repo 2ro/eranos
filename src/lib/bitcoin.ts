@@ -126,7 +126,7 @@ export async function fetchAddressData(
   baseUrls: string[],
   signal?: AbortSignal,
 ): Promise<AddressData> {
-  const response = await esploraFetch(baseUrls, `/address/${address}`, { signal });
+  const response = await esploraFetch(baseUrls, `/address/${address}`, { signal, retryStatuses: [404] });
 
   if (!response.ok) {
     throw new Error('Failed to fetch balance');
@@ -479,7 +479,7 @@ export async function fetchAddressTxs(
   const path = lastSeenTxid
     ? `/address/${address}/txs/chain/${lastSeenTxid}`
     : `/address/${address}/txs`;
-  const response = await esploraFetch(baseUrls, path, { signal });
+  const response = await esploraFetch(baseUrls, path, { signal, retryStatuses: [404] });
 
   if (!response.ok) {
     throw new Error('Failed to fetch address transactions');
@@ -519,7 +519,7 @@ export async function fetchUTXOs(
   baseUrls: string[],
   signal?: AbortSignal,
 ): Promise<UTXO[]> {
-  const response = await esploraFetch(baseUrls, `/address/${address}/utxo`, { signal });
+  const response = await esploraFetch(baseUrls, `/address/${address}/utxo`, { signal, retryStatuses: [404] });
   if (!response.ok) throw new Error('Failed to fetch UTXOs');
   return response.json();
 }
@@ -545,7 +545,12 @@ export interface FeeRates {
  * @param signal     Optional abort signal (e.g. from TanStack Query).
  */
 export async function getFeeRates(baseUrls: string[], signal?: AbortSignal): Promise<FeeRates> {
-  const response = await esploraFetch(baseUrls, `/fee-estimates`, { signal });
+  // `/fee-estimates` is always present on a healthy Esplora backend, so a 404
+  // never means "not found" — it means the endpoint is misbehaving (notably
+  // mempool.space serving 404 instead of 429 to rate-limited mobile clients).
+  // Treat it as a retryable failure so we fail over to the next endpoint
+  // instead of trusting the 404 and giving up.
+  const response = await esploraFetch(baseUrls, `/fee-estimates`, { signal, retryStatuses: [404] });
   if (!response.ok) throw new Error('Failed to fetch fee estimates');
 
   const data = await response.json();
@@ -648,6 +653,8 @@ export async function broadcastTransaction(
     method: 'POST',
     body: txHex,
     signal,
+    // A 404 on broadcast is never a legitimate "not found" — fail over.
+    retryStatuses: [404],
   });
 
   if (!response.ok) {
