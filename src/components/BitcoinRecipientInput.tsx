@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ClipboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bitcoin, EyeOff, QrCode, X } from 'lucide-react';
 
@@ -43,6 +44,45 @@ export interface ResolvedRecipient {
    * (currently unused; the chip just dismisses).
    */
   raw: string;
+}
+
+// ---------------------------------------------------------------------------
+// Candidate extraction
+// ---------------------------------------------------------------------------
+
+/**
+ * Resolve a piece of recipient text into the valid on-chain and/or
+ * silent-payment candidates it carries.
+ *
+ * Handles bare `bc1…` / `sp1…` addresses and `bitcoin:` BIP-21 URIs (which
+ * may carry an on-chain path, an `sp=` parameter, or both). Returns empty
+ * strings for whichever kind isn't present/valid. Shared by the live
+ * input memo and the paste handler so both agree on what counts.
+ */
+function resolveCandidates(text: string): { btc: string; sp: string } {
+  const trimmed = text.trim();
+  if (!trimmed) return { btc: '', sp: '' };
+
+  const bip21 = parseBitcoinUri(trimmed);
+
+  // On-chain: the URI path (when present) or the raw input. SP addresses
+  // live in the `sp` field; don't double-count them as on-chain.
+  const btcRaw = bip21 ? bip21.address : trimmed;
+  const btc =
+    btcRaw && !isSilentPaymentAddress(btcRaw) && validateBitcoinAddress(btcRaw)
+      ? btcRaw
+      : '';
+
+  // Silent payment: prefer the URI `sp=` parameter; otherwise the path may
+  // itself be an sp1 address (rare but legal — `bitcoin:sp1…` is a URI
+  // without an on-chain fallback), or the raw input is a bare sp1.
+  const spRaw = bip21 ? (bip21.sp ?? bip21.address) : trimmed;
+  const sp =
+    spRaw && isSilentPaymentAddress(spRaw) && validateSilentPaymentAddress(spRaw)
+      ? spRaw
+      : '';
+
+  return { btc, sp };
 }
 
 // ---------------------------------------------------------------------------
@@ -121,25 +161,10 @@ export function BitcoinRecipientInput({
   // (on-chain). A raw bc1…/sp1… input falls through here unchanged: `bip21`
   // is null and the candidate is just the trimmed query.
   const trimmed = query.trim();
-  const bip21 = useMemo(() => parseBitcoinUri(trimmed), [trimmed]);
-
-  const btcCandidate = useMemo(() => {
-    const c = bip21 ? bip21.address : trimmed;
-    if (!c) return '';
-    // sp addresses live in spCandidate; don't double-count.
-    if (isSilentPaymentAddress(c)) return '';
-    return validateBitcoinAddress(c) ? c : '';
-  }, [bip21, trimmed]);
-
-  const spCandidate = useMemo(() => {
-    // From the URI: prefer `sp=` if valid; otherwise the path may itself be
-    // an sp1 address (rare but legal — `bitcoin:sp1…` is just a URI without
-    // an on-chain fallback).
-    const c = bip21 ? (bip21.sp ?? bip21.address) : trimmed;
-    if (!c) return '';
-    if (!isSilentPaymentAddress(c)) return '';
-    return validateSilentPaymentAddress(c) ? c : '';
-  }, [bip21, trimmed]);
+  const { btc: btcCandidate, sp: spCandidate } = useMemo(
+    () => resolveCandidates(trimmed),
+    [trimmed],
+  );
 
   const hasBtc = !!btcCandidate;
   const hasSp = !!spCandidate;
@@ -204,6 +229,38 @@ export function BitcoinRecipientInput({
     // (via the initial `query`), so reading them here reflects the prefill.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ── Paste auto-select ──────────────────────────────────────────────────
+  //
+  // When the user pastes text that resolves to exactly one valid candidate
+  // (a bare `bc1…` / `sp1…` address or a single-endpoint `bitcoin:` URI),
+  // convert it straight into a chip instead of making them click the lone
+  // dropdown row. A paste carrying *both* an on-chain address and an sp1
+  // code falls through to the normal dropdown so the donor picks privacy
+  // vs. compatibility.
+  //
+  // We resolve from the pasted text directly because `query` state hasn't
+  // updated yet inside the paste event. Returning early on a single match
+  // lets us `preventDefault()` so the input never flickers the raw text.
+  const handlePaste = useCallback(
+    (e: ClipboardEvent<HTMLInputElement>) => {
+      const pasted = e.clipboardData.getData('text');
+      if (!pasted) return;
+      const { btc, sp } = resolveCandidates(pasted);
+      const count = (btc ? 1 : 0) + (sp ? 1 : 0);
+      if (count !== 1) return; // 0 → let it land as text; 2 → use the dropdown.
+      e.preventDefault();
+      if (btc) {
+        onChange({ address: btc, kind: 'address', raw: pasted.trim() });
+      } else {
+        onChange({ address: sp, kind: 'sp', raw: pasted.trim() });
+      }
+      setQuery('');
+      setOpen(false);
+      inputRef.current?.blur();
+    },
+    [onChange],
+  );
 
   // ── QR scan handling ──────────────────────────────────────────────────
   /**
@@ -294,6 +351,7 @@ export function BitcoinRecipientInput({
               id="hd-recipient-input"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onPaste={handlePaste}
               // Reopen on focus so a user can recover the dropdown after an
               // outside-click dismiss (the value is still in the field).
               onFocus={() => {
