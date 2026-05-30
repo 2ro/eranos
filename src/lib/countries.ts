@@ -1,8 +1,15 @@
-import { iso31662 } from 'iso-3166';
 import { getSubdivisionName, getSubdivisionWikipediaTitle } from './subdivisions';
+import { SUBDIVISION_CODES as SUBDIVISION_CODE_LIST } from './subdivisionCodes';
 
-/** Authoritative set of ISO 3166-2 subdivision codes for validation. */
-const SUBDIVISION_CODES = new Set(iso31662.map((s) => s.code));
+/**
+ * Authoritative set of ISO 3166-2 subdivision codes for validation.
+ *
+ * Backed by a build-time-generated code list (`subdivisionCodes.ts`) rather
+ * than importing the full `iso-3166` package, which would drag ~244 KB of
+ * subdivision objects into the critical-path bundle. Regenerate the list with
+ * `node scripts/gen-subdivision-codes.mjs`.
+ */
+const SUBDIVISION_CODES = new Set(SUBDIVISION_CODE_LIST);
 
 /** ISO 3166-1 alpha-2 country code to country name and flag emoji mapping. */
 export const COUNTRIES: Record<string, { name: string; flag: string }> = {
