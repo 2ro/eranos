@@ -1179,7 +1179,18 @@
       "fastest": "~10 min",
       "halfHour": "~30 min",
       "hour": "~1 hora",
-      "economy": "~1 día"
+      "economy": "~1 día",
+      "custom": "Personalizada"
+    },
+    "fee": {
+      "loading": "cargando…",
+      "unavailable": "no disponible",
+      "loadFailed": "No se pudieron cargar las tasas de comisión.",
+      "retry": "Reintentar",
+      "orCustom": "O introduce una tasa personalizada abajo.",
+      "loadingTiers": "Cargando las tasas de comisión…",
+      "customPlaceholder": "p. ej. 5",
+      "customAriaLabel": "Tasa de comisión personalizada en sat/vB"
     },
     "progress": {
       "building": "Construyendo la transacción…",
@@ -1195,7 +1206,9 @@
       "enterAmount": "Introduce una cantidad.",
       "insufficient": "No hay Bitcoin suficiente para esta cantidad + la comisión de red.",
       "waitingPrice": "Esperando el precio del BTC…",
-      "noneYet": "Aún no tienes Bitcoin."
+      "noneYet": "Aún no tienes Bitcoin.",
+      "feesNotLoadedYet": "Las tasas de comisión aún no se han cargado.",
+      "feeRateTooLow": "Introduce una tasa de comisión de al menos 1 sat/vB."
     },
     "scanError": {
       "title": "No se pudo leer ese código QR",

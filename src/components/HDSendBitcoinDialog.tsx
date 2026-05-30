@@ -22,6 +22,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
 import { BitcoinAmountPicker } from '@/components/BitcoinAmountPicker';
 import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
 import {
@@ -39,6 +40,7 @@ import { notificationSuccess } from '@/lib/haptics';
 import {
   getBitcoinFeeRate,
   getUniqueBitcoinFeeSpeeds,
+  resolveBitcoinFeeRate,
   type BitcoinFeeSpeed,
 } from '@/lib/bitcoinFeeSpeed';
 import { isLargeAmount, satsToUSD } from '@/lib/bitcoin';
@@ -136,6 +138,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       halfHour: t('walletSend.feeSpeed.halfHour'),
       hour: t('walletSend.feeSpeed.hour'),
       economy: t('walletSend.feeSpeed.economy'),
+      custom: t('walletSend.feeSpeed.custom'),
     }),
     [t],
   );
@@ -147,6 +150,8 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
   const [recipient, setRecipient] = useState<ResolvedRecipient | null>(null);
   const [usdAmount, setUsdAmount] = useState<number | string>(5);
   const [feeSpeed, setFeeSpeed] = useState<FeeSpeed>('halfHour');
+  /** Raw text for the custom sat/vB rate input (only used when feeSpeed === 'custom'). */
+  const [customFeeRate, setCustomFeeRate] = useState('');
   const [error, setError] = useState('');
   const [feePopoverOpen, setFeePopoverOpen] = useState(false);
   const [success, setSuccess] = useState<SendResult | null>(null);
@@ -155,17 +160,22 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
 
 
   // ── Fee rates ────────────────────────────────────────────────
-  const { data: feeRates } = useQuery({
+  const {
+    data: feeRates,
+    isLoading: feeRatesLoading,
+    isError: feeRatesError,
+    refetch: refetchFeeRates,
+  } = useQuery({
     queryKey: ['blockbook-fee-rates', blockbookBaseUrl],
     queryFn: ({ signal }) => fetchFeeRates(blockbookBaseUrl, signal),
     enabled: isOpen && isReady,
     staleTime: 30_000,
   });
 
-  const currentFeeRate = useMemo(() => {
-    if (!feeRates) return undefined;
-    return getBitcoinFeeRate(feeRates, feeSpeed);
-  }, [feeRates, feeSpeed]);
+  const currentFeeRate = useMemo(
+    () => resolveBitcoinFeeRate(feeSpeed, feeRates, customFeeRate),
+    [feeSpeed, feeRates, customFeeRate],
+  );
 
   // ── Owned UTXO set ───────────────────────────────────────────
   //
@@ -245,7 +255,9 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
   const handleFeeSpeedChange = useCallback((speed: FeeSpeed) => {
     feeSpeedUserChanged.current = true;
     setFeeSpeed(speed);
-    setFeePopoverOpen(false);
+    // Keep the popover open for 'custom' so the user can type a rate; close
+    // it for preset tiers since the choice is complete.
+    if (speed !== 'custom') setFeePopoverOpen(false);
   }, []);
 
   // ── Two-tap arm + raw-address disclaimer ─────────────────────
@@ -286,11 +298,12 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       }
       if (!recipient) throw new Error(t('walletSend.errors.enterRecipient'));
       if (!ownedInputs.length) throw new Error(t('walletSend.errors.noSpendable'));
-      if (!feeRates) throw new Error(t('walletSend.errors.feesNotLoaded'));
+      if (feeSpeed !== 'custom' && !feeRates) throw new Error(t('walletSend.errors.feesNotLoaded'));
       if (amountSats <= 0) throw new Error(t('walletSend.errors.enterAmount'));
       if (insufficient) throw new Error(t('walletSend.errors.insufficient'));
 
-      const rate = getBitcoinFeeRate(feeRates, feeSpeed);
+      const rate = resolveBitcoinFeeRate(feeSpeed, feeRates, customFeeRate);
+      if (!rate || rate < 1) throw new Error(t('walletSend.errors.feeRateTooLow'));
       const nextChangeIndex = scan?.change.firstUnusedIndex ?? 0;
 
       setProgress('building');
@@ -353,6 +366,14 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     if (!btcPrice) { setError(t('walletSend.errors.waitingPrice')); return; }
     if (amountSats <= 0) { setError(t('walletSend.errors.enterAmount')); return; }
     if (!ownedInputs.length) { setError(t('walletSend.errors.noneYet')); return; }
+    if (!currentFeeRate || currentFeeRate < 1) {
+      setError(
+        feeSpeed === 'custom'
+          ? t('walletSend.errors.feeRateTooLow')
+          : t('walletSend.errors.feesNotLoadedYet'),
+      );
+      return;
+    }
     if (insufficient) { setError(t('walletSend.errors.insufficient')); return; }
     if (requiresArm && !confirmArmed) { setConfirmArmed(true); return; }
     sendMutation.mutate();
@@ -363,6 +384,8 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     btcPrice,
     amountSats,
     ownedInputs.length,
+    currentFeeRate,
+    feeSpeed,
     insufficient,
     requiresArm,
     confirmArmed,
@@ -378,6 +401,8 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       setRecipient(null);
       setUsdAmount(5);
       setError('');
+      setFeeSpeed('halfHour');
+      setCustomFeeRate('');
       setConfirmArmed(false);
       setSuccess(null);
       feeSpeedUserChanged.current = false;
@@ -405,7 +430,9 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     !btcPrice ||
     amountSats <= 0 ||
     insufficient ||
-    !ownedInputs.length;
+    !ownedInputs.length ||
+    !currentFeeRate ||
+    currentFeeRate < 1;
 
   // ── Render ───────────────────────────────────────────────────
   return (
@@ -504,16 +531,41 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
                         <>≈ {satsToUSD(estimatedFeeSats, btcPrice)}</>
                       ) : currentFeeRate ? (
                         <>{t('walletSend.satPerVB', { rate: currentFeeRate })}</>
+                      ) : feeRatesLoading && feeSpeed !== 'custom' ? (
+                        <>{t('walletSend.fee.loading')}</>
+                      ) : feeRatesError && feeSpeed !== 'custom' ? (
+                        <>{t('walletSend.fee.unavailable')}</>
                       ) : (
                         <>—</>
                       )}
                       <span className="opacity-60">·</span>
-                      {feeSpeedLabels[feeSpeed]}
+                      {feeSpeed === 'custom' && currentFeeRate
+                        ? t('walletSend.satPerVB', { rate: currentFeeRate })
+                        : feeSpeedLabels[feeSpeed]}
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-44 p-1" align="center">
+                  <PopoverContent className="w-56 p-1" align="center">
                     <div className="grid gap-0.5">
-                      {getUniqueBitcoinFeeSpeeds(feeRates).map((speed) => (
+                      {feeRatesError && (
+                        <div className="px-3 py-1.5 text-xs text-muted-foreground">
+                          <p className="text-destructive">{t('walletSend.fee.loadFailed')}</p>
+                          <button
+                            type="button"
+                            onClick={() => refetchFeeRates()}
+                            className="mt-1 underline hover:text-foreground transition-colors"
+                          >
+                            {t('walletSend.fee.retry')}
+                          </button>
+                          <p className="mt-1">{t('walletSend.fee.orCustom')}</p>
+                        </div>
+                      )}
+                      {feeRatesLoading && !feeRatesError && (
+                        <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground">
+                          <Loader2 className="size-3 animate-spin" />
+                          {t('walletSend.fee.loadingTiers')}
+                        </div>
+                      )}
+                      {feeRates && getUniqueBitcoinFeeSpeeds(feeRates).map((speed) => (
                         <button
                           key={speed}
                           type="button"
@@ -524,13 +576,39 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
                           )}
                         >
                           <span>{feeSpeedLabels[speed]}</span>
-                          {feeRates && (
-                            <span className="text-muted-foreground tabular-nums">
-                              {t('walletSend.satPerVB', { rate: getBitcoinFeeRate(feeRates, speed) })}
-                            </span>
-                          )}
+                          <span className="text-muted-foreground tabular-nums">
+                            {t('walletSend.satPerVB', { rate: getBitcoinFeeRate(feeRates, speed) })}
+                          </span>
                         </button>
                       ))}
+                      {/* Custom fee rate */}
+                      <button
+                        type="button"
+                        onClick={() => handleFeeSpeedChange('custom')}
+                        className={cn(
+                          'flex justify-between items-center px-3 py-1.5 rounded-md text-xs hover:bg-muted/50 transition-colors',
+                          feeSpeed === 'custom' && 'bg-muted',
+                        )}
+                      >
+                        <span>{feeSpeedLabels.custom}</span>
+                      </button>
+                      {feeSpeed === 'custom' && (
+                        <div className="flex items-center gap-1.5 px-3 py-1.5">
+                          <Input
+                            type="number"
+                            inputMode="decimal"
+                            min={1}
+                            step={1}
+                            autoFocus
+                            value={customFeeRate}
+                            onChange={(e) => setCustomFeeRate(e.target.value)}
+                            placeholder={t('walletSend.fee.customPlaceholder')}
+                            className="h-7 text-xs"
+                            aria-label={t('walletSend.fee.customAriaLabel')}
+                          />
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">sat/vB</span>
+                        </div>
+                      )}
                     </div>
                   </PopoverContent>
                 </Popover>

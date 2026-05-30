@@ -1547,7 +1547,18 @@
       "fastest": "~10 dk",
       "halfHour": "~30 dk",
       "hour": "~1 saat",
-      "economy": "~1 gün"
+      "economy": "~1 gün",
+      "custom": "Özel"
+    },
+    "fee": {
+      "loading": "yükleniyor…",
+      "unavailable": "kullanılamıyor",
+      "loadFailed": "Ücret oranları yüklenemedi.",
+      "retry": "Yeniden dene",
+      "orCustom": "Ya da aşağıya özel bir oran girin.",
+      "loadingTiers": "Ücret oranları yükleniyor…",
+      "customPlaceholder": "örn. 5",
+      "customAriaLabel": "sat/vB cinsinden özel ücret oranı"
     },
     "progress": {
       "building": "İşlem oluşturuluyor…",
@@ -1563,7 +1574,9 @@
       "enterAmount": "Bir tutar girin.",
       "insufficient": "Bu tutar + ağ ücreti için yeterli Bitcoin yok.",
       "waitingPrice": "BTC fiyatı bekleniyor…",
-      "noneYet": "Henüz Bitcoin'iniz yok."
+      "noneYet": "Henüz Bitcoin'iniz yok.",
+      "feesNotLoadedYet": "Ücret oranları henüz yüklenmedi.",
+      "feeRateTooLow": "En az 1 sat/vB ücret oranı girin."
     },
     "toast": {
       "failedTitle": "İşlem başarısız"

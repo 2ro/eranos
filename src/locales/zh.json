@@ -1179,7 +1179,18 @@
       "fastest": "~10 分钟",
       "halfHour": "~30 分钟",
       "hour": "~1 小时",
-      "economy": "~1 天"
+      "economy": "~1 天",
+      "custom": "自定义"
+    },
+    "fee": {
+      "loading": "加载中…",
+      "unavailable": "不可用",
+      "loadFailed": "无法加载费率。",
+      "retry": "重试",
+      "orCustom": "或在下方输入自定义费率。",
+      "loadingTiers": "正在加载费率…",
+      "customPlaceholder": "例如 5",
+      "customAriaLabel": "自定义费率（sat/vB）"
     },
     "progress": {
       "building": "正在构建交易…",
@@ -1195,7 +1206,9 @@
       "enterAmount": "请输入金额。",
       "insufficient": "比特币不足以支付该金额和网络费用。",
       "waitingPrice": "正在等待 BTC 价格…",
-      "noneYet": "你还没有任何比特币。"
+      "noneYet": "你还没有任何比特币。",
+      "feesNotLoadedYet": "费率尚未加载。",
+      "feeRateTooLow": "请输入至少 1 sat/vB 的费率。"
     },
     "scanError": {
       "title": "无法读取该二维码",

@@ -1179,7 +1179,18 @@
       "fastest": "~۱۰ دقیقې",
       "halfHour": "~۳۰ دقیقې",
       "hour": "~۱ ساعت",
-      "economy": "~۱ ورځ"
+      "economy": "~۱ ورځ",
+      "custom": "دودیز"
+    },
+    "fee": {
+      "loading": "لوډېږي…",
+      "unavailable": "د لاسرسي وړ نه دی",
+      "loadFailed": "د فیس نرخونه یې ونه لوډل شول.",
+      "retry": "بیا هڅه وکړئ",
+      "orCustom": "یا لاندې یو دودیز نرخ دننه کړئ.",
+      "loadingTiers": "د فیس نرخونه لوډېږي…",
+      "customPlaceholder": "بېلګه: 5",
+      "customAriaLabel": "دودیز د فیس نرخ په sat/vB کې"
     },
     "progress": {
       "building": "د معاملې جوړول…",
@@ -1195,7 +1206,9 @@
       "enterAmount": "یوه اندازه دننه کړئ.",
       "insufficient": "د دې اندازې او د شبکې فیس لپاره کافي بټکوین نشته.",
       "waitingPrice": "د BTC قیمت ته انتظار…",
-      "noneYet": "تاسو لاهم هېڅ بټکوین نه لرئ."
+      "noneYet": "تاسو لاهم هېڅ بټکوین نه لرئ.",
+      "feesNotLoadedYet": "د فیس نرخونه لاهم نه دي لوډ شوي.",
+      "feeRateTooLow": "لږ تر لږه د 1 sat/vB د فیس نرخ دننه کړئ."
     },
     "scanError": {
       "title": "هغه QR کوډ ونه لوستل شو",

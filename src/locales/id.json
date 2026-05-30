@@ -1548,7 +1548,18 @@
       "fastest": "~10 menit",
       "halfHour": "~30 menit",
       "hour": "~1 jam",
-      "economy": "~1 hari"
+      "economy": "~1 hari",
+      "custom": "Khusus"
+    },
+    "fee": {
+      "loading": "memuat…",
+      "unavailable": "tidak tersedia",
+      "loadFailed": "Tidak bisa memuat tarif biaya.",
+      "retry": "Coba lagi",
+      "orCustom": "Atau masukkan tarif khusus di bawah.",
+      "loadingTiers": "Memuat tarif biaya…",
+      "customPlaceholder": "misal 5",
+      "customAriaLabel": "Tarif biaya khusus dalam sat/vB"
     },
     "progress": {
       "building": "Membangun transaksi…",
@@ -1564,7 +1575,9 @@
       "enterAmount": "Masukkan jumlah.",
       "insufficient": "Bitcoin tidak cukup untuk jumlah ini + biaya jaringan.",
       "waitingPrice": "Menunggu harga BTC…",
-      "noneYet": "Anda belum punya Bitcoin."
+      "noneYet": "Anda belum punya Bitcoin.",
+      "feesNotLoadedYet": "Tarif biaya belum dimuat.",
+      "feeRateTooLow": "Masukkan tarif biaya minimal 1 sat/vB."
     },
     "scanError": {
       "title": "Tidak bisa membaca kode QR itu",

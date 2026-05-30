@@ -1612,7 +1612,18 @@
       "fastest": "~10 мин",
       "halfHour": "~30 мин",
       "hour": "~1 час",
-      "economy": "~1 день"
+      "economy": "~1 день",
+      "custom": "Другая"
+    },
+    "fee": {
+      "loading": "загрузка…",
+      "unavailable": "недоступно",
+      "loadFailed": "Не удалось загрузить ставки комиссий.",
+      "retry": "Повторить",
+      "orCustom": "Или введите свою ставку ниже.",
+      "loadingTiers": "Загрузка ставок комиссий…",
+      "customPlaceholder": "напр. 5",
+      "customAriaLabel": "Своя ставка комиссии в sat/vB"
     },
     "progress": {
       "building": "Создание транзакции…",
@@ -1628,7 +1639,9 @@
       "enterAmount": "Введите сумму.",
       "insufficient": "Недостаточно Bitcoin для этой суммы + комиссии сети.",
       "waitingPrice": "Ожидание цены BTC…",
-      "noneYet": "У вас пока нет Bitcoin."
+      "noneYet": "У вас пока нет Bitcoin.",
+      "feesNotLoadedYet": "Ставки комиссий ещё не загружены.",
+      "feeRateTooLow": "Введите ставку комиссии не менее 1 sat/vB."
     },
     "scanError": {
       "title": "Не удалось прочитать этот QR-код",

@@ -1548,7 +1548,18 @@
       "fastest": "~10 मिनट",
       "halfHour": "~30 मिनट",
       "hour": "~1 घंटा",
-      "economy": "~1 दिन"
+      "economy": "~1 दिन",
+      "custom": "कस्टम"
+    },
+    "fee": {
+      "loading": "लोड हो रहा है…",
+      "unavailable": "अनुपलब्ध",
+      "loadFailed": "Fee rates लोड नहीं हो सकीं।",
+      "retry": "फिर कोशिश करें",
+      "orCustom": "या नीचे एक कस्टम रेट डालें।",
+      "loadingTiers": "Fee rates लोड हो रही हैं…",
+      "customPlaceholder": "उदा. 5",
+      "customAriaLabel": "sat/vB में कस्टम fee rate"
     },
     "progress": {
       "building": "Transaction बन रहा है…",
@@ -1564,7 +1575,9 @@
       "enterAmount": "एक राशि दर्ज करें।",
       "insufficient": "इस राशि + नेटवर्क फ़ीस के लिए Bitcoin पर्याप्त नहीं।",
       "waitingPrice": "BTC दाम का इंतज़ार है…",
-      "noneYet": "आपके पास अभी कोई Bitcoin नहीं है।"
+      "noneYet": "आपके पास अभी कोई Bitcoin नहीं है।",
+      "feesNotLoadedYet": "Fee rates अभी तक लोड नहीं हुई हैं।",
+      "feeRateTooLow": "कम से कम 1 sat/vB का fee rate डालें।"
     },
     "toast": {
       "failedTitle": "Transaction विफल"

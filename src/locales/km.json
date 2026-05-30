@@ -1179,7 +1179,18 @@
       "fastest": "~១០ នាទី",
       "halfHour": "~៣០ នាទី",
       "hour": "~១ ម៉ោង",
-      "economy": "~១ ថ្ងៃ"
+      "economy": "~១ ថ្ងៃ",
+      "custom": "ផ្ទាល់ខ្លួន"
+    },
+    "fee": {
+      "loading": "កំពុងផ្ទុក…",
+      "unavailable": "មិនអាចប្រើបាន",
+      "loadFailed": "មិនអាចផ្ទុកអត្រាថ្លៃបានទេ។",
+      "retry": "ព្យាយាមម្ដងទៀត",
+      "orCustom": "ឬបញ្ចូលអត្រាផ្ទាល់ខ្លួននៅខាងក្រោម។",
+      "loadingTiers": "កំពុងផ្ទុកអត្រាថ្លៃ…",
+      "customPlaceholder": "ឧ. 5",
+      "customAriaLabel": "អត្រាថ្លៃផ្ទាល់ខ្លួនជា sat/vB"
     },
     "progress": {
       "building": "កំពុងបង្កើតប្រតិបត្តិការ…",
@@ -1195,7 +1206,9 @@
       "enterAmount": "បញ្ចូលចំនួន។",
       "insufficient": "មិនមាន Bitcoin គ្រប់គ្រាន់សម្រាប់ចំនួននេះ + ថ្លៃបណ្តាញ។",
       "waitingPrice": "កំពុងរង់ចាំតម្លៃ BTC…",
-      "noneYet": "អ្នកមិនទាន់មាន Bitcoin ទេ។"
+      "noneYet": "អ្នកមិនទាន់មាន Bitcoin ទេ។",
+      "feesNotLoadedYet": "អត្រាថ្លៃមិនទាន់បានផ្ទុកនៅឡើយទេ។",
+      "feeRateTooLow": "បញ្ចូលអត្រាថ្លៃយ៉ាងហោចណាស់ 1 sat/vB។"
     },
     "scanError": {
       "title": "មិនអាចអានកូដ QR នេះបានទេ",

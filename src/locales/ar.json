@@ -1163,7 +1163,18 @@
       "fastest": "~10 دقائق",
       "halfHour": "~30 دقيقة",
       "hour": "~ساعة",
-      "economy": "~يوم"
+      "economy": "~يوم",
+      "custom": "مخصّص"
+    },
+    "fee": {
+      "loading": "جارٍ التحميل…",
+      "unavailable": "غير متاح",
+      "loadFailed": "تعذّر تحميل معدلات الرسوم.",
+      "retry": "إعادة المحاولة",
+      "orCustom": "أو أدخل معدلاً مخصّصاً أدناه.",
+      "loadingTiers": "جارٍ تحميل معدلات الرسوم…",
+      "customPlaceholder": "مثال: 5",
+      "customAriaLabel": "معدل رسوم مخصّص بوحدة sat/vB"
     },
     "progress": {
       "building": "جارٍ بناء المعاملة…",
@@ -1179,7 +1190,9 @@
       "enterAmount": "أدخل مبلغاً.",
       "insufficient": "البيتكوين غير كافٍ لهذا المبلغ + رسوم الشبكة.",
       "waitingPrice": "في انتظار سعر BTC…",
-      "noneYet": "ليس لديك بيتكوين بعد."
+      "noneYet": "ليس لديك بيتكوين بعد.",
+      "feesNotLoadedYet": "لم يتم تحميل معدلات الرسوم بعد.",
+      "feeRateTooLow": "أدخل معدل رسوم لا يقل عن 1 sat/vB."
     },
     "toast": {
       "failedTitle": "فشلت المعاملة"

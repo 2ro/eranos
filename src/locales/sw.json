@@ -1507,7 +1507,18 @@
       "fastest": "~dakika 10",
       "halfHour": "~dakika 30",
       "hour": "~saa 1",
-      "economy": "~siku 1"
+      "economy": "~siku 1",
+      "custom": "Maalum"
+    },
+    "fee": {
+      "loading": "inapakia…",
+      "unavailable": "haipatikani",
+      "loadFailed": "Imeshindwa kupakia viwango vya ada.",
+      "retry": "Jaribu tena",
+      "orCustom": "Au weka kiwango maalum hapa chini.",
+      "loadingTiers": "Inapakia viwango vya ada…",
+      "customPlaceholder": "mf. 5",
+      "customAriaLabel": "Kiwango maalum cha ada katika sat/vB"
     },
     "progress": {
       "building": "Inajenga muamala…",
@@ -1523,7 +1534,9 @@
       "enterAmount": "Weka kiasi.",
       "insufficient": "Hakuna Bitcoin ya kutosha kwa kiasi hiki + ada ya mtandao.",
       "waitingPrice": "Inasubiri bei ya BTC…",
-      "noneYet": "Bado huna Bitcoin yoyote."
+      "noneYet": "Bado huna Bitcoin yoyote.",
+      "feesNotLoadedYet": "Viwango vya ada bado havijapakiwa.",
+      "feeRateTooLow": "Weka kiwango cha ada cha angalau 1 sat/vB."
     },
     "scanError": {
       "title": "Imeshindwa kusoma msimbo huo wa QR",

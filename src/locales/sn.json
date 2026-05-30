@@ -1179,7 +1179,18 @@
       "fastest": "~10 maminitsi",
       "halfHour": "~30 maminitsi",
       "hour": "~awa 1",
-      "economy": "~zuva 1"
+      "economy": "~zuva 1",
+      "custom": "Zvakasarudzwa"
+    },
+    "fee": {
+      "loading": "kuloadwa…",
+      "unavailable": "hazviwanike",
+      "loadFailed": "Hatina kukwanisa kuloadha mitengo yemiripo.",
+      "retry": "Edza zvakare",
+      "orCustom": "Kana isa mutengo wakasarudzwa pazasi.",
+      "loadingTiers": "Kuloadha mitengo yemiripo…",
+      "customPlaceholder": "semuenzaniso 5",
+      "customAriaLabel": "Mutengo wemuripo wakasarudzwa mu-sat/vB"
     },
     "progress": {
       "building": "Kuvaka chinoitwa…",
@@ -1195,7 +1206,9 @@
       "enterAmount": "Isa huwandu.",
       "insufficient": "Bitcoin haina kukwana pahuwandu uhwu + muripo wenetwork.",
       "waitingPrice": "Kumirira mutengo weBTC…",
-      "noneYet": "Hauna kana Bitcoin parizvino."
+      "noneYet": "Hauna kana Bitcoin parizvino.",
+      "feesNotLoadedYet": "Mitengo yemiripo haisati yaloadwa.",
+      "feeRateTooLow": "Isa mutengo wemuripo usingadarike 1 sat/vB."
     },
     "toast": {
       "failedTitle": "Chinoitwa chakundikana"

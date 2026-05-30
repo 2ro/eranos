@@ -1677,7 +1677,18 @@
       "fastest": "~10 min",
       "halfHour": "~30 min",
       "hour": "~1 hour",
-      "economy": "~1 day"
+      "economy": "~1 day",
+      "custom": "Custom"
+    },
+    "fee": {
+      "loading": "loading…",
+      "unavailable": "unavailable",
+      "loadFailed": "Couldn't load fee rates.",
+      "retry": "Retry",
+      "orCustom": "Or enter a custom rate below.",
+      "loadingTiers": "Loading fee rates…",
+      "customPlaceholder": "e.g. 5",
+      "customAriaLabel": "Custom fee rate in sat/vB"
     },
     "progress": {
       "building": "Building transaction…",
@@ -1690,6 +1701,8 @@
       "enterRecipient": "Enter a Bitcoin address or sp1… silent payment address.",
       "noSpendable": "No spendable Bitcoin in this wallet.",
       "feesNotLoaded": "Fee rates not loaded.",
+      "feesNotLoadedYet": "Fee rates haven't loaded yet.",
+      "feeRateTooLow": "Enter a fee rate of at least 1 sat/vB.",
       "enterAmount": "Enter an amount.",
       "insufficient": "Not enough Bitcoin for this amount + network fee.",
       "waitingPrice": "Waiting for BTC price…",

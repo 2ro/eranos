@@ -1115,7 +1115,18 @@
       "fastest": "~10 分鐘",
       "halfHour": "~30 分鐘",
       "hour": "~1 小時",
-      "economy": "~1 天"
+      "economy": "~1 天",
+      "custom": "自訂"
+    },
+    "fee": {
+      "loading": "載入中…",
+      "unavailable": "無法使用",
+      "loadFailed": "無法載入費率。",
+      "retry": "重試",
+      "orCustom": "或在下方輸入自訂費率。",
+      "loadingTiers": "正在載入費率…",
+      "customPlaceholder": "例如 5",
+      "customAriaLabel": "自訂費率（sat/vB）"
     },
     "progress": {
       "building": "正在構建交易…",
@@ -1128,6 +1139,8 @@
       "enterRecipient": "請輸入比特幣地址或 sp1… 靜默支付地址。",
       "noSpendable": "此錢包中沒有可花費的比特幣。",
       "feesNotLoaded": "費率未載入。",
+      "feesNotLoadedYet": "費率尚未載入。",
+      "feeRateTooLow": "請輸入至少 1 sat/vB 的費率。",
       "enterAmount": "請輸入金額。",
       "insufficient": "比特幣不足以支付該金額和網路費用。",
       "waitingPrice": "正在等待 BTC 價格…",

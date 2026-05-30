@@ -1602,7 +1602,18 @@
       "fastest": "~10 min",
       "halfHour": "~30 min",
       "hour": "~1 heure",
-      "economy": "~1 jour"
+      "economy": "~1 jour",
+      "custom": "Personnalisé"
+    },
+    "fee": {
+      "loading": "chargement…",
+      "unavailable": "indisponible",
+      "loadFailed": "Impossible de charger les taux de frais.",
+      "retry": "Réessayer",
+      "orCustom": "Ou saisissez un taux personnalisé ci-dessous.",
+      "loadingTiers": "Chargement des taux de frais…",
+      "customPlaceholder": "p. ex. 5",
+      "customAriaLabel": "Taux de frais personnalisé en sat/vB"
     },
     "progress": {
       "building": "Construction de la transaction…",
@@ -1618,7 +1629,9 @@
       "enterAmount": "Saisissez un montant.",
       "insufficient": "Pas assez de Bitcoin pour ce montant + frais réseau.",
       "waitingPrice": "En attente du prix BTC…",
-      "noneYet": "Vous n'avez pas encore de Bitcoin."
+      "noneYet": "Vous n'avez pas encore de Bitcoin.",
+      "feesNotLoadedYet": "Les taux de frais ne sont pas encore chargés.",
+      "feeRateTooLow": "Saisissez un taux de frais d'au moins 1 sat/vB."
     },
     "scanError": {
       "title": "Impossible de lire ce QR code",
