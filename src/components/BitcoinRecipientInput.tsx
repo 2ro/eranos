@@ -88,9 +88,10 @@ interface BitcoinRecipientInputProps {
  * returns to the input view.
  *
  * Anything else (npub, nprofile, free text) is silently ignored — there is
- * no account search here, by design. Refocusing or clicking the input while
- * it still contains a BIP-21 URI reopens the dropdown so the donor can swap
- * between the available options without retyping.
+ * no account search here, by design. The dropdown stays open as long as the
+ * input holds at least one valid candidate; it doesn't dismiss when the
+ * input loses focus or the user taps elsewhere. It closes only on selection,
+ * when the input is cleared, or on Escape.
  */
 export function BitcoinRecipientInput({
   value,
@@ -332,6 +333,16 @@ export function BitcoinRecipientInput({
           // the input and dismiss the mobile keyboard mid-type.
           onOpenAutoFocus={(e) => e.preventDefault()}
           onCloseAutoFocus={(e) => e.preventDefault()}
+          // The dropdown is a persistent choice list, not a transient
+          // hover-popover: it should stay open even when the input loses
+          // focus or the user taps elsewhere on the page, so blurring out
+          // doesn't make the candidate rows vanish. We block Radix's
+          // auto-dismiss-on-outside-interaction and instead close the
+          // dropdown explicitly — on selection, on a cleared input
+          // (the auto-open effect), or via Escape (still honored below).
+          onFocusOutside={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
           style={{ width: 'var(--radix-popover-trigger-width)' }}
           className="p-0 w-[--radix-popover-trigger-width] max-h-none rounded-xl border border-border bg-popover shadow-lg overflow-hidden"
         >
