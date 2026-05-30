@@ -9,9 +9,7 @@ import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { useAllCampaigns, toQuerySort } from '@/hooks/useAllCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
-import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCampaigns } from '@/hooks/useCampaigns';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDiscoveryFilters } from '@/hooks/useDiscoveryFilters';
 import type { ParsedCampaign } from '@/lib/campaign';
 
@@ -35,9 +33,15 @@ interface CampaignsDiscoverySectionProps {
   idleLimit?: number;
   /**
    * Optional hoisted Show-hidden state. When provided, the toolbar
-   * exposes the mod-only switch and uses this state. The page can
+   * exposes the Show-hidden switch and uses this state. The page can
    * read the same value to drive a separate Hidden collapsible. When
    * omitted, the switch never appears.
+   *
+   * The switch is available to **every viewer** (not gated on
+   * moderator status). The moderation labels are public on relays
+   * regardless, so transparent moderation — letting anyone unhide
+   * what's been suppressed — is the only honest UX. See
+   * `AllCampaignsPage`.
    */
   showHidden?: {
     value: boolean;
@@ -60,10 +64,13 @@ interface CampaignsDiscoverySectionProps {
  *   2. **Active** — renders the full ranked / chronological / country-
  *      scoped result set.
  *
- * Hidden campaigns are excluded by default. Moderators can flip the
+ * Hidden campaigns are excluded by default. Any viewer can flip the
  * Show-hidden switch in the toolbar; the section reads that state
  * from the `showHidden` prop so a page can persist it across
- * multiple shelves (e.g. the Hidden collapsible mod section).
+ * multiple shelves (e.g. the Hidden collapsible mod section). The
+ * switch is intentionally NOT gated on moderator status — the
+ * Campaigns page is the censorship-resistant view, so everyone can
+ * unhide what mods have suppressed.
  *
  * Search is post-filtered client-side across title / summary / story /
  * location / categories — relay NIP-50 sort-by-top doesn't account
@@ -76,9 +83,6 @@ export function CampaignsDiscoverySection({
   showHidden: showHiddenProp,
 }: CampaignsDiscoverySectionProps) {
   const { t } = useTranslation();
-  const { user } = useCurrentUser();
-  const { data: moderators } = useCampaignModerators();
-  const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
   const filters = useDiscoveryFilters({
     urlPrefix: filterPersistence === 'url' ? '' : undefined,
@@ -126,22 +130,28 @@ export function CampaignsDiscoverySection({
 
   // Visible campaigns in the **active** branch: every campaign
   // matching the search / sort / country, minus hidden (unless the
-  // moderator opted in). Featured items are intentionally NOT pulled
+  // viewer opted in). Featured items are intentionally NOT pulled
   // out — when the user is actively browsing, they want a ranked or
   // chronological grid, not the curated shelf.
+  //
+  // The toggle is intentionally available to every viewer (not gated
+  // on moderator status) so that on the Campaigns page anyone can
+  // unhide what mods have suppressed. That's a censorship-resistance
+  // property: the moderation labels are public, so transparent
+  // moderation is the only honest UX.
   const visible = useMemo(() => {
     const all = campaigns ?? [];
     const hiddenCoords = moderation?.hiddenCoords ?? new Set<string>();
     const out: ParsedCampaign[] = [];
     for (const c of all) {
       if (hiddenCoords.has(c.aTag)) {
-        if (isMod && showHiddenValue) out.push(c);
+        if (showHiddenValue) out.push(c);
       } else {
         out.push(c);
       }
     }
     return out;
-  }, [campaigns, isMod, moderation, showHiddenValue]);
+  }, [campaigns, moderation, showHiddenValue]);
 
   const orderedFeaturedCampaigns = useMemo(() => {
     if (!featuredCampaigns) return [] as ParsedCampaign[];
@@ -188,7 +198,7 @@ export function CampaignsDiscoverySection({
           searchPlaceholderKey="campaigns.all.searchPlaceholder"
           searchAriaLabelKey="campaigns.all.searchAriaLabel"
           showHidden={
-            isMod && showHiddenProp
+            showHiddenProp
               ? {
                   value: showHiddenProp.value,
                   onChange: showHiddenProp.onChange,
