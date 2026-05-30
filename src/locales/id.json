@@ -1543,7 +1543,8 @@
       "bitcoinAddress": "Alamat Bitcoin",
       "silentPayment": "Alamat silent payment",
       "toLabel": "Kepada",
-      "clear": "Hapus penerima"
+      "clear": "Hapus penerima",
+      "choosePaymentMethod": "Pilih metode pembayaran untuk melanjutkan"
     },
     "feeSpeed": {
       "fastest": "~10 menit",

@@ -1174,7 +1174,8 @@
       "bitcoinAddress": "Dirección de Bitcoin",
       "silentPayment": "Dirección de pago silencioso",
       "toLabel": "Para",
-      "clear": "Borrar destinatario"
+      "clear": "Borrar destinatario",
+      "choosePaymentMethod": "Elige un método de pago para continuar"
     },
     "feeSpeed": {
       "fastest": "~10 min",

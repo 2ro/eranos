@@ -1110,7 +1110,8 @@
       "bitcoinAddress": "比特幣地址",
       "silentPayment": "靜默支付地址",
       "toLabel": "收件人",
-      "clear": "清除收件人"
+      "clear": "清除收件人",
+      "choosePaymentMethod": "請選擇付款方式以繼續"
     },
     "feeSpeed": {
       "fastest": "~10 分鐘",

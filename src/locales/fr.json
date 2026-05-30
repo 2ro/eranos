@@ -1597,7 +1597,8 @@
       "bitcoinAddress": "Adresse Bitcoin",
       "silentPayment": "Adresse de paiement silencieux",
       "toLabel": "À",
-      "clear": "Effacer le destinataire"
+      "clear": "Effacer le destinataire",
+      "choosePaymentMethod": "Choisissez un mode de paiement pour continuer"
     },
     "feeSpeed": {
       "fastest": "~10 min",

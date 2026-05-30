@@ -1174,7 +1174,8 @@
       "bitcoinAddress": "Kero yeBitcoin",
       "silentPayment": "Kero yemubhadharo wakanyararira",
       "toLabel": "Kuna",
-      "clear": "Bvisa mugamuchiri"
+      "clear": "Bvisa mugamuchiri",
+      "choosePaymentMethod": "Sarudza nzira yokubhadhara kuti uenderere"
     },
     "feeSpeed": {
       "fastest": "~10 maminitsi",

@@ -1158,7 +1158,8 @@
       "bitcoinAddress": "عنوان بيتكوين",
       "silentPayment": "عنوان دفع صامت",
       "toLabel": "إلى",
-      "clear": "مسح المستلم"
+      "clear": "مسح المستلم",
+      "choosePaymentMethod": "اختر طريقة الدفع للمتابعة"
     },
     "feeSpeed": {
       "fastest": "~10 دقائق",

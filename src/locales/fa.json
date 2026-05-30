@@ -1174,7 +1174,8 @@
       "bitcoinAddress": "نشانی بیت‌کوین",
       "silentPayment": "نشانی پرداخت خاموش",
       "toLabel": "به",
-      "clear": "پاک کردن گیرنده"
+      "clear": "پاک کردن گیرنده",
+      "choosePaymentMethod": "برای ادامه یک روش پرداخت انتخاب کنید"
     },
     "feeSpeed": {
       "fastest": "~۱۰ دقیقه",
