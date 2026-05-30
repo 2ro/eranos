@@ -37,8 +37,8 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { labelKey: 'nav.activity', to: '/feed', icon: Activity },
   { labelKey: 'nav.campaigns', to: '/campaigns/all', icon: HandHeart },
+  { labelKey: 'nav.activity', to: '/feed', icon: Activity },
   // Groups and Pledges are intentionally hidden from the main nav for
   // launch — keep the routes and feature code intact so we can re-add
   // them later by uncommenting these two lines (and re-importing the
