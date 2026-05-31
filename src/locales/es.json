@@ -111,6 +111,8 @@
     "profile": {
       "title": "Hazlo tuyo",
       "subtitle": "Cuéntales a los demás un poco sobre ti. Todo es opcional, puedes cambiarlo en cualquier momento.",
+      "campaignTitle": "Ponle cara a tu campaña",
+      "campaignSubtitle": "Un nombre y una foto ayudan a que la gente conecte con tu campaña.",
       "nameLabel": "Nombre visible",
       "namePlaceholder": "Tu nombre",
       "aboutLabel": "Biografía",

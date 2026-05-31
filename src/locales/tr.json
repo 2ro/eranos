@@ -110,6 +110,8 @@
     "profile": {
       "title": "Profilinizi kişiselleştirin",
       "subtitle": "Başkalarına kendiniz hakkında biraz bilgi verin. Hepsi isteğe bağlı, istediğiniz zaman değiştirebilirsiniz.",
+      "campaignTitle": "Kampanyanıza bir yüz kazandırın",
+      "campaignSubtitle": "Bir ad ve fotoğraf, insanların kampanyanızla bağ kurmasına yardımcı olur.",
       "nameLabel": "Görünen ad",
       "namePlaceholder": "Adınız",
       "aboutLabel": "Hakkında",

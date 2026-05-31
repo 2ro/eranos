@@ -111,6 +111,8 @@
     "profile": {
       "title": "Make it yours",
       "subtitle": "Tell others a bit about yourself. All optional, change it any time.",
+      "campaignTitle": "Put a face to your campaign",
+      "campaignSubtitle": "A name and photo help people connect with your campaign.",
       "nameLabel": "Display name",
       "namePlaceholder": "Your name",
       "aboutLabel": "Bio",

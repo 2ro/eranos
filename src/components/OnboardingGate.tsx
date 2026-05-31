@@ -281,6 +281,7 @@ function CaptiveOverlay() {
             onAvatarChange={handleAvatarUpload}
             onFinish={() => finishProfile(false)}
             onSkip={() => finishProfile(true)}
+            campaignMode={skipToProfile && contextRole === 'creator'}
           />
         );
       case 'role':
@@ -573,6 +574,9 @@ interface ProfileStepProps {
   onAvatarChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onFinish: () => void;
   onSkip: () => void;
+  /** When `true`, use campaign-framed heading/subtitle ("Put a face to your
+   *  campaign") instead of the generic onboarding copy. */
+  campaignMode?: boolean;
 }
 
 /** Optional kind-0 metadata — same fields as the legacy AuthDialog profile
@@ -588,14 +592,19 @@ function ProfileStep({
   onAvatarChange,
   onFinish,
   onSkip,
+  campaignMode = false,
 }: ProfileStepProps) {
   const { t } = useTranslation();
   const [showAdvanced, setShowAdvanced] = useState(false);
   return (
     <div className="space-y-6">
       <div className="space-y-2 text-center">
-        <h2 className="text-2xl font-bold tracking-tight">{t('onboarding.profile.title')}</h2>
-        <p className="text-sm text-muted-foreground">{t('onboarding.profile.subtitle')}</p>
+        <h2 className="text-2xl font-bold tracking-tight">
+          {t(campaignMode ? 'onboarding.profile.campaignTitle' : 'onboarding.profile.title')}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {t(campaignMode ? 'onboarding.profile.campaignSubtitle' : 'onboarding.profile.subtitle')}
+        </p>
       </div>
 
       <div className={cn('space-y-4', isPublishing && 'opacity-50 pointer-events-none')}>

@@ -110,6 +110,8 @@
     "profile": {
       "title": "Personnalisez-le",
       "subtitle": "Présentez-vous brièvement aux autres. Tout est facultatif, modifiable à tout moment.",
+      "campaignTitle": "Mettez un visage sur votre campagne",
+      "campaignSubtitle": "Un nom et une photo aident les gens à se connecter à votre campagne.",
       "nameLabel": "Nom affiché",
       "namePlaceholder": "Votre nom",
       "aboutLabel": "Bio",

@@ -110,6 +110,8 @@
     "profile": {
       "title": "Uifanye yako",
       "subtitle": "Waambie wengine kidogo kukuhusu. Yote si lazima, ibadilishe wakati wowote.",
+      "campaignTitle": "Weka uso kwenye kampeni yako",
+      "campaignSubtitle": "Jina na picha husaidia watu kuungana na kampeni yako.",
       "nameLabel": "Jina la kuonyesha",
       "namePlaceholder": "Jina lako",
       "aboutLabel": "Wasifu mfupi",

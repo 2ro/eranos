@@ -111,6 +111,8 @@
     "profile": {
       "title": "打造你的個人資料",
       "subtitle": "向他人簡單介紹一下你自己。全部都是選填，隨時可以修改。",
+      "campaignTitle": "為你的募款活動賦予面孔",
+      "campaignSubtitle": "名字和照片能幫助人們與你的募款活動建立連結。",
       "nameLabel": "顯示名稱",
       "namePlaceholder": "你的名稱",
       "aboutLabel": "個人簡介",

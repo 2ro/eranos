@@ -111,6 +111,8 @@
     "profile": {
       "title": "Deixe do seu jeito",
       "subtitle": "Conte um pouco sobre você. Tudo opcional, você pode alterar a qualquer momento.",
+      "campaignTitle": "Dê um rosto à sua campanha",
+      "campaignSubtitle": "Um nome e uma foto ajudam as pessoas a se conectarem com sua campanha.",
       "nameLabel": "Nome de exibição",
       "namePlaceholder": "Seu nome",
       "aboutLabel": "Bio",
