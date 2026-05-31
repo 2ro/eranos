@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Bitcoin,
+  ChevronDown,
   Download,
   Eye,
   EyeOff,
@@ -92,7 +93,7 @@ export function OnboardingGate({ children }: { children: ReactNode }) {
  *  per-flow state resets cleanly between sessions. */
 function CaptiveOverlay() {
   const { t } = useTranslation();
-  const { cancel, role: contextRole, setRole: setContextRole } = useOnboarding();
+  const { cancel, role: contextRole, setRole: setContextRole, skipToProfile } = useOnboarding();
   const navigate = useNavigate();
   const { toast } = useToast();
   const login = useLoginActions();
@@ -100,13 +101,16 @@ function CaptiveOverlay() {
   const { mutateAsync: publishEvent, isPending: isPublishingProfile } = useNostrPublish();
   const { mutateAsync: uploadFile, isPending: isUploadingAvatar } = useUploadFile();
 
-  // Decide the entry step. Already-authenticated users (e.g. a CTA called
-  // startSignup() on a logged-in surface to walk them to the role picker)
-  // skip keygen / secure / profile and land on `role` directly.
+  // Decide the entry step.
+  // - Already-authenticated users normally land on `role` directly.
+  // - If `skipToProfile` is set (e.g. campaign creation for a user with no
+  //   profile), they land on `profile` first; after finishing we navigate
+  //   straight to the role destination without showing the role picker.
   const initialStep: Step = useMemo(() => {
+    if (user && skipToProfile) return 'profile';
     if (user) return 'role';
     return 'keygen';
-  }, [user]);
+  }, [user, skipToProfile]);
 
   const [step, setStep] = useState<Step>(initialStep);
 
@@ -227,10 +231,19 @@ function CaptiveOverlay() {
           variant: 'destructive',
         });
       } finally {
-        goTo('role');
+        // When the overlay was opened with skipToProfile (e.g. from
+        // /campaigns/new for a user without a profile), skip the role
+        // picker and navigate directly to the pre-seeded role destination.
+        if (skipToProfile && contextRole) {
+          cancel();
+          if (contextRole === 'creator') navigate('/campaigns/new');
+          else navigate('/campaigns');
+        } else {
+          goTo('role');
+        }
       }
     },
-    [profileData, publishEvent, toast, t, goTo],
+    [profileData, publishEvent, toast, t, goTo, skipToProfile, contextRole, cancel, navigate],
   );
 
   // Step renderer -----------------------------------------------------------
@@ -577,6 +590,7 @@ function ProfileStep({
   onSkip,
 }: ProfileStepProps) {
   const { t } = useTranslation();
+  const [showAdvanced, setShowAdvanced] = useState(false);
   return (
     <div className="space-y-6">
       <div className="space-y-2 text-center">
@@ -594,20 +608,6 @@ function ProfileStep({
             value={data.name}
             onChange={(e) => onChange({ name: e.target.value })}
             placeholder={t('onboarding.profile.namePlaceholder')}
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <label htmlFor="onb-profile-about" className="text-sm font-medium">
-            {t('onboarding.profile.aboutLabel')}
-          </label>
-          <Textarea
-            id="onb-profile-about"
-            value={data.about}
-            onChange={(e) => onChange({ about: e.target.value })}
-            placeholder={t('onboarding.profile.aboutPlaceholder')}
-            className="resize-none"
-            rows={3}
           />
         </div>
 
@@ -646,6 +646,33 @@ function ProfileStep({
             </Button>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setShowAdvanced((v) => !v)}
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ChevronDown
+            className={cn('h-4 w-4 transition-transform duration-200', showAdvanced && 'rotate-180')}
+          />
+          {t('onboarding.profile.advanced')}
+        </button>
+
+        {showAdvanced && (
+          <div className="space-y-1.5">
+            <label htmlFor="onb-profile-about" className="text-sm font-medium">
+              {t('onboarding.profile.aboutLabel')}
+            </label>
+            <Textarea
+              id="onb-profile-about"
+              value={data.about}
+              onChange={(e) => onChange({ about: e.target.value })}
+              placeholder={t('onboarding.profile.aboutPlaceholder')}
+              className="resize-none"
+              rows={3}
+            />
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">

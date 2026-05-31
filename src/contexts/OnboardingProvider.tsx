@@ -20,9 +20,11 @@ import {
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [active, setActive] = useState(false);
   const [role, setRoleState] = useState<OnboardingRole>(null);
+  const [skipToProfile, setSkipToProfile] = useState(false);
 
   const startSignup = useCallback((options?: StartSignupOptions) => {
     setRoleState(options?.role ?? null);
+    setSkipToProfile(options?.skipToProfile ?? false);
     setActive(true);
   }, []);
 
@@ -37,7 +39,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <OnboardingContext.Provider value={{ active, role, startSignup, cancel, setRole }}>
+    <OnboardingContext.Provider value={{ active, role, skipToProfile, startSignup, cancel, setRole }}>
       {children}
     </OnboardingContext.Provider>
   );

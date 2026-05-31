@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -39,6 +39,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { useOnboarding } from '@/contexts/onboardingContextDef';
 import { useToast } from '@/hooks/useToast';
 import { formatBTC, satsToUSD } from '@/lib/bitcoin';
 import {
@@ -131,6 +132,33 @@ export function CreateCampaignPage() {
     ? (userMetadata?.name ?? userMetadata?.display_name ?? genUserName(user.pubkey))
     : '';
 
+  const { startSignup, active: onboardingActive } = useOnboarding();
+
+  // Track whether we've already triggered the profile gate so the effect
+  // doesn't re-fire on subsequent renders (e.g. when the overlay dismisses
+  // and userAuthor re-renders with data).
+  const profileGateFiredRef = useRef(false);
+
+  // If a logged-in user navigates to /campaigns/new without a kind-0 profile,
+  // open the onboarding profile step so they set a name before the campaign
+  // wizard loads. Only runs once per page mount and only in create mode.
+  const editNaddr = searchParams.get('edit');
+  const isEditMode = !!editNaddr;
+
+  useEffect(() => {
+    if (isEditMode) return;
+    if (!user) return;
+    if (userAuthor.isLoading) return;
+    if (profileGateFiredRef.current) return;
+    if (onboardingActive) return;
+
+    const hasProfile = !!(userMetadata?.name || userMetadata?.display_name);
+    if (!hasProfile) {
+      profileGateFiredRef.current = true;
+      startSignup({ role: 'creator', skipToProfile: true });
+    }
+  }, [isEditMode, user, userAuthor.isLoading, userMetadata, onboardingActive, startSignup]);
+
   const [title, setTitle] = useState('');
   const [story, setStory] = useState('');
   const [bannerUrl, setBannerUrl] = useState('');
@@ -189,9 +217,7 @@ export function CreateCampaignPage() {
   const [formError, setFormError] = useState('');
   const [prepopulatedEventId, setPrepopulatedEventId] = useState<string | null>(null);
 
-  const editNaddr = searchParams.get('edit');
   const editTarget = useMemo(() => getEditTarget(editNaddr), [editNaddr]);
-  const isEditMode = !!editNaddr;
 
   // ── Organization context (implicit) ────────────────────────────────────
   const orgParam = searchParams.get('org');
