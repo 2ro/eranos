@@ -116,6 +116,7 @@ function ModerationItemsShell({
   reorder,
   moderation,
   moderate,
+  getFeatureRank,
 }: {
   coord: string;
   entityTitle: string;
@@ -123,6 +124,21 @@ function ModerationItemsShell({
   reorder?: ModerationItemsProps['reorder'];
   moderation: ReturnType<typeof useCampaignModeration>['data'];
   moderate: ReturnType<typeof useCampaignModeration>['moderate'];
+  /**
+   * Optional per-surface hook that computes the `rank` tag to publish
+   * on a `featured` action. The display sort is descending by rank,
+   * so returning `min(existing ranks) - 1` makes a newly-featured
+   * entity land at the **bottom** of the featured row (append
+   * semantics), while still leaving moderators free to reorder it
+   * afterwards via the Move-to-top / Move-up controls.
+   *
+   * Only the `featured` action consults this — `unfeatured`,
+   * `hidden`, and `unhidden` ignore it. Surfaces that don't pass it
+   * (currently pledges and organizations) keep the legacy
+   * `created_at`-fallback behavior, which puts the newest feature on
+   * top.
+   */
+  getFeatureRank?: () => number | undefined;
 }) {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -142,7 +158,12 @@ function ModerationItemsShell({
     if (busy) return;
     setBusy(action);
     try {
-      await moderate.mutateAsync({ coord, action });
+      // `featured` actions on surfaces with append-semantics carry an
+      // explicit rank so the new label lands at the bottom of the
+      // descending-rank row. Other axes / surfaces leave `rank`
+      // undefined and rely on `created_at` fallback.
+      const rank = action === 'featured' ? getFeatureRank?.() : undefined;
+      await moderate.mutateAsync({ coord, action, rank });
       toast({ title: verbPast, description: entityTitle });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
@@ -281,7 +302,30 @@ function CampaignItemsInner(props: {
   reorder?: ModerationItemsProps['reorder'];
 }) {
   const { data, moderate } = useCampaignModeration();
-  return <ModerationItemsShell {...props} moderation={data} moderate={moderate} />;
+  // Feature appends to the **bottom** of the curated row. The display
+  // sort is descending by `featuredOrder`, so "bottom" means we need
+  // a rank smaller than every existing featured campaign's rank. We
+  // therefore publish `min(existing ranks) - 1`. When there are no
+  // currently featured campaigns the menu falls back to `undefined`,
+  // letting the mutation omit the rank tag — the fold's
+  // `created_at`-fallback then assigns a sensible default and the
+  // single featured entry has no "above" or "below" to compete with.
+  //
+  // Moderators who want to move a freshly-featured campaign back to
+  // the top of the row use the existing Move-to-top control.
+  const getFeatureRank = (): number | undefined => {
+    const ranks = Array.from(data.featuredOrder.values());
+    if (ranks.length === 0) return undefined;
+    return Math.min(...ranks) - 1;
+  };
+  return (
+    <ModerationItemsShell
+      {...props}
+      moderation={data}
+      moderate={moderate}
+      getFeatureRank={getFeatureRank}
+    />
+  );
 }
 
 function PledgeItemsInner(props: {

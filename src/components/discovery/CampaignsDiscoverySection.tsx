@@ -9,7 +9,6 @@ import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { useAllCampaigns, toQuerySort } from '@/hooks/useAllCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
-import { useCampaigns } from '@/hooks/useCampaigns';
 import { useDiscoveryFilters } from '@/hooks/useDiscoveryFilters';
 import type { ParsedCampaign } from '@/lib/campaign';
 
@@ -25,7 +24,7 @@ interface CampaignsDiscoverySectionProps {
    */
   filterPersistence: 'url' | 'local';
   /**
-   * Visible-row cap for the **idle** featured-first view. The active
+   * Visible-row cap for the **idle** view. The active
    * (search / sort / country) view always shows the full result set,
    * because the user has explicitly asked to browse. Defaults to
    * unlimited (`undefined`).
@@ -58,12 +57,12 @@ interface CampaignsDiscoverySectionProps {
  * The section has two display modes:
  *
  *   1. **Idle** (no search, no sort, no country picked) — renders
- *      featured campaigns at the top of the grid followed by every
- *      other non-hidden campaign in chronological order. Featured
- *      acts as a pinning signal, not as an allowlist; an approved-
- *      but-not-featured campaign still shows up underneath.
+ *      every non-hidden campaign in pure reverse-chronological order.
+ *      The home page has its own dedicated Featured row, so this
+ *      shelf doesn't repeat that ordering; viewers on `/campaigns`
+ *      see "what's new" rather than "what mods picked."
  *   2. **Active** — renders the full ranked / chronological / country-
- *      scoped result set with no featured pinning.
+ *      scoped result set.
  *
  * Hidden campaigns are excluded by default. Any viewer can flip the
  * Show-hidden switch in the toolbar; the section reads that state
@@ -103,30 +102,6 @@ export function CampaignsDiscoverySection({
 
   const { data: moderation, isReady: moderationReady } = useCampaignModeration();
 
-  // Featured slot list — derived from moderation labels. Hidden
-  // coords dropped so a featured-then-hidden campaign disappears
-  // from the row.
-  const featuredCoords = useMemo(() => {
-    if (!moderationReady) return [] as string[];
-    return Array.from(moderation.featuredCoords)
-      .filter((coord) => !moderation.hiddenCoords.has(coord))
-      .sort(
-        (a, b) =>
-          (moderation.featuredOrder.get(b) ?? 0) -
-          (moderation.featuredOrder.get(a) ?? 0),
-      );
-  }, [moderation, moderationReady]);
-
-  const { data: featuredCampaigns } = useCampaigns({
-    coordinates: featuredCoords,
-    limit: featuredCoords.length || 1,
-    // Mirrors the pledges section's pattern: don't enable the query
-    // when there are no coords to fetch. `useCampaigns` already
-    // short-circuits internally on an empty `coordinates` array, so
-    // this is purely about not creating a meaningless cache entry.
-    enabled: moderationReady && featuredCoords.length > 0,
-  });
-
   const showHiddenValue = showHiddenProp?.value ?? false;
 
   // Visible campaigns in the **active** branch: every campaign
@@ -154,27 +129,16 @@ export function CampaignsDiscoverySection({
     return out;
   }, [campaigns, moderation, showHiddenValue]);
 
-  const orderedFeaturedCampaigns = useMemo(() => {
-    if (!featuredCampaigns) return [] as ParsedCampaign[];
-    return [...featuredCampaigns].sort(
-      (a, b) =>
-        (moderation.featuredOrder.get(b.aTag) ?? 0) -
-        (moderation.featuredOrder.get(a.aTag) ?? 0),
-    );
-  }, [featuredCampaigns, moderation]);
-
-  // Idle-mode list: featured pinned at the top, then every other
-  // non-hidden campaign in chronological order. Featured-only would
-  // hide approved-not-featured campaigns from the default view, which
-  // is the exact bug we used to ship — when mods approved a campaign
-  // without featuring it, it never surfaced here until a viewer
-  // changed the sort or typed a search query. Now the section is
-  // truly a "featured + everything else" shelf.
+  // Idle-mode list: every non-hidden campaign in pure
+  // reverse-chronological order (newest first). The home page has its
+  // own dedicated Featured row, so this discovery shelf doesn't need
+  // to repeat that ordering — viewers landing on `/campaigns` expect
+  // "what's new" not "what mods picked." `visible` already arrives
+  // newest-first from `useAllCampaigns` (default sort), so we just
+  // pass it through.
   const idleCampaigns = useMemo<ParsedCampaign[]>(() => {
-    const rest = visible.filter((c) => !moderation?.featuredCoords.has(c.aTag));
-    const list = [...orderedFeaturedCampaigns, ...rest];
-    return idleLimit ? list.slice(0, idleLimit) : list;
-  }, [orderedFeaturedCampaigns, visible, moderation, idleLimit]);
+    return idleLimit ? visible.slice(0, idleLimit) : visible;
+  }, [visible, idleLimit]);
 
   const showSkeleton = isLoading || !moderationReady;
   const listForRender = isActive ? visible : idleCampaigns;
