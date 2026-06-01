@@ -767,7 +767,7 @@
       "whyDifferent": {
         "eyebrow": "Sei {{appName}}",
         "title": "Yakavakwa zvakasiyana.",
-        "lede": "Zvinhu zvitatu zvinoita kuti tisafanane nedzimwe.",
+        "lede": "Bitcoin yakananga kubva kumupi ichienda kumutungamiri. Hapana puratifomu pakati, hapana muchengeti akabata homwe, hapana mvumo inodiwa.",
         "block1": {
           "heading": "Kusiyana neGoFundMe",
           "body": "Hapana puratifomu inogona kudzivirira zvipo zvako, kukumbira kudzoserwa kwemari, kana kupedza mushandirapamwe wako pamusoro pekusawirirana kwemitemo. Hapana Stripe, hapana Visa, hapana bhanga riri pakati ringakucherekedza pakati pemushandirapamwe.",
