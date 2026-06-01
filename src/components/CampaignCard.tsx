@@ -47,13 +47,33 @@ function CampaignProgress({
   raisedSats,
   goalUsd,
   btcPrice,
+  isLoading,
   className,
 }: {
   raisedSats: number;
   goalUsd?: number;
   btcPrice?: number;
+  /**
+   * True while the donation totals are still being fetched. The bar gets
+   * its own skeleton — independent of the card, which paints immediately —
+   * so we never flash a misleading "0 raised" before the on-chain balance
+   * lands. Footprint matches the loaded state (bar row + one text row).
+   */
+  isLoading?: boolean;
   className?: string;
 }) {
+  if (isLoading) {
+    return (
+      <div className={cn('space-y-1.5', className)}>
+        <Skeleton className="h-2 w-full" />
+        <div className="flex items-baseline justify-between gap-2">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-24" />
+        </div>
+      </div>
+    );
+  }
+
   const hasGoal = !!goalUsd && goalUsd > 0;
   const raisedUsd = satsToUsd(raisedSats, btcPrice);
   const pct = hasGoal && raisedUsd !== undefined
@@ -151,7 +171,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
   });
   const displayCampaign = parseCampaign(translatedEvent) ?? campaign;
   const author = useAuthor(campaign.pubkey);
-  const { data: stats } = useCampaignDonations(campaign);
+  const { data: stats, isLoading: donationsLoading } = useCampaignDonations(campaign);
   const { data: btcPrice } = useBtcPrice();
 
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
@@ -287,7 +307,12 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
           {isSilentPayment ? (
             <CampaignPrivateNotice goalUsd={campaign.goalUsd} />
           ) : (
-            <CampaignProgress raisedSats={raisedSats} goalUsd={campaign.goalUsd} btcPrice={btcPrice} />
+            <CampaignProgress
+              raisedSats={raisedSats}
+              goalUsd={campaign.goalUsd}
+              btcPrice={btcPrice}
+              isLoading={donationsLoading}
+            />
           )}
 
           <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
