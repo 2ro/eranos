@@ -22,10 +22,6 @@ export interface WizardProps {
   headingAriaLabel: string;
   /** 1-indexed list of steps. Length determines the total. */
   steps: WizardStep[];
-  /** Number of completed steps before this wizard starts. */
-  progressOffset?: number;
-  /** Total steps in the larger flow when this wizard follows another gate. */
-  totalProgressSteps?: number;
   /**
    * Optional lead content rendered above the first step's body. The
    * campaign wizard uses this for the "publishing under <org>" chip so
@@ -49,6 +45,8 @@ export interface WizardProps {
    * this fn are always allowed to advance.
    */
   canAdvanceFromStep: (step: number) => boolean;
+  /** Optional async guard called before moving from a non-terminal step. */
+  onBeforeAdvance?: (step: number) => boolean | Promise<boolean>;
   /**
    * 1-indexed step from which the "Skip Next & Launch" shortcut may
    * appear. The shortcut is *only* rendered when `launchNowLabel` is
@@ -95,13 +93,12 @@ export interface WizardProps {
 export function Wizard({
   headingAriaLabel,
   steps,
-  progressOffset = 0,
-  totalProgressSteps,
   step1Lead,
   errorAlert,
   submitButtonContent,
   submitting,
   canAdvanceFromStep,
+  onBeforeAdvance,
   launchAvailableFromStep = Infinity,
   launchNowLabel,
   onSubmit,
@@ -109,11 +106,11 @@ export function Wizard({
 }: WizardProps) {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
+  const [isAdvancing, setIsAdvancing] = useState(false);
   const totalSteps = steps.length;
-  const progressTotal = totalProgressSteps ?? totalSteps;
   const current = steps[step - 1];
   const isTerminal = step === totalSteps;
-  const progress = ((progressOffset + step) / progressTotal) * 100;
+  const progress = (step / totalSteps) * 100;
 
   const launchVisible = !!launchNowLabel && step >= launchAvailableFromStep;
   const canAdvance = canAdvanceFromStep(step);
@@ -125,8 +122,23 @@ export function Wizard({
   // user could click "Skip Next & Launch" with a still-empty
   // required field and trip a server-side validation error.
   const canSubmit = isTerminal
-    ? !submitting
-    : launchVisible && canAdvance && !submitting;
+    ? !submitting && !isAdvancing
+    : launchVisible && canAdvance && !submitting && !isAdvancing;
+
+  const handleAdvance = async () => {
+    if (submitting || isAdvancing || !canAdvance) return;
+
+    setIsAdvancing(true);
+    try {
+      const shouldAdvance = await onBeforeAdvance?.(step);
+      if (shouldAdvance === false) return;
+      setStep((s) => Math.min(s + 1, totalSteps));
+    } catch {
+      // The parent owns user-visible errors for async step validation.
+    } finally {
+      setIsAdvancing(false);
+    }
+  };
 
   return (
     <div
@@ -163,7 +175,7 @@ export function Wizard({
         <button
           type="button"
           onClick={() => setStep((s) => Math.max(s - 1, 1))}
-          disabled={submitting}
+          disabled={submitting || isAdvancing}
           aria-label={t('common.back')}
           className="absolute left-4 top-4 z-20 sm:left-6 sm:top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
         >
@@ -190,8 +202,8 @@ export function Wizard({
           // IME composition still in progress — don't hijack.
           if (e.nativeEvent.isComposing) return;
           e.preventDefault();
-          if (submitting || !canAdvance) return;
-          setStep((s) => Math.min(s + 1, totalSteps));
+          if (submitting || isAdvancing || !canAdvance) return;
+          void handleAdvance();
         }}
       >
         <div
@@ -242,8 +254,8 @@ export function Wizard({
               <>
                 <Button
                   type="button"
-                  onClick={() => setStep((s) => Math.min(s + 1, totalSteps))}
-                  disabled={submitting || !canAdvance}
+                  onClick={() => void handleAdvance()}
+                  disabled={submitting || isAdvancing || !canAdvance}
                   className="w-full h-12 text-base rounded-full"
                 >
                   {t('common.next')}

@@ -19,6 +19,7 @@ import {
 
 import { LoginArea } from '@/components/auth/LoginArea';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
+import { StartCampaignLink } from '@/components/StartCampaignLink';
 import {
   CommunityMiniCard,
   CommunityMiniCardSkeleton,
@@ -676,7 +677,11 @@ function EmptyShelf({
         </div>
         {ctaLabel && ctaTo && (
           <Button asChild className="rounded-full mt-1">
-            <Link to={ctaTo}>{ctaLabel}</Link>
+            {ctaTo === '/campaigns/new' ? (
+              <StartCampaignLink>{ctaLabel}</StartCampaignLink>
+            ) : (
+              <Link to={ctaTo}>{ctaLabel}</Link>
+            )}
           </Button>
         )}
       </CardContent>

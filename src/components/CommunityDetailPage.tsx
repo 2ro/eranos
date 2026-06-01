@@ -31,6 +31,7 @@ import { PostActionBar } from '@/components/PostActionBar';
 import { CommentsSection } from '@/components/CommentsSection';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
 import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
+import { StartCampaignLink } from '@/components/StartCampaignLink';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
   AlertDialog,
@@ -515,7 +516,7 @@ function GroupActionColumn({
         </div>
 
         <div className="relative grid grid-cols-2 gap-3">
-          <Link
+          <StartCampaignLink
             to={`/campaigns/new${createQuery}`}
             className="group col-span-2 overflow-hidden rounded-2xl border border-primary/20 bg-primary text-primary-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:hover:translate-y-0"
           >
@@ -534,7 +535,7 @@ function GroupActionColumn({
                 </span>
               </div>
             </div>
-          </Link>
+          </StartCampaignLink>
 
           <Link
             to={`/pledges/new${createQuery}`}

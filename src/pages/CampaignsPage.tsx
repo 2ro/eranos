@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { HeroLightningMap } from '@/components/HeroLightningMap';
+import { StartCampaignLink } from '@/components/StartCampaignLink';
 import { ModeratorCollapsibleSection, ReorderableCampaignGrid, ReorderProvider } from '@/components/moderation';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCampaigns } from '@/hooks/useCampaigns';
@@ -289,10 +290,10 @@ export function CampaignsPage() {
                 </p>
               </div>
               <Button asChild variant="outline" className="hidden sm:inline-flex">
-                <Link to="/campaigns/new">
+                <StartCampaignLink>
                   <PlusCircle className="size-4 mr-2" />
                   {t('campaigns.home.startCampaign')}
-                </Link>
+                </StartCampaignLink>
               </Button>
             </div>
 
@@ -494,10 +495,10 @@ function Hero({ loggedIn }: { loggedIn: boolean }) {
               asChild
               className="rounded-full text-white font-semibold text-base h-12 px-7 [&_svg]:size-[18px] motion-safe:transition-colors"
             >
-              <Link to="/campaigns/new">
+              <StartCampaignLink>
                 <PlusCircle className="mr-2" />
                 {t('campaigns.home.startCampaign')}
-              </Link>
+              </StartCampaignLink>
             </Button>
             <Button
               variant="outline"
@@ -681,10 +682,10 @@ function EmptyState() {
           </p>
         </div>
         <Button asChild>
-          <Link to="/campaigns/new">
+          <StartCampaignLink>
             <PlusCircle className="size-4 mr-2" />
             {t('campaigns.home.startCampaign')}
-          </Link>
+          </StartCampaignLink>
         </Button>
       </CardContent>
     </Card>

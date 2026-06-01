@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -9,9 +9,11 @@ import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
   ArrowLeft,
+  ChevronDown,
   HandHeart,
   HelpCircle,
   Loader2,
+  Upload,
   Wallet,
 } from 'lucide-react';
 
@@ -39,8 +41,8 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
-import { useOnboarding } from '@/contexts/onboardingContextDef';
 import { useToast } from '@/hooks/useToast';
+import { useUploadFile } from '@/hooks/useUploadFile';
 import { formatBTC, satsToUSD } from '@/lib/bitcoin';
 import {
   CAMPAIGN_KIND,
@@ -113,6 +115,21 @@ function buildImetaFromNip94(nip94Tags: string[][]): string[] {
   return result;
 }
 
+function parseProfileMetadata(content: string | undefined): Record<string, unknown> {
+  if (!content) return {};
+
+  try {
+    const parsed: unknown = JSON.parse(content);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed as Record<string, unknown>;
+    }
+  } catch {
+    // Invalid profile JSON should not block required campaign setup.
+  }
+
+  return {};
+}
+
 export function CreateCampaignPage() {
   const { t } = useTranslation();
   const { config } = useAppContext();
@@ -122,6 +139,7 @@ export function CreateCampaignPage() {
   const queryClient = useQueryClient();
   const { nostr } = useNostr();
   const { mutateAsync: publishEvent } = useNostrPublish();
+  const { mutateAsync: uploadProfileFile, isPending: isUploadingProfileAvatar } = useUploadFile();
   const { toast } = useToast();
   const hdWallet = useHdWallet();
   const hdWalletAvailable = hdWallet.availability.status === 'available';
@@ -132,42 +150,10 @@ export function CreateCampaignPage() {
     ? (userMetadata?.name ?? userMetadata?.display_name ?? genUserName(user.pubkey))
     : '';
 
-  const { startSignup, active: onboardingActive } = useOnboarding();
-
-  // Track whether we've already triggered the profile gate so the effect
-  // doesn't re-fire on subsequent renders (e.g. when the overlay dismisses
-  // and userAuthor re-renders with data).
-  const profileGateFiredRef = useRef(false);
-
-  // If a logged-in user navigates to /campaigns/new without a campaign-ready
-  // kind-0 profile, open the required profile step before the campaign wizard.
-  // Only runs once per page mount and only in create mode.
+  // Campaign creation requires an identifiable fundraiser profile. Donor
+  // signup stays profile-free; this requirement is scoped to /campaigns/new.
   const editNaddr = searchParams.get('edit');
   const isEditMode = !!editNaddr;
-
-  useEffect(() => {
-    if (isEditMode) return;
-    if (!user) return;
-    if (userAuthor.isLoading) return;
-    if (profileGateFiredRef.current) return;
-    if (onboardingActive) return;
-
-    const hasDisplayName = !!(userMetadata?.name || userMetadata?.display_name);
-    const hasAvatar = !!userMetadata?.picture;
-    const hasProfile = hasDisplayName && hasAvatar;
-    if (!hasProfile) {
-      profileGateFiredRef.current = true;
-      startSignup({
-        role: 'creator',
-        skipToProfile: true,
-        initialProfileData: {
-          name: userMetadata?.name ?? userMetadata?.display_name ?? '',
-          about: userMetadata?.about ?? '',
-          picture: userMetadata?.picture ?? '',
-        },
-      });
-    }
-  }, [isEditMode, user, userAuthor.isLoading, userMetadata, onboardingActive, startSignup]);
 
   const [title, setTitle] = useState('');
   const [story, setStory] = useState('');
@@ -226,6 +212,11 @@ export function CreateCampaignPage() {
   const [organizationATag, setOrganizationATag] = useState('');
   const [formError, setFormError] = useState('');
   const [prepopulatedEventId, setPrepopulatedEventId] = useState<string | null>(null);
+  const [profileData, setProfileData] = useState({ name: '', about: '', picture: '' });
+  const [profilePrefilledPubkey, setProfilePrefilledPubkey] = useState<string | null>(null);
+  const [includeCampaignProfileStep, setIncludeCampaignProfileStep] = useState(false);
+  const [showProfileMore, setShowProfileMore] = useState(false);
+  const profileAvatarInputRef = useRef<HTMLInputElement>(null);
 
   const editTarget = useMemo(() => getEditTarget(editNaddr), [editNaddr]);
 
@@ -247,6 +238,37 @@ export function CreateCampaignPage() {
     if (isEditMode) return;
     setOrganizationATag(authorizedOrgFromParam?.community.aTag ?? '');
   }, [isEditMode, authorizedOrgFromParam]);
+
+  useEffect(() => {
+    setProfilePrefilledPubkey(null);
+    setIncludeCampaignProfileStep(false);
+  }, [user?.pubkey]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (isEditMode) return;
+    if (userAuthor.isLoading) return;
+    if (profilePrefilledPubkey === user.pubkey) return;
+
+    setProfileData({
+      name: userMetadata?.name ?? userMetadata?.display_name ?? '',
+      about: userMetadata?.about ?? '',
+      picture: userMetadata?.picture ?? '',
+    });
+    setProfilePrefilledPubkey(user.pubkey);
+  }, [isEditMode, profilePrefilledPubkey, user, userAuthor.isLoading, userMetadata]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (isEditMode) return;
+    if (userAuthor.isLoading) return;
+
+    const hasDisplayName = !!(userMetadata?.name || userMetadata?.display_name);
+    const hasAvatar = !!userMetadata?.picture;
+    if (!hasDisplayName || !hasAvatar) {
+      setIncludeCampaignProfileStep(true);
+    }
+  }, [isEditMode, user, userAuthor.isLoading, userMetadata]);
 
   // When the HD wallet becomes available on a fresh campaign, default
   // the source to "My wallet". Skipped in edit mode (we always start
@@ -360,6 +382,61 @@ export function CreateCampaignPage() {
     setOrganizationATag(existingOrgATag);
     setPrepopulatedEventId(editCampaign.event.id);
   }, [editCampaign, prepopulatedEventId]);
+
+  const handleProfileAvatarChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+
+    if (!file.type.startsWith('image/')) {
+      toast({ title: t('onboarding.profile.imageOnly'), variant: 'destructive' });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: t('onboarding.profile.imageTooLarge'), variant: 'destructive' });
+      return;
+    }
+
+    try {
+      const tags = await uploadProfileFile(file);
+      const url = tags[0]?.[1];
+      if (url) setProfileData((prev) => ({ ...prev, picture: url }));
+    } catch {
+      toast({ title: t('onboarding.profile.uploadFailed'), variant: 'destructive' });
+    }
+  };
+
+  const profileMutation = useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error(t('campaignsCreate.errorLoginRequired'));
+
+      const name = profileData.name.trim();
+      const about = profileData.about.trim();
+      const picture = profileData.picture.trim();
+
+      if (!name || !picture) {
+        throw new Error(t('onboarding.profile.publishFailedDescription'));
+      }
+
+      const prev = await fetchFreshEvent(nostr, { kinds: [0], authors: [user.pubkey] });
+      const metadata = parseProfileMetadata(prev?.content);
+      metadata.name = name;
+      if (about) metadata.about = about;
+      metadata.picture = picture;
+
+      await publishEvent({ kind: 0, content: JSON.stringify(metadata), prev: prev ?? undefined });
+    },
+    onSuccess: () => {
+      if (user) void queryClient.invalidateQueries({ queryKey: ['author', user.pubkey] });
+    },
+    onError: () => {
+      toast({
+        title: t('onboarding.profile.publishFailedTitle'),
+        description: t('onboarding.profile.publishFailedDescription'),
+        variant: 'destructive',
+      });
+    },
+  });
 
   const submitMutation = useMutation({
     mutationFn: async () => {
@@ -637,6 +714,21 @@ export function CreateCampaignPage() {
     );
   }
 
+  if (!isEditMode && userAuthor.isLoading) {
+    return (
+      <main className="min-h-screen pb-16">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 lg:py-10">
+          <Card>
+            <CardContent className="py-12 px-8 text-center space-y-3">
+              <Loader2 className="size-8 animate-spin text-muted-foreground mx-auto" />
+              <p className="text-sm text-muted-foreground">{t('campaignsCreate.loadingCampaign')}</p>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    );
+  }
+
   if (isEditMode && !editTarget) {
     return (
       <main className="min-h-screen pb-16">
@@ -699,6 +791,92 @@ export function CreateCampaignPage() {
   // at a time (create mode wizard). Keeping them as locals — instead of
   // extracting into sub-components — avoids dragging the dozen+ state
   // setters into a new prop surface.
+  const needsCampaignProfile = !isEditMode && includeCampaignProfileStep;
+  const profileNameProvided = profileData.name.trim().length > 0;
+  const profileAvatarProvided = profileData.picture.trim().length > 0;
+  const profileSection = (
+    <div className={cn('space-y-4', profileMutation.isPending && 'opacity-50 pointer-events-none')}>
+      <div className="space-y-1.5">
+        <label htmlFor="campaign-profile-name" className="text-sm font-medium">
+          {t('onboarding.profile.nameLabel')}
+        </label>
+        <Input
+          id="campaign-profile-name"
+          value={profileData.name}
+          onChange={(e) => setProfileData((prev) => ({ ...prev, name: e.target.value }))}
+          placeholder={t('onboarding.profile.namePlaceholder')}
+          required
+          aria-required
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <label htmlFor="campaign-profile-picture" className="text-sm font-medium">
+          {t('onboarding.profile.avatarLabel')}
+        </label>
+        <div className="flex gap-2">
+          <Input
+            id="campaign-profile-picture"
+            value={profileData.picture}
+            onChange={(e) => setProfileData((prev) => ({ ...prev, picture: e.target.value }))}
+            placeholder="https://…"
+            className="flex-1"
+            required
+            aria-required
+          />
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            ref={profileAvatarInputRef}
+            onChange={handleProfileAvatarChange}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => profileAvatarInputRef.current?.click()}
+            disabled={isUploadingProfileAvatar}
+            title={t('onboarding.profile.uploadAvatar')}
+          >
+            {isUploadingProfileAvatar ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Upload className="w-4 h-4" />
+            )}
+          </Button>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => setShowProfileMore((v) => !v)}
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ChevronDown
+          className={cn('h-4 w-4 transition-transform duration-200', showProfileMore && 'rotate-180')}
+        />
+        {t('onboarding.profile.advanced')}
+      </button>
+
+      {showProfileMore && (
+        <div className="space-y-1.5">
+          <label htmlFor="campaign-profile-about" className="text-sm font-medium">
+            {t('onboarding.profile.aboutLabel')}
+          </label>
+          <Textarea
+            id="campaign-profile-about"
+            value={profileData.about}
+            onChange={(e) => setProfileData((prev) => ({ ...prev, about: e.target.value }))}
+            placeholder={t('onboarding.profile.aboutPlaceholder')}
+            className="resize-none"
+            rows={3}
+          />
+        </div>
+      )}
+    </div>
+  );
+
   const titleSection = (
     <FormSection title={t('forms.title')} requirement="Required">
       <Input
@@ -972,68 +1150,86 @@ export function CreateCampaignPage() {
     />
   );
 
-  // Required-field gates for the wizard's Next buttons. Title is the
-  // only field we can cleanly gate client-side; the wallet picker is
-  // a multi-mode parser whose validity depends on which inputs the
-  // user touched, so we surface that error via the submit-time
-  // validator (formError) once they try to publish.
+  const wizardSteps = [
+    ...(needsCampaignProfile
+      ? [{
+        title: t('onboarding.profile.campaignTitle'),
+        subtitle: t('onboarding.profile.campaignSubtitle'),
+        body: profileSection,
+      }]
+      : []),
+    {
+      title: t('campaignsCreate.wizard.titleStepTitle'),
+      subtitle: t('campaignsCreate.wizard.titleStepSubtitle'),
+      body: titleSection,
+    },
+    {
+      title: t('campaignsCreate.wizard.walletStepTitle'),
+      subtitle: t('campaignsCreate.wizard.walletStepSubtitle'),
+      body: walletSection,
+    },
+    {
+      title: t('campaignsCreate.wizard.bannerStepTitle'),
+      subtitle: t('campaignsCreate.wizard.bannerStepSubtitle'),
+      body: bannerSection,
+    },
+    {
+      title: t('campaignsCreate.wizard.storyStepTitle'),
+      subtitle: t('campaignsCreate.wizard.storyStepSubtitle'),
+      body: storySection,
+    },
+    {
+      title: t('campaignsCreate.wizard.goalStepTitle'),
+      subtitle: t('campaignsCreate.wizard.goalStepSubtitle'),
+      body: goalDeadlineSection,
+    },
+    {
+      title: t('campaignsCreate.wizard.tagsStepTitle'),
+      subtitle: t('campaignsCreate.wizard.tagsStepSubtitle'),
+      body: (
+        <>
+          {countrySection}
+          {tagsSection}
+        </>
+      ),
+    },
+  ];
+
+  // Required-field gates for the wizard's Next buttons. Profile is required
+  // only for campaign creators missing name/avatar; title is always required.
+  // The wallet picker is validated at submit because its validity depends on
+  // which inputs the user touched.
   const titleProvided = title.trim().length > 0;
+  const profileStep = needsCampaignProfile ? 1 : null;
+  const titleStep = needsCampaignProfile ? 2 : 1;
+  const launchStep = needsCampaignProfile ? 4 : 3;
 
   return (
     <Wizard
       headingAriaLabel={t('campaignsCreate.headingCreate')}
       step1Lead={orgChip}
-      steps={[
-        {
-          title: t('campaignsCreate.wizard.titleStepTitle'),
-          subtitle: t('campaignsCreate.wizard.titleStepSubtitle'),
-          body: titleSection,
-        },
-        {
-          title: t('campaignsCreate.wizard.walletStepTitle'),
-          subtitle: t('campaignsCreate.wizard.walletStepSubtitle'),
-          body: walletSection,
-        },
-        {
-          title: t('campaignsCreate.wizard.bannerStepTitle'),
-          subtitle: t('campaignsCreate.wizard.bannerStepSubtitle'),
-          body: bannerSection,
-        },
-        {
-          title: t('campaignsCreate.wizard.storyStepTitle'),
-          subtitle: t('campaignsCreate.wizard.storyStepSubtitle'),
-          body: storySection,
-        },
-        {
-          title: t('campaignsCreate.wizard.goalStepTitle'),
-          subtitle: t('campaignsCreate.wizard.goalStepSubtitle'),
-          body: goalDeadlineSection,
-        },
-        {
-          title: t('campaignsCreate.wizard.tagsStepTitle'),
-          subtitle: t('campaignsCreate.wizard.tagsStepSubtitle'),
-          body: (
-            <>
-              {countrySection}
-              {tagsSection}
-            </>
-          ),
-        },
-      ]}
-      canAdvanceFromStep={(s) => (s === 1 ? titleProvided : true)}
-      // The shortcut appears once the user has cleared the two
-      // required steps (title @ 1, wallet @ 2). Earlier steps don't
+      steps={wizardSteps}
+      canAdvanceFromStep={(s) => {
+        if (s === profileStep) return profileNameProvided && profileAvatarProvided && !isUploadingProfileAvatar;
+        if (s === titleStep) return titleProvided;
+        return true;
+      }}
+      onBeforeAdvance={async (s) => {
+        if (s !== profileStep) return true;
+        await profileMutation.mutateAsync();
+        return true;
+      }}
+      // The shortcut appears once the user has cleared the required
+      // title and wallet steps. Earlier steps don't
       // even render the button because the wallet picker hasn't been
       // shown yet — publishing without it would be a confusing error.
-      launchAvailableFromStep={3}
+      launchAvailableFromStep={launchStep}
       launchNowLabel={t('campaignsCreate.wizard.launchNow')}
       errorAlert={errorAlert}
       submitButtonContent={submitButtonContent}
-      submitting={submitMutation.isPending || coverUploading}
+      submitting={submitMutation.isPending || profileMutation.isPending || coverUploading || isUploadingProfileAvatar}
       onSubmit={handleSubmit}
       onClose={() => navigate(-1)}
-      progressOffset={1}
-      totalProgressSteps={7}
     />
   );
 }

@@ -1,9 +1,7 @@
 import {
   useCallback,
   useMemo,
-  useRef,
   useState,
-  type ChangeEvent,
   type ReactNode,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +10,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Bitcoin,
-  ChevronDown,
   Download,
   Eye,
   EyeOff,
@@ -20,26 +17,19 @@ import {
   Link2,
   Loader2,
   Megaphone,
-  Upload,
   User,
   X,
 } from 'lucide-react';
 import { generateSecretKey, getPublicKey, nip19 } from 'nostr-tools';
-import { useNostr } from '@nostrify/react';
-import { useQueryClient } from '@tanstack/react-query';
 
 import { AgoraBoltIcon } from '@/components/icons/AgoraBoltIcon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLoginActions } from '@/hooks/useLoginActions';
-import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useOnboarding, type OnboardingRole } from '@/contexts/onboardingContextDef';
 import { useToast } from '@/hooks/useToast';
-import { useUploadFile } from '@/hooks/useUploadFile';
 import { downloadTextFile } from '@/lib/downloadFile';
-import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { cn } from '@/lib/utils';
 
 /**
@@ -54,18 +44,16 @@ import { cn } from '@/lib/utils';
  * key), so the secure step now carries the "this key is your account AND
  * your wallet" framing inline. The outro was a glorified tap-to-continue —
  * the role step's primary button already navigates somewhere meaningful, so
- * the role pick *is* the outro. Profile setup is only shown as a required
- * campaign-creator gate before `/campaigns/new`.
+ * the role pick *is* the outro.
  *
  * Login is handled by the existing `AuthDialog` modal — the captive flow is
  * only ever opened by an explicit `startSignup()` call (e.g. from
  * AuthDialog's "Create a new Nostr account" button), so the user has
  * already picked "signup" by the time we mount.
  */
-type Step = 'keygen' | 'secure' | 'profile' | 'role';
+type Step = 'keygen' | 'secure' | 'role';
 
 const SIGNUP_STEPS: Step[] = ['keygen', 'secure', 'role'];
-const CAMPAIGN_PROFILE_TOTAL_STEPS = 7;
 
 /**
  * The captive onboarding gate. Render this as a sibling of `<AppRouter />`;
@@ -97,26 +85,18 @@ export function OnboardingGate({ children }: { children: ReactNode }) {
  *  per-flow state resets cleanly between sessions. */
 function CaptiveOverlay() {
   const { t } = useTranslation();
-  const { cancel, role: contextRole, setRole: setContextRole, skipToProfile, initialProfileData } = useOnboarding();
+  const { cancel, role: contextRole, setRole: setContextRole } = useOnboarding();
   const navigate = useNavigate();
-  const { nostr } = useNostr();
-  const queryClient = useQueryClient();
   const { toast } = useToast();
   const login = useLoginActions();
   const { user } = useCurrentUser();
-  const { mutateAsync: publishEvent, isPending: isPublishingProfile } = useNostrPublish();
-  const { mutateAsync: uploadFile, isPending: isUploadingAvatar } = useUploadFile();
 
   // Decide the entry step.
   // - Already-authenticated users normally land on `role` directly.
-  // - If `skipToProfile` is set (e.g. campaign creation for a user with no
-  //   profile), they land on `profile` first; after finishing we navigate
-  //   straight to the role destination without showing the role picker.
   const initialStep: Step = useMemo(() => {
-    if (user && skipToProfile) return 'profile';
     if (user) return 'role';
     return 'keygen';
-  }, [user, skipToProfile]);
+  }, [user]);
 
   const [step, setStep] = useState<Step>(initialStep);
 
@@ -124,31 +104,30 @@ function CaptiveOverlay() {
   const [nsec, setNsec] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [showKey, setShowKey] = useState(false);
-  const [profileData, setProfileData] = useState({
-    name: initialProfileData.name ?? '',
-    about: initialProfileData.about ?? '',
-    picture: initialProfileData.picture ?? '',
-  });
-  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   // Linear progress bar position. Every step in the machine counts toward
-  // the bar. Campaign profile setup is step 1 of the larger campaign flow,
-  // so its progress aligns with the campaign wizard that follows it.
-  const progress = (() => {
-    if (step === 'profile' && skipToProfile && contextRole === 'creator') {
-      return (1 / CAMPAIGN_PROFILE_TOTAL_STEPS) * 100;
-    }
-
-    const currentProgressIndex = SIGNUP_STEPS.indexOf(step);
-    return currentProgressIndex < 0
-      ? 0
-      : ((currentProgressIndex + 1) / SIGNUP_STEPS.length) * 100;
-  })();
+  // the bar.
+  const currentProgressIndex = SIGNUP_STEPS.indexOf(step);
+  const progress = currentProgressIndex < 0
+    ? 0
+    : ((currentProgressIndex + 1) / SIGNUP_STEPS.length) * 100;
 
   // Navigation helpers ------------------------------------------------------
   const goTo = useCallback((target: Step) => {
     setStep(target);
   }, []);
+
+  const showBackButton = !(step === 'keygen' && isGenerating);
+  const handleBack = useCallback(() => {
+    if (step === 'keygen') {
+      cancel();
+    } else if (step === 'secure') {
+      goTo('keygen');
+    } else {
+      if (user) cancel();
+      else goTo('secure');
+    }
+  }, [step, user, cancel, goTo]);
 
   // Role pick is the final step. Picking a role both records the choice
   // (used by the role-pick CTA labels) and navigates to the matching
@@ -203,73 +182,6 @@ function CaptiveOverlay() {
     }
   }, [nsec, login, goTo, toast, t]);
 
-  // Avatar upload (profile step) -------------------------------------------
-  const handleAvatarUpload = useCallback(
-    async (e: ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      e.target.value = '';
-
-      if (!file.type.startsWith('image/')) {
-        toast({ title: t('onboarding.profile.imageOnly'), variant: 'destructive' });
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        toast({ title: t('onboarding.profile.imageTooLarge'), variant: 'destructive' });
-        return;
-      }
-
-      try {
-        const tags = await uploadFile(file);
-        const url = tags[0]?.[1];
-        if (url) setProfileData((prev) => ({ ...prev, picture: url }));
-      } catch {
-        toast({ title: t('onboarding.profile.uploadFailed'), variant: 'destructive' });
-      }
-    },
-    [uploadFile, toast, t],
-  );
-
-  // Profile publish ---------------------------------------------------------
-  const finishProfile = useCallback(
-    async (skip: boolean) => {
-      try {
-        if (!skip && user && (profileData.name || profileData.about || profileData.picture)) {
-          const prev = await fetchFreshEvent(nostr, { kinds: [0], authors: [user.pubkey] });
-          const metadata = parseProfileMetadata(prev?.content);
-          const name = profileData.name.trim();
-          const about = profileData.about.trim();
-          const picture = profileData.picture.trim();
-
-          if (name) metadata.name = name;
-          if (about) metadata.about = about;
-          if (picture) metadata.picture = picture;
-
-          await publishEvent({ kind: 0, content: JSON.stringify(metadata), prev: prev ?? undefined });
-          void queryClient.invalidateQueries({ queryKey: ['author', user.pubkey] });
-        }
-      } catch {
-        toast({
-          title: t('onboarding.profile.publishFailedTitle'),
-          description: t('onboarding.profile.publishFailedDescription'),
-          variant: 'destructive',
-        });
-      } finally {
-        // When the overlay was opened with skipToProfile (e.g. from
-        // /campaigns/new for a user without a profile), skip the role
-        // picker and navigate directly to the pre-seeded role destination.
-        if (skipToProfile && contextRole) {
-          cancel();
-          if (contextRole === 'creator') navigate('/campaigns/new');
-          else navigate('/campaigns');
-        } else {
-          goTo('role');
-        }
-      }
-    },
-    [profileData, user, nostr, publishEvent, queryClient, toast, t, goTo, skipToProfile, contextRole, cancel, navigate],
-  );
-
   // Step renderer -----------------------------------------------------------
   const stepBody = (() => {
     switch (step) {
@@ -280,7 +192,6 @@ function CaptiveOverlay() {
           <KeygenStep
             isGenerating={isGenerating}
             onGenerate={handleGenerateKey}
-            onBack={cancel}
           />
         );
       case 'secure':
@@ -290,22 +201,6 @@ function CaptiveOverlay() {
             showKey={showKey}
             onToggleShow={() => setShowKey((v) => !v)}
             onContinue={handleDownloadAndContinue}
-            onBack={() => goTo('keygen')}
-          />
-        );
-      case 'profile':
-        return (
-          <ProfileStep
-            data={profileData}
-            isPublishing={isPublishingProfile}
-            isUploading={isUploadingAvatar}
-            onChange={(patch) => setProfileData((prev) => ({ ...prev, ...patch }))}
-            onUploadClick={() => avatarInputRef.current?.click()}
-            avatarInputRef={avatarInputRef}
-            onAvatarChange={handleAvatarUpload}
-            onFinish={() => finishProfile(false)}
-            onSkip={() => finishProfile(true)}
-            campaignMode={skipToProfile && contextRole === 'creator'}
           />
         );
       case 'role':
@@ -317,7 +212,6 @@ function CaptiveOverlay() {
           <RoleStep
             role={contextRole}
             onPick={handleRolePick}
-            onBack={user ? cancel : () => goTo('secure')}
           />
         );
     }
@@ -337,6 +231,17 @@ function CaptiveOverlay() {
           style={{ width: `${progress}%` }}
         />
       </div>
+
+      {showBackButton && (
+        <button
+          type="button"
+          onClick={handleBack}
+          aria-label={t('common.back')}
+          className="absolute left-4 top-4 z-20 sm:left-6 sm:top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
+        </button>
+      )}
 
       {/* Top-right close. Lets users escape if they truly don't want to
           continue — but it's deliberately unobtrusive vs. a backdrop click
@@ -369,7 +274,6 @@ function CaptiveOverlay() {
 interface RoleStepProps {
   role: OnboardingRole;
   onPick: (role: 'creator' | 'donor') => void;
-  onBack: () => void;
 }
 
 /**
@@ -379,7 +283,7 @@ interface RoleStepProps {
  * structure that makes the choice feel like a role rather than a feature
  * menu.
  */
-function RoleStep({ role, onPick, onBack }: RoleStepProps) {
+function RoleStep({ role, onPick }: RoleStepProps) {
   const { t } = useTranslation();
 
   return (
@@ -408,7 +312,6 @@ function RoleStep({ role, onPick, onBack }: RoleStepProps) {
         />
       </div>
 
-      <BackButton onClick={onBack} />
     </div>
   );
 }
@@ -454,12 +357,11 @@ function RoleCard({ icon, title, description, finderNote, selected, onClick }: R
 interface KeygenStepProps {
   isGenerating: boolean;
   onGenerate: () => void;
-  onBack: () => void;
 }
 
 /** Key generation step — a single CTA that fires off `generateSecretKey()`
  *  with a brief visible spinner for tactile feedback. */
-function KeygenStep({ isGenerating, onGenerate, onBack }: KeygenStepProps) {
+function KeygenStep({ isGenerating, onGenerate }: KeygenStepProps) {
   const { t } = useTranslation();
   return (
     <div className="space-y-6 text-center">
@@ -487,7 +389,6 @@ function KeygenStep({ isGenerating, onGenerate, onBack }: KeygenStepProps) {
           {t('onboarding.keygen.button')}
         </Button>
       )}
-      {!isGenerating && <BackButton onClick={onBack} />}
     </div>
   );
 }
@@ -497,7 +398,6 @@ interface SecureStepProps {
   showKey: boolean;
   onToggleShow: () => void;
   onContinue: () => void;
-  onBack: () => void;
 }
 
 /**
@@ -516,7 +416,7 @@ interface SecureStepProps {
  * permanence to brand-new users, so it has to carry weight without scaring
  * them.
  */
-function SecureStep({ nsec, showKey, onToggleShow, onContinue, onBack }: SecureStepProps) {
+function SecureStep({ nsec, showKey, onToggleShow, onContinue }: SecureStepProps) {
   const { t } = useTranslation();
   return (
     <div className="space-y-6">
@@ -583,181 +483,6 @@ function SecureStep({ nsec, showKey, onToggleShow, onContinue, onBack }: SecureS
         <Download className="w-4 h-4 mr-2" />
         {t('onboarding.secure.button')}
       </Button>
-      <BackButton onClick={onBack} />
     </div>
-  );
-}
-
-interface ProfileStepProps {
-  data: { name: string; about: string; picture: string };
-  isPublishing: boolean;
-  isUploading: boolean;
-  onChange: (patch: Partial<{ name: string; about: string; picture: string }>) => void;
-  onUploadClick: () => void;
-  avatarInputRef: React.RefObject<HTMLInputElement | null>;
-  onAvatarChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  onFinish: () => void;
-  onSkip: () => void;
-  /** When `true`, use campaign-framed heading/subtitle ("Put a face to your
-   *  campaign") instead of the generic onboarding copy. */
-  campaignMode?: boolean;
-}
-
-/** Optional kind-0 metadata — same fields as the legacy AuthDialog profile
- *  step. Publishes only if at least one field is non-empty and the user
- *  doesn't choose to skip. */
-function ProfileStep({
-  data,
-  isPublishing,
-  isUploading,
-  onChange,
-  onUploadClick,
-  avatarInputRef,
-  onAvatarChange,
-  onFinish,
-  onSkip,
-  campaignMode = false,
-}: ProfileStepProps) {
-  const { t } = useTranslation();
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const nameProvided = data.name.trim().length > 0;
-  const avatarProvided = data.picture.trim().length > 0;
-  const canContinue = !campaignMode || (nameProvided && avatarProvided);
-  return (
-    <div className="space-y-6">
-      <div className="space-y-2 text-center">
-        <h2 className="text-2xl font-bold tracking-tight">
-          {t(campaignMode ? 'onboarding.profile.campaignTitle' : 'onboarding.profile.title')}
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          {t(campaignMode ? 'onboarding.profile.campaignSubtitle' : 'onboarding.profile.subtitle')}
-        </p>
-      </div>
-
-      <div className={cn('space-y-4', isPublishing && 'opacity-50 pointer-events-none')}>
-        <div className="space-y-1.5">
-          <label htmlFor="onb-profile-name" className="text-sm font-medium">
-            {t('onboarding.profile.nameLabel')}
-          </label>
-          <Input
-            id="onb-profile-name"
-            value={data.name}
-            onChange={(e) => onChange({ name: e.target.value })}
-            placeholder={t('onboarding.profile.namePlaceholder')}
-            required={campaignMode}
-            aria-required={campaignMode}
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <label htmlFor="onb-profile-picture" className="text-sm font-medium">
-            {t('onboarding.profile.avatarLabel')}
-          </label>
-          <div className="flex gap-2">
-            <Input
-              id="onb-profile-picture"
-              value={data.picture}
-              onChange={(e) => onChange({ picture: e.target.value })}
-              placeholder="https://…"
-              className="flex-1"
-              required={campaignMode}
-              aria-required={campaignMode}
-            />
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              ref={avatarInputRef}
-              onChange={onAvatarChange}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={onUploadClick}
-              disabled={isUploading}
-              title={t('onboarding.profile.uploadAvatar')}
-            >
-              {isUploading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Upload className="w-4 h-4" />
-              )}
-            </Button>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setShowAdvanced((v) => !v)}
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ChevronDown
-            className={cn('h-4 w-4 transition-transform duration-200', showAdvanced && 'rotate-180')}
-          />
-          {t('onboarding.profile.advanced')}
-        </button>
-
-        {showAdvanced && (
-          <div className="space-y-1.5">
-            <label htmlFor="onb-profile-about" className="text-sm font-medium">
-              {t('onboarding.profile.aboutLabel')}
-            </label>
-            <Textarea
-              id="onb-profile-about"
-              value={data.about}
-              onChange={(e) => onChange({ about: e.target.value })}
-              placeholder={t('onboarding.profile.aboutPlaceholder')}
-              className="resize-none"
-              rows={3}
-            />
-          </div>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <Button onClick={onFinish} disabled={isPublishing || !canContinue} className="w-full h-12 rounded-full">
-          {isPublishing ? t('onboarding.profile.saving') : t(campaignMode ? 'common.next' : 'onboarding.profile.finish')}
-        </Button>
-        {!campaignMode && (
-          <Button variant="ghost" onClick={onSkip} disabled={isPublishing} className="w-full">
-            {t('onboarding.profile.skip')}
-          </Button>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function parseProfileMetadata(content: string | undefined): Record<string, unknown> {
-  if (!content) return {};
-
-  try {
-    const parsed: unknown = JSON.parse(content);
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-      return parsed as Record<string, unknown>;
-    }
-  } catch {
-    // Invalid profile JSON should not block the user from setting required fields.
-  }
-
-  return {};
-}
-
-// =============================================================================
-// Shared bits
-// =============================================================================
-
-function BackButton({ onClick }: { onClick: () => void }) {
-  const { t } = useTranslation();
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full text-sm text-muted-foreground hover:text-foreground inline-flex items-center justify-center gap-1.5 py-2"
-    >
-      <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
-      {t('onboarding.back')}
-    </button>
   );
 }

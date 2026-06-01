@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, EyeOff, HandHeart, PlusCircle } from 'lucide-react';
@@ -9,6 +9,7 @@ import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { CampaignsDiscoverySection } from '@/components/discovery/CampaignsDiscoverySection';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
+import { StartCampaignLink } from '@/components/StartCampaignLink';
 import { ModeratorCollapsibleSection } from '@/components/moderation';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useAllCampaigns, toQuerySort } from '@/hooks/useAllCampaigns';
@@ -321,10 +322,10 @@ function AllCampaignsHero({ campaignCount }: AllCampaignsHeroProps) {
               'motion-safe:transition-colors motion-safe:duration-200',
             )}
           >
-            <Link to="/campaigns/new">
+            <StartCampaignLink>
               <PlusCircle className="mr-2" />
               {t('campaigns.all.startCampaign')}
-            </Link>
+            </StartCampaignLink>
           </Button>
         </div>
       </div>

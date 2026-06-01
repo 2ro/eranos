@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { HandHeart, PlusCircle } from 'lucide-react';
 
@@ -7,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
+import { StartCampaignLink } from '@/components/StartCampaignLink';
 import { useAllCampaigns, toQuerySort } from '@/hooks/useAllCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useDiscoveryFilters } from '@/hooks/useDiscoveryFilters';
@@ -221,10 +221,10 @@ export function CampaignsDiscoverySection({
               )}
             </div>
             <Button asChild>
-              <Link to="/campaigns/new">
+              <StartCampaignLink>
                 <PlusCircle className="size-4 mr-2" />
                 {t('campaigns.all.startCampaign')}
-              </Link>
+              </StartCampaignLink>
             </Button>
           </CardContent>
         </Card>

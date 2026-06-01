@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { Megaphone } from 'lucide-react';
 import { useQueries } from '@tanstack/react-query';
 
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
+import { StartCampaignLink } from '@/components/StartCampaignLink';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
@@ -81,12 +81,11 @@ export function ProfileCampaignsTab({
                 : t('profile.campaigns.emptyOther', { name: displayName })}
             </p>
             {isOwnProfile && (
-              <Link
-                to="/campaigns/new"
+              <StartCampaignLink
                 className="inline-block mt-4 text-sm font-medium text-primary hover:underline"
               >
                 {t('profile.campaigns.startLink')}
-              </Link>
+              </StartCampaignLink>
             )}
           </div>
         </Card>
