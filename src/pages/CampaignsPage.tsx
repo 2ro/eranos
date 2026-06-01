@@ -375,19 +375,37 @@ function Hero({ loggedIn }: { loggedIn: boolean }) {
 }
 
 /**
- * Returns the grid class string for an adaptive featured row.
- * Mobile stays 1-column; desktop expands to 2/3/4 columns based on count.
- * Tailwind JIT requires literal class strings, so we spell each variant
- * out rather than building the class name dynamically.
+ * Tailwind class for the wrapper around an individual featured card.
+ *
+ * The Featured row is a single CSS grid that scales from 1 col on
+ * mobile → 2 col on `sm` → 4 col on `lg`. The first two cards span
+ * 2 columns on `sm+` so they read as larger "hero" placements; the
+ * remainder fills the rest of the grid in rows of four on `lg+`.
+ *
+ * - Mobile (1 col): every card is full width.
+ * - `sm` (2 col): top two are full width (col-span-2 = full row each);
+ *   the rest are half width.
+ * - `lg` (4 col): top two are half width side-by-side; the rest are
+ *   quarter width, four per row.
+ *
+ * Returning a literal Tailwind string (rather than building it) keeps
+ * the JIT happy — `col-span-2` etc. are seen by the scanner.
  */
-function featuredGridClass(n: number): string {
-  if (n <= 1) return 'grid grid-cols-1 gap-5';
-  if (n === 2) return 'grid grid-cols-1 md:grid-cols-2 gap-5';
-  if (n === 3) return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5';
-  return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5';
+function featuredItemClass(index: number, total: number): string {
+  // With ≤2 campaigns the layout is just the natural grid; no spans
+  // needed. With 3+, only the first two get the span.
+  if (total < 3) return '';
+  if (index < 2) return 'sm:col-span-2 lg:col-span-2';
+  return '';
 }
 
-/** Renders the featured row with an adaptive column count. */
+function featuredGridContainerClass(total: number): string {
+  if (total <= 1) return 'grid grid-cols-1 gap-5';
+  if (total === 2) return 'grid grid-cols-1 sm:grid-cols-2 gap-5';
+  return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5';
+}
+
+/** Renders the featured row with two large cards on top + 4-up tail. */
 function FeaturedRow({
   campaigns,
   isLoading,
@@ -399,14 +417,16 @@ function FeaturedRow({
   expectedCount: number;
 }) {
   if (isLoading && campaigns.length === 0) {
-    // The skeleton mirrors how many cards we expect, but bounded so a
-    // moderator who's featured 50+ campaigns doesn't get a screenful
-    // of grey placeholders before the real cards arrive.
+    // The skeleton mirrors the real layout: top two large, rest 4-up.
+    // Bounded so a moderator who's featured 50+ campaigns doesn't get
+    // a screenful of grey placeholders before the real cards arrive.
     const skeletonCount = Math.max(1, Math.min(FEATURED_SKELETON_CAP, expectedCount || 2));
     return (
-      <div className={featuredGridClass(skeletonCount)}>
+      <div className={featuredGridContainerClass(skeletonCount)}>
         {Array.from({ length: skeletonCount }).map((_, i) => (
-          <CampaignCardSkeleton key={i} variant={skeletonCount === 1 ? 'featured' : 'compact'} />
+          <div key={i} className={featuredItemClass(i, skeletonCount)}>
+            <CampaignCardSkeleton variant={skeletonCount === 1 ? 'featured' : 'compact'} />
+          </div>
         ))}
       </div>
     );
@@ -419,8 +439,10 @@ function FeaturedRow({
     return null;
   }
 
-  // 1 featured campaign gets the hero `variant="featured"` treatment;
-  // 2+ use the regular compact card sized to the dynamic grid.
+  // 1 featured campaign keeps the hero `variant="featured"` treatment
+  // (image-left / text-right rectangular layout). With 2+ we use the
+  // standard compact card; the top two earn their visual weight from
+  // the column-spanning grid layout above, not the card variant.
   const useFeaturedVariant = campaigns.length === 1;
 
   // Moderators get drag-and-drop / kebab reorder on the featured
@@ -429,7 +451,8 @@ function FeaturedRow({
   return (
     <ReorderableCampaignGrid
       campaigns={campaigns}
-      gridClassName={featuredGridClass(campaigns.length)}
+      gridClassName={featuredGridContainerClass(campaigns.length)}
+      itemClassName={(idx) => featuredItemClass(idx, campaigns.length)}
       renderCard={(campaign) => (
         <CampaignCard
           campaign={campaign}

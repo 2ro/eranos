@@ -22,7 +22,14 @@ interface ReorderableCampaignGridProps {
    * The Featured row uses a custom renderer for its single-/multi-
    * column variant logic.
    */
-  renderCard?: (campaign: ParsedCampaign) => ReactNode;
+  renderCard?: (campaign: ParsedCampaign, index: number) => ReactNode;
+  /**
+   * Optional per-item wrapper class (driven by display index, after
+   * any optimistic reorder). The Featured row uses this to make the
+   * first two cards span two columns on wider breakpoints so they
+   * read as "large" hero placements above a 4-up tail.
+   */
+  itemClassName?: (index: number) => string;
 }
 
 /**
@@ -56,6 +63,7 @@ export function ReorderableCampaignGrid({
   campaigns,
   gridClassName,
   renderCard,
+  itemClassName,
 }: ReorderableCampaignGridProps) {
   const { user } = useCurrentUser();
   const { data: moderators } = useCampaignModerators();
@@ -191,7 +199,7 @@ export function ReorderableCampaignGrid({
   );
 
   const renderItem = useCallback(
-    (campaign: ParsedCampaign) => renderCard?.(campaign) ?? <CampaignCard campaign={campaign} />,
+    (campaign: ParsedCampaign, index: number) => renderCard?.(campaign, index) ?? <CampaignCard campaign={campaign} />,
     [renderCard],
   );
 
@@ -201,8 +209,8 @@ export function ReorderableCampaignGrid({
   if (!isMod) {
     return (
       <div className={gridClassName}>
-        {displayed.map((campaign) => (
-          <div key={campaign.aTag}>{renderItem(campaign)}</div>
+        {displayed.map((campaign, idx) => (
+          <div key={campaign.aTag} className={itemClassName?.(idx)}>{renderItem(campaign, idx)}</div>
         ))}
       </div>
     );
@@ -221,15 +229,16 @@ export function ReorderableCampaignGrid({
       <div className={gridClassName}>
         {displayed.map((campaign, idx) =>
           isMobile ? (
-            <div key={campaign.aTag}>{renderItem(campaign)}</div>
+            <div key={campaign.aTag} className={itemClassName?.(idx)}>{renderItem(campaign, idx)}</div>
           ) : (
             <DraggableCard
               key={campaign.aTag}
               index={idx}
               coord={campaign.aTag}
               onDropAt={(droppedCoord) => onMoveTo(droppedCoord, idx)}
+              className={itemClassName?.(idx)}
             >
-              {renderItem(campaign)}
+              {renderItem(campaign, idx)}
             </DraggableCard>
           ),
         )}
@@ -265,11 +274,13 @@ function DraggableCard({
   index,
   coord,
   onDropAt,
+  className,
   children,
 }: {
   index: number;
   coord: string;
   onDropAt: (sourceCoord: string) => void;
+  className?: string;
   children: ReactNode;
 }) {
   const [isOver, setIsOver] = useState(false);
@@ -280,6 +291,7 @@ function DraggableCard({
       className={cn(
         'relative group/drag motion-safe:transition-shadow',
         isOver && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-xl shadow-lg',
+        className,
       )}
       onDragOver={(e) => {
         if (!e.dataTransfer.types.includes('text/x-agora-campaign-coord')) return;
