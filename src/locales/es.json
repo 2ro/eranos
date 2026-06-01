@@ -764,6 +764,34 @@
       "yourCampaignsDesc": "Tus campañas están activas en Nostr y las donaciones funcionan mediante el enlace de la campaña. Explora todas las campañas en /campaigns; el equipo de {{appName}} destaca una selección curada en la página de inicio.",
       "empty": "Aún no hay campañas",
       "emptyHint": "Sé el primero en iniciar una recaudación en {{appName}}. Cuenta tu historia, elige a los beneficiarios y comparte el enlace.",
+      "whyDifferent": {
+        "eyebrow": "Por qué {{appName}}",
+        "title": "Construido diferente.",
+        "lede": "Tres cosas que nos hacen distintos de los demás.",
+        "block1": {
+          "heading": "A diferencia de GoFundMe y sitios similares",
+          "body": "Ninguna plataforma puede congelar tus donaciones, exigir reembolsos o cerrar tu campaña por desacuerdos sobre políticas. Ni Stripe, ni Visa, ni un banco se interponen en medio y pueden cortarte a mitad de campaña.",
+          "bullet1": "A prueba de congelaciones — sin veto de plataforma",
+          "bullet2": "Ningún procesador de pagos puede tirar del enchufe",
+          "bullet3": "Cero comisiones de plataforma"
+        },
+        "block2": {
+          "heading": "A diferencia de otras plataformas 'Bitcoin'",
+          "body": "Sin nodo Lightning central, custodio o LSP que pueda fallar o caerse. Los fondos se liquidan directamente en Bitcoin a una billetera que tú controlas. Si {{appName}} desapareciera mañana, cada campaña seguiría funcionando.",
+          "bullet1": "Sin billetera custodiada que vaciar o congelar",
+          "bullet2": "Se liquida on-chain a una billetera que tú posees",
+          "bullet3": "Funciona incluso si {{appName}} desaparece"
+        },
+        "block3": {
+          "heading": "Público o privado. Tú eliges.",
+          "body": "Los activistas eligen la opción de recepción que se ajusta a su modelo de amenaza. Los donantes ven un único QR; la billetera elige el protocolo correcto.",
+          "publicLabel": "Público",
+          "publicSummary": "Funciona en todas las billeteras de Bitcoin. Rápido y verificable on-chain.",
+          "privateLabel": "Privado",
+          "privateSummary": "Pagos silenciosos BIP-352. Las donaciones llegan a salidas no enlazables."
+        },
+        "readMore": "Leer el análisis completo"
+      },
       "searchPlaceholder": "Buscar campañas…",
       "searchAriaLabel": "Buscar campañas",
       "noMatch": "Ninguna campaña coincide con «{{query}}»",

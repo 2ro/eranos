@@ -1196,6 +1196,34 @@
       "yourCampaignsDesc": "Suas campanhas estão no ar no Nostr e as doações funcionam através do link da campanha. Navegue por todas as campanhas em /campaigns; a equipe do {{appName}} apresenta uma seleção curada na página inicial.",
       "empty": "Nenhuma campanha ainda",
       "emptyHint": "Seja o primeiro a iniciar uma arrecadação no {{appName}}. Conte sua história, escolha seus beneficiários e compartilhe o link.",
+      "whyDifferent": {
+        "eyebrow": "Por que o {{appName}}",
+        "title": "Construído diferente.",
+        "lede": "Três coisas que nos tornam diferentes dos outros.",
+        "block1": {
+          "heading": "Diferente do GoFundMe e sites similares",
+          "body": "Nenhuma plataforma pode congelar suas doações, exigir reembolsos ou encerrar sua campanha por divergências de política. Sem Stripe, sem Visa, sem banco no meio que pode te cortar no meio da campanha.",
+          "bullet1": "À prova de congelamento — sem veto de plataforma",
+          "bullet2": "Nenhum processador de pagamento pode puxar o plugue",
+          "bullet3": "Zero taxas de plataforma"
+        },
+        "block2": {
+          "heading": "Diferente de outras plataformas ‘Bitcoin’",
+          "body": "Sem nó Lightning central, custodiante ou LSP para falhar ou ficar offline. Os fundos são liquidados diretamente no Bitcoin em uma carteira que você controla. Se o {{appName}} desaparecesse amanhã, toda campanha continuaria funcionando.",
+          "bullet1": "Sem carteira custodial para drenar ou congelar",
+          "bullet2": "Liquida on-chain em uma carteira que você possui",
+          "bullet3": "Funciona mesmo se o {{appName}} desaparecer"
+        },
+        "block3": {
+          "heading": "Público ou privado. Sua escolha.",
+          "body": "Ativistas escolhem a opção de recebimento que combina com seu modelo de ameaça. Doadores veem um único QR; a carteira escolhe o protocolo certo.",
+          "publicLabel": "Público",
+          "publicSummary": "Funciona em toda carteira Bitcoin. Rápido e verificável on-chain.",
+          "privateLabel": "Privado",
+          "privateSummary": "Pagamentos silenciosos BIP-352. Doações chegam em saídas inrastreáveis."
+        },
+        "readMore": "Ler a análise completa"
+      },
       "searchPlaceholder": "Pesquisar campanhas…",
       "searchAriaLabel": "Pesquisar campanhas",
       "noMatch": "Nenhuma campanha corresponde a “{{query}}”",

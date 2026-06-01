@@ -764,6 +764,34 @@
       "yourCampaignsDesc": "你的活动已在 Nostr 上线,通过活动链接即可接收捐款。在 /campaigns 浏览所有活动;{{appName}} 团队会在首页展示精选活动。",
       "empty": "暂无活动",
       "emptyHint": "成为在 {{appName}} 发起众筹的第一人。讲述你的故事、选择受益人、并分享链接。",
+      "whyDifferent": {
+        "eyebrow": "为什么选 {{appName}}",
+        "title": "我们与众不同。",
+        "lede": "三件事让我们与其他平台不一样。",
+        "block1": {
+          "heading": "不像 GoFundMe 等类似网站",
+          "body": "没有平台可以冻结你的捐款、要求退款或因政策分歧而终止你的活动。没有 Stripe、没有 Visa、没有银行夹在中间，可以在活动中途切断你。",
+          "bullet1": "防冻结 — 平台无否决权",
+          "bullet2": "没有支付处理商可以拔掉插头",
+          "bullet3": "零平台费用"
+        },
+        "block2": {
+          "heading": "不像其他「比特币」平台",
+          "body": "没有中央 Lightning 节点、托管方或 LSP 可能出现故障或下线。资金直接在 Bitcoin 上结算到你控制的钱包。如果 {{appName}} 明天消失，每个活动都会继续运作。",
+          "bullet1": "没有可被掏空或冻结的托管钱包",
+          "bullet2": "直接在链上结算到你拥有的钱包",
+          "bullet3": "即使 {{appName}} 消失也能运作"
+        },
+        "block3": {
+          "heading": "公开或私密。由你选择。",
+          "body": "活动人士选择与自身威胁模型相匹配的收款方式。捐赠者只看到一个 QR；钱包会自动选择正确的协议。",
+          "publicLabel": "公开",
+          "publicSummary": "适用于每一个 Bitcoin 钱包。链上快速且可验证。",
+          "privateLabel": "私密",
+          "privateSummary": "BIP-352 静默支付。捐款到达不可链接的输出。"
+        },
+        "readMore": "阅读完整说明"
+      },
       "searchPlaceholder": "搜索活动…",
       "searchAriaLabel": "搜索活动",
       "noMatch": "没有活动匹配「{{query}}」",

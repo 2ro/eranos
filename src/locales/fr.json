@@ -1195,6 +1195,34 @@
       "yourCampaignsDesc": "Vos campagnes sont en ligne sur Nostr et les dons fonctionnent via le lien de la campagne. Parcourez toutes les campagnes sur /campaigns ; l'équipe de {{appName}} met en avant une sélection sur la page d'accueil.",
       "empty": "Aucune campagne pour l'instant",
       "emptyHint": "Soyez le premier à démarrer une collecte de fonds sur {{appName}}. Racontez votre histoire, choisissez vos bénéficiaires et partagez le lien.",
+      "whyDifferent": {
+        "eyebrow": "Pourquoi {{appName}}",
+        "title": "Conçu différemment.",
+        "lede": "Trois choses qui nous distinguent des autres.",
+        "block1": {
+          "heading": "Contrairement à GoFundMe et aux sites similaires",
+          "body": "Aucune plateforme ne peut geler vos dons, exiger des remboursements ou mettre fin à votre campagne pour des désaccords politiques. Ni Stripe, ni Visa, ni banque ne se trouve au milieu et ne peut vous couper en pleine campagne.",
+          "bullet1": "Ingelable — aucun veto de plateforme",
+          "bullet2": "Aucun processeur de paiement ne peut tirer la prise",
+          "bullet3": "Zéro frais de plateforme"
+        },
+        "block2": {
+          "heading": "Contrairement aux autres plateformes « Bitcoin »",
+          "body": "Pas de nœud Lightning central, de dépositaire ou de LSP qui peut tomber en panne ou se déconnecter. Les fonds sont réglés directement sur Bitcoin vers un portefeuille que vous contrôlez. Si {{appName}} disparaissait demain, toutes les campagnes continueraient de fonctionner.",
+          "bullet1": "Pas de portefeuille dépositaire à vider ou à geler",
+          "bullet2": "Règlement sur la chaîne vers un portefeuille que vous possédez",
+          "bullet3": "Fonctionne même si {{appName}} disparaît"
+        },
+        "block3": {
+          "heading": "Public ou privé. À vous de choisir.",
+          "body": "Les activistes choisissent l'option de réception qui correspond à leur modèle de menace. Les donateurs voient un seul QR ; le portefeuille choisit le bon protocole.",
+          "publicLabel": "Public",
+          "publicSummary": "Fonctionne dans tous les portefeuilles Bitcoin. Rapide et vérifiable sur la chaîne.",
+          "privateLabel": "Privé",
+          "privateSummary": "Paiements silencieux BIP-352. Les dons arrivent à des sorties non-traçables."
+        },
+        "readMore": "Lire l'analyse complète"
+      },
       "searchPlaceholder": "Rechercher des campagnes…",
       "searchAriaLabel": "Rechercher des campagnes",
       "noMatch": "Aucune campagne ne correspond à « {{query}} »",

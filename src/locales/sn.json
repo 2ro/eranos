@@ -764,6 +764,34 @@
       "yourCampaignsDesc": "Mishandirapamwe yako iri panetwork yeNostr uye mipiro inoshanda kuburikidza nemurawu wemushandirapamwe. Tarisa mishandirapamwe yose pa/campaigns; boka re{{appName}} rinosarudza yakananga papeji rekutanga.",
       "empty": "Hapana mishandirapamwe parizvino",
       "emptyHint": "Iva wekutanga kutanga kuunganidza mari pa{{appName}}. Taura nyaya yako, sarudza vanobatsirwa, uchipa rwumwe rwekugovera.",
+      "whyDifferent": {
+        "eyebrow": "Sei {{appName}}",
+        "title": "Yakavakwa zvakasiyana.",
+        "lede": "Zvinhu zvitatu zvinoita kuti tisafanane nedzimwe.",
+        "block1": {
+          "heading": "Kusiyana neGoFundMe nemamwe masaiti akafanana",
+          "body": "Hapana puratifomu inogona kudzivirira zvipo zvako, kukumbira kudzoserwa kwemari, kana kupedza mushandirapamwe wako pamusoro pekusawirirana kwemitemo. Hapana Stripe, hapana Visa, hapana bhanga riri pakati ringakucherekedza pakati pemushandirapamwe.",
+          "bullet1": "Hazvigoneki kudzivirira — hapana puratifomu inotonga",
+          "bullet2": "Hapana mutsigiri wokubhadhara anogona kucherekedza",
+          "bullet3": "Hapana mari yepuratifomu"
+        },
+        "block2": {
+          "heading": "Kusiyana nedzimwe puratifomu ‘dzeBitcoin’",
+          "body": "Hapana Lightning node yepakati, muchengeti, kana LSP inogona kukundikana kana kunge offline. Mari inotsoropodzwa zvakananga paBitcoin kuenda muwallet yauno tonga. Kana {{appName}} ikanyangarika mangwana, mushandirapamwe wose unoramba uchishanda.",
+          "bullet1": "Hapana wallet yokuchengetedza inogona kupedzwa kana kudzivirirwa",
+          "bullet2": "Inotsoropodzwa pamuchina kuenda muwallet yauno tora",
+          "bullet3": "Inoshanda kunyange {{appName}} ikanyangarika"
+        },
+        "block3": {
+          "heading": "Yeruzhinji kana yakavanzika. Kusarudza ndokwako.",
+          "body": "Vatungamiri vanosarudza nzira yokugamuchira inoenderana nemamiriro avo enjodzi. Vapi vanoona QR imwe chete; wallet ndiyo inosarudza pirotokori yakakodzera.",
+          "publicLabel": "Yeruzhinji",
+          "publicSummary": "Inoshanda muwallet yose yeBitcoin. Yokukurumidza uye inoonekwa pamuchina.",
+          "privateLabel": "Yakavanzika",
+          "privateSummary": "BIP-352 silent payments. Zvipo zvinosvika pamiganhu isingabatanidziki."
+        },
+        "readMore": "Verenga tsananguro yakazara"
+      },
       "searchPlaceholder": "Tsvaga mishandirapamwe…",
       "searchAriaLabel": "Tsvaga mishandirapamwe",
       "noMatch": "Hapana mushandirapamwe unoenderana ne«{{query}}»",
