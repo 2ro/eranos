@@ -1,71 +1,36 @@
-import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 
-import { TEAM_SOAPBOX } from '@/lib/agoraDefaults';
-import { DITTO_RELAY } from '@/lib/appRelays';
-
-/** A 64-character lowercase hex string. */
-const HEX_64_RE = /^[0-9a-f]{64}$/;
+import { CAMPAIGN_MODERATORS } from '@/lib/agoraDefaults';
 
 /**
- * Returns the hex pubkeys of campaign moderators — the `p` tags of the
- * Team Soapbox follow pack (kind 39089).
+ * Returns the hex pubkeys of campaign moderators — the pubkeys allowed to
+ * sign approve / hide labels in the `agora.moderation` namespace (see
+ * NIP.md).
  *
  * A campaign appears on `/` and Discover only if a moderator has labeled it
  * `approved` (see {@link useCampaignModeration}). A moderator's `hidden`
- * label always wins over any approval. The pack itself is authored by a
- * single admin pubkey, so we pin `authors` to that pubkey to prevent anyone
- * else from publishing a same-`d` event and self-appointing.
+ * label always wins over any approval.
  *
- * **Phase 1 tradeoff:** the pack is fetched live every cold session. We
- * accept the 1-round-trip latency in exchange for not shipping a release
- * every time the moderator roster changes. If perf matters, snapshot the
- * `p` tags into a hardcoded array and short-circuit this hook.
+ * **Hardcoded snapshot.** This used to fetch the Team Soapbox follow pack
+ * (kind 39089) live every cold session, which put a single-relay round-trip
+ * — up to an 8s EOSE timeout — on the critical path of every
+ * moderation-gated surface (home, Discover, profile campaigns, etc.). The
+ * roster changes rarely, so the membership is now snapshotted in
+ * {@link CAMPAIGN_MODERATORS} and served synchronously with zero network
+ * cost. Update that array (and re-cut a release) when the pack changes.
  *
- * @see TEAM_SOAPBOX (src/lib/agoraDefaults.ts) for the pack coordinate.
+ * The hook keeps its `useQuery` return shape so existing consumers
+ * (`{ data, isLoading, ... }`) continue to work unchanged; the query is a
+ * pure synchronous read with no `queryFn` network call.
+ *
+ * @see CAMPAIGN_MODERATORS (src/lib/agoraDefaults.ts) for the pubkey list.
  * @see NIP.md "Campaign moderation labels" for the namespace this powers.
  */
 export function useCampaignModerators() {
-  const { nostr } = useNostr();
-
   return useQuery({
-    queryKey: ['campaign-moderators', TEAM_SOAPBOX.pubkey, TEAM_SOAPBOX.identifier],
-    queryFn: async ({ signal }) => {
-      // The home page gates campaign visibility on this pack. Query the
-      // canonical app relay directly so a fast empty EOSE from another relay
-      // cannot race the pack out and make the page render as empty.
-      const relay = nostr.relay(DITTO_RELAY);
-      const events = await relay.query(
-        [
-          {
-            kinds: [TEAM_SOAPBOX.kind],
-            // Pinning to the pack author is required: kind 39089 is
-            // addressable, so without this anyone could publish a competing
-            // event with the same `d` and force themselves into the moderator
-            // list. (See AGENTS.md `nostr-security`.)
-            authors: [TEAM_SOAPBOX.pubkey],
-            '#d': [TEAM_SOAPBOX.identifier],
-            limit: 1,
-          },
-        ],
-        { signal: AbortSignal.any([signal, AbortSignal.timeout(8000)]) },
-      );
-
-      if (events.length === 0) return [] as string[];
-
-      // The pack is replaceable; relays may serve old revisions alongside the
-      // current one. Keep the newest.
-      const newest = events.reduce((latest, current) =>
-        current.created_at > latest.created_at ? current : latest,
-      );
-
-      // Filter malformed `p` tags so a typo doesn't blow up downstream
-      // relay filters (which reject non-hex `authors:` entries).
-      return newest.tags
-        .filter(([name, value]) => name === 'p' && typeof value === 'string' && HEX_64_RE.test(value))
-        .map(([, pubkey]) => pubkey);
-    },
-    staleTime: 10 * 60_000,
-    gcTime: 60 * 60_000,
+    queryKey: ['campaign-moderators', 'snapshot'],
+    queryFn: () => CAMPAIGN_MODERATORS.slice(),
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
