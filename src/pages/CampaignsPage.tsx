@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { Trans, useTranslation } from 'react-i18next';
-import { ArrowRight, BadgeCheck, EyeOff, HandHeart, PlusCircle } from 'lucide-react';
+import { ArrowRight, BadgeCheck, HandHeart, PlusCircle } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { CampaignListsStrip } from '@/components/campaign-lists/CampaignListsStrip';
 import { HeroLightningMap } from '@/components/HeroLightningMap';
 import { StartCampaignLink } from '@/components/StartCampaignLink';
-import { ModeratorCollapsibleSection, ReorderableCampaignGrid } from '@/components/moderation';
+import { ReorderableCampaignGrid } from '@/components/moderation';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
@@ -51,7 +51,7 @@ const WLC_NPUB = 'npub126e6hwd6a5std2upv9a22xwgvd8fyrhsx5wjjchv99g6nv3n4vhs5fr9g
 /**
  * Home page (`/`).
  *
- * Three sections (last is moderator-only):
+ * Two public sections:
  *
  *  1. **Featured** — moderator-curated, ordered by the moderator's
  *     chosen rank (newest-by-rank first). Capped at FEATURED_CAP for
@@ -60,20 +60,14 @@ const WLC_NPUB = 'npub126e6hwd6a5std2upv9a22xwgvd8fyrhsx5wjjchv99g6nv3n4vhs5fr9g
  *  2. **Topic-list strip + Browse all** — the curated
  *     {@link CampaignListsStrip} (moderator-managed topic pills) plus
  *     a single CTA to `/campaigns`, the full discoverable set with
- *     search / sort / country filters. The previous chronological
- *     "All campaigns" grid on this page was retired: the strip is a
- *     better editorial hand-off than an unsorted feed, and the
- *     dedicated `/campaigns` page already does breadth well.
- *  3. **Hidden** — moderator-only, collapsed by default so the page
- *     doesn't lead with suppressed content for the people
- *     responsible for it.
+ *     search / sort / country filters.
  *
- * Hidden-campaign coverage: a hidden campaign older than the recent
- * stream window would drop off a `limit:` query, so we issue a
- * targeted coord-keyed fetch over every hidden coord and feed the
- * Hidden section from the union of that query and the recent
- * stream. The Featured row uses the same coord-targeted pattern
- * keyed on its own coords.
+ * Hidden-campaign moderation lives entirely on `/campaigns` — the
+ * Show-hidden toggle there is available to every viewer, and the
+ * moderator-only Hidden collapsible there is the structured review
+ * surface. The home page deliberately carries no Hidden affordance
+ * so it never leads with suppressed content for anyone, moderators
+ * included.
  *
  * Campaigns are the home page's sole focus. Groups and Pledges each
  * have their own dedicated browse pages (`/groups`, `/pledges`).
@@ -89,12 +83,10 @@ export function CampaignsPage() {
   const wlcPicture = wlcAuthor.data?.metadata?.picture;
   const wlcFallback = genUserName(WLC_PUBKEY).slice(0, 2).toUpperCase();
 
-  // Moderation pack + label rollups. We gate the Featured and Hidden
-  // sections on `moderationReady` so we never flash an unmoderated
-  // grid.
-  const { data: moderators, isLoading: moderatorsLoading } = useCampaignModerators();
+  // Moderation pack + label rollups. We gate the Featured section on
+  // `moderationReady` so we never flash an unmoderated grid.
+  const { isLoading: moderatorsLoading } = useCampaignModerators();
   const { data: moderation, isReady: moderationReady } = useCampaignModeration();
-  const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
   // Featured slot list — derived from moderation labels. Sorted by
   // the moderator-controlled rank (descending); hidden coords
@@ -136,47 +128,10 @@ export function CampaignsPage() {
       .sort((a, b) => (order.get(b.aTag) ?? 0) - (order.get(a.aTag) ?? 0));
   }, [featuredCampaigns, cappedFeaturedCoords, moderation]);
 
-  // Recent stream — the latest 200 campaign events on the network.
-  // Used by the moderator-only Hidden section below as a union source
-  // alongside the targeted hidden-coord query.
-  const { data: recentCampaigns, isLoading: recentLoading } = useCampaigns({
-    limit: 200,
-  });
-
-  // Targeted query for every hidden coord. Guarantees the Hidden
-  // section renders correctly even when the hidden campaign is
-  // older than the recent-200 window.
-  const hiddenCoordList = useMemo(() => {
-    if (!moderation) return [] as string[];
-    return Array.from(moderation.hiddenCoords);
-  }, [moderation]);
-
-  const { data: hiddenCampaignsRaw, isLoading: hiddenLoading } = useCampaigns(
-    moderationReady && hiddenCoordList.length > 0
-      ? { coordinates: hiddenCoordList }
-      : { coordinates: [] },
-  );
-
   useSeoMeta({
     title: `${t('campaigns.home.seoTitle')} | ${config.appName}`,
     description: t('campaigns.home.seoDescription'),
   });
-
-  // Hidden section: union of the recent stream and the targeted
-  // query, deduped by aTag, filtered to coords currently labeled
-  // hidden. Newest-first for stable ordering.
-  const hiddenCampaigns = useMemo<ParsedCampaign[]>(() => {
-    if (!moderation) return [];
-    const byCoord = new Map<string, ParsedCampaign>();
-    for (const c of recentCampaigns ?? []) byCoord.set(c.aTag, c);
-    for (const c of hiddenCampaignsRaw ?? []) {
-      const prev = byCoord.get(c.aTag);
-      if (!prev || c.createdAt > prev.createdAt) byCoord.set(c.aTag, c);
-    }
-    return Array.from(byCoord.values())
-      .filter((c) => moderation.hiddenCoords.has(c.aTag))
-      .sort((a, b) => b.createdAt - a.createdAt);
-  }, [recentCampaigns, hiddenCampaignsRaw, moderation]);
 
   const featuredEmpty =
     moderationReady && featuredCoords.length === 0 && !featuredLoading;
@@ -258,30 +213,6 @@ export function CampaignsPage() {
             </Button>
           </div>
         </section>
-
-        {/* Hidden — moderator-only, collapsed by default. The
-            Campaigns page is where everyone can transparently flip
-            a switch to view hidden campaigns; on the home page mods
-            get a more structured collapsible review surface, kept
-            closed so the page doesn't lead with suppressed content. */}
-        {isMod && (
-          <ModeratorCollapsibleSection
-            icon={<EyeOff className="size-4" />}
-            title={t('campaigns.home.hidden')}
-            description={t('campaigns.home.hiddenDesc')}
-            count={hiddenCampaigns.length}
-            isLoading={(recentLoading || hiddenLoading) && hiddenCampaigns.length === 0}
-            emptyText={t('campaigns.home.hiddenEmpty')}
-            skeleton={<CampaignGridSkeleton />}
-            defaultOpen={false}
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {hiddenCampaigns.map((campaign) => (
-                <CampaignCard key={campaign.aTag} campaign={campaign} />
-              ))}
-            </div>
-          </ModeratorCollapsibleSection>
-        )}
       </div>
     </main>
   );
@@ -499,16 +430,6 @@ function FeaturedRow({
         />
       )}
     />
-  );
-}
-
-function CampaignGridSkeleton() {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <CampaignCardSkeleton key={i} />
-      ))}
-    </div>
   );
 }
 
