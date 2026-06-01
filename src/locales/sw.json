@@ -1259,6 +1259,10 @@
       "addFailed": "Imeshindikana kuongeza kwenye orodha",
       "addToList": "Ongeza",
       "alreadyAdded": "Imeongezwa",
+      "added": "Imeongezwa",
+      "membershipTitle": "Ongeza kwenye orodha",
+      "membershipDesc": "Chagua orodha ambazo \"{{title}}\" itaonekana ndani yake.",
+      "membershipEmpty": "Bado hakuna orodha. Unda moja ili kuanza kuiratibu.",
       "searchPlaceholder": "Tafuta kampeni…",
       "searchEmpty": "Hakuna kampeni zinazolingana na utafutaji huu.",
       "removeFromList": "Ondoa kwenye orodha",
@@ -1295,6 +1299,7 @@
       "moveToTop": "Hamisha juu kabisa",
       "moveUp": "Hamisha juu",
       "moveDown": "Hamisha chini",
+      "addToList": "Ongeza kwenye orodha…",
       "dragHandle": "Buruta ili kupanga upya (nafasi {{index}})",
       "toast": {
         "movedToTop": "Imehamishwa juu kabisa",

@@ -828,6 +828,10 @@
        "addFailed": "Kuwedzera kurondedzero hakuna kubudirira",
        "addToList": "Wedzera",
        "alreadyAdded": "Yawedzerwa",
+       "added": "Yawedzerwa",
+       "membershipTitle": "Wedzera kuzvirondedzero",
+       "membershipDesc": "Sarudza kuti \"{{title}}\" inofanira kuonekwa muzvirondedzero zvipi.",
+       "membershipEmpty": "Hapana rondedzero parizvino. Gadzira imwe kuti utange kusarudza.",
        "searchPlaceholder": "Tsvaga mishandirapamwe…",
        "searchEmpty": "Hapana mushandirapamwe unoenderana nekutsvaga uku.",
        "removeFromList": "Bvisa parondedzero",
@@ -862,6 +866,7 @@
       "moveToTop": "Endesa kumusoro",
       "moveUp": "Endesa kumusoro",
       "moveDown": "Endesa pasi",
+      "addToList": "Wedzera kurondedzero…",
       "dragHandle": "Kweva kuti uchinje chinzvimbo (chinzvimbo {{index}})",
       "failedReorder": "Hazvina kubudirira kurongedza patsva",
       "toast": {

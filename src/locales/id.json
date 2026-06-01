@@ -1260,6 +1260,10 @@
       "addFailed": "Gagal menambahkan ke daftar",
       "addToList": "Tambah",
       "alreadyAdded": "Ditambahkan",
+      "added": "Ditambahkan",
+      "membershipTitle": "Tambahkan ke daftar",
+      "membershipDesc": "Pilih daftar yang akan memuat \"{{title}}\".",
+      "membershipEmpty": "Belum ada daftar. Buat satu untuk mulai mengkurasi.",
       "searchPlaceholder": "Cari kampanye…",
       "searchEmpty": "Tidak ada kampanye yang cocok dengan pencarian ini.",
       "removeFromList": "Hapus dari daftar",
@@ -1296,6 +1300,7 @@
       "moveToTop": "Pindahkan ke atas",
       "moveUp": "Naikkan",
       "moveDown": "Turunkan",
+      "addToList": "Tambahkan ke daftar…",
       "dragHandle": "Seret untuk mengurutkan ulang (posisi {{index}})",
       "toast": {
         "movedToTop": "Dipindahkan ke atas",

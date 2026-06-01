@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowUp, ArrowDown, ArrowUpToLine,
-  Check, EyeOff, Eye, MoreHorizontal,
+  Check, EyeOff, Eye, ListPlus, MoreHorizontal,
   Sparkles, SparklesIcon,
 } from 'lucide-react';
 
@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { CampaignListMembershipDialog } from '@/components/campaign-lists/CampaignListMembershipDialog';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useToast } from '@/hooks/useToast';
@@ -117,6 +118,7 @@ function ModerationItemsShell({
   moderation,
   moderate,
   getFeatureRank,
+  onAddToList,
 }: {
   coord: string;
   entityTitle: string;
@@ -139,6 +141,13 @@ function ModerationItemsShell({
    * top.
    */
   getFeatureRank?: () => number | undefined;
+  /**
+   * Optional click handler for the "Add to list…" row. When provided,
+   * the row is rendered above the standard axis controls. Only the
+   * campaign surface currently passes this — the menu item opens a
+   * per-campaign membership modal in {@link CampaignItemsInner}.
+   */
+  onAddToList?: () => void;
 }) {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -210,6 +219,16 @@ function ModerationItemsShell({
         {t('moderation.menu.label')}
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
+
+      {onAddToList && (
+        <>
+          <DropdownMenuItem onClick={() => onAddToList()}>
+            <ListPlus className="h-4 w-4 mr-2" />
+            {t('moderation.menu.addToList')}
+          </DropdownMenuItem>
+          {(hasHide || hasFeatured) && <DropdownMenuSeparator />}
+        </>
+      )}
 
       {hasHide && (
         isHidden ? (
@@ -300,6 +319,13 @@ function CampaignItemsInner(props: {
   entityTitle: string;
   axes: readonly ModerationAxis[];
   reorder?: ModerationItemsProps['reorder'];
+  /**
+   * Called when the moderator clicks "Add to list…". The host (a
+   * dropdown menu) closes itself on item-select, which would unmount
+   * a dialog rendered here as a sibling. The host holds the modal
+   * state instead — see {@link ModerationMenu}.
+   */
+  onAddToList?: () => void;
 }) {
   const { data, moderate } = useCampaignModeration();
   // Feature appends to the **bottom** of the curated row. The display
@@ -320,10 +346,14 @@ function CampaignItemsInner(props: {
   };
   return (
     <ModerationItemsShell
-      {...props}
+      coord={props.coord}
+      entityTitle={props.entityTitle}
+      axes={props.axes}
+      reorder={props.reorder}
       moderation={data}
       moderate={moderate}
       getFeatureRank={getFeatureRank}
+      onAddToList={props.onAddToList}
     />
   );
 }
@@ -372,24 +402,53 @@ function GroupItemsInner(props: {
  * share/owner items), use {@link ModerationMenu} or
  * {@link ModerationOverlay} — both wrap this component in their own
  * trigger.
+ *
+ * **Campaign-only "Add to list…" row.** Callers embedding the campaign
+ * surface can pass `onAddToList` to render an extra row above the
+ * standard axes. The host is responsible for owning the dialog state
+ * (the dropdown unmounts its own children on close, which would tear
+ * down a sibling dialog rendered here). {@link ModerationMenu} does
+ * this automatically; other hosts (`ActionShareMenu` etc.) only need
+ * to pass the callback if they want the row inline.
  */
-export function ModerationMenuItems(props: ModerationItemsProps) {
+export function ModerationMenuItems(
+  props: ModerationItemsProps & { onAddToList?: () => void },
+) {
   const { user } = useCurrentUser();
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
   if (!isMod) return null;
 
-  const inner = {
-    coord: props.coord,
-    entityTitle: props.entityTitle,
-    axes: props.axes,
-    reorder: props.reorder,
-  };
   switch (props.surface) {
-    case 'campaign': return <CampaignItemsInner {...inner} />;
-    case 'pledge': return <PledgeItemsInner {...inner} />;
-    case 'group': return <GroupItemsInner {...inner} />;
+    case 'campaign':
+      return (
+        <CampaignItemsInner
+          coord={props.coord}
+          entityTitle={props.entityTitle}
+          axes={props.axes}
+          reorder={props.reorder}
+          onAddToList={props.onAddToList}
+        />
+      );
+    case 'pledge':
+      return (
+        <PledgeItemsInner
+          coord={props.coord}
+          entityTitle={props.entityTitle}
+          axes={props.axes}
+          reorder={props.reorder}
+        />
+      );
+    case 'group':
+      return (
+        <GroupItemsInner
+          coord={props.coord}
+          entityTitle={props.entityTitle}
+          axes={props.axes}
+          reorder={props.reorder}
+        />
+      );
   }
 }
 
@@ -407,30 +466,54 @@ export function ModerationMenuItems(props: ModerationItemsProps) {
  * Used directly on detail pages (no overlay wrapper). For card grids,
  * prefer {@link ModerationOverlay}, which bundles this kebab with a
  * "Hidden" badge in an absolutely-positioned corner.
+ *
+ * Campaign surfaces additionally get an "Add to list…" row at the top
+ * that opens a per-campaign membership modal. The modal's state lives
+ * at this trigger level (not inside `DropdownMenuContent`) because the
+ * dropdown unmounts its children on close — a sibling dialog mounted
+ * inside the content would be torn down on the same tick.
  */
 export function ModerationMenu({ className, ...rest }: ModerationMenuProps) {
   const { t } = useTranslation();
   const { user } = useCurrentUser();
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
+  const [membershipOpen, setMembershipOpen] = useState(false);
 
   if (!isMod) return null;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t(ariaLabelKey(rest.surface))}
-          className={className ?? 'h-8 w-8 bg-background/80 backdrop-blur text-muted-foreground hover:text-foreground'}
-        >
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-        <ModerationMenuItems {...rest} />
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={t(ariaLabelKey(rest.surface))}
+            className={className ?? 'h-8 w-8 bg-background/80 backdrop-blur text-muted-foreground hover:text-foreground'}
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+          <ModerationMenuItems
+            {...rest}
+            onAddToList={
+              rest.surface === 'campaign'
+                ? () => setMembershipOpen(true)
+                : undefined
+            }
+          />
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {rest.surface === 'campaign' && (
+        <CampaignListMembershipDialog
+          open={membershipOpen}
+          onOpenChange={setMembershipOpen}
+          campaignCoord={rest.coord}
+          campaignTitle={rest.entityTitle}
+        />
+      )}
+    </>
   );
 }

@@ -828,6 +828,10 @@
       "addFailed": "無法新增至清單",
       "addToList": "新增",
       "alreadyAdded": "已新增",
+      "added": "已加入",
+      "membershipTitle": "加入清單",
+      "membershipDesc": "選擇「{{title}}」要顯示在哪些清單中。",
+      "membershipEmpty": "目前沒有清單。建立一個以開始整理。",
       "searchPlaceholder": "搜尋活動…",
       "searchEmpty": "沒有活動符合此搜尋。",
       "removeFromList": "從清單中移除",
@@ -863,6 +867,7 @@
       "moveToTop": "移至頂端",
       "moveUp": "上移",
       "moveDown": "下移",
+      "addToList": "加入清單…",
       "dragHandle": "拖曳以重新排序（位置 {{index}}）",
       "toast": {
         "movedToTop": "已移至頂端",

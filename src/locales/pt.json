@@ -1260,6 +1260,10 @@
       "addFailed": "Falha ao adicionar à lista",
       "addToList": "Adicionar",
       "alreadyAdded": "Adicionada",
+      "added": "Adicionada",
+      "membershipTitle": "Adicionar a listas",
+      "membershipDesc": "Escolha em quais listas \"{{title}}\" deve aparecer.",
+      "membershipEmpty": "Ainda não há listas. Crie uma para começar a curar.",
       "searchPlaceholder": "Pesquisar campanhas…",
       "searchEmpty": "Nenhuma campanha corresponde a esta pesquisa.",
       "removeFromList": "Remover da lista",
@@ -1295,6 +1299,7 @@
       "moveToTop": "Mover para o topo",
       "moveUp": "Mover para cima",
       "moveDown": "Mover para baixo",
+      "addToList": "Adicionar à lista…",
       "dragHandle": "Arraste para reordenar (posição {{index}})",
       "failedReorder": "Falha ao reordenar",
       "toast": {
