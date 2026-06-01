@@ -1186,7 +1186,7 @@
       "wlcDesc": "Campaigns curated by World Liberty Congress.",
       "allCampaigns": "All campaigns",
       "allCampaignsDesc": "Every campaign on the network, in chronological order.",
-      "browseAll": "Browse all campaigns →",
+      "browseAll": "Browse all campaigns",
       "searchPlaceholder": "Search campaigns\u2026",
       "searchAriaLabel": "Search campaigns",
       "noMatch": "No campaigns match \u201c{{query}}\u201d",
