@@ -2,7 +2,6 @@ import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
 
-import { DITTO_RELAY } from '@/lib/appRelays';
 import {
   COMMUNITY_DEFINITION_KIND,
   parseCommunityEvent,
@@ -38,13 +37,15 @@ interface UseDiscoverCommunitiesOptions {
 export function useDiscoverCommunities(options: UseDiscoverCommunitiesOptions = {}) {
   const { limit = 24, enabled = true } = options;
   const { nostr } = useNostr();
-  const relay = nostr.relay(DITTO_RELAY);
 
   return useQuery<ParsedCommunity[]>({
     queryKey: ['discover-communities', limit],
     enabled,
     queryFn: async ({ signal }) => {
-      const events = await relay.query(
+      // Global discovery (no `authors:` filter), so fan out to the whole
+      // read pool: more relays means broader community coverage, and it
+      // keeps Discover off the single-relay critical path.
+      const events = await nostr.query(
         [{ kinds: [COMMUNITY_DEFINITION_KIND], limit }],
         { signal },
       );

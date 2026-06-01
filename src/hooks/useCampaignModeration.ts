@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useNostrPublish } from './useNostrPublish';
 import { useCampaignModerators } from './useCampaignModerators';
-import { DITTO_RELAY } from '@/lib/appRelays';
 import { CAMPAIGN_KIND } from '@/lib/campaign';
 import {
   AGORA_MODERATION_NAMESPACE,
@@ -62,8 +61,12 @@ export function useCampaignModeration() {
       if (!moderators || moderators.length === 0) {
         return { ...EMPTY_MODERATION_DATA, moderators: [] };
       }
-      const relay = nostr.relay(DITTO_RELAY);
-      const events = await relay.query(
+      // Fan out to the whole read pool rather than pinning a single relay.
+      // The `authors: moderators` filter enforces the trust model, so
+      // querying more relays only improves coverage — and it keeps this
+      // moderation surface off the single-relay critical path that was
+      // serializing the home page behind relay.ditto.pub.
+      const events = await nostr.query(
         [
           {
             kinds: [LABEL_KIND],
@@ -76,7 +79,7 @@ export function useCampaignModeration() {
             limit: 2000,
           },
         ],
-        { signal: AbortSignal.any([signal, AbortSignal.timeout(8000)]) },
+        { signal },
       );
       return foldModerationLabels(events, moderators, CAMPAIGN_KIND);
     },

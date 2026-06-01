@@ -10,7 +10,6 @@ import {
   foldCampaignLists,
 } from '@/lib/campaignLists';
 import { LIST_CURATOR_PUBKEY } from '@/lib/agoraDefaults';
-import { DITTO_RELAY } from '@/lib/appRelays';
 
 import type { NostrEvent } from '@nostrify/nostrify';
 
@@ -34,7 +33,20 @@ interface UseCampaignListsResult {
  * follow-pack member is trusted to sign approve / hide labels.
  *
  * Because the curator is a hardcoded constant, this query depends on no
- * other query — it fires on first paint with no waterfall.
+ * other query — it fires on first paint.
+ *
+ * **Relay fan-out.** This used to query `relay.ditto.pub` directly (a
+ * single-relay `nostr.relay(...)` call) to avoid a fast empty EOSE from a
+ * less-populated relay racing the surface to "no lists." But this query
+ * sits at the *head* of the home-page waterfall — every hero campaign is
+ * gated on its result (see `CampaignsPage`/`useCampaigns`) — so a slow
+ * `relay.ditto.pub` stalled the entire first paint. We now fan out to the
+ * whole read pool via `nostr.query`. The `authors: [LIST_CURATOR_PUBKEY]`
+ * filter is what enforces the trust model; correctness no longer depends
+ * on hitting one specific relay, and the curated relay is still in the
+ * fan-out so its events are found. The pool accumulates events across
+ * relays until first EOSE (+ the pool's eoseTimeout), so a late event from
+ * the curated relay still folds in on the next tick.
  *
  * Lists *and* the index are pulled in a single filter via
  * `'#t': [LIST_HASHTAG, LIST_INDEX_HASHTAG]` so there's only one
@@ -46,12 +58,7 @@ export function useCampaignLists() {
   const query = useQuery<UseCampaignListsResult>({
     queryKey: ['campaign-lists', LIST_CURATOR_PUBKEY],
     queryFn: async ({ signal }) => {
-      // Query the canonical app relay directly. The same reasoning as
-      // `useCampaignModerators` applies: a fast empty EOSE from a
-      // less-populated relay should not race the moderation surface to
-      // "no lists" while the curated relay still holds them.
-      const relay = nostr.relay(DITTO_RELAY);
-      const events = await relay.query(
+      const events = await nostr.query(
         [
           {
             kinds: [CAMPAIGN_LIST_KIND],
@@ -60,7 +67,7 @@ export function useCampaignLists() {
             limit: 500,
           },
         ],
-        { signal: AbortSignal.any([signal, AbortSignal.timeout(8000)]) },
+        { signal },
       );
       return foldCampaignLists(events);
     },
