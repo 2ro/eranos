@@ -5,13 +5,11 @@ import { Trans, useTranslation } from 'react-i18next';
 import {
   ArrowRight,
   BadgeCheck,
-  Bitcoin,
   Check,
   Eye,
   EyeOff,
   HandHeart,
   PlusCircle,
-  ShieldOff,
 } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -466,29 +464,41 @@ function EmptyState() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// Why Ágora is different — three-block info section at the bottom of the home page
+// Why Ágora is different — manifesto-style info section at the bottom of /
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
- * Full-bleed info band at the bottom of the home page explaining
- * what makes Ágora different. Three blocks:
+ * Mission-and-vision manifesto at the bottom of the home page.
+ * Sits on the site's default `bg-background` so it reads as a
+ * continuation of the page rather than a separate marketing band,
+ * and so dark mode inherits the canonical dark surface without
+ * any locally-chosen "slate" or "navy" tones.
  *
- *  1. **Unlike GoFundMe and similar sites** — no platform freeze,
- *     no payment-processor middleman, zero platform fees.
- *  2. **Unlike other 'Bitcoin' platforms** — no central Lightning
- *     node / custodian / LSP; settles on-chain to a wallet you own.
- *  3. **Public or private** — receiving-option contrast (Bitcoin
- *     public on-chain vs BIP-352 silent payments), with one-line
- *     summaries and a link to the long-form breakdown at
- *     `/about#how-it-works`.
+ * Visual structure (top to bottom):
  *
- * Visual idiom: a full-bleed brand-orange band (`bg-primary`) at
- * the bottom of the home page. Section type is dark slate gray for
- * AA contrast against orange (`text-slate-900`), with the eyebrow
- * lifted to white for the "label" feel. Cards sit on the orange as
- * crisp white surfaces with dark-gray copy, so they read as cards,
- * not stripes of the same color. The "Read the full breakdown"
- * CTA is a dark-slate pill that anchors the section.
+ *  1. **Eyebrow + display headline.** Tracking-wider "MANIFESTO"
+ *     overline with a brand-orange leader line, then a giant
+ *     Bebas Neue display headline that takes the project's hero
+ *     typography (uppercase, italic, stroke-painted, with one
+ *     word inverted into a brand-orange highlight block — the
+ *     same idiom used by `campaigns.home.heroTagline`). A short
+ *     strapline beneath in Inter.
+ *
+ *  2. **Three numbered chapters.** Massive `font-display` italic
+ *     numerals (01 / 02 / 03) in brand orange anchor each
+ *     chapter. Each chapter has a tight heading, a one-paragraph
+ *     mission body, and a short "✓ this is how it works"
+ *     checklist. Block 3 swaps the checklist for a horizontal
+ *     public/private split-card that visualizes the "your
+ *     choice" framing.
+ *
+ *  3. **Closing line.** A two-clause manifesto in Bebas Neue at
+ *     scale ("POWER BACK. MIDDLEMEN OUT.") followed by a quiet
+ *     text-link CTA to `/about#how-it-works`.
+ *
+ * All strings live under `campaigns.home.whyDifferent.*` — no new
+ * translation keys vs. the original implementation. The redesign
+ * is purely visual.
  */
 function WhyDifferentSection() {
   const { t } = useTranslation();
@@ -498,29 +508,59 @@ function WhyDifferentSection() {
   return (
     <section
       aria-labelledby="why-different-title"
-      className="bg-primary py-20 md:py-28"
+      className="relative bg-background py-20 md:py-28 overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-12 md:mb-14">
-          <p className="text-xs font-semibold tracking-widest uppercase text-white/90 mb-3">
-            {t('campaigns.home.whyDifferent.eyebrow', { appName })}
-          </p>
+      {/* Decorative spine: a soft vertical brand-orange line on
+          the far left, evoking the manifesto / editorial feel.
+          Hidden under `md` where the layout becomes single-column
+          and the spine would just be visual noise. */}
+      <div
+        aria-hidden
+        className="hidden md:block absolute left-0 top-24 bottom-24 w-px bg-gradient-to-b from-transparent via-primary/40 to-transparent"
+      />
+      {/* Soft brand-orange halo behind the headline — adds depth
+          without changing the page's base surface color. Pure CSS,
+          no images, respects color theme. */}
+      <div
+        aria-hidden
+        className="absolute -top-32 left-1/2 -translate-x-1/2 size-[36rem] rounded-full bg-primary/[0.06] blur-3xl pointer-events-none"
+      />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* ── Headline block ──────────────────────────────────── */}
+        <div className="max-w-4xl mx-auto text-center mb-16 md:mb-20">
+          <div className="inline-flex items-center gap-3 mb-6">
+            <span aria-hidden className="h-px w-8 bg-primary" />
+            <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary">
+              {t('campaigns.home.whyDifferent.eyebrow', { appName })}
+            </span>
+            <span aria-hidden className="h-px w-8 bg-primary" />
+          </div>
+
+          {/* Bebas Neue display headline. Uses the same stroke-paint
+              trick as the page's hero (font weight 400 only ships)
+              so the letterforms read fat without synthetic-bold
+              fuzz. The title is rendered plainly here — the visual
+              interest comes from the typography itself, the
+              brand-orange eyebrow framing, and the numbered
+              chapters below, not from per-word highlight blocks. */}
           <h2
             id="why-different-title"
-            className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mb-4"
+            className="font-display italic font-normal uppercase tracking-wide leading-[0.95] text-foreground text-5xl sm:text-6xl lg:text-7xl"
+            style={{ WebkitTextStroke: '0.018em currentColor' }}
           >
             {t('campaigns.home.whyDifferent.title')}
           </h2>
-          <p className="text-base sm:text-lg leading-relaxed text-slate-800/90">
+
+          <p className="mt-6 text-base sm:text-lg leading-relaxed text-muted-foreground max-w-2xl mx-auto">
             {t('campaigns.home.whyDifferent.lede')}
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
-          {/* Block 1 — vs centralized fundraising sites */}
-          <WhyBlock
-            accent="orange"
-            icon={<ShieldOff className="size-5" />}
+        {/* ── Three numbered chapters ────────────────────────── */}
+        <div className="grid md:grid-cols-3 gap-10 md:gap-8 lg:gap-12 relative">
+          <ManifestoChapter
+            number="01"
             heading={t('campaigns.home.whyDifferent.block1.heading')}
             body={t('campaigns.home.whyDifferent.block1.body')}
             bullets={[
@@ -529,11 +569,8 @@ function WhyDifferentSection() {
               t('campaigns.home.whyDifferent.block1.bullet3'),
             ]}
           />
-
-          {/* Block 2 — vs other "Bitcoin" platforms */}
-          <WhyBlock
-            accent="orange"
-            icon={<Bitcoin className="size-5" />}
+          <ManifestoChapter
+            number="02"
             heading={t('campaigns.home.whyDifferent.block2.heading')}
             body={t('campaigns.home.whyDifferent.block2.body', { appName })}
             bullets={[
@@ -542,49 +579,45 @@ function WhyDifferentSection() {
               t('campaigns.home.whyDifferent.block2.bullet3', { appName }),
             ]}
           />
-
-          {/* Block 3 — public vs private receiving */}
-          <WhyBlock
-            accent="slate"
-            icon={<Eye className="size-5" />}
+          <ManifestoChapter
+            number="03"
             heading={t('campaigns.home.whyDifferent.block3.heading')}
             body={t('campaigns.home.whyDifferent.block3.body')}
           >
-            <ul className="space-y-3 mt-4 pt-4 border-t border-slate-200 dark:border-white/10">
-              <PublicPrivateRow
+            <div className="mt-5 grid grid-cols-2 rounded-xl border border-border overflow-hidden">
+              <ChoiceCell
                 tone="public"
                 label={t('campaigns.home.whyDifferent.block3.publicLabel')}
                 summary={t('campaigns.home.whyDifferent.block3.publicSummary')}
               />
-              <PublicPrivateRow
+              <ChoiceCell
                 tone="private"
                 label={t('campaigns.home.whyDifferent.block3.privateLabel')}
                 summary={t('campaigns.home.whyDifferent.block3.privateSummary')}
               />
-            </ul>
-          </WhyBlock>
+            </div>
+          </ManifestoChapter>
         </div>
 
-        <div className="mt-10 md:mt-12 flex justify-center">
-          <Button
-            asChild
-            size="lg"
-            className="rounded-full bg-slate-900 text-white hover:bg-slate-800 focus-visible:ring-white"
+        {/* ── Closing CTA ────────────────────────────────────── */}
+        <div className="mt-16 md:mt-20 flex flex-col items-center gap-4">
+          <Link
+            to="/about#how-it-works"
+            className="group inline-flex items-center gap-2 text-sm font-semibold tracking-wide uppercase text-primary hover:text-primary/80 transition-colors"
           >
-            <Link to="/about#how-it-works">
+            <span className="border-b border-primary/40 group-hover:border-primary pb-0.5">
               {t('campaigns.home.whyDifferent.readMore')}
-              <ArrowRight className="ml-2 size-4 rtl:rotate-180" />
-            </Link>
-          </Button>
+            </span>
+            <ArrowRight className="size-4 rtl:rotate-180 transition-transform motion-safe:group-hover:translate-x-0.5" />
+          </Link>
         </div>
       </div>
     </section>
   );
 }
 
-interface WhyBlockProps {
-  accent: 'orange' | 'slate';
-  icon: React.ReactNode;
+interface ManifestoChapterProps {
+  number: string;
   heading: string;
   body: string;
   bullets?: string[];
@@ -592,97 +625,111 @@ interface WhyBlockProps {
 }
 
 /**
- * One of three cards in the WhyDifferentSection. Cards sit on a
- * brand-orange band, so they're solid white in light mode (and a
- * dark slate in dark mode) to read as crisp surfaces, not stripes
- * of the same color. Type is dark-gray for AA contrast on the
- * white card; icon chip accent stays brand-orange for blocks 1 & 2
- * (where the orange reinforces the "Agora-style" answer to each
- * comparison) and switches to slate for block 3, which is itself
- * about a neutral "your choice" tradeoff.
+ * One numbered chapter inside the WhyDifferentSection. Renders a
+ * massive italic Bebas Neue numeral followed by a tight heading,
+ * a mission paragraph, and either a "✓ we do this" checklist or
+ * arbitrary `children` (used for Block 3's public/private split).
+ *
+ * The numeral has a thin brand-orange underline that doubles as
+ * a visual seam connecting the numeral to the heading without a
+ * heavy divider. No card chrome — the chapter sits on the page
+ * background so the section reads as continuous editorial copy
+ * rather than three boxed-off marketing tiles.
  */
-function WhyBlock({ accent, icon, heading, body, bullets, children }: WhyBlockProps) {
+function ManifestoChapter({ number, heading, body, bullets, children }: ManifestoChapterProps) {
   return (
-    <article
-      className={cn(
-        'group relative h-full rounded-2xl border p-6 sm:p-7',
-        'bg-white dark:bg-slate-900',
-        'border-slate-200 dark:border-white/10',
-        'shadow-md shadow-black/10 transition-all duration-300 motion-safe:hover:-translate-y-1 hover:shadow-lg hover:shadow-black/15 dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)]',
-      )}
-    >
-      <div
-        className={cn(
-          'inline-flex items-center justify-center size-10 rounded-xl mb-4 border',
-          accent === 'orange'
-            ? 'bg-primary/10 border-primary/30 text-primary dark:bg-primary/20'
-            : 'bg-slate-100 border-slate-200 text-slate-700 dark:bg-white/10 dark:border-white/15 dark:text-slate-100',
-        )}
-        aria-hidden="true"
-      >
-        {icon}
+    <article className="relative motion-safe:transition-transform">
+      {/* Massive italic numeral. Bebas Neue is used here as
+          designed signage, not a heading — matches the StepCard
+          numeral idiom on /about. */}
+      <div className="flex items-baseline gap-3 mb-5">
+        <span
+          aria-hidden
+          className="font-display italic font-normal text-primary leading-none text-7xl sm:text-8xl tabular-nums"
+          style={{ WebkitTextStroke: '0.015em currentColor' }}
+        >
+          {number}
+        </span>
+        <span aria-hidden className="flex-1 h-px bg-primary/30" />
       </div>
-      <h3 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white mb-2 leading-snug">
+
+      <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground mb-3 leading-snug">
         {heading}
       </h3>
-      <p className="text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed">
+
+      <p className="text-[15px] sm:text-base text-muted-foreground leading-relaxed">
         {body}
       </p>
+
       {bullets && bullets.length > 0 && (
-        <ul className="space-y-2 mt-4 pt-4 border-t border-slate-200 dark:border-white/10">
+        <ul className="mt-5 space-y-2.5">
           {bullets.map((b, i) => (
-            <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200">
-              <Check
-                className={cn(
-                  'size-4 shrink-0 mt-0.5',
-                  accent === 'orange' ? 'text-primary' : 'text-slate-700 dark:text-slate-200',
-                )}
-                aria-hidden="true"
-              />
-              <span>{b}</span>
+            <li key={i} className="flex items-start gap-2.5 text-sm text-foreground/90">
+              <span
+                aria-hidden
+                className="inline-flex items-center justify-center size-5 shrink-0 mt-0.5 rounded-full bg-primary/10 text-primary"
+              >
+                <Check className="size-3" strokeWidth={3} />
+              </span>
+              <span className="leading-snug">{b}</span>
             </li>
           ))}
         </ul>
       )}
+
       {children}
     </article>
   );
 }
 
-interface PublicPrivateRowProps {
+interface ChoiceCellProps {
   tone: 'public' | 'private';
   label: string;
   summary: string;
 }
 
 /**
- * One row inside Block 3 contrasting public vs private receiving.
- * `public` uses the brand-orange `Eye` icon; `private` uses the
- * dark-slate `EyeOff` icon. Both share the same horizontal layout.
+ * One half of Block 3's split-card. `public` cell is tinted with
+ * brand-orange; `private` cell is a neutral muted tone, so the
+ * pair reads as a binary choice without using off-brand colors.
+ * Both cells share a single border via the parent grid + overflow-
+ * hidden rounded wrapper.
  */
-function PublicPrivateRow({ tone, label, summary }: PublicPrivateRowProps) {
+function ChoiceCell({ tone, label, summary }: ChoiceCellProps) {
   return (
-    <li className="flex items-start gap-3">
-      <span
-        className={cn(
-          'inline-flex items-center justify-center size-6 rounded-md shrink-0 mt-0.5',
-          tone === 'public'
-            ? 'bg-primary/10 text-primary dark:bg-primary/20'
-            : 'bg-slate-200 text-slate-800 dark:bg-white/10 dark:text-slate-100',
-        )}
-        aria-hidden="true"
-      >
-        {tone === 'public' ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />}
-      </span>
-      <div className="min-w-0">
-        <p className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">
+    <div
+      className={cn(
+        'p-4 sm:p-5',
+        tone === 'public'
+          ? 'bg-primary/[0.07] border-r border-border last:border-r-0'
+          : 'bg-muted/40',
+      )}
+    >
+      <div className="flex items-center gap-2 mb-2">
+        <span
+          aria-hidden
+          className={cn(
+            'inline-flex items-center justify-center size-6 rounded-md',
+            tone === 'public'
+              ? 'bg-primary/15 text-primary'
+              : 'bg-foreground/10 text-foreground/80',
+          )}
+        >
+          {tone === 'public' ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />}
+        </span>
+        <p
+          className={cn(
+            'text-[11px] font-bold tracking-[0.15em] uppercase',
+            tone === 'public' ? 'text-primary' : 'text-foreground/70',
+          )}
+        >
           {label}
         </p>
-        <p className="text-sm text-slate-600 dark:text-slate-400 leading-snug mt-0.5">
-          {summary}
-        </p>
       </div>
-    </li>
+      <p className="text-sm text-muted-foreground leading-snug">
+        {summary}
+      </p>
+    </div>
   );
 }
 
