@@ -756,6 +756,8 @@
       "featured": "已认证",
       "featuredDesc": "由 World Liberty Congress 认证的活动。",
       "verifiedByAria": "由 {{name}} 认证",
+      "allCampaigns": "所有活动",
+      "allCampaignsDesc": "网络上的所有活动，最新的优先。",
       "browseAll": "浏览所有活动 →",
       "hidden": "已隐藏",
       "hiddenDesc": "已从公共首页隐藏的活动。使用卡片上的菜单可以取消隐藏。",

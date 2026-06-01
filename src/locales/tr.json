@@ -1187,6 +1187,8 @@
       "featured": "Doğrulanmış",
       "featuredDesc": "World Liberty Congress tarafından doğrulanmış kampanyalar.",
       "verifiedByAria": "{{name}} tarafından doğrulandı",
+      "allCampaigns": "Tüm kampanyalar",
+      "allCampaignsDesc": "Ağdaki tüm kampanyalar, en yenisi önce.",
       "browseAll": "Tüm kampanyalara göz at →",
       "hidden": "Gizli",
       "hiddenDesc": "Herkese açık ana sayfadan gizlenmiş kampanyalar. Gizlemeyi kaldırmak için karttaki kebap menüsünü kullanın.",

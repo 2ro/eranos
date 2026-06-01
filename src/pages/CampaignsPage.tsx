@@ -29,6 +29,15 @@ import type { ParsedCampaign } from '@/lib/campaign';
 const FEATURED_SKELETON_CAP = 8;
 
 /**
+ * Maximum number of campaigns shown in the WLC Verified row on the
+ * home page. The layout is two large hero cards on top followed by a
+ * single 4-up row, so 6 is the visual cap. Featured campaigns beyond
+ * the cap still show their WLC chip in the "All campaigns" section
+ * below — they just don't earn the hero placement.
+ */
+const FEATURED_CAP = 6;
+
+/**
  * World Liberty Congress — the partner organization that hand-picks
  * the Featured row. Their pubkey and npub are hard-coded here so the
  * Featured heading can link to their profile and pull their avatar
@@ -88,7 +97,8 @@ export function CampaignsPage() {
   // Featured slot list — derived from moderation labels. Sorted by
   // the moderator-controlled rank (descending); hidden coords
   // removed so a featured-then-hidden campaign disappears from the
-  // row. No cap: every campaign a moderator features renders.
+  // row. The full list drives the WLC chip on every featured card
+  // wherever it appears; the row itself is capped separately below.
   const featuredCoords = useMemo(() => {
     if (!moderation) return [] as string[];
     return Array.from(moderation.featuredCoords)
@@ -96,24 +106,37 @@ export function CampaignsPage() {
       .sort((a, b) => (moderation.featuredOrder.get(b) ?? 0) - (moderation.featuredOrder.get(a) ?? 0));
   }, [moderation]);
 
+  // Fast O(1) lookup used by the "All campaigns" section to decide
+  // whether each card gets the WLC Verified chip.
+  const featuredCoordSet = useMemo(() => new Set(featuredCoords), [featuredCoords]);
+
+  // Visible Featured row — capped at FEATURED_CAP. The rest are
+  // still featured (and still get the chip elsewhere), but they
+  // don't appear in the dedicated hero row.
+  const cappedFeaturedCoords = useMemo(
+    () => featuredCoords.slice(0, FEATURED_CAP),
+    [featuredCoords],
+  );
+
   // `useCampaigns` ignores `limit` when `coordinates` is set (it fans
   // out into one #d-filter per author), so we don't need to pass one.
   const { data: featuredCampaigns, isLoading: featuredLoading } = useCampaigns(
-    moderationReady && featuredCoords.length > 0
-      ? { coordinates: featuredCoords }
+    moderationReady && cappedFeaturedCoords.length > 0
+      ? { coordinates: cappedFeaturedCoords }
       : { coordinates: [] },
   );
 
   // Sort the fetched featured campaigns to match the rank order.
   // `useCampaigns` returns them in network order; we want the row to
-  // match the moderation-rank ordering.
+  // match the moderation-rank ordering, and we filter to the capped
+  // coord set so over-cap featured campaigns don't sneak into the row.
   const orderedFeatured = useMemo<ParsedCampaign[]>(() => {
     if (!moderation || !featuredCampaigns) return [];
     const order = moderation.featuredOrder;
     return [...featuredCampaigns]
-      .filter((c) => featuredCoords.includes(c.aTag))
+      .filter((c) => cappedFeaturedCoords.includes(c.aTag))
       .sort((a, b) => (order.get(b.aTag) ?? 0) - (order.get(a.aTag) ?? 0));
-  }, [featuredCampaigns, featuredCoords, moderation]);
+  }, [featuredCampaigns, cappedFeaturedCoords, moderation]);
 
   // Recent stream — the latest 200 campaign events on the network.
   // Source for the Hidden section (which can also pull from the
@@ -156,6 +179,24 @@ export function CampaignsPage() {
       .filter((c) => moderation.hiddenCoords.has(c.aTag))
       .sort((a, b) => b.createdAt - a.createdAt);
   }, [recentCampaigns, hiddenCampaignsRaw, moderation]);
+
+  // "All campaigns" section — the recent stream (capped at 200 by
+  // useCampaigns above) minus anything currently hidden, sorted by
+  // creation time descending. Featured campaigns DO appear here too;
+  // they're not removed from the chronological feed just because
+  // they earned a hero slot. Each card still picks up the WLC
+  // Verified chip if its coord is in `featuredCoordSet`. The
+  // `/campaigns` page is the canonical "all campaigns" surface with
+  // search and sort — this section just gives the home page enough
+  // chronological depth that visitors can see what's happening
+  // without an extra click.
+  const allCampaignsChronological = useMemo<ParsedCampaign[]>(() => {
+    if (!recentCampaigns) return [];
+    const hiddenSet = moderation?.hiddenCoords ?? new Set<string>();
+    return [...recentCampaigns]
+      .filter((c) => !hiddenSet.has(c.aTag))
+      .sort((a, b) => b.createdAt - a.createdAt);
+  }, [recentCampaigns, moderation]);
 
   const featuredEmpty =
     moderationReady && featuredCoords.length === 0 && !featuredLoading;
@@ -210,21 +251,66 @@ export function CampaignsPage() {
               <FeaturedRow
                 campaigns={orderedFeatured}
                 isLoading={featuredLoading || !moderationReady}
-                expectedCount={featuredCoords.length}
+                expectedCount={cappedFeaturedCoords.length}
               />
             )}
-
-            {/* "Browse all campaigns" link — the gateway to the full,
-                censorship-resistant set on /campaigns. Kept inside
-                the Featured section so the home page hierarchy is
-                Featured → Browse all → (mod-only) Hidden. */}
-            <div className="pt-2 text-center sm:text-left">
-              <Button asChild variant="ghost" size="sm">
-                <Link to="/campaigns">{t('campaigns.home.browseAll')}</Link>
-              </Button>
-            </div>
           </section>
         )}
+
+        {/* All campaigns — the chronological feed under the Featured
+            hero. Everything that's not hidden, newest-first. Featured
+            campaigns repeat here (they still carry the WLC chip via
+            `featuredCoordSet`); the goal is breadth, not curation.
+            The dedicated /campaigns page is still the canonical search
+            and sort surface, linked from the footer below. */}
+        <section className="space-y-5">
+          <div className="flex items-end justify-between gap-4 flex-wrap">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                {t('campaigns.home.allCampaigns')}
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                {t('campaigns.home.allCampaignsDesc')}
+              </p>
+            </div>
+          </div>
+
+          {recentLoading && allCampaignsChronological.length === 0 ? (
+            <CampaignGridSkeleton />
+          ) : allCampaignsChronological.length === 0 ? (
+            <EmptyState />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {allCampaignsChronological.map((campaign) => (
+                <CampaignCard
+                  key={campaign.aTag}
+                  campaign={campaign}
+                  verifiedBy={
+                    featuredCoordSet.has(campaign.aTag)
+                      ? {
+                        pubkey: WLC_PUBKEY,
+                        npub: WLC_NPUB,
+                        defaultName: 'World Liberty Congress',
+                        shortLabel: 'WLC',
+                      }
+                      : undefined
+                  }
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Gateway to the full, censorship-resistant /campaigns
+              surface with search and sort. The home stream is
+              capped at the recent-200 window; users who want
+              everything (and the ability to filter) follow this
+              link. */}
+          <div className="pt-2 text-center sm:text-left">
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/campaigns">{t('campaigns.home.browseAll')}</Link>
+            </Button>
+          </div>
+        </section>
 
         {/* Hidden — moderator-only, collapsed by default. The
             Campaigns page is where everyone can transparently flip

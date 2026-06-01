@@ -756,6 +756,8 @@
       "featured": "Verificadas",
       "featuredDesc": "Campañas verificadas por el Congreso Mundial por la Libertad.",
       "verifiedByAria": "Verificada por {{name}}",
+      "allCampaigns": "Todas las campañas",
+      "allCampaignsDesc": "Todas las campañas de la red, las más recientes primero.",
       "browseAll": "Ver todas las campañas →",
       "hidden": "Ocultas",
       "hiddenDesc": "Campañas suprimidas de la página de inicio pública. Usa el menú de la tarjeta para mostrarlas de nuevo.",

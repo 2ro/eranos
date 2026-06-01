@@ -1186,6 +1186,8 @@
       "featured": "Verified",
       "featuredDesc": "Campaigns verified by World Liberty Congress.",
       "verifiedByAria": "Verified by {{name}}",
+      "allCampaigns": "All campaigns",
+      "allCampaignsDesc": "Every campaign on the network, newest first.",
       "browseAll": "Browse all campaigns →",
       "searchPlaceholder": "Search campaigns\u2026",
       "searchAriaLabel": "Search campaigns",
