@@ -72,6 +72,12 @@ export function AppProvider(props: AppProviderProps) {
   const config = {
     ...defaultConfig,
     ...rawConfig,
+    // An empty persisted translateWorkerUrl must not shadow the build-time
+    // default — fall back to the default so the Translate button stays
+    // available. (Earlier builds could persist "" by merely opening Settings.)
+    translateWorkerUrl: rawConfig.translateWorkerUrl?.trim()
+      ? rawConfig.translateWorkerUrl
+      : defaultConfig.translateWorkerUrl,
     // Deep-merge feedSettings so new keys added to the default are visible
     // even for existing users who have an older feedSettings in localStorage.
     feedSettings: { ...defaultConfig.feedSettings, ...rawConfig.feedSettings },

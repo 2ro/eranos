@@ -410,7 +410,7 @@ export function AdvancedSettings() {
                   Translation Worker URL
                 </Label>
                 <p className="text-xs text-muted-foreground mt-1 mb-2">
-                  DeepL-backed worker endpoint used by the "Translate" button on notes. Receives a POST with the text and target language. Leave empty to disable translation.
+                  DeepL-backed worker endpoint used by the "Translate" button on notes. Receives a POST with the text and target language.
                 </p>
                 <Input
                   id="translate-worker-url"
@@ -419,10 +419,10 @@ export function AdvancedSettings() {
                   onChange={(e) => setTranslateWorkerUrl(e.target.value)}
                   onBlur={async () => {
                     const trimmed = translateWorkerUrl.trim();
-                    if (trimmed !== config.translateWorkerUrl) {
+                    if (trimmed && trimmed !== config.translateWorkerUrl) {
                       updateConfig(() => ({ translateWorkerUrl: trimmed }));
                       if (user) await updateSettings.mutateAsync({ translateWorkerUrl: trimmed });
-                      toast({ title: trimmed ? 'Translation worker URL updated' : 'Translation disabled' });
+                      toast({ title: 'Translation worker URL updated' });
                     }
                   }}
                   placeholder={DEFAULT_TRANSLATE_WORKER_URL || 'https://example.workers.dev'}
