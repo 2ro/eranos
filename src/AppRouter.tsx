@@ -21,6 +21,7 @@ import NotFound from "./pages/NotFound";
 const CampaignsPage = lazy(() => import("./pages/CampaignsPage").then(m => ({ default: m.CampaignsPage })));
 const CreateCampaignPage = lazy(() => import("./pages/CreateCampaignPage").then(m => ({ default: m.CreateCampaignPage })));
 const AllCampaignsPage = lazy(() => import("./pages/AllCampaignsPage").then(m => ({ default: m.AllCampaignsPage })));
+const CampaignListDetailPage = lazy(() => import("./pages/CampaignListDetailPage").then(m => ({ default: m.CampaignListDetailPage })));
 
 // All other pages: code-split via React.lazy
 const ActionsPage = lazy(() => import("./pages/ActionsPage"));
@@ -189,6 +190,7 @@ export function AppRouter() {
           <Route path="/" element={<CampaignsPage />} />
           <Route path="/campaigns" element={<AllCampaignsPage />} />
           <Route path="/campaigns/new" element={<CreateCampaignPage />} />
+          <Route path="/campaigns/lists/:slug" element={<CampaignListDetailPage />} />
           {/* Legacy URL: the all-campaigns directory lived at
               `/campaigns/all` for a while. Keep it as a redirect so
               external links and bookmarks still resolve. */}

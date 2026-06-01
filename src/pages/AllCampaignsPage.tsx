@@ -2,16 +2,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronUp, EyeOff, HandHeart, PlusCircle } from 'lucide-react';
+import { EyeOff, HandHeart, PlusCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { CampaignsDiscoverySection } from '@/components/discovery/CampaignsDiscoverySection';
+import { CampaignListsStrip } from '@/components/campaign-lists/CampaignListsStrip';
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
 import { StartCampaignLink } from '@/components/StartCampaignLink';
 import { ModeratorCollapsibleSection } from '@/components/moderation';
-import { useCampaigns } from '@/hooks/useCampaigns';
 import { useAllCampaigns, toQuerySort } from '@/hooks/useAllCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
@@ -25,10 +25,10 @@ import type { ParsedCampaign } from '@/lib/campaign';
 /**
  * Lists every campaign found on relays.
  *
- * The page itself is a thin shell: hero, optional "Your campaigns"
- * shelf, the shared {@link CampaignsDiscoverySection} (which owns
- * search / sort / country + idle / active grids), and a
- * moderator-only Hidden collapsible.
+ * The page itself is a thin shell: hero, the moderator-curated topic-list
+ * strip ({@link CampaignListsStrip}), the shared
+ * {@link CampaignsDiscoverySection} (which owns search / sort / country
+ * + idle / active grids), and a moderator-only Hidden collapsible.
  *
  * URL state (`?q=&sort=&country=`) lives inside the section's
  * `useDiscoveryFilters` hook so search results stay shareable. The
@@ -86,47 +86,22 @@ export function AllCampaignsPage() {
     return { hiddenCount: count, hiddenCampaigns: list };
   }, [campaigns, moderation]);
 
-  const { data: myCampaigns } = useCampaigns({
-    authors: user ? [user.pubkey] : undefined,
-    limit: 100,
-    enabled: !!user,
-  });
-
   useSeoMeta({
     title: `${t('campaigns.all.seoTitle')} | ${config.appName}`,
     description: t('campaigns.all.description'),
   });
-
-  const DEFAULT_VISIBLE = 4;
-  const [showAllMine, setShowAllMine] = useState(false);
-  const visibleMine = showAllMine
-    ? (myCampaigns ?? [])
-    : (myCampaigns ?? []).slice(0, DEFAULT_VISIBLE);
 
   return (
     <main className="min-h-screen pb-16">
       <AllCampaignsHero campaignCount={campaigns?.length ?? 0} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-8">
-        {user && myCampaigns && myCampaigns.length > 0 && (
-          <section className="space-y-5">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                {t('campaigns.home.yourCampaigns')}
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {t('campaigns.home.yourCampaignsDesc')}
-              </p>
-            </div>
-            <CampaignSection
-              campaigns={visibleMine}
-              total={myCampaigns.length}
-              visible={DEFAULT_VISIBLE}
-              showAll={showAllMine}
-              onToggle={() => setShowAllMine(!showAllMine)}
-            />
-          </section>
-        )}
+        {/* Curated topic-list strip. Moderators can create/edit/reorder
+            lists here; non-moderators see only the published lists (or
+            nothing, if none exist yet). Replaces the previous "Your
+            campaigns" shelf — campaign authors can still find their own
+            campaigns via their profile page. */}
+        <CampaignListsStrip />
 
         <CampaignsDiscoverySection
           filterPersistence="url"
@@ -172,54 +147,6 @@ export function AllCampaignsPage() {
 }
 
 export default AllCampaignsPage;
-
-function CampaignSection({
-  campaigns,
-  total,
-  visible,
-  showAll,
-  onToggle,
-}: {
-  campaigns: ParsedCampaign[];
-  total: number;
-  visible: number;
-  showAll: boolean;
-  onToggle: () => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-        {campaigns.map((campaign) => (
-          <CampaignCard key={campaign.aTag} campaign={campaign} />
-        ))}
-      </div>
-      {total > visible && (
-        <div className="flex justify-center">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={onToggle}
-            className="rounded-full text-sm"
-            aria-expanded={showAll}
-          >
-            {showAll ? (
-              <>
-                <ChevronUp className="size-4 mr-1.5" />
-                {t('common.showLess')}
-              </>
-            ) : (
-              <>
-                <ChevronDown className="size-4 mr-1.5" />
-                {t('groups.list.showMore', { count: total - visible })}
-              </>
-            )}
-          </Button>
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // Hero

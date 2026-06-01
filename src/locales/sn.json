@@ -794,11 +794,55 @@
       "noMatchHint": "Edza zvimwe zvinotsvagwa, kana ubvise kutsvaga kuti uone mishandirapamwe yose.",
       "allHidden": "Hapana mishandirapamwe yekuratidza",
       "allHiddenHint": "Mishandirapamwe yose pamutambo yakavanzwa nevatariri. Vhura «Ratidza dzakavanzwa» kuti uione.",
-      "empty": "Hapana mishandirapamwe parizvino",
-      "emptyHint": "Hapana mushandirapamwe wakatumirwa parizvino. Iva wokutanga."
-    }
-  },
-  "moderation": {
+       "empty": "Hapana mishandirapamwe parizvino",
+       "emptyHint": "Hapana mushandirapamwe wakatumirwa parizvino. Iva wokutanga."
+     },
+     "lists": {
+       "stripAria": "Manjuriro emisoro yemishandirapamwe yakasarudzwa",
+       "create": "Rondedzero itsva",
+       "createDesc": "Gadzira rondedzero itsva yemisoro. Sarudza mishandirapamwe muiri kubva papeji ipi neipi yemushandirapamwe.",
+       "createSubmit": "Gadzira rondedzero",
+       "createFailed": "Kugadzira rondedzero hakuna kubudirira",
+       "edit": "Gadziridza rondedzero",
+       "editDesc": "Gadziridza zita, tsananguro, kana chiratidzo cherondedzero.",
+       "editSubmit": "Chengetedza shanduko",
+       "updateFailed": "Kugadziridza rondedzero hakuna kubudirira",
+       "delete": "Bvisa rondedzero",
+       "deleteFailed": "Kubvisa rondedzero hakuna kubudirira",
+       "deleteConfirmTitle": "Bvisa rondedzero iyi?",
+       "deleteConfirmDesc": "\"{{title}}\" ichabviswa pamutsetse wemisoro. Mishandirapamwe pachayo haisi kubatwa.",
+       "titleField": "Zita",
+       "titlePlaceholder": "semuyenzaniso, Rusununguko rweManyuzipepa",
+       "descriptionField": "Tsananguro",
+       "descriptionPlaceholder": "Mashoko mashoma anotsanangura zviri murondedzero iyi.",
+       "iconField": "Chiratidzo",
+       "menuAria": "Sarudzo dzerondedzero {{title}}",
+       "listActions": "Zviito zverondedzero",
+       "memberMenuAria": "Sarudzo dzerondedzero yemushandirapamwe",
+       "backToCampaigns": "Dzokera kumishandirapamwe",
+       "detailTitle": "Rondedzero yemushandirapamwe",
+       "campaignsCount_one": "mushandirapamwe {{count}}",
+       "campaignsCount_other": "mishandirapamwe {{count}}",
+       "addCampaign": "Wedzera mushandirapamwe",
+       "addCampaignDesc": "Tsvaga panetwork uye sarudza mushandirapamwe wekuwedzera kurondedzero iyi.",
+       "addFailed": "Kuwedzera kurondedzero hakuna kubudirira",
+       "addToList": "Wedzera",
+       "alreadyAdded": "Yawedzerwa",
+       "searchPlaceholder": "Tsvaga mishandirapamwe…",
+       "searchEmpty": "Hapana mushandirapamwe unoenderana nekutsvaga uku.",
+       "removeFromList": "Bvisa parondedzero",
+       "removeFailed": "Kubvisa parondedzero hakuna kubudirira",
+       "empty": "Rondedzero iyi haina chinhu.",
+       "emptyMod": "Rondedzero iyi haina chinhu. Wedzera mishandirapamwe kuti utange kuisarudza.",
+       "iconPicker": {
+         "title": "Sarudza chiratidzo",
+         "description": "Sarudza chiratidzo chipi nechipi kubva muraibhurari yeLucide.",
+         "search": "Tsvaga zviratidzo…",
+         "empty": "Hapana chiratidzo chinoenderana nekutsvaga uku."
+       }
+     }
+   },
+   "moderation": {
     "hiddenBadge": "Zvakavanzwa",
     "menu": {
       "ariaCampaign": "Tarisa mushandirapamwe",
