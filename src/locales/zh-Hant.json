@@ -791,6 +791,8 @@
     "lists": {
       "stripAria": "精選活動主題清單",
       "create": "新清單",
+      "showMore": "再顯示 {{count}} 個",
+      "showLess": "顯示較少",
       "createDesc": "建立一個新的主題清單。可從任何活動頁面將活動加入其中。",
       "createSubmit": "建立清單",
       "createFailed": "無法建立清單",

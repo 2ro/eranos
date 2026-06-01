@@ -1248,6 +1248,8 @@
     "lists": {
       "stripAria": "Listes thématiques de campagnes",
       "create": "Nouvelle liste",
+      "showMore": "Afficher {{count}} de plus",
+      "showLess": "Afficher moins",
       "createDesc": "Créez une nouvelle liste thématique. Ajoutez-y des campagnes depuis n'importe quelle page de campagne.",
       "createSubmit": "Créer la liste",
       "createFailed": "Échec de la création de la liste",

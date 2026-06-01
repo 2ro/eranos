@@ -819,6 +819,8 @@
     "lists": {
       "stripAria": "精选活动主题列表",
       "create": "新建列表",
+      "showMore": "再显示 {{count}} 个",
+      "showLess": "显示较少",
       "createDesc": "创建一个新的主题列表。可以从任意活动页面将活动收录其中。",
       "createSubmit": "创建列表",
       "createFailed": "创建列表失败",

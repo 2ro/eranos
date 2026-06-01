@@ -1251,6 +1251,8 @@
     "lists": {
       "stripAria": "Listas de tópicos de campanhas curadas",
       "create": "Nova lista",
+      "showMore": "Mostrar mais {{count}}",
+      "showLess": "Mostrar menos",
       "createDesc": "Crie uma nova lista de tópicos. Curadoria de campanhas para ela a partir de qualquer página de campanha.",
       "createSubmit": "Criar lista",
       "createFailed": "Falha ao criar lista",

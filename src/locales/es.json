@@ -817,6 +817,8 @@
     "lists": {
       "stripAria": "Listas temáticas de campañas curadas",
       "create": "Nueva lista",
+      "showMore": "Mostrar {{count}} más",
+      "showLess": "Mostrar menos",
       "createDesc": "Crea una nueva lista temática. Cura campañas en ella desde cualquier página de campaña.",
       "createSubmit": "Crear lista",
       "createFailed": "No se pudo crear la lista",

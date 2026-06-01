@@ -1222,6 +1222,8 @@
     "lists": {
       "stripAria": "Özenle seçilmiş kampanya konu listeleri",
       "create": "Yeni liste",
+      "showMore": "{{count}} tane daha göster",
+      "showLess": "Daha az göster",
       "createDesc": "Yeni bir konu listesi oluşturun. Herhangi bir kampanya sayfasından kampanyaları listeye ekleyin.",
       "createSubmit": "Liste oluştur",
       "createFailed": "Liste oluşturulamadı",

@@ -1247,6 +1247,8 @@
     "lists": {
       "stripAria": "Curated campaign topic lists",
       "create": "New list",
+      "showMore": "Show {{count}} more",
+      "showLess": "Show less",
       "createDesc": "Create a new topic list. Curate campaigns into it from any campaign page.",
       "createSubmit": "Create list",
       "createFailed": "Failed to create list",

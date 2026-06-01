@@ -819,6 +819,8 @@
     "lists": {
       "stripAria": "Manjuriro emisoro yemishandirapamwe yakasarudzwa",
       "create": "Rondedzero itsva",
+      "showMore": "Ratidza {{count}} dzimwe",
+      "showLess": "Ratidza zvishoma",
       "createDesc": "Gadzira rondedzero itsva yemisoro. Sarudza mishandirapamwe muiri kubva papeji ipi neipi yemushandirapamwe.",
       "createSubmit": "Gadzira rondedzero",
       "createFailed": "Kugadzira rondedzero hakuna kubudirira",

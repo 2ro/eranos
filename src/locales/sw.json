@@ -1220,6 +1220,8 @@
     "lists": {
       "stripAria": "Orodha za mada za kampeni zilizoratibiwa",
       "create": "Orodha mpya",
+      "showMore": "Onyesha {{count}} zaidi",
+      "showLess": "Onyesha kidogo",
       "createDesc": "Tengeneza orodha mpya ya mada. Iratibu kampeni ndani yake kutoka ukurasa wowote wa kampeni.",
       "createSubmit": "Tengeneza orodha",
       "createFailed": "Imeshindikana kutengeneza orodha",

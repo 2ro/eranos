@@ -1221,6 +1221,8 @@
     "lists": {
       "stripAria": "Daftar topik kampanye terkurasi",
       "create": "Daftar baru",
+      "showMore": "Tampilkan {{count}} lagi",
+      "showLess": "Tampilkan lebih sedikit",
       "createDesc": "Buat daftar topik baru. Kurasi kampanye ke dalamnya dari halaman kampanye mana pun.",
       "createSubmit": "Buat daftar",
       "createFailed": "Gagal membuat daftar",
