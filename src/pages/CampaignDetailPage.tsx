@@ -4,10 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation, Trans } from 'react-i18next';
-import type { TFunction } from 'i18next';
 import type { NostrEvent } from '@nostrify/nostrify';
 import {
-  CalendarClock,
   ChevronLeft,
   HandHeart,
   MapPin,
@@ -89,18 +87,6 @@ function formatSatsFull(sats: number, btcPrice: number | undefined): string {
   if (btcPrice) return satsToUSDWhole(sats, btcPrice);
   if (sats >= 100_000_000) return `${(sats / 100_000_000).toLocaleString(undefined, { maximumFractionDigits: 4 })} BTC`;
   return `${sats.toLocaleString()} sats`;
-}
-
-function formatDeadline(unixSeconds: number, t: TFunction): { label: string; isPast: boolean } {
-  const now = Math.floor(Date.now() / 1000);
-  const diff = unixSeconds - now;
-  if (diff <= 0) {
-    return { label: t('campaignsDetail.deadlineEndedOn', { date: new Date(unixSeconds * 1000).toLocaleDateString() }), isPast: true };
-  }
-  const days = Math.ceil(diff / 86_400);
-  if (days <= 1) return { label: t('campaignsDetail.deadlineEndsToday'), isPast: false };
-  if (days < 60) return { label: t('campaignsDetail.deadlineDaysLeft', { count: days }), isPast: false };
-  return { label: t('campaignsDetail.deadlineEndsOn', { date: new Date(unixSeconds * 1000).toLocaleDateString() }), isPast: false };
 }
 
 function collectReplyEvents(nodes: ReplyNode[], out = new Map<string, NostrEvent>()): Map<string, NostrEvent> {
@@ -254,7 +240,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const authorMetadata = author.data?.metadata;
   const cover = sanitizeUrl(campaign.banner) ?? sanitizeUrl(authorMetadata?.banner) ?? sanitizeUrl(authorMetadata?.picture);
 
-  const deadline = campaign.deadline ? formatDeadline(campaign.deadline, t) : null;
   const countryLabel = getCampaignCountryLabel(campaign);
   const raisedSats = stats?.totalSats ?? 0;
   const pendingSats = stats?.pendingSats ?? 0;
@@ -347,7 +332,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
       statsLoading={statsLoading}
       btcPrice={btcPrice}
       donations={donationReceipts}
-      deadline={deadline}
       onShare={handleShare}
     />
   );
@@ -371,7 +355,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
       <CampaignHeading
         campaign={displayCampaign}
         creatorPubkey={campaign.pubkey}
-        deadline={deadline}
         countryLabel={countryLabel}
         onReply={() => setReplyOpen(true)}
         onMore={() => setMoreMenuOpen(true)}
@@ -944,7 +927,6 @@ function CampaignHero({
 interface CampaignHeadingProps {
   campaign: ParsedCampaign;
   creatorPubkey: string;
-  deadline: { label: string; isPast: boolean } | null;
   countryLabel: string | undefined;
   onReply: () => void;
   onMore: () => void;
@@ -954,7 +936,6 @@ interface CampaignHeadingProps {
 function CampaignHeading({
   campaign,
   creatorPubkey,
-  deadline,
   countryLabel,
   onReply,
   onMore,
@@ -983,18 +964,12 @@ function CampaignHeading({
         <AuthorByline pubkey={creatorPubkey} />
       </div>
 
-      {(countryLabel || deadline) && (
+      {(countryLabel) && (
         <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm font-medium text-muted-foreground">
           {countryLabel && (
             <span className="inline-flex items-center gap-1.5">
               <MapPin className="size-4" />
               {countryLabel}
-            </span>
-          )}
-          {deadline && (
-            <span className="inline-flex items-center gap-1.5">
-              <CalendarClock className="size-4" />
-              {deadline.label}
             </span>
           )}
         </div>
@@ -1056,7 +1031,6 @@ interface DonateColumnProps {
   btcPrice: number | undefined;
   /** Aggregated kind 8333 donation events, newest first. */
   donations: NostrEvent[];
-  deadline: { label: string; isPast: boolean } | null;
   onShare: () => void;
 }
 
@@ -1067,15 +1041,12 @@ function DonateColumn({
   statsLoading,
   btcPrice,
   donations,
-  deadline,
   onShare,
 }: DonateColumnProps) {
   const { t } = useTranslation();
   const { user } = useCurrentUser();
   const hdAccess = useHdWalletAccess();
   const [sendOpen, setSendOpen] = useState(false);
-  const ended = !!deadline?.isPast;
-  const endedLabel = ended ? t('campaignsDetail.campaignEnded') : null;
   const isSilentPayment = !campaign.wallets.onchain;
 
   // The in-app "Pay with Agora" button opens HDSendBitcoinDialog
@@ -1084,7 +1055,6 @@ function DonateColumn({
   // they'd use from /wallet to send Bitcoin to anywhere else.
   //
   // Hide the button when:
-  //   - the campaign has ended.
   //   - the donor is the campaign owner (paying yourself is a foot-gun).
   //   - the campaign is silent-payment-only (no on-chain address to
   //     prefill; SP donations require a BIP-352-aware wallet that derives
@@ -1094,7 +1064,6 @@ function DonateColumn({
   //     logins don't expose the secret key, so we can't derive child
   //     keys — see useHdWalletAccess).
   const canPayInApp =
-    !ended &&
     !!user &&
     !isSilentPayment &&
     user.pubkey !== campaign.pubkey &&
@@ -1168,18 +1137,7 @@ function DonateColumn({
         )}
 
         {/* Primary actions */}
-        {ended ? (
-          <div className="space-y-2">
-            <Button size="lg" className="w-full" disabled>
-              <HandHeart className="size-5 mr-2" />
-              {endedLabel ?? t('campaignsDetail.donate')}
-            </Button>
-            <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
-              <Share2 className="size-4 mr-2" />
-              {t('campaignsDetail.share')}
-            </Button>
-          </div>
-        ) : (
+        {
           // Donors can either pay from their in-app Agora wallet (HD
           // send dialog prefilled with the campaign address) or scan the
           // QR from any external wallet. Both routes terminate at the
@@ -1207,7 +1165,7 @@ function DonateColumn({
               {t('campaignsDetail.share')}
             </Button>
           </div>
-        )}
+        }
       </CardContent>
       {canPayInApp && campaign.wallets.onchain && (
         <HDSendBitcoinDialog

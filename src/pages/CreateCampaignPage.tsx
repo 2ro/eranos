@@ -52,7 +52,6 @@ import {
   parseCampaignWallet,
   sanitizeCampaignTitle,
 } from '@/lib/campaign';
-import { getTodayDateInput } from '@/lib/dateInput';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { genUserName } from '@/lib/genUserName';
 import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
@@ -84,11 +83,6 @@ function getEditTarget(value: string | null): EditTarget | null {
   } catch {
     return null;
   }
-}
-
-function formatDateInput(unixSeconds: number | undefined): string {
-  if (!unixSeconds) return '';
-  return new Date(unixSeconds * 1000).toISOString().slice(0, 10);
 }
 
 /**
@@ -197,7 +191,6 @@ export function CreateCampaignPage() {
   const [customOnchain, setCustomOnchain] = useState('');
   const [customSp, setCustomSp] = useState('');
   const [goalUsd, setGoalUsd] = useState('');
-  const [deadline, setDeadline] = useState('');
   const [countryQuery, setCountryQuery] = useState('');
   const [countryCode, setCountryCode] = useState('');
   /**
@@ -322,7 +315,6 @@ export function CreateCampaignPage() {
   // payload, so the slug's only audience is relays and other clients.
   const derivedSlug = useMemo(() => buildCampaignSlug(title), [title]);
   const activeIdentifier = editCampaign?.identifier ?? derivedSlug.slug;
-  const minDeadline = useMemo(() => getTodayDateInput(), []);
 
   // Live-parsed custom inputs, used to drive disclaimers and inline
   // validation. Empty strings parse to `null` (no inline error).
@@ -362,7 +354,6 @@ export function CreateCampaignPage() {
     setCustomSp(editCampaign.wallets.sp?.value ?? '');
     setWalletDefaultsApplied(true);
     setGoalUsd(editCampaign.goalUsd !== undefined ? String(editCampaign.goalUsd) : '');
-    setDeadline(formatDateInput(editCampaign.deadline));
     const editCountryCode = editCampaign.countryCode ?? '';
     setCountryCode(editCountryCode);
     setCountryQuery(editCountryCode ? (getCountryInfo(editCountryCode)?.subdivisionName ?? getCountryInfo(editCountryCode)?.name ?? editCountryCode) : '');
@@ -520,18 +511,6 @@ export function CreateCampaignPage() {
         goalNum = n;
       }
 
-      let deadlineNum: number | undefined;
-      if (deadline.trim()) {
-        if (deadline < minDeadline) {
-          throw new Error(t('campaignsCreate.errorDeadlinePast'));
-        }
-        const ts = Math.floor(new Date(deadline).getTime() / 1000);
-        if (!Number.isFinite(ts) || ts <= 0) {
-          throw new Error(t('campaignsCreate.errorDeadlineInvalid'));
-        }
-        deadlineNum = ts;
-      }
-
       const resolvedCountryCode = countryCode;
       // Iterate the canonical category list (not the Set) so the tag
       // order on the event is stable and matches the picker's display
@@ -623,7 +602,6 @@ export function CreateCampaignPage() {
       if (onchainWallet) tags.push(['w', onchainWallet.value]);
       if (spWallet) tags.push(['w', spWallet.value]);
       if (goalNum !== undefined) tags.push(['goal', String(goalNum)]);
-      if (deadlineNum !== undefined) tags.push(['deadline', String(deadlineNum)]);
       if (resolvedCountryCode) {
         tags.push(['i', createCountryIdentifier(resolvedCountryCode)]);
         tags.push(['k', 'iso3166']);
@@ -989,62 +967,47 @@ export function CreateCampaignPage() {
     </FormSection>
   );
 
-  const goalDeadlineSection = (
-    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-      {/* Goal — integer USD */}
-      <FormSection
-        title={(
-          <span className="inline-flex items-center gap-1.5">
-            {t('campaignsCreate.goal')}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  className="inline-flex text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  aria-label={t('campaignsCreate.goalNote')}
-                >
-                  <HelpCircle className="size-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="max-w-64 text-xs leading-relaxed">
-                {t('campaignsCreate.goalNote')}
-              </TooltipContent>
-            </Tooltip>
-          </span>
-        )}
-        requirement="Optional"
-      >
-        <div className="relative">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-            $
-          </span>
-          <Input
-            id="campaign-goal"
-            type="text"
-            inputMode="numeric"
-            placeholder={t('campaignsCreate.goalPlaceholder')}
-            value={goalUsd}
-            onChange={(e) => setGoalUsd(e.target.value)}
-            className="pl-7 pr-14"
-          />
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
-            USD
-          </span>
-        </div>
-      </FormSection>
-
-      {/* Deadline */}
-      <FormSection title={t('campaignsCreate.deadline')} requirement="Optional">
+  const goalSection = (
+    <FormSection
+      title={(
+        <span className="inline-flex items-center gap-1.5">
+          {t('campaignsCreate.goal')}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                aria-label={t('campaignsCreate.goalNote')}
+              >
+                <HelpCircle className="size-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-64 text-xs leading-relaxed">
+              {t('campaignsCreate.goalNote')}
+            </TooltipContent>
+          </Tooltip>
+        </span>
+      )}
+      requirement="Optional"
+    >
+      <div className="relative">
+        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+          $
+        </span>
         <Input
-          id="campaign-deadline"
-          type="date"
-          min={minDeadline}
-          value={deadline}
-          onChange={(e) => setDeadline(e.target.value)}
-          className="[color-scheme:light] dark:[color-scheme:dark] dark:[&::-webkit-calendar-picker-indicator]:invert dark:[&::-webkit-calendar-picker-indicator]:opacity-80"
+          id="campaign-goal"
+          type="text"
+          inputMode="numeric"
+          placeholder={t('campaignsCreate.goalPlaceholder')}
+          value={goalUsd}
+          onChange={(e) => setGoalUsd(e.target.value)}
+          className="pl-7 pr-14"
         />
-      </FormSection>
-    </div>
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
+          USD
+        </span>
+      </div>
+    </FormSection>
   );
 
   const header = (
@@ -1119,7 +1082,7 @@ export function CreateCampaignPage() {
             {tagsSection}
             {bannerSection}
             {storySection}
-            {goalDeadlineSection}
+            {goalSection}
           </div>
 
           {errorAlert}
@@ -1181,7 +1144,7 @@ export function CreateCampaignPage() {
     {
       title: t('campaignsCreate.wizard.goalStepTitle'),
       subtitle: t('campaignsCreate.wizard.goalStepSubtitle'),
-      body: goalDeadlineSection,
+      body: goalSection,
     },
     {
       title: t('campaignsCreate.wizard.tagsStepTitle'),

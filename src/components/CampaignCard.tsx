@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { CalendarClock, HandHeart, MapPin, ShieldCheck } from 'lucide-react';
+import { HandHeart, MapPin, ShieldCheck } from 'lucide-react';
 
 import { AuthorByline } from '@/components/AuthorByline';
 import { Card } from '@/components/ui/card';
@@ -22,17 +22,6 @@ import {
 import { formatCampaignAmount, formatUsdGoal, satsToUsd } from '@/lib/formatCampaignAmount';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
-
-function formatDeadline(unixSeconds: number): { label: string; isPast: boolean } {
-  const now = Math.floor(Date.now() / 1000);
-  const diff = unixSeconds - now;
-  if (diff <= 0) return { label: 'Ended', isPast: true };
-  const days = Math.ceil(diff / 86_400);
-  if (days <= 1) return { label: 'Ends today', isPast: false };
-  if (days < 30) return { label: `${days} days left`, isPast: false };
-  const months = Math.round(days / 30);
-  return { label: `${months} mo left`, isPast: false };
-}
 
 /**
  * Short helper rendered both inline (cards) and in the detail page.
@@ -179,7 +168,6 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
   const cover = sanitizeUrl(displayCampaign.banner)
     ?? sanitizeUrl(authorMetadata?.banner)
     ?? sanitizeUrl(authorMetadata?.picture);
-  const deadline = campaign.deadline ? formatDeadline(campaign.deadline) : null;
   const raisedSats = stats?.totalSats ?? 0;
   const countryLabel = getCampaignCountryLabel(campaign);
   // SP-only campaigns hide aggregate totals; dual-endpoint campaigns
@@ -204,7 +192,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
           isFeaturedVariant && 'sm:flex-row sm:items-stretch',
         )}
       >
-        {/* Cover image. Optional metadata (country, deadline) is
+        {/* Cover image. Optional metadata (country) is
             overlaid on the banner as glass chips so the body below can
             stay structurally deterministic. A bottom gradient keeps
             the chips legible against any photo; a top scrim does the
@@ -231,7 +219,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
           {/* Bottom gradient — only present when there are bottom chips
               to display, so a banner with no overlays stays visually
               clean. */}
-          {(countryLabel || deadline) && (
+          {(countryLabel) && (
             <div
               aria-hidden
               className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 via-black/30 to-transparent"
@@ -243,24 +231,13 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 to-transparent"
           />
 
-          {/* Bottom-left meta chips — country + deadline. */}
-          {(countryLabel || deadline) && (
+          {/* Bottom-left meta chips — country. */}
+          {(countryLabel) && (
             <div className="absolute bottom-3 left-3 z-10 flex flex-wrap items-center gap-1.5 [text-shadow:0_1px_2px_rgba(0,0,0,0.6)]">
               {countryLabel && (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-black/35 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-white">
                   <MapPin className="size-3.5" />
                   {countryLabel}
-                </span>
-              )}
-              {deadline && (
-                <span
-                  className={cn(
-                    'inline-flex items-center gap-1.5 rounded-full bg-black/35 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-white',
-                    deadline.isPast && 'bg-destructive/60',
-                  )}
-                >
-                  <CalendarClock className="size-3.5" />
-                  {deadline.label}
                 </span>
               )}
             </div>
