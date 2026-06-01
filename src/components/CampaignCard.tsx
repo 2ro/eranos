@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { CalendarClock, HandHeart, MapPin, ShieldCheck } from 'lucide-react';
+import { CalendarClock, HandHeart, ShieldCheck } from 'lucide-react';
 
 import { AuthorByline } from '@/components/AuthorByline';
 import { Card } from '@/components/ui/card';
@@ -248,7 +248,6 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             <div className="absolute bottom-3 left-3 z-10 flex flex-wrap items-center gap-1.5 [text-shadow:0_1px_2px_rgba(0,0,0,0.6)]">
               {countryLabel && (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-black/35 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-white">
-                  <MapPin className="size-3.5" />
                   {countryLabel}
                 </span>
               )}

@@ -113,7 +113,6 @@ export function CampaignInlinePreview({ event }: { event: NostrEvent }) {
               )}
               {countryLabel && (
                 <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="size-3.5" />
                   {countryLabel}
                 </span>
               )}

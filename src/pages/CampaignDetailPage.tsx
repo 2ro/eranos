@@ -10,7 +10,6 @@ import {
   CalendarClock,
   ChevronLeft,
   HandHeart,
-  MapPin,
   Pencil,
   Share2,
   ShieldCheck,
@@ -987,7 +986,6 @@ function CampaignHeading({
         <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm font-medium text-muted-foreground">
           {countryLabel && (
             <span className="inline-flex items-center gap-1.5">
-              <MapPin className="size-4" />
               {countryLabel}
             </span>
           )}
