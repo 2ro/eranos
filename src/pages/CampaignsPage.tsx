@@ -2,17 +2,20 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { Trans, useTranslation } from 'react-i18next';
-import { ArrowRight, EyeOff, HandHeart, PlusCircle } from 'lucide-react';
+import { ArrowRight, BadgeCheck, EyeOff, HandHeart, PlusCircle } from 'lucide-react';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { HeroLightningMap } from '@/components/HeroLightningMap';
 import { ModeratorCollapsibleSection, ReorderableCampaignGrid } from '@/components/moderation';
+import { useAuthor } from '@/hooks/useAuthor';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { genUserName } from '@/lib/genUserName';
 import { useAppContext } from '@/hooks/useAppContext';
 import type { ParsedCampaign } from '@/lib/campaign';
 
@@ -24,6 +27,15 @@ import type { ParsedCampaign } from '@/lib/campaign';
  * placeholder is bounded.
  */
 const FEATURED_SKELETON_CAP = 8;
+
+/**
+ * World Liberty Congress — the partner organization that hand-picks
+ * the Featured row. Their pubkey and npub are hard-coded here so the
+ * Featured heading can link to their profile and pull their avatar
+ * from kind 0 metadata via `useAuthor`.
+ */
+const WLC_PUBKEY = '56b3abb9baed20b6ab81617aa519c8634e920ef0351d2962ec2951a9b233ab2f';
+const WLC_NPUB = 'npub126e6hwd6a5std2upv9a22xwgvd8fyrhsx5wjjchv99g6nv3n4vhs5fr9g3';
 
 /**
  * Home page (`/`).
@@ -59,6 +71,12 @@ export function CampaignsPage() {
   const { t } = useTranslation();
   const { config } = useAppContext();
   const { user } = useCurrentUser();
+  const wlcAuthor = useAuthor(WLC_PUBKEY);
+  const wlcName = wlcAuthor.data?.metadata?.display_name
+    || wlcAuthor.data?.metadata?.name
+    || 'World Liberty Congress';
+  const wlcPicture = wlcAuthor.data?.metadata?.picture;
+  const wlcFallback = genUserName(WLC_PUBKEY).slice(0, 2).toUpperCase();
 
   // Moderation pack + label rollups. We gate the Featured and Hidden
   // sections on `moderationReady` so we never flash an unmoderated
@@ -159,7 +177,21 @@ export function CampaignsPage() {
           <section className="space-y-5">
             <div className="flex items-end justify-between gap-4 flex-wrap">
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('campaigns.home.featured')}</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2 flex-wrap">
+                  <Link
+                    to={`/${WLC_NPUB}`}
+                    className="inline-flex items-center gap-2 hover:underline underline-offset-4"
+                    aria-label={wlcName}
+                  >
+                    <Avatar className="size-8 sm:size-9 ring-1 ring-border">
+                      <AvatarImage src={wlcPicture} alt="" />
+                      <AvatarFallback>{wlcFallback}</AvatarFallback>
+                    </Avatar>
+                    <span>{wlcName}</span>
+                  </Link>
+                  <BadgeCheck className="size-5 sm:size-6 text-primary shrink-0" aria-hidden="true" />
+                  <span>{t('campaigns.home.featured')}</span>
+                </h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   {t('campaigns.home.featuredDesc', { appName: config.appName })}
                 </p>
