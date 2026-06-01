@@ -345,7 +345,7 @@ function CaptiveOverlay() {
         type="button"
         onClick={cancel}
         aria-label={t('onboarding.close')}
-        className="absolute right-4 top-4 sm:right-6 sm:top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+        className="absolute right-4 top-4 z-20 sm:right-6 sm:top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
       >
         <X className="h-5 w-5" />
       </button>

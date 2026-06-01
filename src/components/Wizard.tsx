@@ -151,7 +151,7 @@ export function Wizard({
         type="button"
         onClick={onClose}
         aria-label={t('common.goBack')}
-        className="absolute right-4 top-4 sm:right-6 sm:top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+        className="absolute right-4 top-4 z-20 sm:right-6 sm:top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
       >
         <X className="h-5 w-5" />
       </button>
@@ -165,7 +165,7 @@ export function Wizard({
           onClick={() => setStep((s) => Math.max(s - 1, 1))}
           disabled={submitting}
           aria-label={t('common.back')}
-          className="absolute left-4 top-4 sm:left-6 sm:top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
+          className="absolute left-4 top-4 z-20 sm:left-6 sm:top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
         >
           <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
         </button>
