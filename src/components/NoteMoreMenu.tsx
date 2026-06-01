@@ -44,9 +44,11 @@ import { EmojifiedText } from '@/components/CustomEmoji';
 import { ReportDialog } from '@/components/ReportDialog';
 import { CommunityReportDialog } from '@/components/CommunityReportDialog';
 import { AddToListDialog } from '@/components/AddToListDialog';
+import { CampaignListMembershipDialog } from '@/components/campaign-lists/CampaignListMembershipDialog';
 import { useNostr } from '@nostrify/react';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { usePinnedNotes } from '@/hooks/usePinnedNotes';
+import { useCampaignListActions } from '@/hooks/useCampaignListActions';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useMuteList } from '@/hooks/useMuteList';
@@ -211,6 +213,7 @@ export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
   const [reportOpen, setReportOpen] = useState(false);
   const [banContentOpen, setBanContentOpen] = useState(false);
   const [addToListOpen, setAddToListOpen] = useState(false);
+  const [addToCampaignListOpen, setAddToCampaignListOpen] = useState(false);
   const [eventJsonOpen, setEventJsonOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
@@ -232,6 +235,16 @@ export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
   const { mutate: deleteEvent, isPending: isDeleting } = useDeleteEvent();
 
   const nip19Id = encodeEventNip19(event);
+
+  // Campaign-specific membership-dialog inputs. Only meaningful when
+  // `event.kind === CAMPAIGN_KIND`; the dialog row that uses them is
+  // gated inside the menu content the same way.
+  const isCampaign = event.kind === CAMPAIGN_KIND;
+  const campaignDTag = event.tags.find(([n]) => n === 'd')?.[1] ?? '';
+  const campaignCoord = isCampaign
+    ? `${CAMPAIGN_KIND}:${event.pubkey}:${campaignDTag}`
+    : '';
+  const campaignTitle = event.tags.find(([n]) => n === 'title')?.[1] ?? '';
 
   const handleDelete = () => {
     const dTag = event.tags.find(([name]) => name === 'd')?.[1];
@@ -268,6 +281,10 @@ export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
           onAddToList={() => {
             onOpenChange(false);
             setTimeout(() => setAddToListOpen(true), 150);
+          }}
+          onAddToCampaignList={() => {
+            onOpenChange(false);
+            setTimeout(() => setAddToCampaignListOpen(true), 150);
           }}
           onViewEventJson={() => {
             onOpenChange(false);
@@ -306,6 +323,15 @@ export function NoteMoreMenu({ event, open, onOpenChange }: NoteMoreMenuProps) {
         open={addToListOpen}
         onOpenChange={setAddToListOpen}
       />
+
+      {isCampaign && (
+        <CampaignListMembershipDialog
+          open={addToCampaignListOpen}
+          onOpenChange={setAddToCampaignListOpen}
+          campaignCoord={campaignCoord}
+          campaignTitle={campaignTitle}
+        />
+      )}
 
       <EventJsonDialog
         event={event}
@@ -347,11 +373,12 @@ interface NoteMoreMenuContentProps extends NoteMoreMenuProps {
   onReport: () => void;
   onBanContent: () => void;
   onAddToList: () => void;
+  onAddToCampaignList: () => void;
   onViewEventJson: () => void;
   onDelete: () => void;
 }
 
-function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onReport, onBanContent, onAddToList, onViewEventJson, onDelete }: NoteMoreMenuContentProps) {
+function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onReport, onBanContent, onAddToList, onAddToCampaignList, onViewEventJson, onDelete }: NoteMoreMenuContentProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useCurrentUser();
@@ -364,6 +391,12 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
   // Bookmark / Add to list / Add to sidebar don't map cleanly to campaigns
   // (kind 33863 — addressable, with their own dedicated UI). Hide them there.
   const isCampaign = event.kind === CAMPAIGN_KIND;
+
+  // Campaign moderators get a dedicated "Add to list" row that toggles
+  // the campaign's membership in the curated topic lists. `isMod` is a
+  // synchronous boolean — no loading state to handle.
+  const campaignListActions = useCampaignListActions();
+  const canManageCampaignLists = isCampaign && campaignListActions.isMod;
 
   // Country-feed pin/unpin context (organizer/admin action). `useCountryFeed`
   // returns null outside of a country page; we only enable usePinnedPosts when
@@ -549,6 +582,13 @@ function NoteMoreMenuContent({ event, open, onOpenChange, communityContext, onRe
               icon={<ListPlus className="size-5" />}
               label={t('noteMoreMenu.addToList')}
               onClick={() => { onAddToList(); }}
+            />
+          )}
+          {canManageCampaignLists && (
+            <MenuItem
+              icon={<ListPlus className="size-5" />}
+              label={t('campaigns.lists.membershipTitle')}
+              onClick={() => { onAddToCampaignList(); }}
             />
           )}
           {!isCampaign && (
