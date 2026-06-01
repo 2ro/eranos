@@ -82,9 +82,9 @@ const WLC_NPUB = 'npub126e6hwd6a5std2upv9a22xwgvd8fyrhsx5wjjchv99g6nv3n4vhs5fr9g
  * Hidden-campaign moderation lives entirely on `/campaigns` — the
  * Show-hidden toggle there is available to every viewer, and the
  * moderator-only Hidden collapsible there is the structured review
- * surface. The home page deliberately carries no Hidden affordance
- * so it never leads with suppressed content for anyone, moderators
- * included.
+ * surface. The home page applies no label-based filtering of its own:
+ * the WLC hero row renders exactly what the curated list declares, in
+ * list order. Curation here is the list's membership, nothing more.
  *
  * Campaigns are the home page's sole focus. Groups and Pledges each
  * have their own dedicated browse pages (`/groups`, `/pledges`).
@@ -127,8 +127,8 @@ export function CampaignsPage() {
   );
 
   // Reorder to match the list's declared order. `useCampaigns` returns
-  // events in network order which we override here so the hero row always
-  // reflects the moderator's intent.
+  // events in network order which we override here so the hero row
+  // always reflects the curator's intent.
   const orderedCampaigns = useMemo<ParsedCampaign[]>(() => {
     if (!heroCampaigns || cappedCoords.length === 0) return [];
     const byCoord = new Map(heroCampaigns.map((c) => [c.aTag, c]));
