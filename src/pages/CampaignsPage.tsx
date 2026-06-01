@@ -195,17 +195,6 @@ export function CampaignsPage() {
                 expectedCount={cappedCoords.length || 2}
               />
             )}
-
-            {wlcList && wlcList.coords.length > WLC_HERO_CAP && (
-              <div className="pt-1">
-                <Button asChild variant="ghost" size="sm">
-                  <Link to={`/campaigns/lists/${WLC_LIST_SLUG}`}>
-                    {t('campaigns.home.viewFullList')}
-                    <ArrowRight className="ml-1.5 size-4 rtl:rotate-180" />
-                  </Link>
-                </Button>
-              </div>
-            )}
           </section>
         )}
 
