@@ -17,17 +17,6 @@ import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
 
-function getDeadlineLabel(unixSeconds: number): { label: string; isPast: boolean } {
-  const now = Math.floor(Date.now() / 1000);
-  const diff = unixSeconds - now;
-  if (diff <= 0) return { label: 'Ended', isPast: true };
-  const days = Math.ceil(diff / 86_400);
-  if (days <= 1) return { label: 'Ends today', isPast: false };
-  if (days < 30) return { label: `${days} days left`, isPast: false };
-  const months = Math.round(days / 30);
-  return { label: `${months} mo left`, isPast: false };
-}
-
 function InlineShell({
   image,
   fallbackIcon,
@@ -76,7 +65,6 @@ export function CampaignInlinePreview({ event }: { event: NostrEvent }) {
     ?? sanitizeUrl(authorMetadata?.picture);
   const naddr = nip19.naddrEncode({ kind: event.kind, pubkey: event.pubkey, identifier: campaign.identifier });
   const countryLabel = getCampaignCountryLabel(campaign);
-  const deadline = campaign.deadline ? getDeadlineLabel(campaign.deadline) : undefined;
   const isSilentPayment = !campaign.wallets.onchain;
   const goalLabel = campaign.goalUsd && campaign.goalUsd > 0 ? formatUsdGoal(campaign.goalUsd) : undefined;
   const raisedSats = stats?.totalSats ?? 0;
@@ -114,12 +102,6 @@ export function CampaignInlinePreview({ event }: { event: NostrEvent }) {
               {countryLabel && (
                 <span className="inline-flex items-center gap-1.5">
                   {countryLabel}
-                </span>
-              )}
-              {deadline && (
-                <span className={cn('inline-flex items-center gap-1.5', deadline.isPast && 'text-destructive')}>
-                  <CalendarClock className="size-3.5" />
-                  {deadline.label}
                 </span>
               )}
             </div>

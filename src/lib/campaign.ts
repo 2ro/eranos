@@ -90,8 +90,6 @@ export interface ParsedCampaign {
   wallets: CampaignWallets;
   /** Fundraising goal in **integer US Dollars**, or `undefined` if not set. */
   goalUsd?: number;
-  /** Deadline (Unix seconds), or `undefined` if not set. */
-  deadline?: number;
   /** ISO 3166-1 alpha-2 country code parsed from a NIP-73 `i` tag. */
   countryCode?: string;
   /** Created-at from the event. */
@@ -259,7 +257,6 @@ export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
     bannerImeta,
     wallets,
     goalUsd: parsePositiveInt(getTag(event, 'goal')),
-    deadline: parsePositiveInt(getTag(event, 'deadline')),
     countryCode: getCountryCode(event),
     createdAt: event.created_at,
   };

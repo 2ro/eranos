@@ -282,11 +282,11 @@ The two zap kinds are complementary. Clients SHOULD sum verified amounts from bo
 
 ### Summary
 
-Addressable event representing a **self-authored fundraising campaign**. A campaign carries marketing-style metadata (title, summary, banner image, markdown story, optional goal, optional deadline, optional country) and one or two Bitcoin wallet endpoints declared in `w` tags. Each wallet endpoint is either a public on-chain bech32(m) address (`bc1q…`, `bc1p…`) or a silent-payment code (`sp1…`, per BIP-352). The mode of each endpoint is inferred from the prefix — the client renders a QR code that combines the present endpoints and adjusts the donation-progress UI accordingly. A campaign MAY declare **at most one** endpoint per mode (at most one on-chain address and at most one silent-payment code).
+Addressable event representing a **self-authored fundraising campaign**. A campaign carries marketing-style metadata (title, summary, banner image, markdown story, optional goal, optional country) and one or two Bitcoin wallet endpoints declared in `w` tags. Each wallet endpoint is either a public on-chain bech32(m) address (`bc1q…`, `bc1p…`) or a silent-payment code (`sp1…`, per BIP-352). The mode of each endpoint is inferred from the prefix — the client renders a QR code that combines the present endpoints and adjusts the donation-progress UI accordingly. A campaign MAY declare **at most one** endpoint per mode (at most one on-chain address and at most one silent-payment code).
 
 The author of the event is also the beneficiary. Campaigns are never authored on behalf of someone else; the event creator owns the wallet declared in `w` and receives the donations. To stop accepting donations, the creator publishes a NIP-09 kind 5 deletion request referencing the campaign's `a` coordinate.
 
-The kind is addressable so the creator can edit the story, banner, goal, deadline, and wallet over the life of the campaign without minting new identifiers. The `d` tag is the campaign's slug.
+The kind is addressable so the creator can edit the story, banner, goal, and wallet over the life of the campaign without minting new identifiers. The `d` tag is the campaign's slug.
 
 ### Event Structure
 
@@ -315,7 +315,6 @@ The kind is addressable so the creator can edit the story, banner, goal, deadlin
     ["w", "sp1qq...verylongsilentpaymentcode..."],
 
     ["goal", "25000"],
-    ["deadline", "1735689600"],
 
     ["i", "iso3166:US"],
     ["k", "iso3166"],
@@ -352,7 +351,6 @@ The `content` field is the **campaign story**, formatted as Markdown. Clients SH
 | `banner`  | Recommended | HTTPS URL of the wide banner image. Clients MUST sanitize the URL (see `sanitizeUrl()` in `nostr-security`) before rendering, and SHOULD pair the URL with a NIP-92 `imeta` tag for dimensions, blurhash, MIME type, and SHA-256. |
 | `imeta`   | Recommended | NIP-92 media metadata for the banner. The first `url <value>` pair MUST match the `banner` URL; clients SHOULD ignore an `imeta` whose URL does not match.                                                                  |
 | `goal`    | Optional | Fundraising goal in **integer US Dollars** (no unit suffix, no decimals). Clients MAY display an estimated sat-equivalent at view time using a live exchange rate.                                                          |
-| `deadline`| Optional | Unix timestamp (seconds) at which the campaign closes for new donations. After the deadline, clients SHOULD show the campaign as ended but MAY still accept donations.                                                       |
 | `i`       | Recommended | NIP-73 country identifier. SHOULD be `iso3166:<code>` with an uppercase ISO 3166-1 alpha-2 country code (e.g. `iso3166:VE`).                                                                                          |
 | `k`       | Recommended if `i` is present | NIP-73 external content kind. For country identifiers this SHOULD be `iso3166`.                                                                                                              |
 | `t`       | Optional | User-entered discovery/category tags. Agora also adds `t:agora` as the app marker; other `t` values are freeform topics such as `legal-defense` or `mutual-aid`. |
