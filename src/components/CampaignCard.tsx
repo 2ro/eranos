@@ -140,9 +140,11 @@ interface CampaignCardProps {
    * cover. Used by the home page Featured row to mark cards as
    * verified by World Liberty Congress. Pass the verifier's pubkey
    * (hex) and the npub the badge should link to; the avatar is
-   * pulled from kind 0 metadata via `useAuthor`.
+   * pulled from kind 0 metadata via `useAuthor`. `shortLabel` is the
+   * compact text shown on the chip (e.g. "WLC"); the full name still
+   * drives the aria-label so screen readers announce it in full.
    */
-  verifiedBy?: { pubkey: string; npub: string; defaultName?: string };
+  verifiedBy?: { pubkey: string; npub: string; defaultName?: string; shortLabel?: string };
 }
 
 /**
@@ -286,7 +288,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
                   {(verifierName || verifiedBy.defaultName || 'WLC').slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <span className="truncate max-w-[140px]">{verifierName || verifiedBy.defaultName}</span>
+              <span className="truncate max-w-[140px]">{verifiedBy.shortLabel ?? verifierName ?? verifiedBy.defaultName}</span>
               <BadgeCheck className="size-3.5 text-white shrink-0" aria-hidden="true" />
             </Link>
           )}

@@ -438,6 +438,7 @@ function FeaturedRow({
             pubkey: WLC_PUBKEY,
             npub: WLC_NPUB,
             defaultName: 'World Liberty Congress',
+            shortLabel: 'WLC',
           }}
         />
       )}
