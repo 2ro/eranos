@@ -1201,7 +1201,7 @@
         "title": "Construído diferente.",
         "lede": "Três coisas que nos tornam diferentes dos outros.",
         "block1": {
-          "heading": "Diferente do GoFundMe e sites similares",
+          "heading": "Diferente do GoFundMe",
           "body": "Nenhuma plataforma pode congelar suas doações, exigir reembolsos ou encerrar sua campanha por divergências de política. Sem Stripe, sem Visa, sem banco no meio que pode te cortar no meio da campanha.",
           "bullet1": "À prova de congelamento — sem veto de plataforma",
           "bullet2": "Nenhum processador de pagamento pode puxar o plugue",
