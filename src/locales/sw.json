@@ -1535,6 +1535,7 @@
   "walletSend": {
     "title": "Tuma Bitcoin",
     "send": "Tuma Bitcoin",
+    "max": "MAX",
     "tapAgainToConfirm": "Bonyeza tena kuthibitisha",
     "satPerVB": "sat/vB {{rate}}",
     "notEnoughBitcoin": "Bitcoin haitoshi",

@@ -1576,6 +1576,7 @@
   "walletSend": {
     "title": "Kirim Bitcoin",
     "send": "Kirim Bitcoin",
+    "max": "MAX",
     "tapAgainToConfirm": "Ketuk lagi untuk konfirmasi",
     "satPerVB": "{{rate}} sat/vB",
     "notEnoughBitcoin": "Bitcoin tidak mencukupi",

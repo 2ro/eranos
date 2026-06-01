@@ -1237,6 +1237,7 @@
   "walletSend": {
     "title": "Tumira Bitcoin",
     "send": "Tumira Bitcoin",
+    "max": "MAX",
     "tapAgainToConfirm": "Dzvanya zvakare kuti usimbise",
     "satPerVB": "{{rate}} sat/vB",
     "notEnoughBitcoin": "Bitcoin haina kukwana",

@@ -1576,6 +1576,7 @@
   "walletSend": {
     "title": "Bitcoin भेजें",
     "send": "Bitcoin भेजें",
+    "max": "MAX",
     "tapAgainToConfirm": "पुष्टि के लिए फिर टैप करें",
     "satPerVB": "{{rate}} sat/vB",
     "notEnoughBitcoin": "पर्याप्त बिटकॉइन नहीं",

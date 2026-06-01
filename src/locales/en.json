@@ -1733,6 +1733,7 @@
   "walletSend": {
     "title": "Send Bitcoin",
     "send": "Send Bitcoin",
+    "max": "MAX",
     "notEnoughBitcoin": "Not enough Bitcoin",
     "tapAgainToConfirm": "Tap again to confirm",
     "satPerVB": "{{rate}} sat/vB",

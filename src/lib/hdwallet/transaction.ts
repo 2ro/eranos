@@ -120,7 +120,7 @@ function inputId(input: HdInput): string {
 }
 
 /** Recipient parsing result. */
-type HdRecipient =
+export type HdRecipient =
   | { kind: 'address'; address: string }
   | { kind: 'sp'; spAddress: string };
 
@@ -667,6 +667,217 @@ export function finalizeHdPsbt(psbtHex: string): string {
 // Max-sendable
 // ---------------------------------------------------------------------------
 
+/** Preview of the maximum spendable amount at a fee rate. */
+export interface HdMaxSpendPreview {
+  /** Sats actually sent to the recipient after subtracting fee. */
+  amountSats: number;
+  /** Network fee in satoshis. */
+  fee: number;
+  /** Total sats across all consumed inputs. */
+  totalInput: number;
+}
+
+/** Arguments accepted by {@link buildHdMaxSpendPsbt}. */
+export interface BuildHdMaxSpendArgs {
+  /** HD account whose keys can sign all `inputs`. */
+  account: HdAccount;
+  /** Every UTXO the wallet should drain. */
+  inputs: readonly HdInput[];
+  /** Where to send the max amount. */
+  recipient: HdRecipient;
+  /** Fee rate in sat/vB. */
+  feeRate: number;
+  /** Required iff any input is a silent-payment UTXO. */
+  seed?: Uint8Array;
+}
+
+/** Result of {@link buildHdMaxSpendPsbt}. */
+export interface HdMaxSpendPsbt extends HdMaxSpendPreview {
+  /** Hex-encoded unsigned PSBT, ready for `signHdPsbt`. */
+  psbtHex: string;
+  /** Per-input descriptor, aligned 1:1 with PSBT inputs. */
+  inputDescriptors: HdInputDescriptor[];
+  /** Resolved recipient address. SP sends resolve to the derived P2TR address. */
+  resolvedRecipientAddress: string;
+  /** SP UTXOs consumed by this max spend, for post-broadcast bookkeeping. */
+  consumedSpUtxos: Array<{ txid: string; vout: number }>;
+}
+
+function dedupeInputs(inputs: readonly HdInput[]): HdInput[] {
+  const seen = new Set<string>();
+  const dedup: HdInput[] = [];
+  for (const i of inputs) {
+    const id = inputId(i);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    dedup.push(i);
+  }
+  return dedup;
+}
+
+/**
+ * Preview a wallet-draining send: all inputs, one recipient output, no change.
+ * Returns `null` when the wallet cannot produce a non-dust recipient output.
+ */
+export function previewHdMaxSpend(
+  inputs: readonly HdInput[],
+  feeRate: number,
+): HdMaxSpendPreview | null {
+  if (!Number.isFinite(feeRate) || feeRate <= 0) return null;
+  if (!inputs.length) return null;
+
+  const dedup = dedupeInputs(inputs);
+  if (!dedup.length) return null;
+
+  const totalInput = dedup.reduce((s, i) => s + inputValue(i), 0);
+  const fee = estimateFee(dedup.length, 1, feeRate);
+  const amountSats = totalInput - fee;
+  if (amountSats < BITCOIN_DUST_LIMIT) return null;
+
+  return { amountSats, fee, totalInput };
+}
+
+/**
+ * Build a one-output PSBT that sends the maximum possible amount to a normal
+ * Bitcoin address or silent-payment address. The fee is deducted from the
+ * wallet balance and no change output is created.
+ */
+export function buildHdMaxSpendPsbt(args: BuildHdMaxSpendArgs): HdMaxSpendPsbt {
+  const { account, inputs, recipient, feeRate, seed } = args;
+
+  if (!inputs.length) throw new Error('Max spend requires at least one input.');
+  if (!Number.isFinite(feeRate) || feeRate <= 0) {
+    throw new Error('Fee rate must be positive.');
+  }
+  if (recipient.kind === 'address' && !validateBitcoinAddress(recipient.address)) {
+    throw new Error(`Invalid Bitcoin address: ${recipient.address}`);
+  }
+
+  const dedup = dedupeInputs(inputs);
+  const preview = previewHdMaxSpend(dedup, feeRate);
+  if (!preview) {
+    const totalInput = dedup.reduce((s, i) => s + inputValue(i), 0);
+    const fee = dedup.length ? estimateFee(dedup.length, 1, feeRate) : 0;
+    throw new Error(
+      `Max spend amount below dust limit after fee. Total: ${totalInput}, fee: ${fee}.`,
+    );
+  }
+
+  const hasSp = dedup.some((i) => i.kind === 'sp');
+  if (hasSp && !seed) {
+    throw new Error('Max spend with SP inputs requires the source wallet seed.');
+  }
+
+  const bSpend = hasSp && seed ? deriveSilentPaymentSpendKey(seed) : undefined;
+  const wipeAfterBuild: Uint8Array[] = [];
+  if (bSpend) wipeAfterBuild.push(bSpend);
+
+  try {
+    const tx = new btc.Transaction();
+    const inputDescriptors: HdInputDescriptor[] = [];
+    const consumedSpUtxos: Array<{ txid: string; vout: number }> = [];
+    const spSenderInputs: SpSenderInput[] = [];
+
+    for (const input of dedup) {
+      if (input.kind === 'bip86') {
+        const utxo = input.utxo;
+        const derived = deriveAddress(
+          utxo.chain === CHANGE_CHAIN ? account.changeNode : account.receiveNode,
+          utxo.chain,
+          utxo.index,
+        );
+        if (derived.address !== utxo.address) {
+          throw new Error(
+            `UTXO address mismatch at ${utxo.chain}/${utxo.index}: ` +
+              `expected ${derived.address}, got ${utxo.address}`,
+          );
+        }
+        const internalPubkey = hex.decode(derived.internalPubkeyHex);
+        const payment = btc.p2tr(internalPubkey, undefined, HD_WALLET_NETWORK);
+        tx.addInput({
+          txid: utxo.txid,
+          index: utxo.vout,
+          witnessUtxo: { script: payment.script, amount: BigInt(utxo.value) },
+          tapInternalKey: internalPubkey,
+        });
+        inputDescriptors.push({ kind: 'bip86', chain: utxo.chain, index: utxo.index });
+
+        if (recipient.kind === 'sp') {
+          const leaf = deriveLeafPrivateKey(account, utxo.chain, utxo.index);
+          const tweaked = bip86TweakedPrivateKey(leaf);
+          leaf.fill(0);
+          wipeAfterBuild.push(tweaked);
+          spSenderInputs.push({
+            txid: utxo.txid,
+            vout: utxo.vout,
+            privateKey: tweaked,
+            isTaproot: true,
+          });
+        }
+      } else {
+        if (!bSpend) {
+          throw new Error('SP input requires b_spend (unreachable).');
+        }
+        const utxo = input.utxo;
+        const tweak = hexToBytes(utxo.tweakHex);
+        const xonly = deriveSpUtxoXOnly(bSpend, tweak);
+        const script = spP2trScriptPubKey(xonly);
+        tx.addInput({
+          txid: utxo.txid,
+          index: utxo.vout,
+          witnessUtxo: { script, amount: BigInt(utxo.value) },
+        });
+        inputDescriptors.push({ kind: 'sp', tweakHex: utxo.tweakHex });
+        consumedSpUtxos.push({ txid: utxo.txid, vout: utxo.vout });
+
+        if (recipient.kind === 'sp') {
+          const dk = deriveSpUtxoSigningKey(bSpend, tweak);
+          wipeAfterBuild.push(dk);
+          spSenderInputs.push({
+            txid: utxo.txid,
+            vout: utxo.vout,
+            privateKey: dk,
+            isTaproot: true,
+          });
+        }
+      }
+    }
+
+    let resolvedRecipientAddress: string;
+    if (recipient.kind === 'address') {
+      resolvedRecipientAddress = recipient.address;
+      tx.addOutputAddress(recipient.address, BigInt(preview.amountSats), HD_WALLET_NETWORK);
+    } else {
+      if (spSenderInputs.length === 0) {
+        throw new Error('Silent-payment max spend needs at least one input.');
+      }
+      const outputs = deriveSilentPaymentOutputs(
+        spSenderInputs,
+        [{ address: decodeSilentPaymentAddress(recipient.spAddress), raw: recipient.spAddress }],
+        { network: 'mainnet' },
+      );
+      if (outputs.length !== 1) {
+        throw new Error('Silent-payment derivation returned unexpected number of outputs.');
+      }
+      const out: SpSenderOutput = outputs[0];
+      tx.addOutput({ script: spP2trScriptPubKey(out.xOnlyPubKey), amount: BigInt(preview.amountSats) });
+      resolvedRecipientAddress = out.address;
+    }
+
+    return {
+      psbtHex: txToPsbtHex(tx),
+      fee: preview.fee,
+      amountSats: preview.amountSats,
+      totalInput: preview.totalInput,
+      inputDescriptors,
+      resolvedRecipientAddress,
+      consumedSpUtxos,
+    };
+  } finally {
+    for (const buf of wipeAfterBuild) buf.fill(0);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Sweep — drain every input into one output
 // ---------------------------------------------------------------------------
@@ -822,4 +1033,3 @@ export function buildHdSweepPsbt(args: BuildHdSweepArgs): HdSweepPsbt {
     if (bSpend) bSpend.fill(0);
   }
 }
-

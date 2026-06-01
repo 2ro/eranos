@@ -1670,6 +1670,7 @@
   "walletSend": {
     "title": "Отправить Bitcoin",
     "send": "Отправить Bitcoin",
+    "max": "MAX",
     "tapAgainToConfirm": "Нажмите ещё раз для подтверждения",
     "satPerVB": "{{rate}} сат/vB",
     "notEnoughBitcoin": "Недостаточно биткоинов",
