@@ -166,9 +166,9 @@ export function CampaignListsStrip() {
   if (isLoading && lists.length === 0) {
     return (
       <section className="space-y-3" aria-label={t('campaigns.lists.stripAria')}>
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+        <div className="flex flex-wrap gap-2">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-10 w-32 rounded-full shrink-0" />
+            <Skeleton key={i} className="h-10 w-32 rounded-full" />
           ))}
         </div>
       </section>
@@ -186,7 +186,7 @@ export function CampaignListsStrip() {
         className="space-y-3"
         aria-label={t('campaigns.lists.stripAria')}
       >
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 [scrollbar-width:thin]">
+        <div className="flex flex-wrap gap-2">
           {displayed.map((list, idx) => (
             <ListPill
               key={list.aTag}
