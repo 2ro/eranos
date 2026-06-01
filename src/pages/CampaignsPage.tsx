@@ -181,22 +181,23 @@ export function CampaignsPage() {
   }, [recentCampaigns, hiddenCampaignsRaw, moderation]);
 
   // "All campaigns" section — the recent stream (capped at 200 by
-  // useCampaigns above) minus anything currently hidden, sorted by
-  // creation time descending. Featured campaigns DO appear here too;
-  // they're not removed from the chronological feed just because
-  // they earned a hero slot. Each card still picks up the WLC
-  // Verified chip if its coord is in `featuredCoordSet`. The
-  // `/campaigns` page is the canonical "all campaigns" surface with
-  // search and sort — this section just gives the home page enough
-  // chronological depth that visitors can see what's happening
-  // without an extra click.
+  // useCampaigns above) minus anything currently hidden AND minus
+  // anything already shown in the Verified hero row above, sorted by
+  // creation time ascending (oldest first; true chronological order,
+  // not reverse-chronological). Over-cap featured campaigns DO
+  // appear here — they didn't earn a hero slot, but the WLC chip
+  // still rides along on each card whose coord is in
+  // `featuredCoordSet`. The `/campaigns` page remains the canonical
+  // search and sort surface; this section just gives the home page
+  // chronological depth without an extra click.
   const allCampaignsChronological = useMemo<ParsedCampaign[]>(() => {
     if (!recentCampaigns) return [];
     const hiddenSet = moderation?.hiddenCoords ?? new Set<string>();
+    const heroSet = new Set(orderedFeatured.map((c) => c.aTag));
     return [...recentCampaigns]
-      .filter((c) => !hiddenSet.has(c.aTag))
-      .sort((a, b) => b.createdAt - a.createdAt);
-  }, [recentCampaigns, moderation]);
+      .filter((c) => !hiddenSet.has(c.aTag) && !heroSet.has(c.aTag))
+      .sort((a, b) => a.createdAt - b.createdAt);
+  }, [recentCampaigns, moderation, orderedFeatured]);
 
   const featuredEmpty =
     moderationReady && featuredCoords.length === 0 && !featuredLoading;
