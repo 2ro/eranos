@@ -1,5 +1,4 @@
-import { useCallback, useMemo } from 'react';
-import type { ReactNode } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -9,16 +8,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
+import { CampaignListsStrip } from '@/components/campaign-lists/CampaignListsStrip';
 import { HeroLightningMap } from '@/components/HeroLightningMap';
 import { StartCampaignLink } from '@/components/StartCampaignLink';
-import { ModeratorCollapsibleSection, ReorderableCampaignGrid, ReorderProvider } from '@/components/moderation';
+import { ModeratorCollapsibleSection, ReorderableCampaignGrid } from '@/components/moderation';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useReorderCampaign } from '@/hooks/useReorderCampaign';
-import { useToast } from '@/hooks/useToast';
 import { genUserName } from '@/lib/genUserName';
 import { useAppContext } from '@/hooks/useAppContext';
 import type { ParsedCampaign } from '@/lib/campaign';
@@ -53,22 +51,22 @@ const WLC_NPUB = 'npub126e6hwd6a5std2upv9a22xwgvd8fyrhsx5wjjchv99g6nv3n4vhs5fr9g
 /**
  * Home page (`/`).
  *
- * Two public sections plus one moderator-only section:
+ * Three sections (last is moderator-only):
  *
  *  1. **Featured** — moderator-curated, ordered by the moderator's
- *     chosen rank (newest-by-rank first). No cap. Visible to
- *     everyone. The empty state replaces the section when no
+ *     chosen rank (newest-by-rank first). Capped at FEATURED_CAP for
+ *     visual weight. The empty state replaces the section when no
  *     campaign is currently featured.
- *  2. **Browse all** — a single link to `/campaigns`, the full
- *     discoverable set with search / sort / country filters.
+ *  2. **Topic-list strip + Browse all** — the curated
+ *     {@link CampaignListsStrip} (moderator-managed topic pills) plus
+ *     a single CTA to `/campaigns`, the full discoverable set with
+ *     search / sort / country filters. The previous chronological
+ *     "All campaigns" grid on this page was retired: the strip is a
+ *     better editorial hand-off than an unsorted feed, and the
+ *     dedicated `/campaigns` page already does breadth well.
  *  3. **Hidden** — moderator-only, collapsed by default so the page
  *     doesn't lead with suppressed content for the people
  *     responsible for it.
- *
- * The previous Community / Pending sections were retired alongside
- * the approval axis: featuring is now the single positive-curation
- * mechanism, and `/campaigns` is the censorship-resistant browse
- * surface.
  *
  * Hidden-campaign coverage: a hidden campaign older than the recent
  * stream window would drop off a `limit:` query, so we issue a
@@ -84,8 +82,6 @@ export function CampaignsPage() {
   const { t } = useTranslation();
   const { config } = useAppContext();
   const { user } = useCurrentUser();
-  const reorder = useReorderCampaign();
-  const { toast } = useToast();
   const wlcAuthor = useAuthor(WLC_PUBKEY);
   const wlcName = wlcAuthor.data?.metadata?.display_name
     || wlcAuthor.data?.metadata?.name
@@ -103,8 +99,7 @@ export function CampaignsPage() {
   // Featured slot list — derived from moderation labels. Sorted by
   // the moderator-controlled rank (descending); hidden coords
   // removed so a featured-then-hidden campaign disappears from the
-  // row. The full list drives the WLC chip on every featured card
-  // wherever it appears; the row itself is capped separately below.
+  // row.
   const featuredCoords = useMemo(() => {
     if (!moderation) return [] as string[];
     return Array.from(moderation.featuredCoords)
@@ -112,13 +107,10 @@ export function CampaignsPage() {
       .sort((a, b) => (moderation.featuredOrder.get(b) ?? 0) - (moderation.featuredOrder.get(a) ?? 0));
   }, [moderation]);
 
-  // Fast O(1) lookup used by the "All campaigns" section to decide
-  // whether each card gets the WLC Verified chip.
-  const featuredCoordSet = useMemo(() => new Set(featuredCoords), [featuredCoords]);
-
   // Visible Featured row — capped at FEATURED_CAP. The rest are
-  // still featured (and still get the chip elsewhere), but they
-  // don't appear in the dedicated hero row.
+  // still featured (and still get the chip elsewhere via the
+  // moderator-facing /campaigns surface), but they don't appear in
+  // the dedicated hero row on the home page.
   const cappedFeaturedCoords = useMemo(
     () => featuredCoords.slice(0, FEATURED_CAP),
     [featuredCoords],
@@ -145,8 +137,8 @@ export function CampaignsPage() {
   }, [featuredCampaigns, cappedFeaturedCoords, moderation]);
 
   // Recent stream — the latest 200 campaign events on the network.
-  // Source for the Hidden section (which can also pull from the
-  // targeted hidden-coord query below).
+  // Used by the moderator-only Hidden section below as a union source
+  // alongside the targeted hidden-coord query.
   const { data: recentCampaigns, isLoading: recentLoading } = useCampaigns({
     limit: 200,
   });
@@ -185,70 +177,6 @@ export function CampaignsPage() {
       .filter((c) => moderation.hiddenCoords.has(c.aTag))
       .sort((a, b) => b.createdAt - a.createdAt);
   }, [recentCampaigns, hiddenCampaignsRaw, moderation]);
-
-  // "All campaigns" section — the recent stream (capped at 200 by
-  // useCampaigns above) minus anything currently hidden AND minus
-  // anything already shown in the Verified hero row above, sorted by
-  // creation time ascending (oldest first; true chronological order,
-  // not reverse-chronological). Over-cap featured campaigns DO
-  // appear here — they didn't earn a hero slot, but the WLC chip
-  // still rides along on each card whose coord is in
-  // `featuredCoordSet`. The `/campaigns` page remains the canonical
-  // search and sort surface; this section just gives the home page
-  // chronological depth without an extra click.
-  const allCampaignsChronological = useMemo<ParsedCampaign[]>(() => {
-    if (!recentCampaigns) return [];
-    const hiddenSet = moderation?.hiddenCoords ?? new Set<string>();
-    const heroSet = new Set(orderedFeatured.map((c) => c.aTag));
-    return [...recentCampaigns]
-      .filter((c) => !hiddenSet.has(c.aTag) && !heroSet.has(c.aTag))
-      .sort((a, b) => a.createdAt - b.createdAt);
-  }, [recentCampaigns, moderation, orderedFeatured]);
-
-  // Reorder handlers for over-cap featured campaigns that surface in
-  // the chronological "All campaigns" section. They mirror the move
-  // operations on `ReorderableCampaignGrid`, but operate against the
-  // *full* featuredCoords list so a card at position 12 can move to
-  // position 11 (or to the top, promoting it into the visible cap).
-  // No optimistic local reorder here: the chronological grid is
-  // sorted by createdAt, not by featured rank, so a successful move
-  // changes which cards appear in the Verified row above — which
-  // re-renders automatically once the moderation pack invalidates
-  // and refetches. Failure surfaces as a toast, matching
-  // ReorderableCampaignGrid.
-  const onFeaturedMoveToTop = useCallback(
-    async (coord: string) => {
-      try {
-        await reorder.moveToTop(coord, featuredCoords);
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : 'Unknown error';
-        toast({ title: t('moderation.menu.failedReorder'), description: msg, variant: 'destructive' });
-      }
-    },
-    [reorder, featuredCoords, toast, t],
-  );
-  const onFeaturedMoveUp = useCallback(
-    async (coord: string) => {
-      try {
-        await reorder.moveUp(coord, featuredCoords);
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : 'Unknown error';
-        toast({ title: t('moderation.menu.failedReorder'), description: msg, variant: 'destructive' });
-      }
-    },
-    [reorder, featuredCoords, toast, t],
-  );
-  const onFeaturedMoveDown = useCallback(
-    async (coord: string) => {
-      try {
-        await reorder.moveDown(coord, featuredCoords);
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : 'Unknown error';
-        toast({ title: t('moderation.menu.failedReorder'), description: msg, variant: 'destructive' });
-      }
-    },
-    [reorder, featuredCoords, toast, t],
-  );
 
   const featuredEmpty =
     moderationReady && featuredCoords.length === 0 && !featuredLoading;
@@ -309,73 +237,24 @@ export function CampaignsPage() {
           </section>
         )}
 
-        {/* All campaigns — the chronological feed under the Featured
-            hero. Everything that's not hidden, newest-first. Featured
-            campaigns repeat here (they still carry the WLC chip via
-            `featuredCoordSet`); the goal is breadth, not curation.
-            The dedicated /campaigns page is still the canonical search
-            and sort surface, linked from the footer below. */}
+        {/* Curated topic-list strip + CTA to the full /campaigns
+            browse surface. Replaces the previous chronological "All
+            campaigns" grid on this page — the canonical breadth-view
+            is `/campaigns`, which already carries search, sort, and
+            country filters. Keeping the home page to one tightly
+            curated row above the strip (Verified) plus the strip
+            itself makes the editorial hierarchy obvious: WLC's
+            chosen heroes → moderator topics → click through for the
+            full catalogue. */}
         <section className="space-y-5">
-          <div className="flex items-end justify-between gap-4 flex-wrap">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                {t('campaigns.home.allCampaigns')}
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {t('campaigns.home.allCampaignsDesc')}
-              </p>
-            </div>
-          </div>
+          <CampaignListsStrip />
 
-          {recentLoading && allCampaignsChronological.length === 0 ? (
-            <CampaignGridSkeleton />
-          ) : allCampaignsChronological.length === 0 ? (
-            <EmptyState />
-          ) : (
-            // Moderators get reorder rows on every featured card's
-            // kebab here so over-cap featured campaigns (the ones
-            // not shown in the visible Verified row above) can still
-            // be moved up, down, or to the top. The provider's coord
-            // list is the FULL featuredCoords — positions 7..N are
-            // exactly what we need to act on. Non-featured cards
-            // aren't in byCoord, so their kebab simply doesn't show
-            // reorder rows. Non-mods skip the provider entirely.
-            <ConditionalReorderProvider
-              enabled={isMod}
-              coords={featuredCoords}
-              onMoveToTop={onFeaturedMoveToTop}
-              onMoveUp={onFeaturedMoveUp}
-              onMoveDown={onFeaturedMoveDown}
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {allCampaignsChronological.map((campaign) => (
-                  <CampaignCard
-                    key={campaign.aTag}
-                    campaign={campaign}
-                    verifiedBy={
-                      featuredCoordSet.has(campaign.aTag)
-                        ? {
-                          pubkey: WLC_PUBKEY,
-                          npub: WLC_NPUB,
-                          defaultName: 'World Liberty Congress',
-                          shortLabel: 'WLC',
-                        }
-                        : undefined
-                    }
-                  />
-                ))}
-              </div>
-            </ConditionalReorderProvider>
-          )}
-
-          {/* Gateway to the full, censorship-resistant /campaigns
-              surface with search and sort. The home stream is
-              capped at the recent-200 window; users who want
-              everything (and the ability to filter) follow this
-              link. */}
-          <div className="pt-2 text-center sm:text-left">
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/campaigns">{t('campaigns.home.browseAll')}</Link>
+          <div className="pt-2 flex justify-center sm:justify-start">
+            <Button asChild size="lg" variant="outline" className="rounded-full">
+              <Link to="/campaigns">
+                {t('campaigns.home.browseAll')}
+                <ArrowRight className="ml-2 size-4 rtl:rotate-180" />
+              </Link>
             </Button>
           </div>
         </section>
@@ -630,41 +509,6 @@ function CampaignGridSkeleton() {
         <CampaignCardSkeleton key={i} />
       ))}
     </div>
-  );
-}
-
-/**
- * Mounts a `ReorderProvider` only when `enabled` is true. Lets the
- * All Campaigns section conditionally expose featured-list reorder
- * controls to moderators without paying for a provider on every
- * visitor's render. When disabled, children render unchanged and no
- * reorder context is published.
- */
-function ConditionalReorderProvider({
-  enabled,
-  coords,
-  onMoveToTop,
-  onMoveUp,
-  onMoveDown,
-  children,
-}: {
-  enabled: boolean;
-  coords: readonly string[];
-  onMoveToTop: (coord: string) => Promise<void> | void;
-  onMoveUp: (coord: string) => Promise<void> | void;
-  onMoveDown: (coord: string) => Promise<void> | void;
-  children: ReactNode;
-}) {
-  if (!enabled) return <>{children}</>;
-  return (
-    <ReorderProvider
-      coords={coords}
-      onMoveToTop={onMoveToTop}
-      onMoveUp={onMoveUp}
-      onMoveDown={onMoveDown}
-    >
-      {children}
-    </ReorderProvider>
   );
 }
 
