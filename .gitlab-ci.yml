@@ -37,12 +37,12 @@ deploy-web:
     - if: $CI_COMMIT_TAG
       when: never
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && $DEPLOY_SSH_KEY && $DEPLOY_TARGET
-  variables:
-    # Vite inlines VITE_* env vars at build time. Sourced from GitLab CI/CD
-    # variables so values can be rotated without a code change.
-    VITE_TRANSLATE_WORKER_URL: $VITE_TRANSLATE_WORKER_URL
-    VITE_PLAUSIBLE_DOMAIN: $VITE_PLAUSIBLE_DOMAIN
-    VITE_PLAUSIBLE_ENDPOINT: $VITE_PLAUSIBLE_ENDPOINT
+  # Vite inlines VITE_* env vars at build time. These are sourced directly from
+  # project-level CI/CD variables, which are already present in the job
+  # environment — do NOT re-declare them here as `KEY: $KEY`. That self-reference
+  # overwrites the real value with the literal string "$KEY" whenever the source
+  # variable is out of scope (e.g. a Protected variable on an unprotected ref),
+  # which is how "$VITE_TRANSLATE_WORKER_URL" leaked into the built app.
   script:
     # Build the web app
     - npm ci
