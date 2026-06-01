@@ -102,6 +102,8 @@ export interface EncryptedSettings {
   aiModel?: string;
   /** Override the AI system prompt for the Agent */
   aiSystemPrompt?: string;
+  /** Custom translation worker URL (only synced when non-empty) */
+  translateWorkerUrl?: string;
 }
 
 /**

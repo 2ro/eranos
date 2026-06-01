@@ -3,10 +3,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
+import { useAppContext } from "@/hooks/useAppContext";
 import { prepareForTranslation, restoreTokens } from "@/lib/prepareTranslation";
 import { cn } from "@/lib/utils";
-
-const DEFAULT_TRANSLATE_WORKER_URL = "https://agora-translate.mk-cc1.workers.dev";
 
 const LANG_MAP: Record<string, string> = {
   en: "EN-US",
@@ -54,6 +53,7 @@ export function TranslateButton({
   className,
 }: TranslateButtonProps) {
   const { t, i18n } = useTranslation();
+  const { config } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -66,6 +66,9 @@ export function TranslateButton({
 
     if (!text.trim()) return;
 
+    const translateUrl = config.translateWorkerUrl.trim();
+    if (!translateUrl) return;
+
     setLoading(true);
     setError(false);
 
@@ -73,7 +76,6 @@ export function TranslateButton({
       const languagePrefix = i18n.language.split("-")[0].toLowerCase();
       const targetLang = LANG_MAP[languagePrefix] ?? "EN-US";
       const prepared = (texts && texts.length > 0 ? texts : [text]).map(prepareForTranslation);
-      const translateUrl = import.meta.env.VITE_TRANSLATE_WORKER_URL ?? DEFAULT_TRANSLATE_WORKER_URL;
 
       const response = await fetch(translateUrl, {
         method: "POST",
@@ -99,6 +101,9 @@ export function TranslateButton({
       setLoading(false);
     }
   };
+
+  // No translation worker configured — hide the button entirely.
+  if (!config.translateWorkerUrl.trim()) return null;
 
   return (
     <Button

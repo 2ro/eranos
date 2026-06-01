@@ -123,6 +123,7 @@ export function TestApp({ children }: TestAppProps) {
     aiApiKey: '',
     aiModel: 'google/gemma-4-26b',
     aiSystemPrompt: '',
+    translateWorkerUrl: '',
   };
 
   return (

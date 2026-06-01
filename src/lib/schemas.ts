@@ -178,6 +178,7 @@ export const AppConfigSchema = z.object({
   aiApiKey: z.string().optional(),
   aiModel: z.string().optional(),
   aiSystemPrompt: z.string().optional(),
+  translateWorkerUrl: z.string().optional(),
 });
 
 // ─── BuildConfigSchema (build-time app config) ───────────────────────
@@ -277,4 +278,5 @@ export const EncryptedSettingsSchema = z.looseObject({
   aiApiKey: z.string().optional(),
   aiModel: z.string().optional(),
   aiSystemPrompt: z.string().optional(),
+  translateWorkerUrl: z.string().optional(),
 });

@@ -162,6 +162,7 @@ const hardcodedConfig: AppConfig = {
   aiApiKey: '',
   aiModel: 'google/gemma-4-26b',
   aiSystemPrompt: '',
+  translateWorkerUrl: import.meta.env.VITE_TRANSLATE_WORKER_URL || '',
 };
 
 /**

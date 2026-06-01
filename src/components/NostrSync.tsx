@@ -367,6 +367,14 @@ export function NostrSync() {
         changed = true;
       }
 
+      if (
+        encryptedSettings.translateWorkerUrl &&
+        encryptedSettings.translateWorkerUrl !== current.translateWorkerUrl
+      ) {
+        updates.translateWorkerUrl = encryptedSettings.translateWorkerUrl;
+        changed = true;
+      }
+
       // Return the same reference if nothing changed to prevent re-render
       return changed ? updates : current;
     });

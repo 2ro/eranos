@@ -379,6 +379,13 @@ export interface AppConfig {
   aiModel: string;
   /** Custom system prompt for the Agent. Empty string = use the default template. */
   aiSystemPrompt: string;
+  /**
+   * URL of the DeepL-backed Cloudflare Worker used to translate user-generated
+   * content (the "Translate" button on notes). Defaults to the build-time
+   * `VITE_TRANSLATE_WORKER_URL` env value. Empty string falls back to the
+   * hardcoded worker URL in the translate flow.
+   */
+  translateWorkerUrl: string;
 }
 
 /** Configuration for a single widget in the right sidebar. */

@@ -17,6 +17,9 @@ import { DEFAULT_SYSTEM_PROMPT_TEMPLATE } from '@/lib/aiChatSystemPrompt';
 const DEFAULT_AI_BASE_URL = 'https://ai.shakespeare.diy/v1';
 const DEFAULT_AI_MODEL = 'google/gemma-4-26b';
 
+/** Build-time default translation worker URL from the environment variable. */
+const DEFAULT_TRANSLATE_WORKER_URL = import.meta.env.VITE_TRANSLATE_WORKER_URL || '';
+
 /** The build-time default DSN from the environment variable. */
 const DEFAULT_SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || '';
 
@@ -34,6 +37,7 @@ export function AdvancedSettings() {
   const [faviconUrl, setFaviconUrl] = useState(config.faviconUrl);
   const [linkPreviewUrl, setLinkPreviewUrl] = useState(config.linkPreviewUrl);
   const [corsProxy, setCorsProxy] = useState(config.corsProxy);
+  const [translateWorkerUrl, setTranslateWorkerUrl] = useState(config.translateWorkerUrl);
   const [sentryDsn, setSentryDsn] = useState(config.sentryDsn);
   const [baseUrlDraft, setBaseUrlDraft] = useState(config.aiBaseURL);
   const [apiKeyDraft, setApiKeyDraft] = useState(config.aiApiKey);
@@ -398,6 +402,40 @@ export function AdvancedSettings() {
                   <span className="font-medium">Default: </span>
                   <span className="font-mono break-all">https://proxy.shakespeare.diy/?url={'{href}'}</span>
                 </div>
+              </div>
+
+              {/* Translation Worker URL */}
+              <div>
+                <Label htmlFor="translate-worker-url" className="text-sm font-medium">
+                  Translation Worker URL
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  DeepL-backed worker endpoint used by the "Translate" button on notes. Receives a POST with the text and target language. Leave empty to disable translation.
+                </p>
+                <Input
+                  id="translate-worker-url"
+                  type="url"
+                  value={translateWorkerUrl}
+                  onChange={(e) => setTranslateWorkerUrl(e.target.value)}
+                  onBlur={async () => {
+                    const trimmed = translateWorkerUrl.trim();
+                    if (trimmed !== config.translateWorkerUrl) {
+                      updateConfig(() => ({ translateWorkerUrl: trimmed }));
+                      if (user) await updateSettings.mutateAsync({ translateWorkerUrl: trimmed });
+                      toast({ title: trimmed ? 'Translation worker URL updated' : 'Translation disabled' });
+                    }
+                  }}
+                  placeholder={DEFAULT_TRANSLATE_WORKER_URL || 'https://example.workers.dev'}
+                  className="font-mono text-base md:text-sm"
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+                {DEFAULT_TRANSLATE_WORKER_URL && (
+                  <div className="text-xs text-muted-foreground mt-2">
+                    <span className="font-medium">Default: </span>
+                    <span className="font-mono break-all">{DEFAULT_TRANSLATE_WORKER_URL}</span>
+                  </div>
+                )}
               </div>
             </div>
           </CollapsibleContent>
