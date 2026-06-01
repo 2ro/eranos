@@ -139,9 +139,9 @@ export function CreateCampaignPage() {
   // and userAuthor re-renders with data).
   const profileGateFiredRef = useRef(false);
 
-  // If a logged-in user navigates to /campaigns/new without a kind-0 profile,
-  // open the onboarding profile step so they set a name before the campaign
-  // wizard loads. Only runs once per page mount and only in create mode.
+  // If a logged-in user navigates to /campaigns/new without a campaign-ready
+  // kind-0 profile, open the required profile step before the campaign wizard.
+  // Only runs once per page mount and only in create mode.
   const editNaddr = searchParams.get('edit');
   const isEditMode = !!editNaddr;
 
@@ -152,10 +152,20 @@ export function CreateCampaignPage() {
     if (profileGateFiredRef.current) return;
     if (onboardingActive) return;
 
-    const hasProfile = !!(userMetadata?.name || userMetadata?.display_name);
+    const hasDisplayName = !!(userMetadata?.name || userMetadata?.display_name);
+    const hasAvatar = !!userMetadata?.picture;
+    const hasProfile = hasDisplayName && hasAvatar;
     if (!hasProfile) {
       profileGateFiredRef.current = true;
-      startSignup({ role: 'creator', skipToProfile: true });
+      startSignup({
+        role: 'creator',
+        skipToProfile: true,
+        initialProfileData: {
+          name: userMetadata?.name ?? userMetadata?.display_name ?? '',
+          about: userMetadata?.about ?? '',
+          picture: userMetadata?.picture ?? '',
+        },
+      });
     }
   }, [isEditMode, user, userAuthor.isLoading, userMetadata, onboardingActive, startSignup]);
 
@@ -1022,6 +1032,8 @@ export function CreateCampaignPage() {
       submitting={submitMutation.isPending || coverUploading}
       onSubmit={handleSubmit}
       onClose={() => navigate(-1)}
+      progressOffset={1}
+      totalProgressSteps={7}
     />
   );
 }

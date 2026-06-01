@@ -25,6 +25,8 @@ import {
   X,
 } from 'lucide-react';
 import { generateSecretKey, getPublicKey, nip19 } from 'nostr-tools';
+import { useNostr } from '@nostrify/react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { AgoraBoltIcon } from '@/components/icons/AgoraBoltIcon';
 import { Button } from '@/components/ui/button';
@@ -37,21 +39,23 @@ import { useOnboarding, type OnboardingRole } from '@/contexts/onboardingContext
 import { useToast } from '@/hooks/useToast';
 import { useUploadFile } from '@/hooks/useUploadFile';
 import { downloadTextFile } from '@/lib/downloadFile';
+import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { cn } from '@/lib/utils';
 
 /**
  * Step state machine for the captive signup flow.
  *
  * Order:
- *   keygen → secure → profile → role
+ *   keygen → secure → role
  *
- * Four screens total. The old flow had a separate "wallet-coupling explainer"
+ * Three screens total. The old flow had a separate "wallet-coupling explainer"
  * step and a separate "outro" celebration screen; both were folded in. The
  * coupling explainer was redundant with `secure` (both screens are about the
  * key), so the secure step now carries the "this key is your account AND
  * your wallet" framing inline. The outro was a glorified tap-to-continue —
  * the role step's primary button already navigates somewhere meaningful, so
- * the role pick *is* the outro.
+ * the role pick *is* the outro. Profile setup is only shown as a required
+ * campaign-creator gate before `/campaigns/new`.
  *
  * Login is handled by the existing `AuthDialog` modal — the captive flow is
  * only ever opened by an explicit `startSignup()` call (e.g. from
@@ -60,7 +64,8 @@ import { cn } from '@/lib/utils';
  */
 type Step = 'keygen' | 'secure' | 'profile' | 'role';
 
-const STEPS: Step[] = ['keygen', 'secure', 'profile', 'role'];
+const SIGNUP_STEPS: Step[] = ['keygen', 'secure', 'role'];
+const CAMPAIGN_PROFILE_TOTAL_STEPS = 7;
 
 /**
  * The captive onboarding gate. Render this as a sibling of `<AppRouter />`;
@@ -70,8 +75,7 @@ const STEPS: Step[] = ['keygen', 'secure', 'profile', 'role'];
  * The flow guides a brand-new user through:
  *   1. Key generation
  *   2. Save the nsec (with inline wallet-coupling framing)
- *   3. Optional profile metadata (kind 0)
- *   4. Role pick — primary CTA navigates by intent: creator → /campaigns/new,
+ *   3. Role pick — primary CTA navigates by intent: creator → /campaigns/new,
  *      donor → / (campaign grid)
  *
  * The overlay sits above all app chrome and cannot be dismissed by clicking
@@ -93,8 +97,10 @@ export function OnboardingGate({ children }: { children: ReactNode }) {
  *  per-flow state resets cleanly between sessions. */
 function CaptiveOverlay() {
   const { t } = useTranslation();
-  const { cancel, role: contextRole, setRole: setContextRole, skipToProfile } = useOnboarding();
+  const { cancel, role: contextRole, setRole: setContextRole, skipToProfile, initialProfileData } = useOnboarding();
   const navigate = useNavigate();
+  const { nostr } = useNostr();
+  const queryClient = useQueryClient();
   const { toast } = useToast();
   const login = useLoginActions();
   const { user } = useCurrentUser();
@@ -118,15 +124,26 @@ function CaptiveOverlay() {
   const [nsec, setNsec] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [showKey, setShowKey] = useState(false);
-  const [profileData, setProfileData] = useState({ name: '', about: '', picture: '' });
+  const [profileData, setProfileData] = useState({
+    name: initialProfileData.name ?? '',
+    about: initialProfileData.about ?? '',
+    picture: initialProfileData.picture ?? '',
+  });
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   // Linear progress bar position. Every step in the machine counts toward
-  // the bar — there's no longer a non-funnel "welcome" step to skip.
-  const currentProgressIndex = STEPS.indexOf(step);
-  const progress = currentProgressIndex < 0
-    ? 0
-    : ((currentProgressIndex + 1) / STEPS.length) * 100;
+  // the bar. Campaign profile setup is step 1 of the larger campaign flow,
+  // so its progress aligns with the campaign wizard that follows it.
+  const progress = (() => {
+    if (step === 'profile' && skipToProfile && contextRole === 'creator') {
+      return (1 / CAMPAIGN_PROFILE_TOTAL_STEPS) * 100;
+    }
+
+    const currentProgressIndex = SIGNUP_STEPS.indexOf(step);
+    return currentProgressIndex < 0
+      ? 0
+      : ((currentProgressIndex + 1) / SIGNUP_STEPS.length) * 100;
+  })();
 
   // Navigation helpers ------------------------------------------------------
   const goTo = useCallback((target: Step) => {
@@ -176,7 +193,7 @@ function CaptiveOverlay() {
       const filename = `nostr-${location.hostname.replaceAll(/\./g, '-')}-${npub.slice(5, 9)}.nsec.txt`;
       await downloadTextFile(filename, nsec);
       login.nsec(nsec);
-      goTo('profile');
+      goTo('role');
     } catch {
       toast({
         title: t('onboarding.secure.downloadFailedTitle'),
@@ -217,12 +234,19 @@ function CaptiveOverlay() {
   const finishProfile = useCallback(
     async (skip: boolean) => {
       try {
-        if (!skip && (profileData.name || profileData.about || profileData.picture)) {
-          const metadata: Record<string, string> = {};
-          if (profileData.name) metadata.name = profileData.name;
-          if (profileData.about) metadata.about = profileData.about;
-          if (profileData.picture) metadata.picture = profileData.picture;
-          await publishEvent({ kind: 0, content: JSON.stringify(metadata) });
+        if (!skip && user && (profileData.name || profileData.about || profileData.picture)) {
+          const prev = await fetchFreshEvent(nostr, { kinds: [0], authors: [user.pubkey] });
+          const metadata = parseProfileMetadata(prev?.content);
+          const name = profileData.name.trim();
+          const about = profileData.about.trim();
+          const picture = profileData.picture.trim();
+
+          if (name) metadata.name = name;
+          if (about) metadata.about = about;
+          if (picture) metadata.picture = picture;
+
+          await publishEvent({ kind: 0, content: JSON.stringify(metadata), prev: prev ?? undefined });
+          void queryClient.invalidateQueries({ queryKey: ['author', user.pubkey] });
         }
       } catch {
         toast({
@@ -243,7 +267,7 @@ function CaptiveOverlay() {
         }
       }
     },
-    [profileData, publishEvent, toast, t, goTo, skipToProfile, contextRole, cancel, navigate],
+    [profileData, user, nostr, publishEvent, queryClient, toast, t, goTo, skipToProfile, contextRole, cancel, navigate],
   );
 
   // Step renderer -----------------------------------------------------------
@@ -286,14 +310,14 @@ function CaptiveOverlay() {
         );
       case 'role':
         // Final step. Picking a role navigates to the matching surface
-        // (creator → /campaigns/new, donor → /); Back goes to profile if
-        // the user signed up through the full flow, or cancels the overlay
-        // if they were already-authenticated and landed here directly.
+        // (creator → /campaigns/new, donor → /); Back goes to secure if the
+        // user signed up through the full flow, or cancels the overlay if
+        // they were already-authenticated and landed here directly.
         return (
           <RoleStep
             role={contextRole}
             onPick={handleRolePick}
-            onBack={user ? cancel : () => goTo('profile')}
+            onBack={user ? cancel : () => goTo('secure')}
           />
         );
     }
@@ -596,6 +620,9 @@ function ProfileStep({
 }: ProfileStepProps) {
   const { t } = useTranslation();
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const nameProvided = data.name.trim().length > 0;
+  const avatarProvided = data.picture.trim().length > 0;
+  const canContinue = !campaignMode || (nameProvided && avatarProvided);
   return (
     <div className="space-y-6">
       <div className="space-y-2 text-center">
@@ -617,6 +644,8 @@ function ProfileStep({
             value={data.name}
             onChange={(e) => onChange({ name: e.target.value })}
             placeholder={t('onboarding.profile.namePlaceholder')}
+            required={campaignMode}
+            aria-required={campaignMode}
           />
         </div>
 
@@ -631,6 +660,8 @@ function ProfileStep({
               onChange={(e) => onChange({ picture: e.target.value })}
               placeholder="https://…"
               className="flex-1"
+              required={campaignMode}
+              aria-required={campaignMode}
             />
             <input
               type="file"
@@ -685,15 +716,32 @@ function ProfileStep({
       </div>
 
       <div className="space-y-2">
-        <Button onClick={onFinish} disabled={isPublishing} className="w-full h-12 rounded-full">
-          {isPublishing ? t('onboarding.profile.saving') : t('onboarding.profile.finish')}
+        <Button onClick={onFinish} disabled={isPublishing || !canContinue} className="w-full h-12 rounded-full">
+          {isPublishing ? t('onboarding.profile.saving') : t(campaignMode ? 'common.next' : 'onboarding.profile.finish')}
         </Button>
-        <Button variant="ghost" onClick={onSkip} disabled={isPublishing} className="w-full">
-          {t('onboarding.profile.skip')}
-        </Button>
+        {!campaignMode && (
+          <Button variant="ghost" onClick={onSkip} disabled={isPublishing} className="w-full">
+            {t('onboarding.profile.skip')}
+          </Button>
+        )}
       </div>
     </div>
   );
+}
+
+function parseProfileMetadata(content: string | undefined): Record<string, unknown> {
+  if (!content) return {};
+
+  try {
+    const parsed: unknown = JSON.parse(content);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed as Record<string, unknown>;
+    }
+  } catch {
+    // Invalid profile JSON should not block the user from setting required fields.
+  }
+
+  return {};
 }
 
 // =============================================================================

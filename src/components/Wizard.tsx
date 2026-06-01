@@ -22,6 +22,10 @@ export interface WizardProps {
   headingAriaLabel: string;
   /** 1-indexed list of steps. Length determines the total. */
   steps: WizardStep[];
+  /** Number of completed steps before this wizard starts. */
+  progressOffset?: number;
+  /** Total steps in the larger flow when this wizard follows another gate. */
+  totalProgressSteps?: number;
   /**
    * Optional lead content rendered above the first step's body. The
    * campaign wizard uses this for the "publishing under <org>" chip so
@@ -91,6 +95,8 @@ export interface WizardProps {
 export function Wizard({
   headingAriaLabel,
   steps,
+  progressOffset = 0,
+  totalProgressSteps,
   step1Lead,
   errorAlert,
   submitButtonContent,
@@ -104,9 +110,10 @@ export function Wizard({
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const totalSteps = steps.length;
+  const progressTotal = totalProgressSteps ?? totalSteps;
   const current = steps[step - 1];
   const isTerminal = step === totalSteps;
-  const progress = (step / totalSteps) * 100;
+  const progress = ((progressOffset + step) / progressTotal) * 100;
 
   const launchVisible = !!launchNowLabel && step >= launchAvailableFromStep;
   const canAdvance = canAdvanceFromStep(step);

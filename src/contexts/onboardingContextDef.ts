@@ -9,6 +9,12 @@ import { createContext, useContext } from 'react';
  */
 export type OnboardingRole = 'creator' | 'donor' | null;
 
+export interface OnboardingProfileData {
+  name: string;
+  about: string;
+  picture: string;
+}
+
 /** Options to pre-seed when invoking the captive flow from a specific CTA. */
 export interface StartSignupOptions {
   /**
@@ -23,6 +29,8 @@ export interface StartSignupOptions {
    * After the profile step completes the flow navigates based on `role`.
    */
   skipToProfile?: boolean;
+  /** Existing profile metadata used to prefill required campaign profile setup. */
+  initialProfileData?: Partial<OnboardingProfileData>;
 }
 
 export interface OnboardingContextValue {
@@ -35,6 +43,8 @@ export interface OnboardingContextValue {
    * already-logged-in user sees the profile step first.
    */
   skipToProfile: boolean;
+  /** Existing profile metadata passed in when the flow started. */
+  initialProfileData: Partial<OnboardingProfileData>;
   /** Begin the captive signup flow. Optionally pre-seed the role. */
   startSignup: (options?: StartSignupOptions) => void;
   /** Cancel and dismiss the overlay. Called from the gate when the user
