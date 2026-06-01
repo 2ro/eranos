@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAllCampaigns } from '@/hooks/useAllCampaigns';
+import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCampaignListActions } from '@/hooks/useCampaignListActions';
 import { toast } from '@/hooks/useToast';
@@ -36,6 +37,12 @@ interface AddCampaignToListDialogProps {
  * The search query is debounced and runs through {@link useAllCampaigns}.
  * Already-in-list campaigns are shown with a check mark and an
  * "already added" affordance instead of an Add button.
+ *
+ * Campaigns hidden via {@link useCampaignModeration} are filtered out
+ * entirely — a moderator shouldn't be encouraged to surface suppressed
+ * content into a curated list. (If a coord is already on the list and
+ * later gets hidden, it stays on the list but renders as the
+ * `member`-state row so a moderator can still see + remove it.)
  */
 export function AddCampaignToListDialog({
   open,
@@ -53,6 +60,20 @@ export function AddCampaignToListDialog({
     limit: 50,
     enabled: open,
   });
+
+  const { data: moderation } = useCampaignModeration();
+
+  // Filter out hidden campaigns. Existing list members that are hidden
+  // remain in the dialog so the moderator can spot them and unwind the
+  // membership — but freshly-searched hidden campaigns are dropped.
+  const visibleCampaigns = useMemo<ParsedCampaign[]>(() => {
+    const hiddenCoords = moderation?.hiddenCoords ?? new Set<string>();
+    if (hiddenCoords.size === 0) return campaigns;
+    const existingSet = new Set(existingCoords);
+    return campaigns.filter(
+      (c) => !hiddenCoords.has(c.aTag) || existingSet.has(c.aTag),
+    );
+  }, [campaigns, moderation, existingCoords]);
 
   const { addCampaignToList } = useCampaignListActions();
   const [pendingCoord, setPendingCoord] = useState<string | null>(null);
@@ -122,17 +143,17 @@ export function AddCampaignToListDialog({
         </div>
 
         <div className="flex-1 min-h-0 overflow-y-auto -mx-6 px-6 py-2">
-          {isLoading && campaigns.length === 0 ? (
+          {isLoading && visibleCampaigns.length === 0 ? (
             <div className="flex items-center justify-center py-12 text-muted-foreground">
               <Loader2 className="size-5 animate-spin" />
             </div>
-          ) : campaigns.length === 0 ? (
+          ) : visibleCampaigns.length === 0 ? (
             <div className="py-12 text-center text-sm text-muted-foreground">
               {t('campaigns.lists.searchEmpty')}
             </div>
           ) : (
             <ul className="divide-y divide-border">
-              {campaigns.map((campaign) => {
+              {visibleCampaigns.map((campaign) => {
                 const isMember = existingSet.has(campaign.aTag);
                 const isPending = pendingCoord === campaign.aTag;
                 return (

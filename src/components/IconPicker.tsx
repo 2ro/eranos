@@ -87,7 +87,10 @@ export function IconPicker({ open, onOpenChange, value, onSelect }: IconPickerPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80dvh] rounded-2xl flex flex-col overflow-hidden">
+      <DialogContent
+        className="max-w-2xl max-h-[80dvh] rounded-2xl flex flex-col overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         <DialogTitle>{t('campaigns.lists.iconPicker.title')}</DialogTitle>
         <DialogDescription className="text-sm text-muted-foreground">
           {t('campaigns.lists.iconPicker.description')}

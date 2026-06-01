@@ -94,7 +94,10 @@ export function ListFormDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={(o) => !submitting && onOpenChange(o)}>
-        <DialogContent className="max-w-md rounded-2xl">
+        <DialogContent
+          className="max-w-md rounded-2xl"
+          onClick={(e) => e.stopPropagation()}
+        >
           <DialogTitle>
             {mode === 'create'
               ? t('campaigns.lists.create')

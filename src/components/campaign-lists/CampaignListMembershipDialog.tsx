@@ -74,7 +74,17 @@ export function CampaignListMembershipDialog({
     };
   }, [optimistic, campaignCoord]);
 
-  const handleToggle = async (slug: string, currentlyMember: boolean) => {
+  const handleToggle = async (
+    slug: string,
+    currentlyMember: boolean,
+    event: React.MouseEvent,
+  ) => {
+    // The dialog is portaled but React's synthetic events still bubble
+    // through the React tree — without this, clicking a row inside the
+    // dialog would propagate to whichever <Link> wraps the card the
+    // moderator opened the kebab from and trigger a navigation.
+    event.preventDefault();
+    event.stopPropagation();
     setPendingSlug(slug);
     try {
       if (currentlyMember) {
@@ -135,7 +145,10 @@ export function CampaignListMembershipDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="max-w-md max-h-[80dvh] rounded-2xl flex flex-col overflow-hidden">
+        <DialogContent
+          className="max-w-md max-h-[80dvh] rounded-2xl flex flex-col overflow-hidden"
+          onClick={(e) => e.stopPropagation()}
+        >
           <DialogTitle>{t('campaigns.lists.membershipTitle')}</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
             {t('campaigns.lists.membershipDesc', { title: campaignTitle })}
@@ -178,7 +191,7 @@ export function CampaignListMembershipDialog({
                         variant={member ? 'secondary' : 'outline'}
                         size="sm"
                         disabled={pending}
-                        onClick={() => handleToggle(list.slug, member)}
+                        onClick={(e) => handleToggle(list.slug, member, e)}
                         className={cn('min-w-[88px] justify-center')}
                       >
                         {pending ? (
