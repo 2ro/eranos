@@ -22,7 +22,6 @@ import { StartCampaignLink } from '@/components/StartCampaignLink';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignList } from '@/hooks/useCampaignLists';
-import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { genUserName } from '@/lib/genUserName';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -127,23 +126,19 @@ export function CampaignsPage() {
       : { coordinates: [] },
   );
 
-  // Filter out hidden campaigns and reorder to match the list's
-  // declared order. `useCampaigns` returns events in network order
-  // which we override here so the hero row always reflects the
-  // moderator's intent.
-  const { data: moderation } = useCampaignModeration();
+  // Reorder to match the list's declared order. `useCampaigns` returns
+  // events in network order which we override here so the hero row always
+  // reflects the moderator's intent.
   const orderedCampaigns = useMemo<ParsedCampaign[]>(() => {
     if (!heroCampaigns || cappedCoords.length === 0) return [];
-    const hidden = moderation?.hiddenCoords ?? new Set<string>();
     const byCoord = new Map(heroCampaigns.map((c) => [c.aTag, c]));
     const out: ParsedCampaign[] = [];
     for (const coord of cappedCoords) {
-      if (hidden.has(coord)) continue;
       const found = byCoord.get(coord);
       if (found) out.push(found);
     }
     return out;
-  }, [heroCampaigns, cappedCoords, moderation]);
+  }, [heroCampaigns, cappedCoords]);
 
   useSeoMeta({
     title: `${t('campaigns.home.seoTitle')} | ${config.appName}`,
