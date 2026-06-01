@@ -482,10 +482,13 @@ function EmptyState() {
  *     summaries and a link to the long-form breakdown at
  *     `/about#how-it-works`.
  *
- * Visual idiom matches `AboutPage`'s sections: cream `#faf8f4` in
- * light mode, near-black `#0a0c14` in dark, `py-20 md:py-28`,
- * brand-orange eyebrow + Inter Bold heading. Lives at module scope
- * so the home page's main component stays focused on data wiring.
+ * Visual idiom: a full-bleed brand-orange band (`bg-primary`) at
+ * the bottom of the home page. Section type is dark slate gray for
+ * AA contrast against orange (`text-slate-900`), with the eyebrow
+ * lifted to white for the "label" feel. Cards sit on the orange as
+ * crisp white surfaces with dark-gray copy, so they read as cards,
+ * not stripes of the same color. The "Read the full breakdown"
+ * CTA is a dark-slate pill that anchors the section.
  */
 function WhyDifferentSection() {
   const { t } = useTranslation();
@@ -495,20 +498,20 @@ function WhyDifferentSection() {
   return (
     <section
       aria-labelledby="why-different-title"
-      className="bg-[#faf8f4] dark:bg-[#0a0c14] border-t border-border py-20 md:py-28"
+      className="bg-primary py-20 md:py-28"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-14">
-          <p className="text-xs font-semibold tracking-widest uppercase text-primary mb-3">
+          <p className="text-xs font-semibold tracking-widest uppercase text-white/90 mb-3">
             {t('campaigns.home.whyDifferent.eyebrow', { appName })}
           </p>
           <h2
             id="why-different-title"
-            className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white mb-4"
+            className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mb-4"
           >
             {t('campaigns.home.whyDifferent.title')}
           </h2>
-          <p className="text-base sm:text-lg leading-relaxed text-gray-600 dark:text-gray-400">
+          <p className="text-base sm:text-lg leading-relaxed text-slate-800/90">
             {t('campaigns.home.whyDifferent.lede')}
           </p>
         </div>
@@ -542,12 +545,12 @@ function WhyDifferentSection() {
 
           {/* Block 3 — public vs private receiving */}
           <WhyBlock
-            accent="indigo"
+            accent="slate"
             icon={<Eye className="size-5" />}
             heading={t('campaigns.home.whyDifferent.block3.heading')}
             body={t('campaigns.home.whyDifferent.block3.body')}
           >
-            <ul className="space-y-3 mt-4 pt-4 border-t border-gray-200 dark:border-white/10">
+            <ul className="space-y-3 mt-4 pt-4 border-t border-slate-200 dark:border-white/10">
               <PublicPrivateRow
                 tone="public"
                 label={t('campaigns.home.whyDifferent.block3.publicLabel')}
@@ -565,9 +568,8 @@ function WhyDifferentSection() {
         <div className="mt-10 md:mt-12 flex justify-center">
           <Button
             asChild
-            variant="outline"
             size="lg"
-            className="rounded-full"
+            className="rounded-full bg-slate-900 text-white hover:bg-slate-800 focus-visible:ring-white"
           >
             <Link to="/about#how-it-works">
               {t('campaigns.home.whyDifferent.readMore')}
@@ -581,7 +583,7 @@ function WhyDifferentSection() {
 }
 
 interface WhyBlockProps {
-  accent: 'orange' | 'indigo';
+  accent: 'orange' | 'slate';
   icon: React.ReactNode;
   heading: string;
   body: string;
@@ -590,47 +592,50 @@ interface WhyBlockProps {
 }
 
 /**
- * One of three cards in the WhyDifferentSection. Card chrome and
- * icon-chip styling match the `RailCard` idiom on `/about` so the
- * home-page band reads as a shorter, more scannable preview of the
- * full About content.
+ * One of three cards in the WhyDifferentSection. Cards sit on a
+ * brand-orange band, so they're solid white in light mode (and a
+ * dark slate in dark mode) to read as crisp surfaces, not stripes
+ * of the same color. Type is dark-gray for AA contrast on the
+ * white card; icon chip accent stays brand-orange for blocks 1 & 2
+ * (where the orange reinforces the "Agora-style" answer to each
+ * comparison) and switches to slate for block 3, which is itself
+ * about a neutral "your choice" tradeoff.
  */
 function WhyBlock({ accent, icon, heading, body, bullets, children }: WhyBlockProps) {
   return (
     <article
       className={cn(
-        'group relative h-full rounded-2xl border bg-white dark:bg-[#1c2230] p-6 sm:p-7',
-        'shadow-sm transition-all duration-300 motion-safe:hover:-translate-y-1 hover:shadow-md dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)]',
-        accent === 'orange'
-          ? 'border-primary/20 dark:border-primary/30'
-          : 'border-indigo-200 dark:border-indigo-400/30',
+        'group relative h-full rounded-2xl border p-6 sm:p-7',
+        'bg-white dark:bg-slate-900',
+        'border-slate-200 dark:border-white/10',
+        'shadow-md shadow-black/10 transition-all duration-300 motion-safe:hover:-translate-y-1 hover:shadow-lg hover:shadow-black/15 dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)]',
       )}
     >
       <div
         className={cn(
           'inline-flex items-center justify-center size-10 rounded-xl mb-4 border',
           accent === 'orange'
-            ? 'bg-primary/10 dark:bg-primary/20 border-primary/30 text-primary'
-            : 'bg-indigo-500/10 dark:bg-indigo-400/15 border-indigo-300 dark:border-indigo-400/40 text-indigo-600 dark:text-indigo-300',
+            ? 'bg-primary/10 border-primary/30 text-primary dark:bg-primary/20'
+            : 'bg-slate-100 border-slate-200 text-slate-700 dark:bg-white/10 dark:border-white/15 dark:text-slate-100',
         )}
         aria-hidden="true"
       >
         {icon}
       </div>
-      <h3 className="text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white mb-2 leading-snug">
+      <h3 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white mb-2 leading-snug">
         {heading}
       </h3>
-      <p className="text-[15px] text-gray-600 dark:text-gray-300 leading-relaxed">
+      <p className="text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed">
         {body}
       </p>
       {bullets && bullets.length > 0 && (
-        <ul className="space-y-2 mt-4 pt-4 border-t border-gray-200 dark:border-white/10">
+        <ul className="space-y-2 mt-4 pt-4 border-t border-slate-200 dark:border-white/10">
           {bullets.map((b, i) => (
-            <li key={i} className="flex items-start gap-2.5 text-sm text-gray-700 dark:text-gray-200">
+            <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200">
               <Check
                 className={cn(
                   'size-4 shrink-0 mt-0.5',
-                  accent === 'orange' ? 'text-primary' : 'text-indigo-500 dark:text-indigo-300',
+                  accent === 'orange' ? 'text-primary' : 'text-slate-700 dark:text-slate-200',
                 )}
                 aria-hidden="true"
               />
@@ -653,8 +658,7 @@ interface PublicPrivateRowProps {
 /**
  * One row inside Block 3 contrasting public vs private receiving.
  * `public` uses the brand-orange `Eye` icon; `private` uses the
- * indigo `EyeOff` icon. Both share the same horizontal layout so
- * the eye matches across rows.
+ * dark-slate `EyeOff` icon. Both share the same horizontal layout.
  */
 function PublicPrivateRow({ tone, label, summary }: PublicPrivateRowProps) {
   return (
@@ -664,17 +668,17 @@ function PublicPrivateRow({ tone, label, summary }: PublicPrivateRowProps) {
           'inline-flex items-center justify-center size-6 rounded-md shrink-0 mt-0.5',
           tone === 'public'
             ? 'bg-primary/10 text-primary dark:bg-primary/20'
-            : 'bg-indigo-500/10 text-indigo-600 dark:bg-indigo-400/15 dark:text-indigo-300',
+            : 'bg-slate-200 text-slate-800 dark:bg-white/10 dark:text-slate-100',
         )}
         aria-hidden="true"
       >
         {tone === 'public' ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />}
       </span>
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight">
+        <p className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">
           {label}
         </p>
-        <p className="text-sm text-gray-600 dark:text-gray-400 leading-snug mt-0.5">
+        <p className="text-sm text-slate-600 dark:text-slate-400 leading-snug mt-0.5">
           {summary}
         </p>
       </div>
