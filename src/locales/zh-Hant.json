@@ -755,6 +755,7 @@
       "exploreCampaigns": "瀏覽活動",
       "featured": "已認證",
       "featuredDesc": "由 World Liberty Congress 認證的活動。",
+      "verifiedByAria": "由 {{name}} 認證",
       "browseAll": "瀏覽所有活動 →",
       "hidden": "已隱藏",
       "hiddenDesc": "已從公共首頁隱藏的活動。使用卡片上的選單可以取消隱藏。",

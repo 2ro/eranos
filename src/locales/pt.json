@@ -1187,6 +1187,7 @@
       "exploreCampaigns": "Explorar campanhas",
       "featured": "Verificadas",
       "featuredDesc": "Campanhas verificadas pelo World Liberty Congress.",
+      "verifiedByAria": "Verificada por {{name}}",
       "browseAll": "Navegar por todas as campanhas →",
       "hidden": "Ocultas",
       "hiddenDesc": "Campanhas suprimidas da página inicial pública. Use o menu de três pontos em um cartão para reexibir.",

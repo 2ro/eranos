@@ -189,8 +189,8 @@ export function CampaignsPage() {
                     </Avatar>
                     <span>{wlcName}</span>
                   </Link>
-                  <BadgeCheck className="size-5 sm:size-6 text-primary shrink-0" aria-hidden="true" />
                   <span>{t('campaigns.home.featured')}</span>
+                  <BadgeCheck className="size-5 sm:size-6 text-primary shrink-0" aria-hidden="true" />
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   {t('campaigns.home.featuredDesc', { appName: config.appName })}
@@ -434,6 +434,11 @@ function FeaturedRow({
         <CampaignCard
           campaign={campaign}
           variant={useFeaturedVariant ? 'featured' : 'compact'}
+          verifiedBy={{
+            pubkey: WLC_PUBKEY,
+            npub: WLC_NPUB,
+            defaultName: 'World Liberty Congress',
+          }}
         />
       )}
     />
