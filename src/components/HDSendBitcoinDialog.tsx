@@ -387,7 +387,6 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     onSuccess: (result) => {
       notificationSuccess();
       setSuccess(result);
-      queryClient.invalidateQueries({ queryKey: ['hdwallet-scan'] });
       // Remove the SP UTXOs we just spent from local storage and
       // republish the NIP-78 doc. Blockbook's xpub scan can't see SP
       // outputs, so without this the spent UTXOs would linger forever:
@@ -399,6 +398,9 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       if (result.consumedSpUtxos.length > 0) {
         pruneSpentSilentPaymentUtxos(result.consumedSpUtxos);
       }
+      // Refresh after pruning so transaction history can classify mixed
+      // BIP-86 + SP sends with the spent SP outpoints already archived.
+      queryClient.invalidateQueries({ queryKey: ['hdwallet-scan'] });
       void refetchWallet();
     },
     onError: (err) => {
