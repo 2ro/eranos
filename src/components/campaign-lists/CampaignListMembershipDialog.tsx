@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Check, Loader2, Plus } from 'lucide-react';
 
@@ -54,6 +55,7 @@ export function CampaignListMembershipDialog({
   campaignTitle,
 }: CampaignListMembershipDialogProps) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const { data, isLoading } = useCampaignLists();
   const actions = useCampaignListActions();
 
@@ -63,6 +65,19 @@ export function CampaignListMembershipDialog({
   // authoritative cache until the relay query refetches.
   const [optimistic, setOptimistic] = useState<Map<string, boolean>>(new Map());
   const [createOpen, setCreateOpen] = useState(false);
+
+  // Force a refetch of the campaign-lists query every time the dialog
+  // opens. The query's default staleTime is 30s, which means a
+  // moderator who edits a list elsewhere (e.g. by adding this campaign
+  // from the list detail page) and then opens this membership dialog
+  // for the same campaign would otherwise see stale "Add" buttons for
+  // 30s. Invalidating on open guarantees the membership state shown
+  // reflects the latest published revisions.
+  useEffect(() => {
+    if (open) {
+      void queryClient.invalidateQueries({ queryKey: ['campaign-lists'] });
+    }
+  }, [open, queryClient]);
 
   const lists = data?.lists ?? [];
 
