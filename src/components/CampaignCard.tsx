@@ -2,10 +2,9 @@ import { useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { BadgeCheck, CalendarClock, HandHeart, MapPin, ShieldCheck } from 'lucide-react';
+import { CalendarClock, HandHeart, MapPin, ShieldCheck } from 'lucide-react';
 
 import { AuthorByline } from '@/components/AuthorByline';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -128,6 +127,9 @@ interface CampaignCardProps {
    *
    * - `compact` — default grid item.
    * - `featured` — hero placement (wider, side-by-side on `sm+`).
+   *   The token is purely visual — it names the layout, not a
+   *   curation state — and stayed after the moderator-level
+   *   "Featured" concept was retired in favor of curated lists.
    * - `shelf` — fixed-width card for horizontal scroll rails (e.g. group
    *   official-activity). Caller no longer hand-rolls the size wrapper.
    */
@@ -135,23 +137,13 @@ interface CampaignCardProps {
   className?: string;
   /** Optional footer affordance rendered opposite the author line. */
   footerBadge?: ReactNode;
-  /**
-   * When set, renders a "verified by" chip on the top-left of the
-   * cover. Used by the home page Featured row to mark cards as
-   * verified by World Liberty Congress. Pass the verifier's pubkey
-   * (hex) and the npub the badge should link to; the avatar is
-   * pulled from kind 0 metadata via `useAuthor`. `shortLabel` is the
-   * compact text shown on the chip (e.g. "WLC"); the full name still
-   * drives the aria-label so screen readers announce it in full.
-   */
-  verifiedBy?: { pubkey: string; npub: string; defaultName?: string; shortLabel?: string };
 }
 
 /**
  * Renders a single campaign as a clickable card. The whole card is a
  * `<Link>` to the campaign's naddr-based detail route.
  */
-export function CampaignCard({ campaign, variant = 'compact', className, footerBadge, verifiedBy }: CampaignCardProps) {
+export function CampaignCard({ campaign, variant = 'compact', className, footerBadge }: CampaignCardProps) {
   const { t } = useTranslation();
   const { translatedEvent, translateAction } = useEventTranslation(campaign.event, {
     iconOnly: true,
@@ -159,13 +151,6 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
   });
   const displayCampaign = parseCampaign(translatedEvent) ?? campaign;
   const author = useAuthor(campaign.pubkey);
-  const verifierAuthor = useAuthor(verifiedBy?.pubkey);
-  const verifierMetadata = verifierAuthor.data?.metadata;
-  const verifierName = verifierMetadata?.display_name
-    ?? verifierMetadata?.name
-    ?? verifiedBy?.defaultName
-    ?? '';
-  const verifierPicture = verifierMetadata?.picture;
   const { data: stats } = useCampaignDonations(campaign);
   const { data: btcPrice } = useBtcPrice();
 
@@ -265,33 +250,10 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             coord={campaign.aTag}
             entityTitle={campaign.title}
             surface="campaign"
-            axes={['hide', 'featured']}
+            axes={['hide']}
             badgeSize="default"
             className="absolute top-3 right-3 z-10 flex items-center gap-2"
           />
-
-          {/* Top-left "verified by" chip — used on the home Featured
-              row to attribute curation to World Liberty Congress. The
-              chip is itself a `<Link>` to the verifier's profile, so
-              we stop propagation to keep the outer card link from
-              swallowing the click. */}
-          {verifiedBy && (
-            <Link
-              to={`/${verifiedBy.npub}`}
-              onClick={(e) => e.stopPropagation()}
-              aria-label={t('campaigns.home.verifiedByAria', { name: verifierName || verifiedBy.defaultName || '' })}
-              className="absolute top-3 left-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-black/45 backdrop-blur-md px-2 py-1 text-[11px] font-medium text-white hover:bg-black/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-            >
-              <Avatar className="size-5 ring-1 ring-white/40">
-                <AvatarImage src={verifierPicture} alt="" />
-                <AvatarFallback className="text-[9px] bg-white/10 text-white">
-                  {(verifierName || verifiedBy.defaultName || 'WLC').slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <span className="truncate max-w-[140px]">{verifiedBy.shortLabel ?? verifierName ?? verifiedBy.defaultName}</span>
-              <BadgeCheck className="size-3.5 text-white shrink-0" aria-hidden="true" />
-            </Link>
-          )}
         </div>
 
         {/* Body — deterministic structure: title (1 line, truncates) →

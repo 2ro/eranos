@@ -6,16 +6,6 @@ import { usePledgeModeration } from '@/hooks/usePledgeModeration';
 
 import { HiddenBadge } from './HiddenBadge';
 import { ModerationMenu, type ModerationAxis, type ModerationSurface } from './ModerationMenu';
-import { useReorderControlsFor } from './reorderContext';
-
-/** Reorder controls forwarded to the embedded `ModerationMenu`. */
-interface ReorderControls {
-  canMoveUp: boolean;
-  canMoveDown: boolean;
-  onMoveToTop: () => Promise<void> | void;
-  onMoveUp: () => Promise<void> | void;
-  onMoveDown: () => Promise<void> | void;
-}
 
 interface ModerationOverlayProps {
   /** Addressable coordinate of the entity (`<kind>:<pubkey>:<d>`). */
@@ -46,13 +36,6 @@ interface ModerationOverlayProps {
    * pledges/groups use `top-2 right-2`.
    */
   className?: string;
-  /**
-   * Optional reorder controls. Forwarded to the moderator kebab so the
-   * Move up / Move down / Move to top rows show inside the existing
-   * dropdown. Provided by a parent that knows the card's position in
-   * its surrounding ordered list (e.g. `ReorderableCampaignGrid`).
-   */
-  reorder?: ReorderControls;
 }
 
 /** Shared overlay body once the hide state has been resolved. */
@@ -65,16 +48,8 @@ function OverlayBody({
   badgeSize,
   showMenu = true,
   className,
-  reorder,
 }: Omit<ModerationOverlayProps, never> & { isHidden: boolean }) {
   const wrapperClass = className ?? 'absolute top-2 right-2 z-10 flex items-center gap-1.5';
-
-  // If no explicit reorder prop, fall back to a ReorderProvider in
-  // the parent tree (mounted by `ReorderableCampaignGrid`). This is
-  // how home-page cards pick up move-up / move-down rows without the
-  // card itself knowing anything about reorder concerns.
-  const contextReorder = useReorderControlsFor(coord);
-  const effectiveReorder = reorder ?? contextReorder;
 
   // When the menu is suppressed AND nothing is hidden, the overlay
   // would render an empty positioned div. Skip render entirely so the
@@ -90,7 +65,6 @@ function OverlayBody({
           entityTitle={entityTitle}
           surface={surface}
           axes={axes}
-          reorder={effectiveReorder}
         />
       )}
     </div>

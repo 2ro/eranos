@@ -282,9 +282,18 @@
       "unknown": "INCONNU"
     },
     "kindHeader": {
-      "photo": { "action": "a partagé une", "noun": "photo" },
-      "encryptedMessage": { "action": "a envoyé un", "noun": "message chiffré" },
-      "letter": { "action": "a envoyé une", "noun": "lettre" },
+      "photo": {
+        "action": "a partagé une",
+        "noun": "photo"
+      },
+      "encryptedMessage": {
+        "action": "a envoyé un",
+        "noun": "message chiffré"
+      },
+      "letter": {
+        "action": "a envoyé une",
+        "noun": "lettre"
+      },
       "treasureHidCreated": "a caché un",
       "treasureHidUpdated": "a mis à jour un",
       "treasureNoun": "trésor",
@@ -1175,9 +1184,8 @@
       "startCampaign": "Démarrer une campagne",
       "howItWorks": "Comment ça marche",
       "exploreCampaigns": "Explorer les campagnes",
-      "featured": "Vérifiées",
-      "featuredDesc": "Campagnes vérifiées par le World Liberty Congress.",
-      "verifiedByAria": "Vérifiée par {{name}}",
+      "wlcDesc": "Campagnes sélectionnées par le World Liberty Congress.",
+      "viewFullList": "Voir la liste complète",
       "allCampaigns": "Toutes les campagnes",
       "allCampaignsDesc": "Toutes les campagnes du réseau, par ordre chronologique.",
       "browseAll": "Parcourir toutes les campagnes →",

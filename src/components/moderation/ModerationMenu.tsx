@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  ArrowUp, ArrowDown, ArrowUpToLine,
   Check, EyeOff, Eye, ListPlus, MoreHorizontal,
   Sparkles, SparklesIcon,
 } from 'lucide-react';
@@ -32,13 +31,14 @@ import type { ModerationLabel } from '@/lib/agoraModeration';
 export type ModerationSurface = 'campaign' | 'pledge' | 'group';
 
 /**
- * Which axes the menu should render. Two are defined: `hide` and
- * `featured`. Every current surface (campaigns, organizations,
- * pledges) supports both; the prop exists so future surfaces can
- * selectively expose one axis if needed. The order in this array
- * does NOT determine render order — the menu always renders
- * Hide → Feature top-to-bottom when present, which keeps the
- * surfaces visually consistent.
+ * Which axes the menu should render. Two are defined: `hide` (used
+ * by every surface) and `featured` (used by pledges and groups; the
+ * campaign surface stopped opting into this axis when the curated
+ * Lists feature replaced campaign-level featuring). The prop exists
+ * so future surfaces can selectively expose one axis if needed. The
+ * order in this array does NOT determine render order — the menu
+ * always renders Hide → Feature top-to-bottom when present, which
+ * keeps the surfaces visually consistent.
  */
 export type ModerationAxis = 'hide' | 'featured';
 
@@ -51,27 +51,6 @@ interface ModerationItemsProps {
   surface: ModerationSurface;
   /** Which axes to render. */
   axes: readonly ModerationAxis[];
-  /**
-   * Optional reorder controls. Present when this entity sits inside a
-   * moderator-curated ordered list (the Featured row and Community
-   * Campaigns grid on the home page). When present, three rows render
-   * between the standard axis controls and the trailing rule:
-   *
-   *  - Move to top (skipped when already at index 0)
-   *  - Move up    (skipped when already at index 0)
-   *  - Move down  (skipped when already at the last index)
-   *
-   * Callers compute `canMoveUp` / `canMoveDown` themselves from the
-   * displayed list so the dropdown stays purely presentational and
-   * doesn't need to know about list state.
-   */
-  reorder?: {
-    canMoveUp: boolean;
-    canMoveDown: boolean;
-    onMoveToTop: () => Promise<void> | void;
-    onMoveUp: () => Promise<void> | void;
-    onMoveDown: () => Promise<void> | void;
-  };
 }
 
 interface ModerationMenuProps extends ModerationItemsProps {
@@ -114,7 +93,6 @@ function ModerationItemsShell({
   coord,
   entityTitle,
   axes,
-  reorder,
   moderation,
   moderate,
   getFeatureRank,
@@ -123,22 +101,19 @@ function ModerationItemsShell({
   coord: string;
   entityTitle: string;
   axes: readonly ModerationAxis[];
-  reorder?: ModerationItemsProps['reorder'];
   moderation: ReturnType<typeof useCampaignModeration>['data'];
   moderate: ReturnType<typeof useCampaignModeration>['moderate'];
   /**
    * Optional per-surface hook that computes the `rank` tag to publish
    * on a `featured` action. The display sort is descending by rank,
    * so returning `min(existing ranks) - 1` makes a newly-featured
-   * entity land at the **bottom** of the featured row (append
-   * semantics), while still leaving moderators free to reorder it
-   * afterwards via the Move-to-top / Move-up controls.
+   * entity land at the **bottom** of the surface's featured shelf
+   * (append semantics).
    *
    * Only the `featured` action consults this — `unfeatured`,
    * `hidden`, and `unhidden` ignore it. Surfaces that don't pass it
-   * (currently pledges and organizations) keep the legacy
-   * `created_at`-fallback behavior, which puts the newest feature on
-   * top.
+   * keep the legacy `created_at`-fallback behavior, which puts the
+   * newest feature on top.
    */
   getFeatureRank?: () => number | undefined;
   /**
@@ -152,10 +127,6 @@ function ModerationItemsShell({
   const { t } = useTranslation();
   const { toast } = useToast();
   const [busy, setBusy] = useState<ModerationLabel | null>(null);
-  // Separate busy flag for reorder operations — they share the same
-  // mutate hook but we want the menu to remain interactive for axis
-  // actions while a reorder is in flight (and vice-versa).
-  const [reordering, setReordering] = useState(false);
 
   const isHidden = moderation.hiddenCoords.has(coord);
   const isFeatured = moderation.featuredCoords.has(coord);
@@ -169,7 +140,7 @@ function ModerationItemsShell({
     try {
       // `featured` actions on surfaces with append-semantics carry an
       // explicit rank so the new label lands at the bottom of the
-      // descending-rank row. Other axes / surfaces leave `rank`
+      // descending-rank shelf. Other axes / surfaces leave `rank`
       // undefined and rely on `created_at` fallback.
       const rank = action === 'featured' ? getFeatureRank?.() : undefined;
       await moderate.mutateAsync({ coord, action, rank });
@@ -183,33 +154,6 @@ function ModerationItemsShell({
       });
     } finally {
       setBusy(null);
-    }
-  };
-
-  /**
-   * Wraps a reorder callback with the shared toast + busy-flag UX. The
-   * caller passes the actual move (a thunk returned from
-   * `useReorderCampaign`); we surface success / failure here so every
-   * site that mounts the menu gets the same feedback for free.
-   */
-  const runReorder = async (
-    op: () => Promise<void> | void,
-    toastKey: 'movedUp' | 'movedDown' | 'movedToTop',
-  ) => {
-    if (reordering) return;
-    setReordering(true);
-    try {
-      await op();
-      toast({ title: t(`moderation.menu.toast.${toastKey}`), description: entityTitle });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      toast({
-        title: t('moderation.menu.failedReorder'),
-        description: message,
-        variant: 'destructive',
-      });
-    } finally {
-      setReordering(false);
     }
   };
 
@@ -269,43 +213,6 @@ function ModerationItemsShell({
           </DropdownMenuItem>
         )
       )}
-
-      {/* Reorder section — only rendered when the host passes the
-          reorder prop (i.e. the entity lives in a moderator-curated
-          ordered list). Individual rows are gated on canMoveUp /
-          canMoveDown so the menu doesn't show dead-end actions. */}
-      {reorder && (reorder.canMoveUp || reorder.canMoveDown) && (
-        <>
-          <DropdownMenuSeparator />
-          {reorder.canMoveUp && (
-            <DropdownMenuItem
-              onClick={() => runReorder(reorder.onMoveToTop, 'movedToTop')}
-              disabled={reordering}
-            >
-              <ArrowUpToLine className="h-4 w-4 mr-2" />
-              {t('moderation.menu.moveToTop')}
-            </DropdownMenuItem>
-          )}
-          {reorder.canMoveUp && (
-            <DropdownMenuItem
-              onClick={() => runReorder(reorder.onMoveUp, 'movedUp')}
-              disabled={reordering}
-            >
-              <ArrowUp className="h-4 w-4 mr-2" />
-              {t('moderation.menu.moveUp')}
-            </DropdownMenuItem>
-          )}
-          {reorder.canMoveDown && (
-            <DropdownMenuItem
-              onClick={() => runReorder(reorder.onMoveDown, 'movedDown')}
-              disabled={reordering}
-            >
-              <ArrowDown className="h-4 w-4 mr-2" />
-              {t('moderation.menu.moveDown')}
-            </DropdownMenuItem>
-          )}
-        </>
-      )}
     </>
   );
 }
@@ -318,7 +225,6 @@ function CampaignItemsInner(props: {
   coord: string;
   entityTitle: string;
   axes: readonly ModerationAxis[];
-  reorder?: ModerationItemsProps['reorder'];
   /**
    * Called when the moderator clicks "Add to list…". The host (a
    * dropdown menu) closes itself on item-select, which would unmount
@@ -328,31 +234,18 @@ function CampaignItemsInner(props: {
   onAddToList?: () => void;
 }) {
   const { data, moderate } = useCampaignModeration();
-  // Feature appends to the **bottom** of the curated row. The display
-  // sort is descending by `featuredOrder`, so "bottom" means we need
-  // a rank smaller than every existing featured campaign's rank. We
-  // therefore publish `min(existing ranks) - 1`. When there are no
-  // currently featured campaigns the menu falls back to `undefined`,
-  // letting the mutation omit the rank tag — the fold's
-  // `created_at`-fallback then assigns a sensible default and the
-  // single featured entry has no "above" or "below" to compete with.
-  //
-  // Moderators who want to move a freshly-featured campaign back to
-  // the top of the row use the existing Move-to-top control.
-  const getFeatureRank = (): number | undefined => {
-    const ranks = Array.from(data.featuredOrder.values());
-    if (ranks.length === 0) return undefined;
-    return Math.min(...ranks) - 1;
-  };
+  // The campaign surface stopped exposing the `featured` axis when
+  // the curated Lists feature replaced campaign-level featuring, so
+  // the rank computation is dead weight here. We still pass through
+  // the shared shell because the shell drives the "Add to list…" row
+  // plus Hide / Unhide.
   return (
     <ModerationItemsShell
       coord={props.coord}
       entityTitle={props.entityTitle}
       axes={props.axes}
-      reorder={props.reorder}
       moderation={data}
       moderate={moderate}
-      getFeatureRank={getFeatureRank}
       onAddToList={props.onAddToList}
     />
   );
@@ -362,7 +255,6 @@ function PledgeItemsInner(props: {
   coord: string;
   entityTitle: string;
   axes: readonly ModerationAxis[];
-  reorder?: ModerationItemsProps['reorder'];
 }) {
   const { data, moderate } = usePledgeModeration({ coordinates: [props.coord] });
   return <ModerationItemsShell {...props} moderation={data} moderate={moderate} />;
@@ -372,7 +264,6 @@ function GroupItemsInner(props: {
   coord: string;
   entityTitle: string;
   axes: readonly ModerationAxis[];
-  reorder?: ModerationItemsProps['reorder'];
 }) {
   const { data, moderate } = useOrganizationModeration();
   return <ModerationItemsShell {...props} moderation={data} moderate={moderate} />;
@@ -427,7 +318,6 @@ export function ModerationMenuItems(
           coord={props.coord}
           entityTitle={props.entityTitle}
           axes={props.axes}
-          reorder={props.reorder}
           onAddToList={props.onAddToList}
         />
       );
@@ -437,7 +327,6 @@ export function ModerationMenuItems(
           coord={props.coord}
           entityTitle={props.entityTitle}
           axes={props.axes}
-          reorder={props.reorder}
         />
       );
     case 'group':
@@ -446,7 +335,6 @@ export function ModerationMenuItems(
           coord={props.coord}
           entityTitle={props.entityTitle}
           axes={props.axes}
-          reorder={props.reorder}
         />
       );
   }
