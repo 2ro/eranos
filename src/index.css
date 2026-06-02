@@ -115,6 +115,14 @@
   -webkit-text-stroke: 0;
 }
 
+:root[lang|="zh"] .font-display.latin-display {
+  font-family: 'Bebas Neue', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  -webkit-text-stroke: 0.022em currentColor;
+}
+
 @layer utilities {
   /* ── Safe-area inset utilities ────────────────────────────────────────────
      Use var(--safe-area-inset-*, …) as the outer wrapper. On the Android APK

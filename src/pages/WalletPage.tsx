@@ -180,7 +180,7 @@ export function WalletPage() {
           >
             <span className="flex items-center gap-2 text-primary group-hover:opacity-80 transition-opacity">
               <span
-                className="font-display font-normal tracking-wide leading-none uppercase text-5xl inline-block tabular-nums"
+                className="latin-display font-display font-normal tracking-wide leading-none uppercase text-5xl inline-block tabular-nums"
                 style={{
                   WebkitTextStroke: '0.022em currentColor',
                   transform: 'skewX(-6deg) scaleX(1.1)',

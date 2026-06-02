@@ -95,7 +95,7 @@ export function TopNav() {
         >
           <LogoIcon className="size-9" />
           <span
-            className="font-display font-normal tracking-wide leading-none uppercase text-3xl inline-block -ml-0.5"
+            className="latin-display font-display font-normal tracking-wide leading-none uppercase text-3xl inline-block -ml-0.5"
             style={{
               WebkitTextStroke: '0.022em currentColor',
               transform: 'skewX(-6deg) scaleX(1.1)',
@@ -148,7 +148,7 @@ export function TopNav() {
             >
               <LogoIcon className="size-9" />
               <span
-                className="font-display font-normal tracking-wide leading-none uppercase text-3xl inline-block -ml-0.5"
+                className="latin-display font-display font-normal tracking-wide leading-none uppercase text-3xl inline-block -ml-0.5"
                 style={{
                   WebkitTextStroke: '0.022em currentColor',
                   transform: 'skewX(-6deg) scaleX(1.1)',
@@ -218,7 +218,7 @@ function WalletBalancePill() {
       title={t('nav.wallet')}
     >
       <span
-        className="font-display font-normal tracking-wide leading-none uppercase text-xl inline-block tabular-nums"
+        className="latin-display font-display font-normal tracking-wide leading-none uppercase text-xl inline-block tabular-nums"
         style={{
           WebkitTextStroke: '0.022em currentColor',
           transform: 'skewX(-6deg) scaleX(1.1)',
