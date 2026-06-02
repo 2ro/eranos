@@ -42,14 +42,17 @@ if [ ! -f "$SOURCE_SVG" ]; then
 fi
 
 # Brand colors
-BG_COLOR="#7c52e0"   # Ditto purple
+BG_COLOR="#e9673f"   # Agora orange (hsl(14 79% 58%))
 
 TMPDIR=$(mktemp -d)
 LOGO_WHITE_SVG="$TMPDIR/logo_white.svg"
 LOGO_WHITE="$TMPDIR/logo_white.png"
 
-# Recolor the SVG fill to white before rasterizing.
-sed 's/#7c52e0/#ffffff/g' "$SOURCE_SVG" > "$LOGO_WHITE_SVG"
+# Recolor the SVG fill to white before rasterizing. logo.svg declares the
+# glyph with fill="black", so recolor both the attribute form and any hex.
+sed -e 's/fill="black"/fill="#ffffff"/g' \
+    -e 's/#000000/#ffffff/g' \
+    -e 's/#7c52e0/#ffffff/g' "$SOURCE_SVG" > "$LOGO_WHITE_SVG"
 
 echo "Rendering white SVG at 512x512..."
 
@@ -82,23 +85,27 @@ make_foreground 192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foregrou
 
 # ── Legacy launcher icons (ic_launcher.png and ic_launcher_round.png) ──
 # These are used on pre-API-26 devices and as fallback on some launchers.
-# They must have the logo composited onto the purple background — NOT just
-# a solid color fill.
+# Both are the white logo composited onto an orange circle (brand mark).
 
 echo "Generating legacy launcher icons (ic_launcher.png and ic_launcher_round.png)..."
 
-# make_legacy_square: logo on flat purple square background
+# make_legacy_square: white logo on an orange circle (transparent corners)
 make_legacy_square() {
     local size=$1
     local content_size=$(echo "$size * 60 / 100" | bc)
     local dest=$2
+    local mask="$TMPDIR/circle_mask_sq_${size}.png"
+    $MAGICK -size "${size}x${size}" "xc:none" \
+        -fill white -draw "circle $((size/2)),$((size/2)) $((size/2)),0" \
+        "$mask"
     $MAGICK -size "${size}x${size}" "xc:${BG_COLOR}" \
+        "$mask" -compose dst-in -composite \
         \( "$LOGO_WHITE" -resize "${content_size}x${content_size}" \) \
         -gravity center -compose over -composite \
         "$dest"
 }
 
-# make_legacy_round: logo on circular purple background (alpha-masked circle)
+# make_legacy_round: white logo on circular orange background (alpha-masked circle)
 make_legacy_round() {
     local size=$1
     local content_size=$(echo "$size * 60 / 100" | bc)
@@ -108,7 +115,7 @@ make_legacy_round() {
     $MAGICK -size "${size}x${size}" "xc:none" \
         -fill white -draw "circle $((size/2)),$((size/2)) $((size/2)),0" \
         "$mask"
-    # Fill purple, apply circle mask, composite logo
+    # Fill orange, apply circle mask, composite logo
     $MAGICK -size "${size}x${size}" "xc:${BG_COLOR}" \
         "$mask" -compose dst-in -composite \
         \( "$LOGO_WHITE" -resize "${content_size}x${content_size}" \) \
@@ -134,11 +141,11 @@ mkdir -p android/app/src/main/res/values
 cat > "$BACKGROUND_COLOR_FILE" << 'EOF'
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#7c52e0</color>
+    <color name="ic_launcher_background">#e9673f</color>
 </resources>
 EOF
 
-# ── iOS App Icon (1024x1024, white logo on purple background) ──
+# ── iOS App Icon (1024x1024, white logo on orange background) ──
 
 echo "Generating iOS app icon..."
 
@@ -146,7 +153,7 @@ IOS_ICON_DIR="ios/App/App/Assets.xcassets/AppIcon.appiconset"
 
 if [ -d "$IOS_ICON_DIR" ]; then
     IOS_ICON="$IOS_ICON_DIR/AppIcon-512@2x.png"
-    # Logo at ~60% of canvas, centered on purple background (matches legacy Android style)
+    # Logo at ~60% of canvas, centered on orange background (matches Android style)
     $MAGICK -size "1024x1024" "xc:${BG_COLOR}" \
         \( "$LOGO_WHITE" -resize "614x614" \) \
         -gravity center -compose over -composite \
@@ -160,7 +167,7 @@ fi
 rm -rf "$TMPDIR"
 
 echo -e "\n${GREEN}App icons generated successfully!${NC}"
-echo -e "Icon: white Ditto logo on ${GREEN}${BG_COLOR}${NC} (Ditto purple)"
+echo -e "Icon: white Agora logo on ${GREEN}${BG_COLOR}${NC} (Agora orange)"
 echo -e "Generated:"
 echo -e "  Android:"
 echo -e "    - ic_launcher_foreground.png (adaptive, all densities)"
