@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.8.6] - 2026-06-02
+
+Refreshes the app icon to the orange Agora bolt mark across Android, iOS, and the web.
+
+### Changed
+
+- Update the app icon to the current Agora bolt on a brand-orange background.
+
 ## [2.8.5] - 2026-06-02
 
 A maintenance release that fixes the Android build so signed releases publish correctly. No user-facing changes.
