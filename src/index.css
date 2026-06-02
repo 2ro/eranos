@@ -117,9 +117,9 @@
 
 @layer utilities {
   /* ── Safe-area inset utilities ────────────────────────────────────────────
-     Use var(--safe-area-inset-*, …) as the outer wrapper so that
-     Capacitor's SystemBars plugin (which injects --safe-area-inset-* CSS
-     variables on Android) takes precedence when available.  The inner
+     Use var(--safe-area-inset-*, …) as the outer wrapper. On the Android APK
+     the WebView reports env(safe-area-inset-*) as 0, so MainActivity injects
+     the real system-bar insets into --safe-area-inset-top/bottom. The inner
      env(safe-area-inset-*, 0px) is the standard fallback for iOS / web. */
 
   .safe-area-top {

@@ -67,7 +67,7 @@ export function TopNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+    <header className="safe-area-top sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-1 md:gap-4 px-4 sm:px-6">
         {/* Mobile menu trigger */}
         <button

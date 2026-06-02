@@ -18,13 +18,6 @@ const config: CapacitorConfig = {
     contentInset: 'never',
     scheme: 'Agora'
   },
-  plugins: {
-    SystemBars: {
-      // Inject --safe-area-inset-* CSS variables on Android to work around
-      // a Chromium bug (<140) where env(safe-area-inset-*) reports 0.
-      insetsHandling: 'css',
-    },
-  },
 };
 
 export default config;

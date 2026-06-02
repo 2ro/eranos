@@ -8,6 +8,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.webkit.WebView;
+
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.getcapacitor.BridgeActivity;
 
@@ -47,6 +53,35 @@ public class MainActivity extends BridgeActivity {
 
         // Handle notification tap deep link
         handleNotificationIntent(getIntent());
+
+        // The Android WebView reports env(safe-area-inset-*) as 0, so inject the
+        // real system-bar insets as CSS variables (--safe-area-inset-top/bottom)
+        // that the web layer consumes (see src/index.css). Without this, the top
+        // nav renders behind the status bar in the APK.
+        applySafeAreaInsets();
+    }
+
+    /**
+     * Read the status-bar (top) and navigation-bar (bottom) insets and write
+     * them into the WebView as CSS pixel variables. Re-applies on every inset
+     * change (rotation, status-bar show/hide, etc.).
+     */
+    private void applySafeAreaInsets() {
+        final WebView webView = getBridge().getWebView();
+        if (webView == null) return;
+
+        ViewCompat.setOnApplyWindowInsetsListener(webView, (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            float density = getResources().getDisplayMetrics().density;
+            int topPx = Math.round(bars.top / density);
+            int bottomPx = Math.round(bars.bottom / density);
+            String js =
+                "document.documentElement.style.setProperty('--safe-area-inset-top','" + topPx + "px');" +
+                "document.documentElement.style.setProperty('--safe-area-inset-bottom','" + bottomPx + "px');";
+            v.post(() -> webView.evaluateJavascript(js, null));
+            return insets;
+        });
+        ViewCompat.requestApplyInsets(webView);
     }
 
     @Override

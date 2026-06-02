@@ -4,8 +4,7 @@ name: Agora
 
 summary: Power to the people.
 
-description: |
-Agora is a censorship-resistant donation platform built on Nostr and Bitcoin. No frozen bank accounts. No corporate shut-downs. Just direct support from people who believe in your cause.
+description: Agora is a censorship-resistant donation platform built on Nostr and Bitcoin. No frozen bank accounts. No corporate shut-downs. Just direct support from people who believe in your cause.
 
 tags:
   - nostr
