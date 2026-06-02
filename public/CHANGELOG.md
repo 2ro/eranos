@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.8.7] - 2026-06-02
+
+Fixes the top navigation bar rendering behind the status bar on Android.
+
+### Fixed
+
+- Top navigation bar now clears the system status bar on Android.
+
 ## [2.8.6] - 2026-06-02
 
 Refreshes the app icon to the orange Agora bolt mark across Android, iOS, and the web.
