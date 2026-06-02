@@ -496,7 +496,7 @@
     "wallet": "محفظة بيتكوين",
     "myWalletLabel": "محفظة {{name}}",
     "myWalletDefault": "محفظتي",
-    "walletHeroNote": "تتدفّق التبرّعات مباشرةً إلى محفظة Agora الخاصة بك. لا وسيط، ولا انتظار.",
+    "walletHeroNote": "تتدفّق التبرّعات مباشرةً إلى محفظة Agora الخاصة بك.\nلا وسيط.",
     "walletHeroReassurance": "أنت تملك المفتاح، إذًا أنت تملك الأموال. اسحبها في أي وقت من تبويب المحفظة.",
     "walletChoose": "اختر محفظة",
     "walletCustom": "مخصصة",

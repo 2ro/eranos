@@ -939,7 +939,7 @@
     "wallet": "Portefeuille Bitcoin",
     "myWalletLabel": "Portefeuille de {{name}}",
     "myWalletDefault": "Mon portefeuille",
-    "walletHeroNote": "Les dons arrivent directement dans votre propre portefeuille Agora. Pas d'intermédiaire, pas d'attente.",
+    "walletHeroNote": "Les dons arrivent directement dans votre propre portefeuille Agora.\nPas d'intermédiaire.",
     "walletHeroReassurance": "Vous détenez la clé, donc vous détenez les fonds. Retirez à tout moment depuis l'onglet portefeuille.",
     "walletChoose": "Choisir un portefeuille",
     "walletCustom": "Personnalisé",

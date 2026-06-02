@@ -939,7 +939,7 @@
     "wallet": "Pochi ya Bitcoin",
     "myWalletLabel": "Pochi ya {{name}}",
     "myWalletDefault": "Pochi yangu",
-    "walletHeroNote": "Michango huingia moja kwa moja kwenye pochi yako mwenyewe ya Agora. Hakuna mtu wa kati, hakuna kusubiri.",
+    "walletHeroNote": "Michango huingia moja kwa moja kwenye pochi yako mwenyewe ya Agora.\nHakuna mtu wa kati.",
     "walletHeroReassurance": "Wewe ndiye unayeshikilia ufunguo, kwa hivyo wewe ndiye unayeshikilia pesa. Toa wakati wowote kupitia kichupo cha pochi.",
     "walletChoose": "Chagua pochi",
     "walletCustom": "Maalum",

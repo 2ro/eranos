@@ -1323,7 +1323,7 @@ function WalletPicker({
               </div>
             </div>
 
-            <p className="text-center text-sm leading-relaxed text-foreground">
+            <p className="whitespace-pre-line text-center text-sm leading-relaxed text-foreground">
               {t('campaignsCreate.walletHeroNote')}
             </p>
 

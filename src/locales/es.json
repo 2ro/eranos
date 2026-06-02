@@ -508,7 +508,7 @@
     "wallet": "Cartera Bitcoin",
     "myWalletLabel": "Cartera de {{name}}",
     "myWalletDefault": "Mi cartera",
-    "walletHeroNote": "Las donaciones llegan directamente a tu propia cartera de Agora. Sin intermediarios, sin esperas.",
+    "walletHeroNote": "Las donaciones llegan directamente a tu propia cartera de Agora.\nSin intermediarios.",
     "walletHeroReassurance": "Tú tienes la clave, así que tú tienes los fondos. Retíralos en cualquier momento desde la pestaña de la cartera.",
     "walletChoose": "Elige una cartera",
     "walletCustom": "Personalizada",

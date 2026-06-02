@@ -508,7 +508,7 @@
     "wallet": "Chikwama cheBitcoin",
     "myWalletLabel": "Chikwama cha{{name}}",
     "myWalletDefault": "Chikwama changu",
-    "walletHeroNote": "Zvipo zvinopinda zvakananga muchikwama chako cheAgora. Hapana munhu ari pakati, hapana kumirira.",
+    "walletHeroNote": "Zvipo zvinopinda zvakananga muchikwama chako cheAgora.\nHapana munhu ari pakati.",
     "walletHeroReassurance": "Iwe ndiwe une kiyi, saka ndiwe une mari. Bvisa mari nguva ipi zvayo kubva mutabhu yechikwama.",
     "walletChoose": "Sarudza chikwama",
     "walletCustom": "Chenyu",

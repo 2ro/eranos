@@ -934,7 +934,7 @@
     "wallet": "Bitcoin wallet",
     "myWalletLabel": "{{name}}'s wallet",
     "myWalletDefault": "My wallet",
-    "walletHeroNote": "Donations flow straight into your own Agora wallet. No middleman, no waiting.",
+    "walletHeroNote": "Donations flow straight into your own Agora wallet.\nNo middleman.",
     "walletHeroReassurance": "You hold the key, so you hold the funds. Withdraw any time from the wallet tab.",
     "walletChoose": "Choose a wallet",
     "walletCustom": "Custom wallet",

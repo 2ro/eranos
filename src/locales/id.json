@@ -940,7 +940,7 @@
     "wallet": "Dompet Bitcoin",
     "myWalletLabel": "Dompet {{name}}",
     "myWalletDefault": "Dompet saya",
-    "walletHeroNote": "Donasi langsung masuk ke dompet Agora Anda sendiri. Tanpa perantara, tanpa menunggu.",
+    "walletHeroNote": "Donasi langsung masuk ke dompet Agora Anda sendiri.\nTanpa perantara.",
     "walletHeroReassurance": "Anda yang memegang kuncinya, jadi Anda yang memegang dananya. Tarik kapan saja dari tab dompet.",
     "walletChoose": "Pilih dompet",
     "walletCustom": "Kustom",
