@@ -54,12 +54,16 @@ sed -e 's/fill="black"/fill="#ffffff"/g' \
     -e 's/#000000/#ffffff/g' \
     -e 's/#7c52e0/#ffffff/g' "$SOURCE_SVG" > "$LOGO_WHITE_SVG"
 
-echo "Rendering white SVG at 512x512..."
+echo "Rendering white SVG (preserving aspect ratio)..."
 
+# Render at 1024px tall and let the renderer derive the width from the SVG
+# viewBox, so the non-square logo (720x880) is NOT stretched into a square.
+# The composite steps below use -resize WxH which fits-inside (aspect-
+# preserving), keeping the glyph's true proportions.
 if [ "$SVG_RENDERER" = "inkscape" ]; then
-    inkscape --export-type=png --export-filename="$LOGO_WHITE" -w 512 -h 512 "$LOGO_WHITE_SVG" 2>/dev/null
+    inkscape --export-type=png --export-filename="$LOGO_WHITE" -h 1024 "$LOGO_WHITE_SVG" 2>/dev/null
 else
-    rsvg-convert -w 512 -h 512 "$LOGO_WHITE_SVG" -o "$LOGO_WHITE"
+    rsvg-convert -h 1024 "$LOGO_WHITE_SVG" -o "$LOGO_WHITE"
 fi
 
 # ── Adaptive icon foreground PNGs (transparent bg, white logo, safe-zone padding) ──
