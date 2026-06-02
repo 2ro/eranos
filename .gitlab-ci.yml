@@ -167,30 +167,33 @@ build-apk:
     # Write local.properties for Gradle
     - echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
 
-    # Decode signing keystore and migrate JKS -> PKCS12 for Gradle compatibility
+    # Decode signing keystore and migrate JKS -> PKCS12 for Gradle compatibility.
+    # PKCS12 conceptually uses one password for the store and every entry; if the
+    # store and key passwords differ, keytool protects the migrated entry with the
+    # STORE password regardless of -destkeypass, so Gradle's later read with the
+    # key password fails ("Given final block not properly padded"). Unlock the
+    # source key with its own password ($KEY_PASSWORD), then write the PKCS12 with
+    # a single uniform password ($KEY_PASSWORD) for both store and entry so the
+    # key.properties below is internally consistent.
     - echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/my-upload-key.jks
-    # Pass the alias key password explicitly via -srckeypass / -destkeypass.
-    # The upload key inside the JKS has its own password ($KEY_PASSWORD) that
-    # differs from the store password ($KEYSTORE_PASSWORD); without these flags
-    # keytool prompts for it on a non-interactive runner and dies with
-    # "Too many failures - try later".
     - keytool -importkeystore
         -srckeystore android/app/my-upload-key.jks
         -destkeystore android/app/my-upload-key.keystore
         -deststoretype pkcs12
         -srcstorepass "$KEYSTORE_PASSWORD"
-        -deststorepass "$KEYSTORE_PASSWORD"
         -srcalias upload
         -destalias upload
         -srckeypass "$KEY_PASSWORD"
+        -deststorepass "$KEY_PASSWORD"
         -destkeypass "$KEY_PASSWORD"
         -noprompt
     - rm android/app/my-upload-key.jks
 
-    # Write key.properties from CI/CD variables
+    # Write key.properties from CI/CD variables. The PKCS12 above uses
+    # $KEY_PASSWORD uniformly, so both storePassword and keyPassword point to it.
     - |
       cat > android/key.properties << EOF
-      storePassword=$KEYSTORE_PASSWORD
+      storePassword=$KEY_PASSWORD
       keyPassword=$KEY_PASSWORD
       keyAlias=upload
       storeFile=my-upload-key.keystore
