@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.8.9] - 2026-06-02
+
+Adds an in-app prompt to grab the Android app from Zapstore, makes it easier to start or explore campaigns right from the home page, and irons out a batch of language and display fixes.
+
+### Added
+
+- A prompt to download the Android app from Zapstore, shown to mobile web visitors on the home page, in the account menu, and in the slide-out menu.
+- A "Start a campaign" button alongside "Browse all" in the middle of the home page.
+
+### Changed
+
+- The "Explore campaigns" button now appears for everyone, not just logged-out visitors.
+
+### Fixed
+
+- Switching languages now takes effect immediately instead of showing stale text.
+- The reply box and the replies heading on a post now show up in your chosen language.
+- Account balances keep their Latin numerals regardless of display language.
+- Filled in missing translations on the "Why Agora" screen.
+
 ## [2.8.8] - 2026-06-02
 
 Fixes the app icon proportions and updates the loading splash to the Agora bolt.
