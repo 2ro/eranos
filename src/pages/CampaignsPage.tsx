@@ -19,10 +19,10 @@ import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { CampaignListsStrip } from '@/components/campaign-lists/CampaignListsStrip';
 import { HeroLightningMap } from '@/components/HeroLightningMap';
 import { StartCampaignLink } from '@/components/StartCampaignLink';
+import { AppDownloadNudge } from '@/components/AppDownloadNudge';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignList } from '@/hooks/useCampaignLists';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { genUserName } from '@/lib/genUserName';
 import { useAppContext } from '@/hooks/useAppContext';
 import { cn } from '@/lib/utils';
@@ -92,7 +92,6 @@ const WLC_NPUB = 'npub126e6hwd6a5std2upv9a22xwgvd8fyrhsx5wjjchv99g6nv3n4vhs5fr9g
 export function CampaignsPage() {
   const { t } = useTranslation();
   const { config } = useAppContext();
-  const { user } = useCurrentUser();
 
   const wlcAuthor = useAuthor(WLC_PUBKEY);
   const wlcName = wlcAuthor.data?.metadata?.display_name
@@ -157,7 +156,7 @@ export function CampaignsPage() {
 
   return (
     <main className="min-h-screen pb-16">
-      <Hero loggedIn={!!user} />
+      <Hero />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12" id="campaigns">
         {showWlcSection && (
@@ -222,6 +221,8 @@ export function CampaignsPage() {
             </Button>
           </div>
         </section>
+
+        <AppDownloadNudge className="px-0 pt-0 pb-0" />
       </div>
 
       <WhyDifferentSection />
@@ -233,7 +234,7 @@ export function CampaignsPage() {
 // Hero
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function Hero({ loggedIn }: { loggedIn: boolean }) {
+function Hero() {
   const { t } = useTranslation();
 
   return (
@@ -332,16 +333,14 @@ function Hero({ loggedIn }: { loggedIn: boolean }) {
                 <ArrowRight className="ml-2 rtl:rotate-180" />
               </Link>
             </Button>
-            {!loggedIn && (
-              <Button
-                variant="outline"
-                size="lg"
-                asChild
-                className="rounded-full h-12 px-6 text-base border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white hover:border-white/50"
-              >
-                <a href="#campaigns">{t('campaigns.home.exploreCampaigns')}</a>
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="lg"
+              asChild
+              className="rounded-full h-12 px-6 text-base border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white hover:border-white/50"
+            >
+              <a href="#campaigns">{t('campaigns.home.exploreCampaigns')}</a>
+            </Button>
           </div>
         </div>
       </div>
