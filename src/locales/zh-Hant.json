@@ -1,4 +1,17 @@
 {
+  "tor": {
+    "status": {
+      "disabled": "關閉",
+      "connecting": "連線中…",
+      "connected": "已連線",
+      "failed": "連線失敗"
+    },
+    "banner": {
+      "connecting": "正在連線至 Tor — 連線就緒前內容將無法載入。",
+      "failed": "無法連線至 Tor — 連線成功前內容將被封鎖。",
+      "retry": "重試"
+    }
+  },
   "common": {
     "loading": "載入中…",
     "error": "錯誤",
@@ -984,7 +997,14 @@
       "title": "高階",
       "subtitle": "錢包連線、系統配置和其他面向高階使用者的選項。",
       "intro": "錢包連線、系統配置和其他高階選項。",
-      "wallet": "錢包"
+      "wallet": "錢包",
+      "torHeading": "Tor",
+      "torToggle": "透過 Tor 路由流量",
+      "torToggleDesc": "連線至中繼節點並透過 Tor 網路載入媒體，以獲得更強的隱私保護。預期速度會較慢，且 Tor 連線期間會有短暫延遲。",
+      "torApplyNote": "開啟此功能會將所有流量透過 Tor 路由。連線期間，其他內容將無法載入（橫幅會顯示連線狀態）— 不會有任何資料在 Tor 以外傳送。關閉後將切換回直接連線。",
+      "torStatusLabel": "狀態：",
+      "torExitIp": "Tor 出口 IP：",
+      "torCheckAgain": "重新檢查"
     },
     "wallet": {
       "title": "錢包",

@@ -15,7 +15,9 @@ import { SentryProvider } from "@/components/SentryProvider";
 
 
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useAppContext } from "@/hooks/useAppContext";
 import { useNsecPasteGuard } from "@/hooks/useNsecPasteGuard";
+import { useTor } from "@/hooks/useTor";
 import type { AppConfig } from "@/contexts/AppContext";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
 import { NWCProvider } from "@/contexts/NWCContext";
@@ -147,6 +149,7 @@ const hardcodedConfig: AppConfig = {
   imageQuality: 'compressed',
   imageProxy: 'https://wsrv.nl',
   lowBandwidthMode: false,
+  torEnabled: false,
   curatorPubkey: '932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d',
   esploraApis: [
     'https://mempool.emzy.de/api',
@@ -194,6 +197,24 @@ const defaultConfig: AppConfig = {
   feedSettings: { ...hardcodedConfig.feedSettings, ...buildConfig.feedSettings },
 };
 
+/**
+ * Wraps NostrProvider with a key that changes when Tor routing changes, so the
+ * relay layer remounts: existing connections close and reopen under the new
+ * routing (direct ⇄ fail-closed Tor), and reconnect immediately once Tor is up
+ * rather than waiting out the relay reconnect backoff. No-op off Android (the
+ * key is always "direct").
+ */
+function RelayProvider({ children }: { children: React.ReactNode }) {
+  const { config } = useAppContext();
+  const { status } = useTor();
+  const key = !config.torEnabled
+    ? "direct"
+    : status === "connected"
+      ? "tor-connected"
+      : "tor-pending";
+  return <NostrProvider key={key}>{children}</NostrProvider>;
+}
+
 export function App() {
   useNsecPasteGuard();
 
@@ -205,7 +226,7 @@ export function App() {
           <PlausibleProvider>
             <QueryClientProvider client={queryClient}>
               <NostrLoginProvider storageKey="nostr:login" storage={secureStorage}>
-                <NostrProvider>
+                <RelayProvider>
                   <NostrSync />
                   <InitialSyncRunner />
                   <NativeNotifications />
@@ -221,7 +242,7 @@ export function App() {
                         </TooltipProvider>
                       </OnboardingProvider>
                   </NWCProvider>
-                </NostrProvider>
+                </RelayProvider>
               </NostrLoginProvider>
             </QueryClientProvider>
           </PlausibleProvider>

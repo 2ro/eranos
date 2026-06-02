@@ -1,4 +1,17 @@
 {
+  "tor": {
+    "status": {
+      "disabled": "Imezimwa",
+      "connecting": "Inaunganisha…",
+      "connected": "Imeunganishwa",
+      "failed": "Muunganisho umeshindikana"
+    },
+    "banner": {
+      "connecting": "Inaunganisha kwenye Tor — maudhui hayatapakia hadi itakapokuwa tayari.",
+      "failed": "Haikuweza kuunganisha kwenye Tor — maudhui yamezuiwa hadi itakapoungana.",
+      "retry": "Jaribu tena"
+    }
+  },
   "common": {
     "loading": "Inapakia…",
     "error": "Hitilafu",
@@ -1423,7 +1436,14 @@
       "title": "Ya kina",
       "subtitle": "Muunganisho wa pochi, usanidi wa mfumo, na chaguzi zingine za kina kwa watumiaji wenye uwezo.",
       "intro": "Muunganisho wa pochi, usanidi wa mfumo, na chaguzi zingine za kina.",
-      "wallet": "Pochi"
+      "wallet": "Pochi",
+      "torHeading": "Tor",
+      "torToggle": "Peleka trafiki kupitia Tor",
+      "torToggleDesc": "Inaunganisha kwenye relei na kupakia midia kupitia mtandao wa Tor kwa faragha zaidi. Tarajia utendaji polepole na kuchelewa kidogo wakati Tor inaunganisha.",
+      "torApplyNote": "Kuiwasha hupeleka trafiki yote kupitia Tor. Wakati inaunganisha, maudhui mengine hayatapakia (bango linaonyesha hali) — hakuna kinachotumwa nje ya Tor. Kuizima kurudi kwenye muunganisho wa moja kwa moja.",
+      "torStatusLabel": "Hali:",
+      "torExitIp": "IP ya kutoka ya Tor:",
+      "torCheckAgain": "Angalia tena"
     },
     "wallet": {
       "title": "Pochi",

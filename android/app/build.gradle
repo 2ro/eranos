@@ -16,6 +16,13 @@ android {
         versionCode 1
         versionName "2.8.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // The arti-mobile AAR bundles large native Rust libraries for every
+        // ABI (~45 MB total). Restrict to the ABIs we actually ship/test:
+        // arm64-v8a + armeabi-v7a (real devices) and x86_64 (emulators).
+        // Drop x86_64 here if you only ever test on physical devices.
+        ndk {
+            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+        }
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
@@ -56,6 +63,13 @@ dependencies {
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    // Tor in Rust (arti) — prebuilt AAR from Guardian Project's gpmaven repo.
+    // Provides org.torproject.arti.ArtiProxy used by TorController.
+    implementation 'org.torproject:arti-mobile:1.7.0.1'
+    // arti pulls androidx.webkit in transitively but only at runtime; we
+    // compile against ProxyController/WebViewFeature in TorController, so
+    // declare it explicitly on the app's compile classpath.
+    implementation "androidx.webkit:webkit:$androidxWebkitVersion"
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"

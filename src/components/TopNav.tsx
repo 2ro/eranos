@@ -297,7 +297,15 @@ function getProfileMenuItems({
   userPubkey?: string;
   showDashboard: boolean;
 }): MobileLinkItem[] {
-  if (!userPubkey) return [];
+  // Logged-out users still get Settings (appearance, language, network, etc.)
+  // and About in the menu — the account-specific items are added below.
+  if (!userPubkey) {
+    return [
+      { labelKey: 'nav.search', to: '/search', icon: Search },
+      { labelKey: 'nav.settings', to: '/settings', icon: Settings },
+      { labelKey: 'nav.about', to: '/about', icon: Info },
+    ];
+  }
 
   return [
     ...(showDashboard ? [{ labelKey: 'nav.dashboard', to: '/dashboard', icon: Activity }] : []),

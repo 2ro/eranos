@@ -21,6 +21,9 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // Guardian Project's experimental Maven repo, hosting the prebuilt
+        // org.torproject:arti-mobile AAR (Tor in Rust) used for the optional Tor mode.
+        maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
     }
 }
 
