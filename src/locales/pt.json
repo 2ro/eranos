@@ -270,6 +270,14 @@
     },
     "blueskyDisclaimer": "As pessoas no Bluesky não podem te ver porque eles não são realmente descentralizados."
   },
+  "postDetail": {
+    "repliesHeading": "Respostas",
+    "commentsHeading": "Comentários",
+    "replyCount_one": "resposta",
+    "replyCount_other": "respostas",
+    "commentCount_one": "comentário",
+    "commentCount_other": "comentários"
+  },
   "noteCard": {
     "botAccount": "Conta bot",
     "showLess": "Mostrar menos",

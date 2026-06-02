@@ -1977,6 +1977,14 @@
     },
     "blueskyDisclaimer": "La gente en Bluesky no puede verte porque en realidad no están descentralizados."
   },
+  "postDetail": {
+    "repliesHeading": "Respuestas",
+    "commentsHeading": "Comentarios",
+    "replyCount_one": "respuesta",
+    "replyCount_other": "respuestas",
+    "commentCount_one": "comentario",
+    "commentCount_other": "comentarios"
+  },
   "noteCard": {
     "botAccount": "Cuenta de bot",
     "showLess": "Mostrar menos",

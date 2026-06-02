@@ -270,6 +270,14 @@
     },
     "blueskyDisclaimer": "Люди в Bluesky не могут вас видеть, потому что они на самом деле не децентрализованы."
   },
+  "postDetail": {
+    "repliesHeading": "Ответы",
+    "commentsHeading": "Комментарии",
+    "replyCount_one": "ответ",
+    "replyCount_other": "ответов",
+    "commentCount_one": "комментарий",
+    "commentCount_other": "комментариев"
+  },
   "noteCard": {
     "botAccount": "Бот-аккаунт",
     "showLess": "Свернуть",

@@ -1977,6 +1977,14 @@
     },
     "blueskyDisclaimer": "افراد در Bluesky نمی‌توانند شما را ببینند چون آن‌ها در واقع غیرمتمرکز نیستند."
   },
+  "postDetail": {
+    "repliesHeading": "پاسخ‌ها",
+    "commentsHeading": "نظرات",
+    "replyCount_one": "پاسخ",
+    "replyCount_other": "پاسخ",
+    "commentCount_one": "نظر",
+    "commentCount_other": "نظر"
+  },
   "noteCard": {
     "botAccount": "حساب ربات",
     "showLess": "نمایش کمتر",

@@ -270,6 +270,14 @@
     },
     "blueskyDisclaimer": "Bluesky पर लोग आपको नहीं देख सकते क्योंकि वे असल में डिसेंट्रलाइज़्ड नहीं हैं।"
   },
+  "postDetail": {
+    "repliesHeading": "उत्तर",
+    "commentsHeading": "कमेंट",
+    "replyCount_one": "उत्तर",
+    "replyCount_other": "उत्तर",
+    "commentCount_one": "कमेंट",
+    "commentCount_other": "कमेंट"
+  },
   "noteCard": {
     "botAccount": "बॉट अकाउंट",
     "showLess": "कम दिखाएँ",

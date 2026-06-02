@@ -1977,6 +1977,14 @@
     },
     "blueskyDisclaimer": "មនុស្សនៅលើ Bluesky មិនអាចមើលឃើញអ្នកទេ ព្រោះតាមពិតពួកគេមិនមែនជាការវិមជ្ឈការទេ។"
   },
+  "postDetail": {
+    "repliesHeading": "ការឆ្លើយតប",
+    "commentsHeading": "មតិយោបល់",
+    "replyCount_one": "ការឆ្លើយតប",
+    "replyCount_other": "ការឆ្លើយតប",
+    "commentCount_one": "មតិយោបល់",
+    "commentCount_other": "មតិយោបល់"
+  },
   "noteCard": {
     "botAccount": "គណនី Bot",
     "showLess": "បង្ហាញតិច",

@@ -1915,6 +1915,14 @@
     },
     "blueskyDisclaimer": "Bluesky 上的人看不到你，因為它們實際上不是去中心化的。"
   },
+  "postDetail": {
+    "repliesHeading": "回覆",
+    "commentsHeading": "評論",
+    "replyCount_one": "則回覆",
+    "replyCount_other": "則回覆",
+    "commentCount_one": "則評論",
+    "commentCount_other": "則評論"
+  },
   "noteCard": {
     "botAccount": "機器人賬號",
     "showLess": "顯示較少",

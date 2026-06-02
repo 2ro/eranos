@@ -2079,14 +2079,14 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
       <div className="mt-6 pb-16 sidebar:pb-0">
         <div className="flex items-baseline justify-between gap-3 mb-3 px-1">
           <h2 className="text-lg font-semibold tracking-tight">
-            {isKind1 ? 'Replies' : 'Comments'}
+            {isKind1 ? t('postDetail.repliesHeading') : t('postDetail.commentsHeading')}
           </h2>
           {replyTree.length > 0 ? (
             <span className="text-sm text-muted-foreground tabular-nums">
               {formatNumber(replyTree.length)}{' '}
-              {replyTree.length === 1
-                ? isKind1 ? 'reply' : 'comment'
-                : isKind1 ? 'replies' : 'comments'}
+              {isKind1
+                ? t('postDetail.replyCount', { count: replyTree.length })
+                : t('postDetail.commentCount', { count: replyTree.length })}
             </span>
           ) : null}
         </div>

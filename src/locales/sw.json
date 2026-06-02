@@ -269,6 +269,14 @@
     },
     "blueskyDisclaimer": "Watu wa Bluesky hawawezi kukuona kwa sababu si wa kweli waliogawanywa."
   },
+  "postDetail": {
+    "repliesHeading": "Majibu",
+    "commentsHeading": "Maoni",
+    "replyCount_one": "jibu",
+    "replyCount_other": "majibu",
+    "commentCount_one": "maoni",
+    "commentCount_other": "maoni"
+  },
   "noteCard": {
     "botAccount": "Akaunti ya bot",
     "showLess": "Onyesha kidogo",

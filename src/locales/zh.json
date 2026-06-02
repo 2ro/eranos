@@ -1979,6 +1979,14 @@
     },
     "blueskyDisclaimer": "Bluesky 上的人看不到你，因为它们实际上不是去中心化的。"
   },
+  "postDetail": {
+    "repliesHeading": "回复",
+    "commentsHeading": "评论",
+    "replyCount_one": "条回复",
+    "replyCount_other": "条回复",
+    "commentCount_one": "条评论",
+    "commentCount_other": "条评论"
+  },
   "noteCard": {
     "botAccount": "机器人账号",
     "showLess": "显示较少",

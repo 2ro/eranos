@@ -271,6 +271,14 @@
     },
     "blueskyDisclaimer": "People on Bluesky can't see you because they're not actually decentralized."
   },
+  "postDetail": {
+    "repliesHeading": "Replies",
+    "commentsHeading": "Comments",
+    "replyCount_one": "reply",
+    "replyCount_other": "replies",
+    "commentCount_one": "comment",
+    "commentCount_other": "comments"
+  },
   "noteCard": {
     "botAccount": "Bot account",
     "showLess": "Show less",

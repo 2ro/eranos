@@ -269,6 +269,14 @@
     },
     "blueskyDisclaimer": "Les utilisateurs de Bluesky ne peuvent pas vous voir car ils ne sont pas vraiment décentralisés."
   },
+  "postDetail": {
+    "repliesHeading": "Réponses",
+    "commentsHeading": "Commentaires",
+    "replyCount_one": "réponse",
+    "replyCount_other": "réponses",
+    "commentCount_one": "commentaire",
+    "commentCount_other": "commentaires"
+  },
   "noteCard": {
     "botAccount": "Compte bot",
     "showLess": "Réduire",

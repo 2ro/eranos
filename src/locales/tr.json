@@ -269,6 +269,14 @@
     },
     "blueskyDisclaimer": "Bluesky'daki insanlar sizi göremez çünkü aslında merkeziyetsiz değiller."
   },
+  "postDetail": {
+    "repliesHeading": "Yanıtlar",
+    "commentsHeading": "Yorumlar",
+    "replyCount_one": "yanıt",
+    "replyCount_other": "yanıt",
+    "commentCount_one": "yorum",
+    "commentCount_other": "yorum"
+  },
   "noteCard": {
     "botAccount": "Bot hesabı",
     "showLess": "Daha az göster",

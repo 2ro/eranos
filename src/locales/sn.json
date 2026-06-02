@@ -1979,6 +1979,14 @@
     },
     "blueskyDisclaimer": "Vanhu paBluesky havakukuoni nokuti chaizvoizvo havasi vakapararira."
   },
+  "postDetail": {
+    "repliesHeading": "Mhinduro",
+    "commentsHeading": "Tsinhiro",
+    "replyCount_one": "mhinduro",
+    "replyCount_other": "mhinduro",
+    "commentCount_one": "tsinhiro",
+    "commentCount_other": "tsinhiro"
+  },
   "noteCard": {
     "botAccount": "Akaundi yebhoti",
     "showLess": "Ratidza zvishoma",

@@ -270,6 +270,14 @@
     },
     "blueskyDisclaimer": "Orang-orang di Bluesky tidak bisa melihat Anda karena mereka sebenarnya tidak terdesentralisasi."
   },
+  "postDetail": {
+    "repliesHeading": "Balasan",
+    "commentsHeading": "Komentar",
+    "replyCount_one": "balasan",
+    "replyCount_other": "balasan",
+    "commentCount_one": "komentar",
+    "commentCount_other": "komentar"
+  },
   "noteCard": {
     "botAccount": "Akun bot",
     "showLess": "Tampilkan lebih sedikit",

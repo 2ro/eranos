@@ -1963,6 +1963,14 @@
     },
     "blueskyDisclaimer": "الأشخاص على Bluesky لا يمكنهم رؤيتك لأنهم في الواقع غير لامركزيين."
   },
+  "postDetail": {
+    "repliesHeading": "الردود",
+    "commentsHeading": "التعليقات",
+    "replyCount_one": "رد",
+    "replyCount_other": "ردود",
+    "commentCount_one": "تعليق",
+    "commentCount_other": "تعليقات"
+  },
   "noteCard": {
     "botAccount": "حساب بوت",
     "showLess": "عرض أقل",
