@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   ArrowLeft,
   ArrowRight,
+  Bitcoin,
   Check,
   ChevronDown,
   EyeOff,
@@ -1407,6 +1408,13 @@ function WalletPicker({
             </div>
           </div>
 
+          {/* Restate the field-driven accept model in the same plain
+              voice as the "mine" branch's accept picker, so swapping to
+              custom mode doesn't drop the public/private hand-holding. */}
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            {t('campaignsCreate.customWalletIntro')}
+          </p>
+
           <CustomWalletInput
             id="campaign-wallet-onchain"
             label={t('campaignsCreate.bitcoinAddress')}
@@ -1538,10 +1546,16 @@ function AcceptModePicker({
 }
 
 /**
- * Single labeled custom-wallet input. The inline error fires only when
- * a non-empty value either fails to parse OR parses to a mode that
- * doesn't match {@link expectedMode} (e.g., an `sp1…` typed into the
- * on-chain field).
+ * Single labeled custom-wallet input. Mirrors the accept-picker
+ * language so the field-driven custom flow keeps the same public /
+ * private framing: a {@link Bitcoin}/{@link EyeOff} icon next to the
+ * label and a one-line caption spell out what filling this field
+ * means, so the user never has to infer "address = public,
+ * code = private".
+ *
+ * The inline error fires only when a non-empty value either fails to
+ * parse OR parses to a mode that doesn't match {@link expectedMode}
+ * (e.g., an `sp1…` typed into the on-chain field).
  */
 function CustomWalletInput({
   id,
@@ -1567,11 +1581,19 @@ function CustomWalletInput({
     expectedMode === 'onchain'
       ? t('campaignsCreate.onchainInvalid')
       : t('campaignsCreate.spInvalid');
+  const MeaningIcon = expectedMode === 'onchain' ? Bitcoin : EyeOff;
+  const meaning =
+    expectedMode === 'onchain'
+      ? t('campaignsCreate.customOnchainMeaning')
+      : t('campaignsCreate.customSpMeaning');
   return (
-    <div className="space-y-1">
-      <label htmlFor={id} className="text-xs font-medium text-muted-foreground">
-        {label}
-      </label>
+    <div className="space-y-1.5">
+      <div className="flex items-center gap-1.5">
+        <MeaningIcon className="size-3.5 shrink-0 text-muted-foreground" />
+        <label htmlFor={id} className="text-xs font-medium">
+          {label}
+        </label>
+      </div>
       <div className="relative">
         <Wallet className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
@@ -1586,7 +1608,11 @@ function CustomWalletInput({
           aria-invalid={hasError}
         />
       </div>
-      {hasError && <p className="text-xs text-destructive">{errorMessage}</p>}
+      {hasError ? (
+        <p className="text-xs text-destructive">{errorMessage}</p>
+      ) : (
+        <p className="text-xs leading-relaxed text-muted-foreground">{meaning}</p>
+      )}
     </div>
   );
 }
