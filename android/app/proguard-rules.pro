@@ -19,6 +19,14 @@
 -dontwarn okio.**
 -keep class okhttp3.** { *; }
 
+# Barcode scanner plugin (@capacitor/barcode-scanner -> OutSystems ionbarcode)
+# references Gson's @SerializedName, but Gson isn't on the release classpath.
+# Suppress the missing-class warning, keep the annotation attribute, and keep
+# the plugin's model classes so R8 doesn't strip/rename serialized fields.
+-dontwarn com.google.gson.**
+-keepattributes *Annotation*
+-keep class com.outsystems.plugins.barcode.** { *; }
+
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
 #-keepattributes SourceFile,LineNumberTable
