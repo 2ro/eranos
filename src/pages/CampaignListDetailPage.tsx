@@ -40,6 +40,7 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { toast } from '@/hooks/useToast';
 import { Link } from 'react-router-dom';
 import type { ParsedCampaign } from '@/lib/campaign';
+import { CAMPAIGN_CATEGORY_LABEL_KEYS_BY_SLUG } from '@/lib/campaignCategories';
 import { cn } from '@/lib/utils';
 import NotFound from './NotFound';
 
@@ -207,9 +208,16 @@ export function CampaignListDetailPage() {
     }
   };
 
+  const listLabelKey = list
+    ? CAMPAIGN_CATEGORY_LABEL_KEYS_BY_SLUG.get(list.slug)
+    : undefined;
+  const localizedListTitle = list
+    ? listLabelKey ? t(listLabelKey) : list.title
+    : undefined;
+
   useSeoMeta({
-    title: list
-      ? `${list.title} | ${config.appName}`
+    title: localizedListTitle
+      ? `${localizedListTitle} | ${config.appName}`
       : `${t('campaigns.lists.detailTitle')} | ${config.appName}`,
     description: list?.description,
   });
@@ -228,6 +236,7 @@ export function CampaignListDetailPage() {
   }
   if (!list) return <NotFound />;
 
+  const listTitle = localizedListTitle ?? list.title;
   const visibleCount = displayedCampaigns.length;
   const isLoadingCampaigns = campaignsLoading && coords.length > 0;
 
@@ -247,7 +256,7 @@ export function CampaignListDetailPage() {
                 <span className="inline-flex size-10 sm:size-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
                   <LucideIcon name={list.icon} className="size-5 sm:size-6" />
                 </span>
-                <span className="break-words">{list.title}</span>
+                <span className="break-words">{listTitle}</span>
               </h1>
               {list.description && (
                 <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
@@ -352,7 +361,7 @@ export function CampaignListDetailPage() {
               {t('campaigns.lists.deleteConfirmTitle')}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {t('campaigns.lists.deleteConfirmDesc', { title: list.title })}
+              {t('campaigns.lists.deleteConfirmDesc', { title: listTitle })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

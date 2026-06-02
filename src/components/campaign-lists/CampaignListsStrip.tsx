@@ -36,6 +36,7 @@ import { useCampaignLists } from '@/hooks/useCampaignLists';
 import { useCampaignListActions } from '@/hooks/useCampaignListActions';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { toast } from '@/hooks/useToast';
+import { CAMPAIGN_CATEGORY_LABEL_KEYS_BY_SLUG } from '@/lib/campaignCategories';
 import type { ParsedCampaignList } from '@/lib/campaignLists';
 import { cn } from '@/lib/utils';
 
@@ -208,6 +209,13 @@ export function CampaignListsStrip() {
     />
   );
 
+  const deleteTargetLabelKey = deleteTarget
+    ? CAMPAIGN_CATEGORY_LABEL_KEYS_BY_SLUG.get(deleteTarget.slug)
+    : undefined;
+  const deleteTargetTitle = deleteTarget
+    ? deleteTargetLabelKey ? t(deleteTargetLabelKey) : deleteTarget.title
+    : '';
+
   return (
     <>
       <section
@@ -293,7 +301,7 @@ export function CampaignListsStrip() {
             </AlertDialogTitle>
             <AlertDialogDescription>
               {t('campaigns.lists.deleteConfirmDesc', {
-                title: deleteTarget?.title ?? '',
+                title: deleteTargetTitle,
               })}
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -346,12 +354,14 @@ function ListPill({
 }: ListPillProps) {
   const { t } = useTranslation();
   const [isOver, setIsOver] = useState(false);
+  const labelKey = CAMPAIGN_CATEGORY_LABEL_KEYS_BY_SLUG.get(list.slug);
+  const title = labelKey ? t(labelKey) : list.title;
 
   // Visible label + icon — same shape for mods and non-mods.
   const content: ReactNode = (
     <>
       <LucideIcon name={list.icon} className="size-4 shrink-0 text-primary" />
-      <span className="whitespace-nowrap">{list.title}</span>
+      <span className="whitespace-nowrap">{title}</span>
     </>
   );
 
@@ -434,7 +444,7 @@ function ListPill({
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            aria-label={t('campaigns.lists.menuAria', { title: list.title })}
+            aria-label={t('campaigns.lists.menuAria', { title })}
             onClick={(e) => e.stopPropagation()}
             className="inline-flex items-center px-2 rounded-r-full bg-background border border-l-0 border-border text-muted-foreground hover:text-foreground hover:bg-primary/5 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >

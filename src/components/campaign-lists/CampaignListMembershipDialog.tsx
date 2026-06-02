@@ -15,6 +15,7 @@ import { ListFormDialog } from './ListFormDialog';
 import { useCampaignLists } from '@/hooks/useCampaignLists';
 import { useCampaignListActions } from '@/hooks/useCampaignListActions';
 import { toast } from '@/hooks/useToast';
+import { CAMPAIGN_CATEGORY_LABEL_KEYS_BY_SLUG } from '@/lib/campaignCategories';
 import { cn } from '@/lib/utils';
 
 interface CampaignListMembershipDialogProps {
@@ -183,6 +184,8 @@ export function CampaignListMembershipDialog({
                 {lists.map((list) => {
                   const member = isMember(list.slug, list.coords);
                   const pending = pendingSlug === list.slug;
+                  const labelKey = CAMPAIGN_CATEGORY_LABEL_KEYS_BY_SLUG.get(list.slug);
+                  const title = labelKey ? t(labelKey) : list.title;
                   return (
                     <li
                       key={list.aTag}
@@ -193,7 +196,7 @@ export function CampaignListMembershipDialog({
                       </span>
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium truncate">
-                          {list.title}
+                          {title}
                         </div>
                         {list.description && (
                           <div className="text-xs text-muted-foreground truncate">
