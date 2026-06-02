@@ -508,7 +508,7 @@
     "wallet": "比特币钱包",
     "myWalletLabel": "{{name}} 的钱包",
     "myWalletDefault": "我的钱包",
-    "walletHeroNote": "捐款将直接进入你自己的 Agora 钱包。没有中间人，无需设置收款，也无需等待。",
+    "walletHeroNote": "捐款将直接进入你自己的 Agora 钱包。没有中间人，也无需等待。",
     "walletHeroReassurance": "你掌握密钥，就掌握资金。随时可在钱包标签页提现。",
     "walletChoose": "选择钱包",
     "walletCustom": "自定义",

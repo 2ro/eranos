@@ -939,7 +939,7 @@
     "wallet": "Bitcoin cüzdanı",
     "myWalletLabel": "{{name}} cüzdanı",
     "myWalletDefault": "Cüzdanım",
-    "walletHeroNote": "Bağışlar doğrudan kendi Agora cüzdanınıza akar. Aracı yok, ödeme ayarı yok, bekleme yok.",
+    "walletHeroNote": "Bağışlar doğrudan kendi Agora cüzdanınıza akar. Aracı yok, bekleme yok.",
     "walletHeroReassurance": "Anahtar sizde olduğu için para da sizde. Cüzdan sekmesinden istediğiniz zaman çekebilirsiniz.",
     "walletChoose": "Bir cüzdan seçin",
     "walletCustom": "Özel",

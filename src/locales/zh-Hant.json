@@ -508,7 +508,7 @@
     "wallet": "比特幣錢包",
     "myWalletLabel": "{{name}} 的錢包",
     "myWalletDefault": "我的錢包",
-    "walletHeroNote": "捐款會直接進入您自己的 Agora 錢包。沒有中間人，不必設定提領，也不用等待。",
+    "walletHeroNote": "捐款會直接進入您自己的 Agora 錢包。沒有中間人，也不用等待。",
     "walletHeroReassurance": "您持有金鑰，因此您持有資金。隨時都可以從錢包分頁提領。",
     "walletChoose": "選擇錢包",
     "walletCustom": "自定義",
