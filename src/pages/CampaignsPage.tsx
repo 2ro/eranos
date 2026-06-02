@@ -155,7 +155,7 @@ export function CampaignsPage() {
     (heroLoading && cappedCoords.length > 0);
 
   return (
-    <main className="min-h-screen pb-16">
+    <main className="min-h-screen">
       <Hero />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12" id="campaigns">
@@ -212,20 +212,26 @@ export function CampaignsPage() {
         <section className="space-y-5">
           <CampaignListsStrip />
 
-          <div className="pt-2 flex justify-center sm:justify-start">
+          <div className="pt-2 flex flex-col sm:flex-row gap-3 items-center justify-center sm:justify-start">
             <Button asChild size="lg" variant="outline" className="rounded-full">
               <Link to="/campaigns">
                 {t('campaigns.home.browseAll')}
                 <ArrowRight className="ml-2 size-4 rtl:rotate-180" />
               </Link>
             </Button>
+            <Button asChild size="lg" className="rounded-full">
+              <StartCampaignLink>
+                <PlusCircle className="mr-2 size-4" />
+                {t('campaigns.home.startCampaign')}
+              </StartCampaignLink>
+            </Button>
           </div>
         </section>
-
-        <AppDownloadNudge className="px-0 pt-0 pb-0" />
       </div>
 
       <WhyDifferentSection />
+
+      <AppDownloadNudge className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pt-8 pb-0" />
     </main>
   );
 }
@@ -502,7 +508,7 @@ function WhyDifferentSection() {
   return (
     <section
       aria-labelledby="why-different-title"
-      className="relative bg-background py-20 md:py-28 overflow-hidden"
+      className="relative bg-background pt-20 pb-12 md:pt-28 md:pb-16 overflow-hidden"
     >
       {/* Decorative spine: a soft vertical brand-orange line on
           the far left, evoking the manifesto / editorial feel.
