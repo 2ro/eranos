@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.8.5] - 2026-06-02
+
+A maintenance release that fixes the Android build so signed releases publish correctly. No user-facing changes.
+
 ## [2.8.4] - 2026-06-02
 
 A maintenance release that fixes the Android build so signed releases publish correctly. No user-facing changes.
