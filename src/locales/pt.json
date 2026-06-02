@@ -940,6 +940,8 @@
     "wallet": "Carteira Bitcoin",
     "myWalletLabel": "Carteira de {{name}}",
     "myWalletDefault": "Minha carteira",
+    "walletHeroNote": "As doações vão direto para a sua própria carteira Agora — desbloqueada pela mesma chave que assina suas publicações. Sem intermediários, sem configuração de pagamento, sem espera.",
+    "walletHeroReassurance": "Você guarda a chave, então você guarda os fundos. Saque a qualquer momento na aba da carteira.",
     "walletChoose": "Escolher uma carteira",
     "walletCustom": "Personalizada",
     "walletUseCustom": "Usar uma carteira personalizada",

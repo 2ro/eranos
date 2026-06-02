@@ -12,7 +12,9 @@ import {
   ChevronDown,
   HandHeart,
   HelpCircle,
+  Link2,
   Loader2,
+  ShieldCheck,
   Upload,
   Wallet,
 } from 'lucide-react';
@@ -1206,13 +1208,14 @@ export function CreateCampaignPage() {
  * Two modes selectable via a single inline toggle:
  *
  *  1. **My wallet** (`'mine'`, default when nsec is available) — a
- *     compact identity card shows the user's avatar, display name and
- *     live USD/BTC balance, modelled on the wallet-page balance
- *     treatment. A small pencil affordance to the right is the entry
- *     point to swap into custom mode; mirror-link beneath the inputs
- *     swaps back. The HD-wallet mode also surfaces a segmented
- *     "Accept" picker (All / Public / Private) that picks which
- *     donation types the campaign accepts.
+ *     primary-tinted hero card (modelled on the onboarding "Save your
+ *     key" surface) whose centerpiece is a linked-icon trio
+ *     (campaign ↔ key ↔ wallet) explaining that donations land in the
+ *     creator's own Agora wallet. An avatar + live USD/BTC balance
+ *     chip confirms the exact destination, and a "Use a custom wallet"
+ *     sub-link swaps into custom mode. The HD-wallet mode also
+ *     surfaces a segmented "Accept" picker (All / Public / Private)
+ *     that picks which donation types the campaign accepts.
  *  2. **Custom** (`'custom'`) — two address inputs (on-chain + silent
  *     payment). At least one must parse to a valid endpoint of its
  *     mode.
@@ -1300,32 +1303,63 @@ function WalletPicker({
     <div className="space-y-4">
       {walletSource === 'mine' ? (
         <>
-          {/* Identity + balance row. Pure visual chrome — the swap to
-              custom mode is handled by the "Use a custom wallet"
-              sub-link below so the row reads as confirmation of the
-              destination, not as a tappable target. */}
-          <div className="flex items-center gap-3 px-1 py-2">
-            <Avatar className="size-10 shrink-0">
-              <AvatarImage src={picture} alt={displayName} />
-              <AvatarFallback>{initial}</AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">{myWalletLabel}</p>
-              {balanceLoading ? (
-                <Skeleton className="mt-1 h-4 w-24" />
-              ) : btcPrice ? (
-                <p className="text-xs text-muted-foreground tabular-nums">
-                  <span className="font-medium text-foreground">
-                    {satsToUSD(totalBalance, btcPrice)}
-                  </span>
-                  <span className="mx-1.5 opacity-60">·</span>
-                  <span>{formatBTC(totalBalance)} BTC</span>
-                </p>
-              ) : (
-                <p className="text-xs text-muted-foreground tabular-nums">
-                  {formatBTC(totalBalance)} BTC
-                </p>
-              )}
+          {/* Hero coupling card. Modelled on the onboarding "Save your
+              key" surface: a primary-tinted card whose visual
+              centerpiece is the linked-icon trio (the campaign ↔ the
+              key ↔ the wallet) so a first-time creator instantly
+              grasps that donations land in their own Agora wallet,
+              unlocked by the same key that signs their posts. The
+              avatar + live balance below confirm the exact destination. */}
+          <div className="rounded-xl border-2 border-primary/30 bg-primary/10 p-5 space-y-4">
+            <div className="flex items-center justify-center gap-3">
+              <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-background shadow-sm ring-2 ring-primary/30">
+                <HandHeart className="size-7 text-primary" />
+              </div>
+              <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow">
+                <Link2 className="size-4" />
+              </div>
+              <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-background shadow-sm ring-2 ring-primary/30">
+                <Wallet className="size-7 text-primary" />
+              </div>
+            </div>
+
+            <p className="text-center text-sm leading-relaxed text-foreground">
+              {t('campaignsCreate.walletHeroNote')}
+            </p>
+
+            {/* Destination confirmation — avatar + live balance, framed
+                as a self-contained chip so it reads as "this exact
+                wallet" rather than incidental chrome. */}
+            <div className="flex items-center gap-3 rounded-lg border border-primary/20 bg-background/60 px-3 py-2.5">
+              <Avatar className="size-10 shrink-0">
+                <AvatarImage src={picture} alt={displayName} />
+                <AvatarFallback>{initial}</AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold">{myWalletLabel}</p>
+                {balanceLoading ? (
+                  <Skeleton className="mt-1 h-4 w-24" />
+                ) : btcPrice ? (
+                  <p className="text-xs text-muted-foreground tabular-nums">
+                    <span className="font-medium text-foreground">
+                      {satsToUSD(totalBalance, btcPrice)}
+                    </span>
+                    <span className="mx-1.5 opacity-60">·</span>
+                    <span>{formatBTC(totalBalance)} BTC</span>
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground tabular-nums">
+                    {formatBTC(totalBalance)} BTC
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2 border-t border-primary/20 pt-3">
+              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                {t('campaignsCreate.walletHeroReassurance')}
+              </p>
             </div>
           </div>
 
