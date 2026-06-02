@@ -3,7 +3,7 @@ import { Check, Languages } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import { useAppContext } from '@/hooks/useAppContext';
-import i18n, { SUPPORTED_LANGUAGES, isRTLLanguage } from '@/i18n';
+import { SUPPORTED_LANGUAGES, changeAppLanguage, isRTLLanguage } from '@/i18n';
 import { cn } from '@/lib/utils';
 
 export function LanguageSettingsPage() {
@@ -42,7 +42,7 @@ export function LanguageSettingsPage() {
 
   const handleSelect = (code: string) => {
     if (code === currentLng) return;
-    void i18n.changeLanguage(code);
+    void changeAppLanguage(code);
   };
 
   return (

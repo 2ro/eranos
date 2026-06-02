@@ -95,6 +95,7 @@ function resolveLocaleFile(lng: string): string | undefined {
  * already-loaded locales).
  */
 const loadedLocales = new Set<string>(['en']);
+let languageChangeRequest = 0;
 
 async function loadLocale(lng: string): Promise<void> {
   const file = resolveLocaleFile(lng);
@@ -134,6 +135,21 @@ async function loadLocale(lng: string): Promise<void> {
   loadedLocales.add(file);
 }
 
+/**
+ * Switch languages only after the target locale has been registered.
+ *
+ * Calling i18next.changeLanguage() first can render React components against a
+ * missing lazy-loaded bundle, leaving them stuck on fallback English until an
+ * unrelated render happens. The request counter keeps rapid clicks ordered so a
+ * slower earlier download cannot overwrite the latest selection.
+ */
+export async function changeAppLanguage(lng: string): Promise<void> {
+  const request = ++languageChangeRequest;
+  await loadLocale(lng);
+  if (request !== languageChangeRequest) return;
+  await i18n.changeLanguage(lng);
+}
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -160,6 +176,9 @@ i18n
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
       lookupLocalStorage: 'i18nextLng',
+    },
+    react: {
+      bindI18nStore: 'added',
     },
   });
 
