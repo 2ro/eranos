@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Activity,
   Bell,
+  Download,
   HandHeart,
   Info,
   LayoutDashboard,
@@ -15,6 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
+import { Capacitor } from '@capacitor/core';
 
 import { LoginArea } from '@/components/auth/LoginArea';
 import { LogoIcon } from '@/components/icons/LogoIcon';
@@ -25,6 +27,7 @@ import { useFeedSettings } from '@/hooks/useFeedSettings';
 import { useHdBtcPrice } from '@/hooks/useHdBtcPrice';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { satsToUSD } from '@/lib/bitcoin';
+import { ZAPSTORE_URL } from '@/lib/zapstore';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -175,6 +178,18 @@ export function TopNav() {
               })}
               onClose={() => setMobileOpen(false)}
             />
+            {!Capacitor.isNativePlatform() && (
+              <a
+                href={ZAPSTORE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary motion-safe:transition-colors"
+              >
+                <Download className="size-4 shrink-0" />
+                {t('nav.getApp')}
+              </a>
+            )}
           </nav>
           <div className="border-t border-border p-4 space-y-3">
             <MobileFooterLinks onClose={() => setMobileOpen(false)} />

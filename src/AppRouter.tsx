@@ -84,7 +84,7 @@ function PageSkeleton() {
 function SiteFooter() {
   const { t } = useTranslation();
   return (
-    <footer className="bg-background mt-auto pt-12">
+    <footer className="bg-background mt-auto pt-6 sm:pt-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
         <button
           type="button"

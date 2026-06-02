@@ -3,20 +3,21 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import { useAppContext } from '@/hooks/useAppContext';
 import { ZAPSTORE_URL } from '@/lib/zapstore';
+import { cn } from '@/lib/utils';
 
 /**
  * Zapstore download nudge — prompts mobile-web visitors to install the native
  * Android app. Hidden inside the native app (you're already in it) and on
  * desktop (`sm:hidden`), where downloading works differently.
  */
-export function AppDownloadNudge() {
+export function AppDownloadNudge({ className }: { className?: string }) {
   const { t } = useTranslation();
   const { config } = useAppContext();
 
   if (Capacitor.isNativePlatform()) return null;
 
   return (
-    <div className="sm:hidden px-4 pt-8 pb-4">
+    <div className={cn('sm:hidden px-4 pt-8 pb-4', className)}>
       <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
         {t('feed.getApp.eyebrow')}
       </p>
