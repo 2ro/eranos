@@ -85,17 +85,22 @@ export function CampaignWalletDonatePanel({
           Error-correction level H tolerates the centered occlusion
           (~30% of modules can be missing and the code still scans). */}
       <div className="flex justify-center">
-        <div className="relative rounded-2xl bg-white p-4 shadow-sm">
-          <QRCodeCanvas value={qrPayload} size={280} level="H" />
+        <div className="relative w-full max-w-[280px] rounded-2xl bg-white p-4 shadow-sm">
+          <QRCodeCanvas
+            value={qrPayload}
+            size={280}
+            level="H"
+            className="block h-auto w-full"
+          />
           <div
             aria-hidden
             className="absolute inset-0 flex items-center justify-center pointer-events-none"
           >
-            <div className="rounded-full bg-primary p-2 ring-[6px] ring-white">
+            <div className="flex aspect-square w-[28%] items-center justify-center rounded-full bg-primary ring-[6px] ring-white">
               <img
                 src="/logo.svg"
                 alt=""
-                className="size-16 object-contain brightness-0 invert"
+                className="aspect-square w-3/5 object-contain brightness-0 invert"
                 draggable={false}
               />
             </div>

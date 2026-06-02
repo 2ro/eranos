@@ -472,7 +472,7 @@ export function PostDetailShell({
   const navigate = useNavigate();
 
   return (
-    <main className="">
+    <main className="w-full max-w-3xl mx-auto">
       <div className="flex items-center gap-4 px-4 pt-4 pb-5">
         <button
           onClick={() =>

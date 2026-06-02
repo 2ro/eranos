@@ -368,7 +368,7 @@ export function ExternalContentPage() {
   }
 
   return (
-    <main className="">
+    <main className="w-full max-w-3xl mx-auto">
       {/* Non-sticky transparent header — skipped on country pages because
           the country hero carries its own back arrow overlaid on the
           photo, which lets the cinematic banner reach all the way to the
