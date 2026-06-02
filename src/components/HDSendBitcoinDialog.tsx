@@ -48,17 +48,19 @@ import {
   classifyBroadcastError,
   type BroadcastErrorKind,
 } from '@/lib/bitcoinBroadcastError';
-import { isLargeAmount, satsToUSD } from '@/lib/bitcoin';
+import { formatSats, isLargeAmount, satsToUSD } from '@/lib/bitcoin';
 import {
   broadcastBlockbookTx,
   fetchFeeRates,
 } from '@/lib/hdwallet/blockbook';
 import {
   buildHdSpendPsbt,
+  buildHdMaxSpendPsbt,
   finalizeHdPsbt,
   type HdInput,
   type HdSpendableSpUtxo,
   type HdSpendableUtxo,
+  previewHdMaxSpend,
   previewHdFee,
   signHdPsbt,
 } from '@/lib/hdwallet/transaction';
@@ -68,7 +70,7 @@ import { useQuery } from '@tanstack/react-query';
 // Constants
 // ---------------------------------------------------------------------------
 
-const USD_PRESETS = [1, 5, 10, 25, 100];
+const USD_PRESETS = [5, 10, 25, 100];
 
 type FeeSpeed = BitcoinFeeSpeed;
 
@@ -154,6 +156,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
   // recipient (or null) to us. We only see the final picked destination.
   const [recipient, setRecipient] = useState<ResolvedRecipient | null>(null);
   const [usdAmount, setUsdAmount] = useState<number | string>(5);
+  const [sendMax, setSendMax] = useState(false);
   const [feeSpeed, setFeeSpeed] = useState<FeeSpeed>('halfHour');
   /** Raw text for the custom sat/vB rate input (only used when feeSpeed === 'custom'). */
   const [customFeeRate, setCustomFeeRate] = useState('');
@@ -228,6 +231,11 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     return Math.round((usd / btcPrice) * 100_000_000);
   }, [usdAmount, btcPrice]);
 
+  const maxSpend = useMemo(
+    () => (currentFeeRate ? previewHdMaxSpend(ownedInputs, currentFeeRate) : null),
+    [ownedInputs, currentFeeRate],
+  );
+
   // ── Fee estimate (matches the actual coin selection) ────────
   //
   // Crucially we do NOT use `ownedInputs.length` as the input count: an HD
@@ -240,17 +248,21 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     return previewHdFee(ownedInputs, amountSats, currentFeeRate);
   }, [ownedInputs, currentFeeRate, amountSats]);
 
-  const totalSats = amountSats + estimatedFeeSats;
+  const effectiveAmountSats = sendMax ? (maxSpend?.amountSats ?? 0) : amountSats;
+  const effectiveFeeSats = sendMax ? (maxSpend?.fee ?? 0) : estimatedFeeSats;
+  const totalSats = effectiveAmountSats + effectiveFeeSats;
   // `previewHdFee` returns 0 when the coin selector can't cover `amount + fee`.
   // Treat that as insufficient so the UI doesn't claim a 0-sat fee is fine.
-  const selectionFailed =
-    amountSats > 0 && !!currentFeeRate && ownedInputs.length > 0 && estimatedFeeSats === 0;
+  const selectionFailed = sendMax
+    ? !!currentFeeRate && ownedInputs.length > 0 && !maxSpend
+    : amountSats > 0 && !!currentFeeRate && ownedInputs.length > 0 && estimatedFeeSats === 0;
   const insufficient = selectionFailed || (totalBalance > 0 && totalSats > totalBalance);
 
   // Auto-tune fee speed to keep fees < 40% of the send amount, unless the
   // user has manually overridden.
   useEffect(() => {
     if (feeSpeedUserChanged.current) return;
+    if (sendMax) return;
     if (!ownedInputs.length || !feeRates || amountSats <= 0) return;
 
     const uniqueSpeeds = getUniqueBitcoinFeeSpeeds(feeRates);
@@ -263,7 +275,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       if (fee > 0 && fee <= threshold) { target = speed; break; }
     }
     setFeeSpeed((prev) => (prev === target ? prev : target));
-  }, [amountSats, feeRates, ownedInputs, totalBalance]);
+  }, [amountSats, feeRates, ownedInputs, sendMax, totalBalance]);
 
   const handleFeeSpeedChange = useCallback((speed: FeeSpeed) => {
     feeSpeedUserChanged.current = true;
@@ -284,7 +296,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
 
   useEffect(() => {
     setConfirmArmed(false);
-  }, [amountSats, currentFeeRate, btcPrice, recipient?.address]);
+  }, [effectiveAmountSats, currentFeeRate, btcPrice, recipient?.address]);
 
   // Track open transitions so we can re-key the picker on each
   // closed → open transition. Re-keying remounts the picker with a fresh
@@ -312,31 +324,56 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       if (!recipient) throw new Error(t('walletSend.errors.enterRecipient'));
       if (!ownedInputs.length) throw new Error(t('walletSend.errors.noSpendable'));
       if (feeSpeed !== 'custom' && !feeRates) throw new Error(t('walletSend.errors.feesNotLoaded'));
-      if (amountSats <= 0) throw new Error(t('walletSend.errors.enterAmount'));
+      if (effectiveAmountSats <= 0) throw new Error(t('walletSend.errors.enterAmount'));
       if (insufficient) throw new Error(t('walletSend.errors.insufficient'));
 
       const rate = resolveBitcoinFeeRate(feeSpeed, feeRates, customFeeRate);
       if (!rate || rate < 1) throw new Error(t('walletSend.errors.feeRateTooLow'));
       const nextChangeIndex = scan?.change.firstUnusedIndex ?? 0;
+      const resolvedRecipient = recipient.kind === 'sp'
+        ? { kind: 'sp' as const, spAddress: recipient.address }
+        : { kind: 'address' as const, address: recipient.address };
 
       setProgress('building');
-      const built = buildHdSpendPsbt({
-        account: availability.account,
-        inputs: ownedInputs,
-        recipient:
-          recipient.kind === 'sp'
-            ? { kind: 'sp', spAddress: recipient.address }
-            : { kind: 'address', address: recipient.address },
-        amountSats,
-        feeRate: rate,
-        nextChangeIndex,
-        seed: availability.seed,
-      });
+      let psbtHex: string;
+      let fee: number;
+      let sentAmountSats = effectiveAmountSats;
+      let inputDescriptors: Parameters<typeof signHdPsbt>[1];
+      let consumedSpUtxos: Array<{ txid: string; vout: number }>;
+
+      if (sendMax) {
+        const built = buildHdMaxSpendPsbt({
+          account: availability.account,
+          inputs: ownedInputs,
+          recipient: resolvedRecipient,
+          feeRate: rate,
+          seed: availability.seed,
+        });
+        psbtHex = built.psbtHex;
+        fee = built.fee;
+        sentAmountSats = built.amountSats;
+        inputDescriptors = built.inputDescriptors;
+        consumedSpUtxos = built.consumedSpUtxos;
+      } else {
+        const built = buildHdSpendPsbt({
+          account: availability.account,
+          inputs: ownedInputs,
+          recipient: resolvedRecipient,
+          amountSats: effectiveAmountSats,
+          feeRate: rate,
+          nextChangeIndex,
+          seed: availability.seed,
+        });
+        psbtHex = built.psbtHex;
+        fee = built.fee;
+        inputDescriptors = built.inputDescriptors;
+        consumedSpUtxos = built.consumedSpUtxos;
+      }
 
       setProgress('signing');
       const signedHex = signHdPsbt(
-        built.psbtHex,
-        built.inputDescriptors,
+        psbtHex,
+        inputDescriptors,
         availability.account,
         availability.seed,
       );
@@ -345,12 +382,11 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       setProgress('broadcasting');
       const txid = await broadcastBlockbookTx(blockbookBaseUrl, txHex);
 
-      return { txid, amountSats, fee: built.fee, consumedSpUtxos: built.consumedSpUtxos };
+      return { txid, amountSats: sentAmountSats, fee, consumedSpUtxos };
     },
     onSuccess: (result) => {
       notificationSuccess();
       setSuccess(result);
-      queryClient.invalidateQueries({ queryKey: ['hdwallet-scan'] });
       // Remove the SP UTXOs we just spent from local storage and
       // republish the NIP-78 doc. Blockbook's xpub scan can't see SP
       // outputs, so without this the spent UTXOs would linger forever:
@@ -362,6 +398,9 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       if (result.consumedSpUtxos.length > 0) {
         pruneSpentSilentPaymentUtxos(result.consumedSpUtxos);
       }
+      // Refresh after pruning so transaction history can classify mixed
+      // BIP-86 + SP sends with the spent SP outpoints already archived.
+      queryClient.invalidateQueries({ queryKey: ['hdwallet-scan'] });
       void refetchWallet();
     },
     onError: (err) => {
@@ -393,7 +432,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
   // because that's just a passive refresh.
   useEffect(() => {
     setBroadcastError(null);
-  }, [recipient?.address, amountSats, feeSpeed, customFeeRate]);
+  }, [recipient?.address, effectiveAmountSats, feeSpeed, customFeeRate]);
 
   /**
    * Recovery action for fee-related broadcast failures.
@@ -466,7 +505,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     }
     if (!recipient) { setError(t('walletSend.errors.enterRecipient')); return; }
     if (!btcPrice) { setError(t('walletSend.errors.waitingPrice')); return; }
-    if (amountSats <= 0) { setError(t('walletSend.errors.enterAmount')); return; }
+    if (effectiveAmountSats <= 0) { setError(t('walletSend.errors.enterAmount')); return; }
     if (!ownedInputs.length) { setError(t('walletSend.errors.noneYet')); return; }
     if (!currentFeeRate || currentFeeRate < 1) {
       setError(
@@ -484,7 +523,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     availability,
     recipient,
     btcPrice,
-    amountSats,
+    effectiveAmountSats,
     ownedInputs.length,
     currentFeeRate,
     feeSpeed,
@@ -502,6 +541,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     setTimeout(() => {
       setRecipient(null);
       setUsdAmount(5);
+      setSendMax(false);
       setError('');
       setFeeSpeed('halfHour');
       setCustomFeeRate('');
@@ -531,11 +571,15 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     sendMutation.isPending ||
     !recipient ||
     !btcPrice ||
-    amountSats <= 0 ||
+    effectiveAmountSats <= 0 ||
     insufficient ||
     !ownedInputs.length ||
     !currentFeeRate ||
     currentFeeRate < 1;
+
+  const maxAmountLabel = sendMax && effectiveAmountSats > 0 && btcPrice
+    ? `${satsToUSD(effectiveAmountSats, btcPrice)} · ${t('walletSend.success.satsAmount', { sats: formatSats(effectiveAmountSats) })}`
+    : undefined;
 
   // ── Render ───────────────────────────────────────────────────
   return (
@@ -570,10 +614,24 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
             <div className="grid gap-4 px-4 py-4 w-full overflow-y-auto">
               <BitcoinAmountPicker
                 usdAmount={usdAmount}
-                onUsdAmountChange={setUsdAmount}
+                onUsdAmountChange={(amount) => {
+                  setSendMax(false);
+                  setUsdAmount(amount);
+                }}
                 presets={USD_PRESETS}
+                maxLabel={t('walletSend.max')}
+                maxSelected={sendMax}
+                maxDisabled={!ownedInputs.length || !currentFeeRate || !maxSpend}
+                onMaxSelect={() => {
+                  setError('');
+                  setSendMax(true);
+                }}
                 insufficient={insufficient}
-                onAmountChangeStart={() => setError('')}
+                satsLabel={maxAmountLabel}
+                onAmountChangeStart={() => {
+                  setError('');
+                  setSendMax(false);
+                }}
               />
 
               {/* Recipient — text input + Popover dropdown surfacing the
@@ -648,8 +706,8 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
                       type="button"
                       className="flex items-center gap-1.5 hover:text-foreground transition-colors text-muted-foreground tabular-nums"
                     >
-                      {estimatedFeeSats > 0 && btcPrice ? (
-                        <>≈ {satsToUSD(estimatedFeeSats, btcPrice)}</>
+                      {effectiveFeeSats > 0 && btcPrice ? (
+                        <>≈ {satsToUSD(effectiveFeeSats, btcPrice)}</>
                       ) : currentFeeRate ? (
                         <>{t('walletSend.satPerVB', { rate: currentFeeRate })}</>
                       ) : feeRatesLoading && feeSpeed !== 'custom' ? (

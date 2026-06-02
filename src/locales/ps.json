@@ -1239,6 +1239,7 @@
   "walletSend": {
     "title": "بټکوین لیږل",
     "send": "بټکوین لیږل",
+    "max": "MAX",
     "tapAgainToConfirm": "د تایید لپاره بیا ټک ووهئ",
     "satPerVB": "{{rate}} ساتوشي/vB",
     "notEnoughBitcoin": "کافی بټکوین نشته",

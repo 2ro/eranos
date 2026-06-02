@@ -1147,6 +1147,7 @@
   "walletSend": {
     "title": "傳送比特幣",
     "send": "傳送比特幣",
+    "max": "MAX",
     "tapAgainToConfirm": "再次點選確認",
     "satPerVB": "{{rate}} sat/vB",
     "notEnoughBitcoin": "比特幣不足",

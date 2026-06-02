@@ -7,6 +7,10 @@ interface BitcoinAmountPickerProps {
   usdAmount: number | string;
   onUsdAmountChange: (amount: number | string) => void;
   presets: readonly number[];
+  maxLabel?: string;
+  maxSelected?: boolean;
+  maxDisabled?: boolean;
+  onMaxSelect?: () => void;
   insufficient?: boolean;
   satsLabel?: string;
   onAmountChangeStart?: () => void;
@@ -16,6 +20,10 @@ export function BitcoinAmountPicker({
   usdAmount,
   onUsdAmountChange,
   presets,
+  maxLabel = 'MAX',
+  maxSelected = false,
+  maxDisabled = false,
+  onMaxSelect,
   insufficient = false,
   satsLabel,
   onAmountChangeStart,
@@ -74,14 +82,25 @@ export function BitcoinAmountPicker({
         ) : (
           <button
             type="button"
-            onClick={() => setEditingAmount(true)}
+            onClick={() => {
+              onAmountChangeStart?.();
+              setEditingAmount(true);
+            }}
             aria-label="Edit amount"
             className="flex items-baseline justify-center rounded-md px-2 -mx-2 hover:bg-muted/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
           >
-            <span className={cn('text-4xl font-semibold', insufficient ? 'text-destructive' : 'text-muted-foreground')}>$</span>
-            <span className={cn('text-4xl font-semibold tabular-nums', insufficient && 'text-destructive')}>
-              {Number.isFinite(currentUsd) && currentUsd > 0 ? currentUsd : 0}
-            </span>
+            {maxSelected ? (
+              <span className={cn('text-4xl font-semibold tracking-tight', insufficient && 'text-destructive')}>
+                {maxLabel}
+              </span>
+            ) : (
+              <>
+                <span className={cn('text-4xl font-semibold', insufficient ? 'text-destructive' : 'text-muted-foreground')}>$</span>
+                <span className={cn('text-4xl font-semibold tabular-nums', insufficient && 'text-destructive')}>
+                  {Number.isFinite(currentUsd) && currentUsd > 0 ? currentUsd : 0}
+                </span>
+              </>
+            )}
           </button>
         )}
         {satsLabel && (
@@ -93,10 +112,15 @@ export function BitcoinAmountPicker({
 
       <ToggleGroup
         type="single"
-        value={presets.includes(Number(usdAmount)) ? String(usdAmount) : ''}
+        value={maxSelected ? 'max' : presets.includes(Number(usdAmount)) ? String(usdAmount) : ''}
         onValueChange={(value) => {
           if (value) {
             onAmountChangeStart?.();
+            if (value === 'max') {
+              onMaxSelect?.();
+              setEditingAmount(false);
+              return;
+            }
             onUsdAmountChange(Number(value));
             setEditingAmount(false);
           }
@@ -112,6 +136,13 @@ export function BitcoinAmountPicker({
             ${preset}
           </ToggleGroupItem>
         ))}
+        <ToggleGroupItem
+          value="max"
+          disabled={maxDisabled}
+          className="h-8 min-w-0 text-xs font-semibold px-1"
+        >
+          {maxLabel}
+        </ToggleGroupItem>
       </ToggleGroup>
     </>
   );

@@ -454,6 +454,16 @@ export function buildHdTransactions(
 
   const out: HdTransaction[] = [];
   for (const tx of result.rawTransactions) {
+    const spValuesByTxid = new Map<string, number[]>();
+    for (const [outpoint, value] of spOutpoints ?? []) {
+      const sep = outpoint.lastIndexOf(':');
+      if (sep <= 0) continue;
+      const txid = outpoint.slice(0, sep);
+      const values = spValuesByTxid.get(txid);
+      if (values) values.push(value);
+      else spValuesByTxid.set(txid, [value]);
+    }
+
     let inflowsBip86 = 0;
     let outflowsBip86 = 0;
     let outflowsSp = 0;
@@ -483,16 +493,25 @@ export function buildHdTransactions(
         }
       }
       if (attributed) continue;
-      if (
-        spOutpoints &&
-        typeof v.txid === 'string' &&
-        typeof v.vout === 'number'
-      ) {
+      if (spOutpoints && typeof v.txid === 'string' && typeof v.vout === 'number') {
         const spValue = spOutpoints.get(`${v.txid}:${v.vout}`);
         if (spValue !== undefined) {
           // Trust the wallet's own stored value for SP inputs — Blockbook
           // doesn't always populate `vin.value` for taproot inputs.
           outflowsSp += spValue || value;
+        }
+      } else if (typeof v.txid === 'string') {
+        // Blockbook's tx rows often omit the previous output index on inputs
+        // (they expose `n`, the input index, instead). Fall back to matching
+        // archived SP outpoints by prev txid + value so historical mixed
+        // BIP-86/SP sends can still be attributed after an include-spent scan.
+        const candidates = spValuesByTxid.get(v.txid);
+        if (candidates?.length) {
+          const idx = value > 0 ? candidates.findIndex((candidate) => candidate === value) : 0;
+          if (idx >= 0) {
+            outflowsSp += candidates[idx] || value;
+            candidates.splice(idx, 1);
+          }
         }
       }
     }

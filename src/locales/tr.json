@@ -1579,6 +1579,7 @@
   "walletSend": {
     "title": "Bitcoin Gönder",
     "send": "Bitcoin Gönder",
+    "max": "MAX",
     "tapAgainToConfirm": "Onaylamak için tekrar dokunun",
     "satPerVB": "{{rate}} sat/vB",
     "notEnoughBitcoin": "Yetersiz Bitcoin",

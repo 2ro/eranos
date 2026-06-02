@@ -44,6 +44,8 @@ export function WalletPage() {
     availability,
     currentReceiveAddress,
     silentPaymentAddress,
+    scan,
+    silentPaymentStorage,
     transactions,
     totalBalance,
     pendingBalance,
@@ -68,6 +70,13 @@ export function WalletPage() {
 
   const address = currentReceiveAddress?.address ?? '';
   const spAddress = silentPaymentAddress?.address ?? '';
+
+  // Whether the wallet holds any spendable inputs. Mirrors the Send dialog's
+  // `ownedInputs` set (BIP-86 UTXOs from the Blockbook scan + silent-payment
+  // UTXOs from local storage). When empty, sending is impossible, so the
+  // Send button is disabled just like the modal's "Send Bitcoin" button.
+  const hasSpendableBalance =
+    (scan?.utxos?.length ?? 0) > 0 || (silentPaymentStorage?.utxos?.length ?? 0) > 0;
 
   // Combined BIP-21 payload: `bitcoin:<bc1>?sp=<sp1>` when both are
   // available, falling back to the single endpoint that exists.
@@ -278,6 +287,7 @@ export function WalletPage() {
             <Button
               size="lg"
               onClick={() => setSendOpen(true)}
+              disabled={!hasSpendableBalance}
               className="flex-1 rounded-full text-white font-semibold text-base h-12 px-7 [&_svg]:size-[18px] motion-safe:transition-colors"
             >
               <ArrowUpRight className="mr-2" />

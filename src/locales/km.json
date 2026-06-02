@@ -1237,6 +1237,7 @@
   "walletSend": {
     "title": "ផ្ញើ Bitcoin",
     "send": "ផ្ញើ Bitcoin",
+    "max": "MAX",
     "tapAgainToConfirm": "ប៉ះម្ដងទៀតដើម្បីបញ្ជាក់",
     "satPerVB": "{{rate}} sat/vB",
     "notEnoughBitcoin": "មិនមាន Bitcoin គ្រប់គ្រាន់",

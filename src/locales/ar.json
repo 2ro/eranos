@@ -1223,6 +1223,7 @@
   "walletSend": {
     "title": "إرسال البيتكوين",
     "send": "إرسال البيتكوين",
+    "max": "MAX",
     "tapAgainToConfirm": "انقر مرة أخرى للتأكيد",
     "satPerVB": "{{rate}} ساتوشي/vB",
     "notEnoughBitcoin": "لا يوجد بيتكوين كافٍ",

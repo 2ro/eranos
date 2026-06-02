@@ -1239,6 +1239,7 @@
   "walletSend": {
     "title": "发送比特币",
     "send": "发送比特币",
+    "max": "MAX",
     "tapAgainToConfirm": "再次点击确认",
     "satPerVB": "{{rate}} sat/vB",
     "notEnoughBitcoin": "比特币不足",

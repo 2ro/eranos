@@ -591,10 +591,13 @@ export function useHdWalletSp(): UseHdWalletSpResult {
             }
 
             const opt = optimisticRef.current!;
+            const spentKeys = new Set(freshArchive.map((u) => `${u.txid}:${u.vout}`));
             optimisticRef.current = {
               version: SP_STORAGE_VERSION,
               scanHeight: opt.scanHeight,
-              utxos: mergeUtxos(opt.utxos, freshActive),
+              utxos: mergeUtxos(opt.utxos, freshActive).filter(
+                (u) => !spentKeys.has(`${u.txid}:${u.vout}`),
+              ),
               spent: mergeUtxos(opt.spent ?? [], freshArchive),
             };
             matchesFound += blockMatches.length;
