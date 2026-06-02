@@ -64,7 +64,8 @@
     "privacy": "प्राइवेसी",
     "safety": "सुरक्षा",
     "changelog": "बदलाव",
-    "sourceCode": "सोर्स कोड"
+    "sourceCode": "सोर्स कोड",
+    "getApp": "ऐप पाएं"
   },
   "auth": {
     "join": "जुड़ें",
@@ -132,6 +133,12 @@
   },
   "feed": {
     "indexTagline": "आपका कंटेंट। आपका अंदाज़। आपके नियम।",
+    "getApp": {
+      "eyebrow": "ऐप पाएं",
+      "title": "Android के लिए {{appName}}",
+      "subtitle": "संपूर्ण {{appName}} अनुभव",
+      "download": "डाउनलोड करें"
+    },
     "compose": {
       "placeholder": "क्या चल रहा है?"
     },

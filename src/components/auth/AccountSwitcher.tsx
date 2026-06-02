@@ -7,8 +7,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Activity, Bell, ChevronDown, CircleHelp, LayoutDashboard, LogOut, Search, Settings, User, UserIcon, UserPlus, Wallet } from 'lucide-react';
+import { Capacitor } from '@capacitor/core';
+import { Activity, Bell, ChevronDown, CircleHelp, Download, LayoutDashboard, LogOut, Search, Settings, User, UserIcon, UserPlus, Wallet } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
+import { ZAPSTORE_URL } from '@/lib/zapstore';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -144,6 +146,14 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
             <span>{t('nav.about')}</span>
           </Link>
         </DropdownMenuItem>
+        {!Capacitor.isNativePlatform() && (
+          <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
+            <a href={ZAPSTORE_URL} target="_blank" rel="noopener noreferrer">
+              <Download className='w-4 h-4' />
+              <span>{t('nav.getApp')}</span>
+            </a>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={onAddAccountClick}

@@ -64,7 +64,8 @@
     "privacy": "حریم خصوصی",
     "safety": "ایمنی",
     "changelog": "تغییرات",
-    "sourceCode": "کد منبع"
+    "sourceCode": "کد منبع",
+    "getApp": "دریافت برنامه"
   },
   "auth": {
     "join": "پیوستن",
@@ -132,6 +133,12 @@
   },
   "feed": {
     "indexTagline": "محتوای شما. سبک شما. قوانین شما.",
+    "getApp": {
+      "eyebrow": "دریافت برنامه",
+      "title": "{{appName}} برای اندروید",
+      "subtitle": "تجربه کامل {{appName}}",
+      "download": "دانلود"
+    },
     "compose": {
       "placeholder": "چه خبر؟"
     },

@@ -64,7 +64,8 @@
     "privacy": "Privacy",
     "safety": "Safety",
     "changelog": "Changelog",
-    "sourceCode": "Source code"
+    "sourceCode": "Source code",
+    "getApp": "Get the app"
   },
   "auth": {
     "join": "Join",
@@ -132,6 +133,12 @@
   },
   "feed": {
     "indexTagline": "Your content. Your vibe. Your rules.",
+    "getApp": {
+      "eyebrow": "Get the app",
+      "title": "{{appName}} for Android",
+      "subtitle": "The full {{appName}} experience",
+      "download": "Download"
+    },
     "compose": {
       "placeholder": "What's happening?"
     },

@@ -64,7 +64,8 @@
     "privacy": "隱私",
     "safety": "安全",
     "changelog": "更新日誌",
-    "sourceCode": "原始碼"
+    "sourceCode": "原始碼",
+    "getApp": "取得應用程式"
   },
   "auth": {
     "join": "加入",
@@ -132,6 +133,12 @@
   },
   "feed": {
     "indexTagline": "你的內容。你的風格。你的規則。",
+    "getApp": {
+      "eyebrow": "取得應用程式",
+      "title": "適用於 Android 的 {{appName}}",
+      "subtitle": "完整的 {{appName}} 體驗",
+      "download": "下載"
+    },
     "compose": {
       "placeholder": "有什麼新鮮事？"
     },

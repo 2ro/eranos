@@ -64,7 +64,8 @@
     "privacy": "Akavanzika",
     "safety": "Kuchengetedzeka",
     "changelog": "Rondedzero yeshanduko",
-    "sourceCode": "Kodhi yetsime"
+    "sourceCode": "Kodhi yetsime",
+    "getApp": "Tora app"
   },
   "auth": {
     "join": "Joinha",
@@ -132,6 +133,12 @@
   },
   "feed": {
     "indexTagline": "Zviri zvako. Mafambisirwo ako. Mitemo yako.",
+    "getApp": {
+      "eyebrow": "Tora app",
+      "title": "{{appName}} yeAndroid",
+      "subtitle": "Ruzivo rwakazara rwe{{appName}}",
+      "download": "Dhaunirodha"
+    },
     "compose": {
       "placeholder": "Chii chiri kuitika?"
     },

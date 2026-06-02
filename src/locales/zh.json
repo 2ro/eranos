@@ -64,7 +64,8 @@
     "privacy": "隐私",
     "safety": "安全",
     "changelog": "更新日志",
-    "sourceCode": "源代码"
+    "sourceCode": "源代码",
+    "getApp": "获取应用"
   },
   "auth": {
     "join": "加入",
@@ -132,6 +133,12 @@
   },
   "feed": {
     "indexTagline": "你的内容。你的风格。你的规则。",
+    "getApp": {
+      "eyebrow": "获取应用",
+      "title": "适用于 Android 的 {{appName}}",
+      "subtitle": "完整的 {{appName}} 体验",
+      "download": "下载"
+    },
     "compose": {
       "placeholder": "有什么新鲜事？"
     },

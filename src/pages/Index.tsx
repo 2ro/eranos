@@ -1,6 +1,7 @@
 import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
 import { Feed } from '@/components/Feed';
+import { AppDownloadNudge } from '@/components/AppDownloadNudge';
 import { useAppContext } from '@/hooks/useAppContext';
 
 const Index = () => {
@@ -12,7 +13,12 @@ const Index = () => {
     description: t('feed.indexTagline'),
   });
 
-  return <Feed />;
+  return (
+    <>
+      <Feed />
+      <AppDownloadNudge />
+    </>
+  );
 };
 
 export default Index;

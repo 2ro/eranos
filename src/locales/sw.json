@@ -63,7 +63,8 @@
     "privacy": "Faragha",
     "safety": "Usalama",
     "changelog": "Kumbukumbu ya mabadiliko",
-    "sourceCode": "Msimbo wa chanzo"
+    "sourceCode": "Msimbo wa chanzo",
+    "getApp": "Pata programu"
   },
   "auth": {
     "join": "Jiunge",
@@ -131,6 +132,12 @@
   },
   "feed": {
     "indexTagline": "Maudhui yako. Mtindo wako. Sheria zako.",
+    "getApp": {
+      "eyebrow": "Pata programu",
+      "title": "{{appName}} kwa Android",
+      "subtitle": "Uzoefu kamili wa {{appName}}",
+      "download": "Pakua"
+    },
     "compose": {
       "placeholder": "Kuna nini?"
     },

@@ -64,7 +64,8 @@
     "privacy": "Privacidade",
     "safety": "Segurança",
     "changelog": "Notas de versão",
-    "sourceCode": "Código-fonte"
+    "sourceCode": "Código-fonte",
+    "getApp": "Baixar o app"
   },
   "auth": {
     "join": "Entrar",
@@ -132,6 +133,12 @@
   },
   "feed": {
     "indexTagline": "Seu conteúdo. Seu estilo. Suas regras.",
+    "getApp": {
+      "eyebrow": "Baixar o app",
+      "title": "{{appName}} para Android",
+      "subtitle": "A experiência completa do {{appName}}",
+      "download": "Baixar"
+    },
     "compose": {
       "placeholder": "O que está acontecendo?"
     },

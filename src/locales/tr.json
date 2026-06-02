@@ -63,7 +63,8 @@
     "privacy": "Gizlilik",
     "safety": "Güvenlik",
     "changelog": "Sürüm notları",
-    "sourceCode": "Kaynak kod"
+    "sourceCode": "Kaynak kod",
+    "getApp": "Uygulamayı edinin"
   },
   "auth": {
     "join": "Katıl",
@@ -131,6 +132,12 @@
   },
   "feed": {
     "indexTagline": "İçeriğin senin. Tarzın senin. Kuralların senin.",
+    "getApp": {
+      "eyebrow": "Uygulamayı edinin",
+      "title": "Android için {{appName}}",
+      "subtitle": "Tüm {{appName}} deneyimi",
+      "download": "İndir"
+    },
     "compose": {
       "placeholder": "Neler oluyor?"
     },

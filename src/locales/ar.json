@@ -60,7 +60,8 @@
     "privacy": "الخصوصية",
     "safety": "السلامة",
     "changelog": "سجل التغييرات",
-    "sourceCode": "الكود المصدري"
+    "sourceCode": "الكود المصدري",
+    "getApp": "احصل على التطبيق"
   },
   "auth": {
     "join": "انضمام",
@@ -128,6 +129,12 @@
   },
   "feed": {
     "indexTagline": "محتواك. أسلوبك. قواعدك.",
+    "getApp": {
+      "eyebrow": "احصل على التطبيق",
+      "title": "{{appName}} لنظام أندرويد",
+      "subtitle": "تجربة {{appName}} الكاملة",
+      "download": "تنزيل"
+    },
     "compose": {
       "placeholder": "ماذا يحدث؟"
     },

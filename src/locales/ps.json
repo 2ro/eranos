@@ -64,7 +64,8 @@
     "privacy": "محرمیت",
     "safety": "خوندیتوب",
     "changelog": "د بدلونونو لاګ",
-    "sourceCode": "د سرچینې کوډ"
+    "sourceCode": "د سرچینې کوډ",
+    "getApp": "اپ ترلاسه کړئ"
   },
   "auth": {
     "join": "ګډون",
@@ -132,6 +133,12 @@
   },
   "feed": {
     "indexTagline": "ستاسو مینځپانګه. ستاسو سټایل. ستاسو قواعد.",
+    "getApp": {
+      "eyebrow": "اپ ترلاسه کړئ",
+      "title": "{{appName}} د اندروید لپاره",
+      "subtitle": "بشپړ {{appName}} تجربه",
+      "download": "ډاونلوډ"
+    },
     "compose": {
       "placeholder": "څه روان دي؟"
     },

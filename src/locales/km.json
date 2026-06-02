@@ -64,7 +64,8 @@
     "privacy": "ភាពឯកជន",
     "safety": "សុវត្ថិភាព",
     "changelog": "កំណត់ហេតុការផ្លាស់ប្តូរ",
-    "sourceCode": "កូដប្រភព"
+    "sourceCode": "កូដប្រភព",
+    "getApp": "ទាញយកកម្មវិធី"
   },
   "auth": {
     "join": "ចូលរួម",
@@ -132,6 +133,12 @@
   },
   "feed": {
     "indexTagline": "ខ្លឹមសាររបស់អ្នក។ ស្ទីលរបស់អ្នក។ ច្បាប់របស់អ្នក។",
+    "getApp": {
+      "eyebrow": "ទាញយកកម្មវិធី",
+      "title": "{{appName}} សម្រាប់ Android",
+      "subtitle": "បទពិសោធន៍ {{appName}} ពេញលេញ",
+      "download": "ទាញយក"
+    },
     "compose": {
       "placeholder": "មានរឿងអ្វី?"
     },

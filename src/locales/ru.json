@@ -64,7 +64,8 @@
     "privacy": "Конфиденциальность",
     "safety": "Безопасность",
     "changelog": "История изменений",
-    "sourceCode": "Исходный код"
+    "sourceCode": "Исходный код",
+    "getApp": "Скачать приложение"
   },
   "auth": {
     "join": "Присоединиться",
@@ -132,6 +133,12 @@
   },
   "feed": {
     "indexTagline": "Ваш контент. Ваша атмосфера. Ваши правила.",
+    "getApp": {
+      "eyebrow": "Скачать приложение",
+      "title": "{{appName}} для Android",
+      "subtitle": "Полный опыт {{appName}}",
+      "download": "Скачать"
+    },
     "compose": {
       "placeholder": "Что происходит?"
     },

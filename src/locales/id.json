@@ -64,7 +64,8 @@
     "privacy": "Privasi",
     "safety": "Keamanan",
     "changelog": "Catatan Versi",
-    "sourceCode": "Kode sumber"
+    "sourceCode": "Kode sumber",
+    "getApp": "Dapatkan aplikasi"
   },
   "auth": {
     "join": "Gabung",
@@ -132,6 +133,12 @@
   },
   "feed": {
     "indexTagline": "Konten Anda. Gaya Anda. Aturan Anda.",
+    "getApp": {
+      "eyebrow": "Dapatkan aplikasi",
+      "title": "{{appName}} untuk Android",
+      "subtitle": "Pengalaman {{appName}} sepenuhnya",
+      "download": "Unduh"
+    },
     "compose": {
       "placeholder": "Apa yang sedang terjadi?"
     },
