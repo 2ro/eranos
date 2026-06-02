@@ -5,15 +5,7 @@ name: Agora
 summary: Power to the people.
 
 description: |
-  Agora is an open-source Nostr client built from the Ditto codebase, focused on
-  customization, creativity, and open social interoperability on Nostr.
-
-  Features:
-  - Theming — 9 built-in presets, shareable themes
-  - Infinite content types — notes, articles, short videos (Vines), live streams,
-    polls, follow packs, color moments, magic decks, geocaching, Webxdc mini-apps
-  - Lightning payments — zap posts and profiles via NWC or WebLN
-  - Comments on anything — posts, URLs, profiles, hashtags, books, and more
+Agora is a censorship-resistant donation platform built on Nostr and Bitcoin. No frozen bank accounts. No corporate shut-downs. Just direct support from people who believe in your cause.
 
 tags:
   - nostr
@@ -29,14 +21,16 @@ website: https://agora.spot
 icon: ./public/logo.png
 
 images:
-  - https://blossom.ditto.pub/47fcb3bdc414ced245fbba53b0456d9bfdf112d711ecf5cc628361a47002392a.png
-  - https://blossom.ditto.pub/e387a4c4566545c650477cee66e638131eb874a90761cf0a371e5abf1e2c7af2.png
-  - https://blossom.ditto.pub/73585c9547868da215a91f8a13543251a20967a74f6e8329231544add50e3dee.png
-  - https://blossom.ditto.pub/4216d18d5854444c64b482dbbac9e077a453f85a9d72d91bc6adf89fd1f42c36.png
-  - https://blossom.ditto.pub/a7521e652d625c57cf66fd97ea92c66b8559bcedcb805aaf375bc047415625a3.png
-  - https://blossom.ditto.pub/daf008f146391f0172b89595500f640b84eac4e146b2e081db80791819443fa0.png
-  - https://blossom.ditto.pub/22c144a792e32559a838c8f69fbb4ae22264f47ff3d04341e656748d264064bc.png
-  - https://blossom.ditto.pub/fa609e4a03e984063fbc6c474bd8a73bb088666b7c0e5561f993264f372c90ef.png
+ - https://blossom.soapbox.pub/91b95e5acb7a199db8dacf8fdaa9b5c3bf46e0c7658c4034eb57657fdd52120d.png
+ - https://blossom.soapbox.pub/49c5eb12fc9c06c4b379dfa8942f6db8719c53ce75f9008a390c1b47d94b417e.png
+ - https://blossom.soapbox.pub/cad4bdb439c210fcb7afc9ae945c6ebe6bc24902c6aabf0d8bc8069d6f6d28c4.png
+ - https://blossom.soapbox.pub/d84536fa1e8aeb73fda74bef6dde2c695b75cb0ff172ce3b11b489d2c27dec5d.png
+ - https://blossom.soapbox.pub/92460118d03db475e5993fe7980a67f5df0b812daa85326c6386eac74124dcd5.png
+ - https://blossom.soapbox.pub/ffc7a4739b957c471e79631e69e7abf2f19738e3b2485953a34925858590f2f4.png
+ - https://blossom.soapbox.pub/d38edf1f02230d353ff872ed238d85c6d5aa98f2b3e4bdf9d0dc30d33c7fcb57.png
+ - https://blossom.soapbox.pub/559e82282f7ad29f2676e02d33e0bb462bf48101878be26910397e6a6513c8e3.png
+ - https://blossom.soapbox.pub/559e82282f7ad29f2676e02d33e0bb462bf48101878be26910397e6a6513c8e3.png
+ - https://blossom.soapbox.pub/3efbb0b3b65e932217a784cd7e2e3c01479db50864d183d449571a9911625b10.png
 
 release_notes: ./CHANGELOG.md
 
@@ -88,5 +82,3 @@ supported_nips:
   - "94"  # File metadata (kind 1063)
   - "98"  # HTTP authentication (kind 27235, used for AI API calls)
   - "A0"  # Voice messages (kind 1222 root, kind 1244 reply)
-  - "GC"  # Geocaching (kind 37516 cache listings, kind 7516 found logs)
-  - "MG"  # Magic decks (kind 37381)
