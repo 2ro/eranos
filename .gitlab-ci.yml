@@ -169,6 +169,11 @@ build-apk:
 
     # Decode signing keystore and migrate JKS -> PKCS12 for Gradle compatibility
     - echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/my-upload-key.jks
+    # Pass the alias key password explicitly via -srckeypass / -destkeypass.
+    # The upload key inside the JKS has its own password ($KEY_PASSWORD) that
+    # differs from the store password ($KEYSTORE_PASSWORD); without these flags
+    # keytool prompts for it on a non-interactive runner and dies with
+    # "Too many failures - try later".
     - keytool -importkeystore
         -srckeystore android/app/my-upload-key.jks
         -destkeystore android/app/my-upload-key.keystore
@@ -177,6 +182,8 @@ build-apk:
         -deststorepass "$KEYSTORE_PASSWORD"
         -srcalias upload
         -destalias upload
+        -srckeypass "$KEY_PASSWORD"
+        -destkeypass "$KEY_PASSWORD"
         -noprompt
     - rm android/app/my-upload-key.jks
 
