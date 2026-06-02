@@ -1192,7 +1192,35 @@
       "searchPlaceholder": "Tafuta kampeni…",
       "searchAriaLabel": "Tafuta kampeni",
       "noMatch": "Hakuna kampeni zinazolingana na “{{query}}”",
-      "noMatchHint": "Jaribu neno tofauti la utafutaji, au futa utafutaji."
+      "noMatchHint": "Jaribu neno tofauti la utafutaji, au futa utafutaji.",
+      "whyDifferent": {
+        "eyebrow": "Kwa nini {{appName}}",
+        "title": "Imejengwa tofauti.",
+        "lede": "Bitcoin moja kwa moja kutoka kwa mfadhili hadi mwanaharakati. Hakuna jukwaa katikati, hakuna mtunzaji anayeshikilia fedha, hakuna ruhusa inayohitajika.",
+        "block1": {
+          "heading": "Tofauti na GoFundMe",
+          "body": "Hakuna jukwaa linaloweza kufungia michango yako, kudai marejesho, au kusitisha kampeni yako kwa sababu ya tofauti za sera. Hakuna Stripe, Visa, au benki iliyo katikati inayoweza kukukata wakati kampeni inaendelea.",
+          "bullet1": "Haiwezi kufungiwa — hakuna kura ya turufu ya jukwaa",
+          "bullet2": "Hakuna mchakatishaji malipo anayeweza kukata huduma",
+          "bullet3": "Ada za jukwaa ni sifuri"
+        },
+        "block2": {
+          "heading": "Tofauti na majukwaa mengine ya ‘Bitcoin’",
+          "body": "Hakuna node kuu ya Lightning, mtunzaji, au LSP inayoweza kushindwa au kwenda nje ya mtandao. Fedha hukamilika moja kwa moja kwenye Bitcoin hadi pochi unayodhibiti. Ikiwa {{appName}} ingetoweka kesho, kila kampeni ingeendelea kufanya kazi.",
+          "bullet1": "Hakuna pochi ya mtunzaji ya kufilisiwa au kufungiwa",
+          "bullet2": "Hukamilika on-chain kwenye pochi yako mwenyewe",
+          "bullet3": "Hufanya kazi hata {{appName}} ikitoweka"
+        },
+        "block3": {
+          "heading": "Hadharani au kwa faragha. Chaguo ni lako.",
+          "body": "Wanaharakati huchagua njia ya kupokea inayolingana na hatari wanazokabiliana nazo. Wafadhili huona QR moja; pochi huchagua itifaki sahihi.",
+          "publicLabel": "Hadharani",
+          "publicSummary": "Hufanya kazi kwenye kila pochi ya Bitcoin. Haraka na inaweza kuthibitishwa on-chain.",
+          "privateLabel": "Faragha",
+          "privateSummary": "Malipo ya kimya ya BIP-352. Michango hufika kwenye outputs zisizoweza kuunganishwa."
+        },
+        "readMore": "Soma uchambuzi kamili"
+      }
     },
     "all": {
       "title": "Kampeni",

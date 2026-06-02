@@ -763,7 +763,35 @@
       "searchPlaceholder": "搜尋活動…",
       "searchAriaLabel": "搜尋活動",
       "noMatch": "沒有活動符合「{{query}}」",
-      "noMatchHint": "請嘗試不同的搜尋字詞,或清除搜尋。"
+      "noMatchHint": "請嘗試不同的搜尋字詞,或清除搜尋。",
+      "whyDifferent": {
+        "eyebrow": "為什麼選擇 {{appName}}",
+        "title": "生來不同。",
+        "lede": "比特幣從捐款者直接到活動人士。沒有平台擋在中間，沒有託管方扣住資金，也不需要任何人的許可。",
+        "block1": {
+          "heading": "不同於 GoFundMe",
+          "body": "沒有平台可以凍結你的捐款、要求退款，或因政策分歧終止你的活動。沒有 Stripe、Visa 或銀行卡在中間，在活動進行到一半時切斷你的資金。",
+          "bullet1": "抗凍結 — 沒有平台否決權",
+          "bullet2": "沒有支付處理商可以拔掉插頭",
+          "bullet3": "零平台費"
+        },
+        "block2": {
+          "heading": "不同於其他「Bitcoin」平台",
+          "body": "沒有可能故障或離線的中心化 Lightning node、託管方或 LSP。資金直接在比特幣上結算到你控制的錢包。即使 {{appName}} 明天消失，每個活動仍會繼續運作。",
+          "bullet1": "沒有可被清空或凍結的託管錢包",
+          "bullet2": "在鏈上結算到你擁有的錢包",
+          "bullet3": "即使 {{appName}} 消失也能運作"
+        },
+        "block3": {
+          "heading": "公開或私密。由你選擇。",
+          "body": "活動人士可選擇符合自身威脅模型的收款方式。捐款者只會看到一個 QR；錢包會選擇正確的協議。",
+          "publicLabel": "公開",
+          "publicSummary": "適用於所有比特幣錢包。快速，且可在鏈上驗證。",
+          "privateLabel": "私密",
+          "privateSummary": "BIP-352 silent payments。捐款會落到無法關聯的 outputs。"
+        },
+        "readMore": "閱讀完整說明"
+      }
     },
     "all": {
       "title": "活動",

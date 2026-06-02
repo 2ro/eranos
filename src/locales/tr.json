@@ -1194,7 +1194,35 @@
       "searchPlaceholder": "Kampanya ara…",
       "searchAriaLabel": "Kampanyaları ara",
       "noMatch": "“{{query}}” ile eşleşen kampanya yok",
-      "noMatchHint": "Farklı bir arama terimi deneyin ya da aramayı temizleyin."
+      "noMatchHint": "Farklı bir arama terimi deneyin ya da aramayı temizleyin.",
+      "whyDifferent": {
+        "eyebrow": "Neden {{appName}}",
+        "title": "Farklı inşa edildi.",
+        "lede": "Bağışçıdan aktiviste doğrudan Bitcoin. Arada platform yok, parayı tutan emanetçi yok, izin gerekmiyor.",
+        "block1": {
+          "heading": "GoFundMe'den farklı",
+          "body": "Hiçbir platform bağışlarınızı donduramaz, iade talep edemez veya politika anlaşmazlıkları nedeniyle kampanyanızı sonlandıramaz. Arada Stripe, Visa veya banka yok; kampanya ortasında sizi kesemezler.",
+          "bullet1": "Dondurmaya dayanıklı — platform vetosu yok",
+          "bullet2": "Hiçbir ödeme işlemcisi fişi çekemez",
+          "bullet3": "Sıfır platform ücreti"
+        },
+        "block2": {
+          "heading": "Diğer ‘Bitcoin’ platformlarından farklı",
+          "body": "Arızalanacak veya çevrimdışı kalacak merkezi Lightning node'u, emanetçi ya da LSP yok. Fonlar doğrudan Bitcoin üzerinde kontrol ettiğiniz cüzdana aktarılır. {{appName}} yarın ortadan kaybolsa bile her kampanya çalışmaya devam eder.",
+          "bullet1": "Boşaltılacak veya dondurulacak emanet cüzdan yok",
+          "bullet2": "Size ait cüzdana on-chain aktarım",
+          "bullet3": "{{appName}} yok olsa bile çalışır"
+        },
+        "block3": {
+          "heading": "Herkese açık veya özel. Seçim sizin.",
+          "body": "Aktivistler tehdit modellerine uygun alım seçeneğini seçer. Bağışçılar tek bir QR görür; cüzdan doğru protokolü seçer.",
+          "publicLabel": "Herkese açık",
+          "publicSummary": "Her Bitcoin cüzdanında çalışır. Hızlıdır ve on-chain doğrulanabilir.",
+          "privateLabel": "Özel",
+          "privateSummary": "BIP-352 silent payments. Bağışlar ilişkilendirilemeyen çıktılara ulaşır."
+        },
+        "readMore": "Tam dökümü oku"
+      }
     },
     "all": {
       "title": "Kampanyalar",
