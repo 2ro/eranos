@@ -9,10 +9,13 @@ import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
   ArrowLeft,
+  ArrowRight,
+  Check,
   ChevronDown,
+  EyeOff,
+  Globe,
   HandHeart,
   HelpCircle,
-  Link2,
   Loader2,
   ShieldCheck,
   Upload,
@@ -33,7 +36,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -1303,21 +1305,18 @@ function WalletPicker({
     <div className="space-y-4">
       {walletSource === 'mine' ? (
         <>
-          {/* Hero coupling card. Modelled on the onboarding "Save your
-              key" surface: a primary-tinted card whose visual
-              centerpiece is the linked-icon trio (the campaign ↔ the
-              key ↔ the wallet) so a first-time creator instantly
-              grasps that donations land in their own Agora wallet,
-              unlocked by the same key that signs their posts. The
-              avatar + live balance below confirm the exact destination. */}
+          {/* Hero card. Modelled on the onboarding "Save your key"
+              surface: a primary-tinted card whose visual centerpiece
+              is an icon pair (the campaign -> the wallet) so a
+              first-time creator instantly grasps that donations land
+              in their own Agora wallet. The avatar + live balance
+              below confirm the exact destination. */}
           <div className="rounded-xl border-2 border-primary/30 bg-primary/10 p-5 space-y-4">
             <div className="flex items-center justify-center gap-3">
               <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-background shadow-sm ring-2 ring-primary/30">
                 <HandHeart className="size-7 text-primary" />
               </div>
-              <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow">
-                <Link2 className="size-4" />
-              </div>
+              <ArrowRight className="size-5 shrink-0 text-primary rtl:rotate-180" />
               <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-background shadow-sm ring-2 ring-primary/30">
                 <Wallet className="size-7 text-primary" />
               </div>
@@ -1433,11 +1432,14 @@ function WalletPicker({
 }
 
 /**
- * Segmented "Accept" picker for the HD-wallet branch. Three pill
- * buttons (Accept All / Public Only / Private Only) with a one-line
- * caption beneath that explains the current selection. Public is
- * always available; the All and Private buttons disable when SP isn't
- * supported (extension / bunker logins).
+ * "What donations will you accept?" picker for the HD-wallet branch.
+ *
+ * Written for a first-time, possibly anxious creator: instead of three
+ * terse jargon pills (Accept All / Public Only / Private Only) it
+ * presents three full-width selectable cards, each with a friendly
+ * icon, a plain-language title, and a one-line reassurance. The two
+ * SP-dependent options are disabled (with a short note) when silent
+ * payments aren't supported on this login (extension / bunker).
  */
 function AcceptModePicker({
   value,
@@ -1450,49 +1452,87 @@ function AcceptModePicker({
 }) {
   const { t } = useTranslation();
 
-  const caption = {
-    all: t('campaignsCreate.acceptAllHint'),
-    public: t('campaignsCreate.acceptPublicHint'),
-    private: t('campaignsCreate.acceptPrivateHint'),
-  }[value];
+  const options: {
+    key: 'all' | 'public' | 'private';
+    icon: typeof Globe;
+    title: string;
+    description: string;
+    requiresSp?: boolean;
+  }[] = [
+    {
+      key: 'all',
+      icon: HandHeart,
+      title: t('campaignsCreate.acceptAllTitle'),
+      description: t('campaignsCreate.acceptAllHint'),
+      requiresSp: true,
+    },
+    {
+      key: 'public',
+      icon: Globe,
+      title: t('campaignsCreate.acceptPublicTitle'),
+      description: t('campaignsCreate.acceptPublicHint'),
+    },
+    {
+      key: 'private',
+      icon: EyeOff,
+      title: t('campaignsCreate.acceptPrivateTitle'),
+      description: t('campaignsCreate.acceptPrivateHint'),
+      requiresSp: true,
+    },
+  ];
 
   return (
-    <div className="space-y-2">
-      <ToggleGroup
-        type="single"
-        value={value}
-        // Radix ToggleGroup emits '' when the user toggles off the
-        // selected item. Required campaigns can never be in "no
-        // mode" state — coerce empty back to the previous value.
-        onValueChange={(next) => {
-          if (!next) return;
-          onChange(next as 'all' | 'public' | 'private');
-        }}
-        variant="outline"
-        className="grid w-full grid-cols-3 gap-1.5"
-      >
-        <ToggleGroupItem
-          value="all"
-          disabled={!silentPaymentSupported}
-          className="h-auto justify-center rounded-full px-3 py-2 text-xs font-medium"
-        >
-          {t('campaignsCreate.acceptAllShort')}
-        </ToggleGroupItem>
-        <ToggleGroupItem
-          value="public"
-          className="h-auto justify-center rounded-full px-3 py-2 text-xs font-medium"
-        >
-          {t('campaignsCreate.acceptPublicShort')}
-        </ToggleGroupItem>
-        <ToggleGroupItem
-          value="private"
-          disabled={!silentPaymentSupported}
-          className="h-auto justify-center rounded-full px-3 py-2 text-xs font-medium"
-        >
-          {t('campaignsCreate.acceptPrivateShort')}
-        </ToggleGroupItem>
-      </ToggleGroup>
-      <p className="text-xs text-muted-foreground">{caption}</p>
+    <div className="space-y-3">
+      <p className="text-sm font-medium">{t('campaignsCreate.acceptHeading')}</p>
+      <div className="space-y-2" role="radiogroup" aria-label={t('campaignsCreate.acceptHeading')}>
+        {options.map((option) => {
+          const Icon = option.icon;
+          const selected = value === option.key;
+          const disabled = option.requiresSp && !silentPaymentSupported;
+          return (
+            <button
+              key={option.key}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              disabled={disabled}
+              onClick={() => onChange(option.key)}
+              className={cn(
+                'flex w-full items-start gap-3 rounded-xl border-2 p-4 text-left transition-colors',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                selected
+                  ? 'border-primary bg-primary/10'
+                  : 'border-border bg-background hover:border-primary/40 hover:bg-muted/40',
+                disabled && 'cursor-not-allowed opacity-50 hover:border-border hover:bg-background',
+              )}
+            >
+              <span
+                className={cn(
+                  'flex size-10 shrink-0 items-center justify-center rounded-full',
+                  selected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground',
+                )}
+              >
+                <Icon className="size-5" />
+              </span>
+              <span className="min-w-0 flex-1 space-y-0.5">
+                <span className="block text-sm font-semibold">{option.title}</span>
+                <span className="block text-xs leading-relaxed text-muted-foreground">
+                  {disabled ? t('campaignsCreate.acceptUnavailable') : option.description}
+                </span>
+              </span>
+              <span
+                className={cn(
+                  'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
+                  selected ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30',
+                )}
+                aria-hidden="true"
+              >
+                {selected && <Check className="size-3" />}
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
