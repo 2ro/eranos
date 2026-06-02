@@ -43,7 +43,7 @@ const hardcodedConfig: AppConfig = {
   appId: "agora",
   shareOrigin: import.meta.env.VITE_SHARE_ORIGIN || undefined,
   homePage: "campaigns",
-  client: "naddr1qvzqqqru7cpzq7q6z5ns2hm5c8msyv83qwzxpxe52j8c4d4q5m92wsp9sflelkh9qqzkg6t5w3hswjl4yp",
+  client: "naddr1qvzqqqru7cpzq7q6z5ns2hm5c8msyv83qwzxpxe52j8c4d4q5m92wsp9sflelkh9qqzkzem0wfssdl264k",
   theme: "system",
   useAppRelays: true,
   useUserRelays: false,
