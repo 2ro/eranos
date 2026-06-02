@@ -263,6 +263,7 @@
     },
     "placeholder": {
       "writeComment": "Yorum yaz...",
+      "writeReply": "Yanıt yaz...",
       "addComment": "Yorum ekle...",
       "whatsHappening": "Neler oluyor?"
     },

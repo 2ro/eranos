@@ -1971,6 +1971,7 @@
     },
     "placeholder": {
       "writeComment": "Escribe un comentario...",
+      "writeReply": "Escribe una respuesta...",
       "addComment": "Agregar un comentario...",
       "whatsHappening": "¿Qué está pasando?"
     },

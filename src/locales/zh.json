@@ -1973,6 +1973,7 @@
     },
     "placeholder": {
       "writeComment": "写一条评论...",
+      "writeReply": "写一条回复...",
       "addComment": "添加评论...",
       "whatsHappening": "有什么新鲜事？"
     },

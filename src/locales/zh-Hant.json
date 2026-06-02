@@ -1909,6 +1909,7 @@
     },
     "placeholder": {
       "writeComment": "寫一條評論...",
+      "writeReply": "撰寫回覆...",
       "addComment": "新增評論...",
       "whatsHappening": "有什麼新鮮事？"
     },

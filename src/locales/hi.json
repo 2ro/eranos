@@ -264,6 +264,7 @@
     },
     "placeholder": {
       "writeComment": "कमेंट लिखें...",
+      "writeReply": "उत्तर लिखें...",
       "addComment": "कमेंट जोड़ें...",
       "whatsHappening": "क्या चल रहा है?"
     },

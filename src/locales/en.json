@@ -265,6 +265,7 @@
     },
     "placeholder": {
       "writeComment": "Write a comment...",
+      "writeReply": "Write a reply...",
       "addComment": "Add a comment...",
       "whatsHappening": "What's happening?"
     },

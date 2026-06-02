@@ -263,6 +263,7 @@
     },
     "placeholder": {
       "writeComment": "Écrire un commentaire...",
+      "writeReply": "Écrire une réponse...",
       "addComment": "Ajouter un commentaire...",
       "whatsHappening": "Que se passe-t-il ?"
     },

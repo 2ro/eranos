@@ -264,6 +264,7 @@
     },
     "placeholder": {
       "writeComment": "Написать комментарий...",
+      "writeReply": "Написать ответ...",
       "addComment": "Добавить комментарий...",
       "whatsHappening": "Что происходит?"
     },

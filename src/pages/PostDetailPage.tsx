@@ -2094,7 +2094,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
         <DetailCommentComposer
           event={event}
           className="mb-3"
-          placeholder={isKind1 ? 'Write a reply...' : t('compose.activityPlaceholder')}
+          placeholder={isKind1 ? t('replyModal.placeholder.writeReply') : t('replyModal.placeholder.writeComment')}
         />
 
         {repliesLoading ? (
