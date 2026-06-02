@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.8.8] - 2026-06-02
+
+Fixes the app icon proportions and updates the loading splash to the Agora bolt.
+
+### Fixed
+
+- App icon no longer appears squashed.
+- Loading splash now shows the Agora bolt instead of the old logo.
+
 ## [2.8.7] - 2026-06-02
 
 Fixes the top navigation bar rendering behind the status bar on Android.
