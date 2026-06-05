@@ -1772,6 +1772,7 @@
       "historyWarning": "This address has already been used on-chain. Sending your private funds here links them to its existing transaction history and undoes the privacy of your silent payments. Use a silent payment address (sp1…) instead, or send anyway.",
       "ownPublicWarning": "This is an address from your own public wallet. Sending your private funds to it merges the two wallets and links them together. Use a silent payment address (sp1…) instead, or send anyway."
     },
+    "ownSilentPaymentBlocked": "This is your own silent payment address. You can't send from your public wallet to your private wallet — doing so co-mingles your private silent payment funds with coins already exposed on the public ledger, linking your private wallet to a known identity and destroying its privacy. Send to a different address instead.",
     "recipient": {
       "placeholder": "bc1…, sp1…",
       "scan": "Scan QR code",

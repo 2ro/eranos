@@ -1725,7 +1725,8 @@
       "acknowledge": "Riski anlıyorum — yine de gönder",
       "historyWarning": "Bu adres zincir üstünde daha önce kullanılmış. Gizli fonlarınızı buraya göndermek, onları mevcut işlem geçmişiyle ilişkilendirir ve sessiz ödemelerinizin gizliliğini ortadan kaldırır. Bunun yerine bir sessiz ödeme adresi (sp1…) kullanın ya da yine de gönderin.",
       "ownPublicWarning": "Bu, kendi herkese açık cüzdanınızdan bir adres. Gizli fonlarınızı ona göndermek iki cüzdanı birleştirir ve birbirine bağlar. Bunun yerine bir sessiz ödeme adresi (sp1…) kullanın ya da yine de gönderin."
-    }
+    },
+    "ownSilentPaymentBlocked": "Bu, kendi sessiz ödeme adresiniz. Herkese açık cüzdanınızdan gizli cüzdanınıza gönderemezsiniz — bunu yapmak, gizli sessiz ödeme fonlarınızı herkese açık defterde zaten açığa çıkmış paralarla birleştirir, gizli cüzdanınızı bilinen bir kimliğe bağlar ve gizliliğini ortadan kaldırır. Bunun yerine farklı bir adrese gönderin."
   },
   "qrScanner": {
     "title": "QR kodu tara",

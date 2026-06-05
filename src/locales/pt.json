@@ -1790,7 +1790,8 @@
       "acknowledge": "Entendo o risco — enviar mesmo assim",
       "historyWarning": "Este endereço já foi usado on-chain. Enviar seus fundos privados para aqui os vincula ao histórico de transações existente e anula a privacidade dos seus pagamentos silenciosos. Use um endereço de pagamento silencioso (sp1…), ou envie mesmo assim.",
       "ownPublicWarning": "Este é um endereço da sua própria carteira pública. Enviar seus fundos privados para ele mescla as duas carteiras e as vincula. Use um endereço de pagamento silencioso (sp1…), ou envie mesmo assim."
-    }
+    },
+    "ownSilentPaymentBlocked": "Este é o seu próprio endereço de pagamento silencioso. Você não pode enviar da sua carteira pública para a sua carteira privada — fazer isso mescla seus fundos privados de pagamento silencioso com moedas já expostas no registro público, vinculando sua carteira privada a uma identidade conhecida e destruindo sua privacidade. Envie para um endereço diferente."
   },
   "qrScanner": {
     "title": "Escanear código QR",

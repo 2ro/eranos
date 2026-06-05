@@ -1348,7 +1348,8 @@
       "acknowledge": "Ndinonzwisisa njodzi — tumira zvakadaro",
       "historyWarning": "Kero iyi yatoshandiswa pacheni. Kutumira mari yako yakavanzika pano kunoibatanidza nenhoroondo yayo iripo yekutengeserana uye kunopedza kuvanzika kwemibhadharo yako yekunyararira. Shandisa kero yekubhadhara kunyararira (sp1…) panzvimbo yacho, kana kutumira zvakadaro.",
       "ownPublicWarning": "Iyi ndiyo kero yechikwama chako pachako chepachena. Kutumira mari yako yakavanzika kwairi kunobatanidza zvikwama zviviri uye kuzvibatanidza pamwe. Shandisa kero yekubhadhara kunyararira (sp1…) panzvimbo yacho, kana kutumira zvakadaro."
-    }
+    },
+    "ownSilentPaymentBlocked": "Iyi ndiyo kero yako pachako yekubhadhara kunyararira. Haukwanisi kutumira uchibva muchikwama chako chepachena uchienda kuchikwama chako chakavanzika — kuita izvozvo kunosanganisa mari yako yakavanzika yekubhadhara kunyararira nemakoini akatoonekwa pacheni yepachena, zvichibatanidza chikwama chako chakavanzika kune chiziviso chinozivikanwa uye zvichiparadza kuvanzika kwacho. Tumira kune imwe kero panzvimbo yacho."
   },
   "qrScanner": {
     "title": "Skena kodhi yeQR",

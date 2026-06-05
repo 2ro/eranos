@@ -1346,7 +1346,8 @@
       "acknowledge": "Entiendo el riesgo: enviar de todos modos",
       "historyWarning": "Esta dirección ya se ha usado en la cadena. Enviar aquí tus fondos privados los vincula a su historial de transacciones existente y anula la privacidad de tus pagos silenciosos. Usa una dirección de pago silencioso (sp1…) en su lugar, o envía de todos modos.",
       "ownPublicWarning": "Esta es una dirección de tu propia billetera pública. Enviarle tus fondos privados fusiona ambas billeteras y las vincula entre sí. Usa una dirección de pago silencioso (sp1…) en su lugar, o envía de todos modos."
-    }
+    },
+    "ownSilentPaymentBlocked": "Esta es una dirección de tu propio pago silencioso. No puedes enviar desde tu billetera pública a tu billetera privada: hacerlo mezcla tus fondos privados de pago silencioso con monedas ya expuestas en el libro mayor público, lo que vincula tu billetera privada a una identidad conocida y destruye su privacidad. Envía a una dirección diferente en su lugar."
   },
   "qrScanner": {
     "title": "Escanear código QR",

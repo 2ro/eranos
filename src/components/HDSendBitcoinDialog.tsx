@@ -146,6 +146,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, walletScope, btcPrice, in
   const availability = useHdWalletAccess();
   const {
     scan,
+    silentPaymentAddress,
     silentPaymentBalance,
     silentPaymentStorage,
     ownPublicAddresses,
@@ -343,6 +344,23 @@ export function HDSendBitcoinDialog({ isOpen, onClose, walletScope, btcPrice, in
 
   // The private-send guard only applies to bare on-chain recipients.
   const needsReuseCheck = isPrivate && isRawAddress;
+
+  // ── Public-send to own silent-payment address: hard block ────
+  //
+  // The inverse of the private-send reuse guard. When the PUBLIC wallet is
+  // about to pay the user's OWN silent-payment address, the silent-payment
+  // UTXOs that result get co-mingled with funds the user already exposed on
+  // the public ledger — linking the private wallet back to a known on-chain
+  // identity and destroying the privacy the silent-payment wallet exists to
+  // provide. Unlike the private-send guard there is no "send anyway" escape
+  // hatch: this is disallowed outright. We still render the explanation so
+  // the user understands why.
+  const ownSilentPaymentBlock =
+    !isPrivate &&
+    !!recipient &&
+    recipient.kind === 'sp' &&
+    !!silentPaymentAddress &&
+    recipient.address === silentPaymentAddress.address;
 
   useEffect(() => {
     setConfirmArmed(false);
@@ -618,6 +636,10 @@ export function HDSendBitcoinDialog({ isOpen, onClose, walletScope, btcPrice, in
     }
     if (insufficient) { setError(t('walletSend.errors.insufficient')); return; }
 
+    // Public wallet → own silent-payment address: disallowed outright. The
+    // blocking notice is rendered inline; bail before building anything.
+    if (ownSilentPaymentBlock) return;
+
     // Private-wallet send to a bare on-chain address: the reuse check runs
     // automatically when the recipient is selected. Here we just enforce its
     // outcome — block until the probe settles, and require the explicit
@@ -647,6 +669,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, walletScope, btcPrice, in
     reuseChecked,
     reuseWarning,
     reuseAcknowledged,
+    ownSilentPaymentBlock,
   ]);
 
   // ── Reset on close ───────────────────────────────────────────
@@ -701,7 +724,9 @@ export function HDSendBitcoinDialog({ isOpen, onClose, walletScope, btcPrice, in
     currentFeeRate < 1 ||
     // Private-send reuse guard: once a warning has surfaced, the user must
     // tick "Send anyway" before the button re-enables.
-    (needsReuseCheck && !!reuseWarning && !reuseAcknowledged);
+    (needsReuseCheck && !!reuseWarning && !reuseAcknowledged) ||
+    // Public-send to own silent-payment address: disallowed, no override.
+    ownSilentPaymentBlock;
 
   const maxAmountLabel = sendMax && effectiveAmountSats > 0 && btcPrice
     ? `${satsToUSD(effectiveAmountSats, btcPrice)} · ${t('walletSend.success.satsAmount', { sats: formatSats(effectiveAmountSats) })}`
@@ -812,6 +837,24 @@ export function HDSendBitcoinDialog({ isOpen, onClose, walletScope, btcPrice, in
                       />
                       <span>{t('walletSend.reuse.acknowledge')}</span>
                     </label>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Public-wallet → own silent-payment address. Disallowed
+                  outright: sending public funds to your own private wallet
+                  co-mingles the silent-payment UTXOs with coins already
+                  exposed on the public ledger, linking the private wallet to
+                  a known identity. No "send anyway" — the Send button stays
+                  disabled while this is the recipient. */}
+              {ownSilentPaymentBlock && (
+                <Alert
+                  role="alert"
+                  className="border-destructive/50 bg-destructive/5 text-destructive dark:border-destructive py-3"
+                >
+                  <AlertTriangle className="size-4 text-destructive" />
+                  <AlertDescription className="text-xs">
+                    {t('walletSend.ownSilentPaymentBlocked')}
                   </AlertDescription>
                 </Alert>
               )}

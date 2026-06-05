@@ -1683,7 +1683,8 @@
       "acknowledge": "Naelewa hatari — tuma hata hivyo",
       "historyWarning": "Anwani hii tayari imetumika kwenye mnyororo. Kutuma fedha zako za faragha hapa kunaziunganisha na historia yake ya miamala iliyopo na kuondoa faragha ya malipo yako kimya. Tumia anwani ya malipo kimya (sp1…) badala yake, au tuma hata hivyo.",
       "ownPublicWarning": "Hii ni anwani kutoka pochi yako ya hadharani. Kutuma fedha zako za faragha kwake kunaunganisha pochi zote mbili na kuziunganisha pamoja. Tumia anwani ya malipo kimya (sp1…) badala yake, au tuma hata hivyo."
-    }
+    },
+    "ownSilentPaymentBlocked": "Hii ni anwani yako mwenyewe ya malipo kimya. Huwezi kutuma kutoka pochi yako ya hadharani kwenda pochi yako ya faragha — kufanya hivyo kunachanganya fedha zako za faragha za malipo kimya na sarafu ambazo tayari zimewekwa wazi kwenye leja ya hadharani, kuunganisha pochi yako ya faragha na utambulisho unaojulikana na kuharibu faragha yake. Tuma kwa anwani tofauti badala yake."
   },
   "qrScanner": {
     "title": "Changanua msimbo wa QR",

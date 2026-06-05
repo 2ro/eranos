@@ -1724,7 +1724,8 @@
       "acknowledge": "Saya memahami risikonya — tetap kirim",
       "historyWarning": "Alamat ini sudah pernah digunakan on-chain. Mengirim dana privat Anda ke sini menautkannya ke riwayat transaksi yang ada dan menghapus privasi silent payment Anda. Gunakan alamat silent payment (sp1…), atau tetap kirim.",
       "ownPublicWarning": "Ini adalah alamat dari dompet publik Anda sendiri. Mengirim dana privat ke alamat ini menggabungkan kedua dompet dan menautkannya. Gunakan alamat silent payment (sp1…), atau tetap kirim."
-    }
+    },
+    "ownSilentPaymentBlocked": "Ini adalah alamat silent payment Anda sendiri. Anda tidak bisa mengirim dari dompet publik ke dompet privat Anda — melakukannya menggabungkan dana silent payment privat Anda dengan koin yang sudah terekspos di ledger publik, menautkan dompet privat Anda ke identitas yang diketahui dan menghancurkan privasinya. Kirim ke alamat lain saja."
   },
   "qrScanner": {
     "title": "Pindai kode QR",

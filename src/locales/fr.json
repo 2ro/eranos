@@ -1785,7 +1785,8 @@
       "acknowledge": "Je comprends le risque — envoyer quand même",
       "historyWarning": "Cette adresse a déjà été utilisée on-chain. Y envoyer vos fonds privés les lie à son historique de transactions existant et annule la confidentialité de vos paiements silencieux. Utilisez plutôt une adresse de paiement silencieux (sp1…), ou envoyez quand même.",
       "ownPublicWarning": "Il s’agit d’une adresse de votre propre portefeuille public. Y envoyer vos fonds privés fusionne les deux portefeuilles et les relie. Utilisez plutôt une adresse de paiement silencieux (sp1…), ou envoyez quand même."
-    }
+    },
+    "ownSilentPaymentBlocked": "Il s’agit de votre propre adresse de paiement silencieux. Vous ne pouvez pas envoyer depuis votre portefeuille public vers votre portefeuille privé — cela mélangerait vos fonds privés de paiement silencieux avec des pièces déjà exposées sur le registre public, reliant votre portefeuille privé à une identité connue et détruisant sa confidentialité. Envoyez plutôt à une adresse différente."
   },
   "qrScanner": {
     "title": "Scanner le QR code",
