@@ -1463,7 +1463,6 @@
     "amountPending": "{{amount}} tertunda",
     "pending": "tertunda",
     "send": "Kirim",
-    "receive": "Terima",
     "transactions": "Transaksi",
     "receiveDialog": {
       "title": "Terima Bitcoin",
@@ -1482,7 +1481,13 @@
       "silentBadge": "silent",
       "silentDetectedTitle": "Terdeteksi melalui pemindaian silent payment BIP-352"
     },
-    "openMenu": "Menu dompet"
+    "openMenu": "Menu dompet",
+    "sendPublic": "Kirim",
+    "sendPrivate": "Kirim secara privat",
+    "tabs": {
+      "public": "Publik",
+      "private": "Privat"
+    }
   },
   "walletSettings": {
     "backup": {
@@ -1710,6 +1715,15 @@
       "satsAmount": "{{sats}} sats",
       "viewTransaction": "Lihat transaksi",
       "done": "Selesai"
+    },
+    "titlePublic": "Kirim Bitcoin",
+    "titlePrivate": "Kirim secara privat",
+    "reuse": {
+      "checking": "Memeriksa alamat…",
+      "sendAnyway": "Tetap kirim",
+      "acknowledge": "Saya memahami risikonya — tetap kirim",
+      "historyWarning": "Alamat ini sudah pernah digunakan on-chain. Mengirim dana privat Anda ke sini menautkannya ke riwayat transaksi yang ada dan menghapus privasi silent payment Anda. Gunakan alamat silent payment (sp1…), atau tetap kirim.",
+      "ownPublicWarning": "Ini adalah alamat dari dompet publik Anda sendiri. Mengirim dana privat ke alamat ini menggabungkan kedua dompet dan menautkannya. Gunakan alamat silent payment (sp1…), atau tetap kirim."
     }
   },
   "qrScanner": {

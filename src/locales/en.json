@@ -1461,8 +1461,13 @@
     "amountPending": "{{amount}} pending",
     "pending": "pending",
     "send": "Send",
-    "receive": "Receive",
+    "sendPublic": "Send",
+    "sendPrivate": "Send privately",
     "transactions": "Transactions",
+    "tabs": {
+      "public": "Public",
+      "private": "Private"
+    },
     "receiveDialog": {
       "title": "Receive Bitcoin",
       "description": "Share an address to receive bitcoin.",
@@ -1753,11 +1758,20 @@
   },
   "walletSend": {
     "title": "Send Bitcoin",
+    "titlePublic": "Send Bitcoin",
+    "titlePrivate": "Send privately",
     "send": "Send Bitcoin",
     "max": "MAX",
     "notEnoughBitcoin": "Not enough Bitcoin",
     "tapAgainToConfirm": "Tap again to confirm",
     "satPerVB": "{{rate}} sat/vB",
+    "reuse": {
+      "checking": "Checking address…",
+      "sendAnyway": "Send anyway",
+      "acknowledge": "I understand the risk — send anyway",
+      "historyWarning": "This address has already been used on-chain. Sending your private funds here links them to its existing transaction history and undoes the privacy of your silent payments. Use a silent payment address (sp1…) instead, or send anyway.",
+      "ownPublicWarning": "This is an address from your own public wallet. Sending your private funds to it merges the two wallets and links them together. Use a silent payment address (sp1…) instead, or send anyway."
+    },
     "recipient": {
       "placeholder": "bc1…, sp1…",
       "scan": "Scan QR code",

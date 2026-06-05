@@ -1023,7 +1023,6 @@
     "amountPending": "{{amount}} 待確認",
     "pending": "待確認",
     "send": "傳送",
-    "receive": "接收",
     "transactions": "交易",
     "receiveDialog": {
       "title": "接收比特幣",
@@ -1042,7 +1041,13 @@
       "silentBadge": "靜默",
       "silentDetectedTitle": "通過 BIP-352 靜默支付掃描檢測到"
     },
-    "openMenu": "錢包選單"
+    "openMenu": "錢包選單",
+    "sendPublic": "傳送",
+    "sendPrivate": "私密傳送",
+    "tabs": {
+      "public": "公開",
+      "private": "私密"
+    }
   },
   "walletSettings": {
     "backup": {
@@ -1270,6 +1275,15 @@
       "satsAmount": "{{sats}} sats",
       "viewTransaction": "檢視交易",
       "done": "完成"
+    },
+    "titlePublic": "傳送比特幣",
+    "titlePrivate": "私密傳送",
+    "reuse": {
+      "checking": "正在檢查位址…",
+      "sendAnyway": "仍然傳送",
+      "acknowledge": "我了解風險——仍然傳送",
+      "historyWarning": "此位址已在鏈上使用過。將你的私密資金傳送到這裡，會把它與該位址既有的交易紀錄關聯，破壞靜默支付的隱私性。請改用靜默支付位址（sp1…），或仍然傳送。",
+      "ownPublicWarning": "這是你自己公開錢包中的位址。將私密資金傳送到它會合併兩個錢包並將其關聯。請改用靜默支付位址（sp1…），或仍然傳送。"
     }
   },
   "qrScanner": {

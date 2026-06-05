@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { QRCodeCanvas } from '@/components/ui/qrcode';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +36,7 @@ import { useHdWallet } from '@/hooks/useHdWallet';
 import { useHdWalletSp } from '@/hooks/useHdWalletSp';
 import { useHdBtcPrice } from '@/hooks/useHdBtcPrice';
 import { satsToUSD, formatBTC } from '@/lib/bitcoin';
+import type { WalletScope } from '@/lib/hdwallet/transaction';
 import type { HdTransaction } from '@/lib/hdwallet/scan';
 
 export function WalletPage() {
@@ -46,8 +48,10 @@ export function WalletPage() {
     silentPaymentAddress,
     scan,
     silentPaymentStorage,
-    transactions,
-    totalBalance,
+    publicTransactions,
+    privateTransactions,
+    publicBalance,
+    privateBalance,
     pendingBalance,
     isLoading,
     isFetching,
@@ -57,8 +61,8 @@ export function WalletPage() {
   const sp = useHdWalletSp();
   const { data: btcPrice } = useHdBtcPrice();
 
-  const [copiedPayload, setCopiedPayload] = useState(false);
-  const [txOpen, setTxOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<WalletScope>('public');
+  const [sendScope, setSendScope] = useState<WalletScope>('public');
   const [sendOpen, setSendOpen] = useState(false);
   const [spScanOpen, setSpScanOpen] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
@@ -71,35 +75,15 @@ export function WalletPage() {
   const address = currentReceiveAddress?.address ?? '';
   const spAddress = silentPaymentAddress?.address ?? '';
 
-  // Whether the wallet holds any spendable inputs. Mirrors the Send dialog's
-  // `ownedInputs` set (BIP-86 UTXOs from the Blockbook scan + silent-payment
-  // UTXOs from local storage). When empty, sending is impossible, so the
-  // Send button is disabled just like the modal's "Send Bitcoin" button.
-  const hasSpendableBalance =
-    (scan?.utxos?.length ?? 0) > 0 || (silentPaymentStorage?.utxos?.length ?? 0) > 0;
+  // Each wallet has spendable funds independently. The public wallet spends
+  // BIP-86 UTXOs; the private wallet spends silent-payment UTXOs. The Send
+  // button on each tab is disabled when that wallet alone has no inputs.
+  const hasPublicSpendable = (scan?.utxos?.length ?? 0) > 0;
+  const hasPrivateSpendable = (silentPaymentStorage?.utxos?.length ?? 0) > 0;
 
-  // Combined BIP-21 payload: `bitcoin:<bc1>?sp=<sp1>` when both are
-  // available, falling back to the single endpoint that exists.
-  // Mirrors the campaign donate panel's QR payload so BIP-352-aware
-  // wallets pick the `sp=` parameter and legacy wallets fall back to
-  // the on-chain address.
-  const qrPayload = address && spAddress
-    ? `bitcoin:${address}?sp=${spAddress}`
-    : address
-      ? `bitcoin:${address}`
-      : spAddress
-        ? `bitcoin:?sp=${spAddress}`
-        : '';
-
-  const copyPayload = async () => {
-    if (!qrPayload) return;
-    try {
-      await navigator.clipboard.writeText(qrPayload);
-      setCopiedPayload(true);
-      setTimeout(() => setCopiedPayload(false), 2000);
-    } catch {
-      // clipboard unavailable
-    }
+  const openSend = (scope: WalletScope) => {
+    setSendScope(scope);
+    setSendOpen(true);
   };
 
   // ── Logged out ────────────────────────────────────────────────
@@ -151,202 +135,294 @@ export function WalletPage() {
     );
   }
 
-  // ── Available — full HD wallet UI ────────────────────────────
+  // ── Available — tabbed Public / Private wallet UI ────────────
   return (
     <main className="max-w-sm mx-auto">
-      <div className="flex flex-col items-center px-4 pt-4 pb-4 space-y-4">
-        {/* Balance */}
-        {isLoading ? (
-          <div className="flex flex-col items-center space-y-2">
-            <Skeleton className="h-10 w-40 rounded-lg" />
-            <Skeleton className="h-4 w-24 rounded" />
-          </div>
-        ) : error ? (
-          <div className="text-center space-y-3">
-            <p className="text-sm text-destructive">{t('wallet.scanFailed')}</p>
-            <Button variant="outline" size="sm" onClick={() => refetch()}>
-              <RefreshCw className="size-3.5 mr-1.5" />
-              {t('wallet.retry')}
-            </Button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="flex flex-col items-center space-y-1 group cursor-pointer disabled:cursor-default rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring px-4 py-2"
-            aria-label={t('wallet.refreshBalance')}
-            title={t('wallet.refreshBalanceTitle')}
-          >
-            <span className="flex items-center gap-2 text-primary group-hover:opacity-80 transition-opacity">
-              <span
-                className="latin-display font-display font-normal tracking-wide leading-none uppercase text-5xl inline-block tabular-nums"
-                style={{
-                  WebkitTextStroke: '0.022em currentColor',
-                  transform: 'skewX(-6deg) scaleX(1.1)',
-                  transformOrigin: '0 100%',
-                }}
+      <Tabs
+        value={activeTab}
+        onValueChange={(v) => setActiveTab(v as WalletScope)}
+        className="w-full"
+      >
+        {/* Tabs row: compact tabs centered in the container, with the
+            overflow menu (back-up, legacy recovery) pinned to the right so
+            it's reachable from either wallet. */}
+        <div className="relative flex items-center justify-center px-4 pt-3 pb-6">
+          <TabsList className="h-9">
+            <TabsTrigger value="public">
+              {t('wallet.tabs.public')}
+            </TabsTrigger>
+            <TabsTrigger value="private">
+              {t('wallet.tabs.private')}
+            </TabsTrigger>
+          </TabsList>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                aria-label={t('wallet.openMenu')}
+                title={t('wallet.openMenu')}
+                className="absolute right-4 shrink-0 p-2 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                {btcPrice ? satsToUSD(totalBalance, btcPrice) : '---'}
-              </span>
-              {isFetching && (
-                <RefreshCw className="size-5 animate-spin text-muted-foreground" />
-              )}
-            </span>
-            <span className="text-sm text-muted-foreground">
-              {formatBTC(totalBalance)} BTC
-            </span>
+                <MoreVertical className="size-5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => setBackupOpen(true)} className="cursor-pointer">
+                <KeyRound className="size-4 mr-2" />
+                {t('walletSettings.backup.label')}
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/wallet/legacy" className="cursor-pointer">
+                  <History className="size-4 mr-2" />
+                  {t('walletSettings.legacy.label')}
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
-            {pendingBalance !== 0 && (
-              <PendingBadge
-                amountLabel={btcPrice ? satsToUSD(Math.abs(pendingBalance), btcPrice) : undefined}
-                className="pt-1 flex"
-              />
-            )}
-          </button>
-        )}
+        <TabsContent value="public" className="mt-0">
+          <WalletTabPanel
+            scope="public"
+            balance={publicBalance}
+            pendingBalance={pendingBalance}
+            receivePayload={address ? `bitcoin:${address}` : ''}
+            transactions={publicTransactions}
+            hasSpendable={hasPublicSpendable}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            error={error}
+            btcPrice={btcPrice}
+            onRefetch={refetch}
+            onSend={() => openSend('public')}
+          />
+        </TabsContent>
 
-        {sp.enabled && spAddress && (
-          <button
-            type="button"
-            onClick={() => setSpScanOpen(true)}
-            className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm cursor-pointer"
-          >
-            {t('wallet.receiveDialog.scanForNew')}
-          </button>
-        )}
-
-        {/* Back-up affordance and v1 detection live in the overflow menu
-            in the top-right. Back up opens a dialog inline; Legacy wallet
-            recovery navigates to its own page. The wallet home no longer
-            auto-detects any legacy balances — that scan only runs when
-            the user explicitly opens the Legacy Wallet Recovery screen. */}
-
-        <HDSendBitcoinDialog
-          isOpen={sendOpen}
-          onClose={() => setSendOpen(false)}
-          btcPrice={btcPrice}
-        />
-
-        <HDSilentPaymentScanDialog open={spScanOpen} onOpenChange={setSpScanOpen} />
-
-        <WalletBackupMnemonicDialog open={backupOpen} onOpenChange={setBackupOpen} />
-
-        {/* Inline receive panel — lives directly under the balance instead
-            of behind a modal so the QR is always visible. The copy row uses
-            the same explicit width as the white QR tile (280 + p-4 + p-4). */}
-        {!isLoading && !error && qrPayload && (
-          <div className="flex flex-col items-center gap-4">
-            {/* Combined BIP-21 QR with centered Agora logo. BIP-352-aware
-                wallets pick the `sp=` parameter; legacy wallets fall back
-                to the on-chain address. Mirrors CampaignWalletDonatePanel:
-                level="H" tolerates the logo occlusion. */}
-            <div className="relative rounded-2xl bg-white p-4 shadow-sm">
-              <QRCodeCanvas value={qrPayload} size={280} level="H" />
-              <div
-                aria-hidden
-                className="absolute inset-0 flex items-center justify-center pointer-events-none"
-              >
-                <div className="rounded-full bg-primary p-2 ring-[6px] ring-white">
-                  <img
-                    src="/logo.svg"
-                    alt=""
-                    className="size-16 object-contain brightness-0 invert"
-                    draggable={false}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Copyable row showing the full payment URI. The receive
-                address advances automatically once funds are detected, so
-                there is no manual "next address" affordance here. */}
-            <button
-              type="button"
-              onClick={copyPayload}
-              className="w-[312px] flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 text-left hover:bg-muted/60 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
-            >
-              <span className="flex-1 min-w-0 truncate font-mono text-xs" title={qrPayload}>
-                {qrPayload}
-              </span>
-              {copiedPayload ? (
-                <Check className="size-4 text-green-500 shrink-0" />
-              ) : (
-                <Copy className="size-4 text-muted-foreground shrink-0" />
-              )}
-            </button>
-          </div>
-        )}
-
-        {/* Send button — placed at the bottom of the wallet column so the
-            receive QR is the first thing users see; sending is a less
-            frequent action. Styled to mirror the `Start a campaign` hero
-            CTA on the home page. */}
-        {!isLoading && !error && (
-          <div className="w-[312px] flex items-center gap-2">
-            <Button
-              size="lg"
-              onClick={() => setSendOpen(true)}
-              disabled={!hasSpendableBalance}
-              className="flex-1 rounded-full text-white font-semibold text-base h-12 px-7 [&_svg]:size-[18px] motion-safe:transition-colors"
-            >
-              <ArrowUpRight className="mr-2" />
-              {t('wallet.send')}
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+        <TabsContent value="private" className="mt-0">
+          <WalletTabPanel
+            scope="private"
+            balance={privateBalance}
+            pendingBalance={0}
+            receivePayload={spAddress ? `bitcoin:?sp=${spAddress}` : ''}
+            transactions={privateTransactions}
+            hasSpendable={hasPrivateSpendable}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            error={error}
+            btcPrice={btcPrice}
+            onRefetch={refetch}
+            onSend={() => openSend('private')}
+            footer={
+              sp.enabled && spAddress ? (
                 <button
                   type="button"
-                  aria-label={t('wallet.openMenu')}
-                  title={t('wallet.openMenu')}
-                  className="shrink-0 p-2 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  onClick={() => setSpScanOpen(true)}
+                  className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm cursor-pointer"
                 >
-                  <MoreVertical className="size-5" />
+                  {t('wallet.receiveDialog.scanForNew')}
                 </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onSelect={() => setBackupOpen(true)} className="cursor-pointer">
-                  <KeyRound className="size-4 mr-2" />
-                  {t('walletSettings.backup.label')}
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/wallet/legacy" className="cursor-pointer">
-                    <History className="size-4 mr-2" />
-                    {t('walletSettings.legacy.label')}
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )}
+              ) : null
+            }
+          />
+        </TabsContent>
+      </Tabs>
 
-        {/* Transactions */}
-        {transactions && transactions.length > 0 && (
-          <>
-            <button
-              onClick={() => setTxOpen((o) => !o)}
-              className="!mt-10 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-            >
-              {t('wallet.transactions')}
-              <ChevronDown className={`size-3 transition-transform duration-200 ${txOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            <TxAccordion open={txOpen}>
-              <div className="w-full divide-y">
-                {transactions.map((tx) => (
-                  <TxRow key={tx.txid} tx={tx} btcPrice={btcPrice} />
-                ))}
-              </div>
-            </TxAccordion>
-          </>
-        )}
-      </div>
+      <HDSendBitcoinDialog
+        isOpen={sendOpen}
+        onClose={() => setSendOpen(false)}
+        walletScope={sendScope}
+        btcPrice={btcPrice}
+      />
+      <HDSilentPaymentScanDialog open={spScanOpen} onOpenChange={setSpScanOpen} />
+      <WalletBackupMnemonicDialog open={backupOpen} onOpenChange={setBackupOpen} />
     </main>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Helpers (mirrors WalletPage.tsx)
+// Per-wallet tab panel
+// ---------------------------------------------------------------------------
+
+interface WalletTabPanelProps {
+  scope: WalletScope;
+  balance: number;
+  pendingBalance: number;
+  /** BIP-21 payload for this wallet's receive QR (`''` when unavailable). */
+  receivePayload: string;
+  transactions?: HdTransaction[];
+  hasSpendable: boolean;
+  isLoading: boolean;
+  isFetching: boolean;
+  error: unknown;
+  btcPrice?: number;
+  onRefetch: () => void;
+  onSend: () => void;
+  footer?: React.ReactNode;
+}
+
+function WalletTabPanel({
+  scope,
+  balance,
+  pendingBalance,
+  receivePayload,
+  transactions,
+  hasSpendable,
+  isLoading,
+  isFetching,
+  error,
+  btcPrice,
+  onRefetch,
+  onSend,
+  footer,
+}: WalletTabPanelProps) {
+  const { t } = useTranslation();
+  const [copied, setCopied] = useState(false);
+  const [txOpen, setTxOpen] = useState(false);
+
+  const copyPayload = async () => {
+    if (!receivePayload) return;
+    try {
+      await navigator.clipboard.writeText(receivePayload);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // clipboard unavailable
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center px-4 pt-4 pb-4 space-y-4">
+      {/* Balance */}
+      {isLoading ? (
+        <div className="flex flex-col items-center space-y-2">
+          <Skeleton className="h-10 w-40 rounded-lg" />
+          <Skeleton className="h-4 w-24 rounded" />
+        </div>
+      ) : error ? (
+        <div className="text-center space-y-3">
+          <p className="text-sm text-destructive">{t('wallet.scanFailed')}</p>
+          <Button variant="outline" size="sm" onClick={onRefetch}>
+            <RefreshCw className="size-3.5 mr-1.5" />
+            {t('wallet.retry')}
+          </Button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={onRefetch}
+          disabled={isFetching}
+          className="flex flex-col items-center space-y-1 group cursor-pointer disabled:cursor-default rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring px-4 py-2"
+          aria-label={t('wallet.refreshBalance')}
+          title={t('wallet.refreshBalanceTitle')}
+        >
+          <span className="flex items-center gap-2 text-primary group-hover:opacity-80 transition-opacity">
+            <span
+              className="latin-display font-display font-normal tracking-wide leading-none uppercase text-5xl inline-block tabular-nums"
+              style={{
+                WebkitTextStroke: '0.022em currentColor',
+                transform: 'skewX(-6deg) scaleX(1.1)',
+                transformOrigin: '0 100%',
+              }}
+            >
+              {btcPrice ? satsToUSD(balance, btcPrice) : '---'}
+            </span>
+            {isFetching && (
+              <RefreshCw className="size-5 animate-spin text-muted-foreground" />
+            )}
+          </span>
+          <span className="text-sm text-muted-foreground">
+            {formatBTC(balance)} BTC
+          </span>
+
+          {pendingBalance !== 0 && (
+            <PendingBadge
+              amountLabel={btcPrice ? satsToUSD(Math.abs(pendingBalance), btcPrice) : undefined}
+              className="pt-1 flex"
+            />
+          )}
+        </button>
+      )}
+
+      {footer}
+
+      {/* Inline receive panel */}
+      {!isLoading && !error && receivePayload && (
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative rounded-2xl bg-white p-4 shadow-sm">
+            <QRCodeCanvas value={receivePayload} size={280} level="H" />
+            <div
+              aria-hidden
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            >
+              <div className="rounded-full bg-primary p-2 ring-[6px] ring-white">
+                <img
+                  src="/logo.svg"
+                  alt=""
+                  className="size-16 object-contain brightness-0 invert"
+                  draggable={false}
+                />
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={copyPayload}
+            className="w-[312px] flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 text-left hover:bg-muted/60 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
+          >
+            <span className="flex-1 min-w-0 truncate font-mono text-xs" title={receivePayload}>
+              {receivePayload}
+            </span>
+            {copied ? (
+              <Check className="size-4 text-green-500 shrink-0" />
+            ) : (
+              <Copy className="size-4 text-muted-foreground shrink-0" />
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* Send button */}
+      {!isLoading && !error && (
+        <div className="w-[312px] flex items-center gap-2">
+          <Button
+            size="lg"
+            onClick={onSend}
+            disabled={!hasSpendable}
+            className="flex-1 rounded-full text-white font-semibold text-base h-12 px-7 [&_svg]:size-[18px] motion-safe:transition-colors"
+          >
+            <ArrowUpRight className="mr-2" />
+            {scope === 'private' ? t('wallet.sendPrivate') : t('wallet.sendPublic')}
+          </Button>
+        </div>
+      )}
+
+      {/* Transactions */}
+      {transactions && transactions.length > 0 && (
+        <>
+          <button
+            onClick={() => setTxOpen((o) => !o)}
+            className="!mt-10 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          >
+            {t('wallet.transactions')}
+            <ChevronDown className={`size-3 transition-transform duration-200 ${txOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          <TxAccordion open={txOpen}>
+            <div className="w-full divide-y">
+              {transactions.map((tx) => (
+                <TxRow key={tx.txid} tx={tx} btcPrice={btcPrice} />
+              ))}
+            </div>
+          </TxAccordion>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
 // ---------------------------------------------------------------------------
 
 function TxAccordion({ open, children }: { open: boolean; children: React.ReactNode }) {

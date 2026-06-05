@@ -1464,7 +1464,6 @@
     "amountPending": "{{amount}} beklemede",
     "pending": "beklemede",
     "send": "Gönder",
-    "receive": "Al",
     "transactions": "İşlemler",
     "receiveDialog": {
       "title": "Bitcoin Al",
@@ -1483,7 +1482,13 @@
       "silentBadge": "sessiz",
       "silentDetectedTitle": "BIP-352 sessiz ödeme taramasıyla algılandı"
     },
-    "openMenu": "Cüzdan menüsü"
+    "openMenu": "Cüzdan menüsü",
+    "sendPublic": "Gönder",
+    "sendPrivate": "Gizlice gönder",
+    "tabs": {
+      "public": "Herkese açık",
+      "private": "Gizli"
+    }
   },
   "walletSettings": {
     "backup": {
@@ -1711,6 +1716,15 @@
     "scanError": {
       "title": "Bu QR kodu okunamadı",
       "description": "Bir Bitcoin adresi, sessiz ödeme adresi (sp1…) veya bitcoin: URI'si bekleniyordu."
+    },
+    "titlePublic": "Bitcoin Gönder",
+    "titlePrivate": "Gizlice gönder",
+    "reuse": {
+      "checking": "Adres kontrol ediliyor…",
+      "sendAnyway": "Yine de gönder",
+      "acknowledge": "Riski anlıyorum — yine de gönder",
+      "historyWarning": "Bu adres zincir üstünde daha önce kullanılmış. Gizli fonlarınızı buraya göndermek, onları mevcut işlem geçmişiyle ilişkilendirir ve sessiz ödemelerinizin gizliliğini ortadan kaldırır. Bunun yerine bir sessiz ödeme adresi (sp1…) kullanın ya da yine de gönderin.",
+      "ownPublicWarning": "Bu, kendi herkese açık cüzdanınızdan bir adres. Gizli fonlarınızı ona göndermek iki cüzdanı birleştirir ve birbirine bağlar. Bunun yerine bir sessiz ödeme adresi (sp1…) kullanın ya da yine de gönderin."
     }
   },
   "qrScanner": {

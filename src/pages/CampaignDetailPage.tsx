@@ -1169,6 +1169,7 @@ function DonateColumn({
         <HDSendBitcoinDialog
           isOpen={sendOpen}
           onClose={() => setSendOpen(false)}
+          walletScope="public"
           btcPrice={btcPrice}
           /* When the campaign exposes both an on-chain address and a
              silent-payment code, prefill with a combined `bitcoin:`

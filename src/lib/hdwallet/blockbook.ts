@@ -508,6 +508,63 @@ export async function broadcastBlockbookTx(
 }
 
 // ---------------------------------------------------------------------------
+// getAccountInfo (single address) — transaction-history probe
+// ---------------------------------------------------------------------------
+//
+// Used by the private-wallet send flow to warn before sending a silent-
+// payment spend to a reused on-chain address. Blockbook's `getAccountInfo`
+// accepts a bare address as the `descriptor`; with `details: 'basic'` it
+// returns aggregate counters (`txs`, `totalReceived`, `balance`) without the
+// full tx list — enough to decide whether the address has ever been used.
+
+/** Subset of the Blockbook `getAccountInfo` response we consume for an address. */
+interface BlockbookAccountInfo {
+  /** Total number of transactions touching the address. */
+  txs?: number;
+  /** Total ever received, sats (string). */
+  totalReceived?: string;
+  /** Current confirmed balance, sats (string). */
+  balance?: string;
+}
+
+/** Result of an address-history probe. */
+export interface AddressHistoryInfo {
+  /** Whether the address has ANY on-chain history (received funds or txs). */
+  hasHistory: boolean;
+  /** Number of transactions touching the address (0 when unused). */
+  txCount: number;
+}
+
+/**
+ * Probe whether an on-chain Bitcoin address has any transaction history.
+ *
+ * A `true` result means the address has been used before — sending to it
+ * links the new payment to that history, which is precisely what the private
+ * (silent-payment) wallet exists to avoid. The caller surfaces a warning and
+ * requires explicit confirmation before proceeding.
+ *
+ * Network failures are surfaced (thrown) so the UI can decide how to treat an
+ * inconclusive probe; callers that prefer to fail open should catch and treat
+ * the result as "unknown".
+ */
+export async function fetchAddressInfo(
+  baseUrl: string,
+  address: string,
+  signal?: AbortSignal,
+): Promise<AddressHistoryInfo> {
+  const data = await getSocket(baseUrl).send<BlockbookAccountInfo>(
+    'getAccountInfo',
+    { descriptor: address, details: 'basic' },
+    signal,
+  );
+  const txCount = typeof data?.txs === 'number' ? data.txs : 0;
+  const received = data?.totalReceived ? Number(data.totalReceived) : 0;
+  const balance = data?.balance ? Number(data.balance) : 0;
+  const hasHistory = txCount > 0 || received > 0 || balance > 0;
+  return { hasHistory, txCount };
+}
+
+// ---------------------------------------------------------------------------
 // getTransaction — per-vout spent status
 // ---------------------------------------------------------------------------
 //

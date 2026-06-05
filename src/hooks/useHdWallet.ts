@@ -84,6 +84,33 @@ interface UseHdWalletResult {
    * in `totalBalance` — this field is exposed for the UI breakdown.
    */
   silentPaymentBalance: number;
+  /**
+   * Public-wallet balance: BIP-86 on-chain UTXOs only (confirmed + pending),
+   * in sats. This is the headline figure for the "Public" wallet tab.
+   */
+  publicBalance: number;
+  /**
+   * Private-wallet balance: silent-payment UTXOs only, in sats. Alias of
+   * `silentPaymentBalance`, named for the "Private" wallet tab.
+   */
+  privateBalance: number;
+  /**
+   * Transaction history scoped to the public (BIP-86) wallet only — every
+   * row whose `source` is not `'silent-payment'`.
+   */
+  publicTransactions?: HdTransaction[];
+  /**
+   * Transaction history scoped to the private (silent-payment) wallet only.
+   */
+  privateTransactions?: HdTransaction[];
+  /**
+   * Every on-chain address this wallet controls on the public (BIP-86)
+   * hierarchy — used + lookahead + the currently-advertised receive address.
+   * The private-wallet send flow checks recipients against this set so it can
+   * warn when a user is about to send a silent payment to their own public
+   * wallet (which would defeat the separation).
+   */
+  ownPublicAddresses: Set<string>;
   /** The persisted SP UTXO document, if loaded. */
   silentPaymentStorage?: SPStorageDocument;
   /** Initial scan in progress. */
@@ -281,15 +308,50 @@ export function useHdWallet(): UseHdWalletResult {
     return refetchScan();
   }, [queryClient, refetchScan]);
 
+  // ── Per-wallet partitioning ──────────────────────────────────
+  //
+  // The wallet is presented as two strictly-separated balances. The public
+  // wallet is the BIP-86 on-chain balance from Blockbook; the private wallet
+  // is the silent-payment balance from local SP storage. Transactions split
+  // by `source` so each tab shows only its own activity.
+  const publicBalance = scan?.totalBalance ?? 0;
+  const privateBalance = sp.balance;
+
+  const publicTransactions = useMemo(
+    () => transactions?.filter((tx) => tx.source !== 'silent-payment'),
+    [transactions],
+  );
+  const privateTransactions = useMemo(
+    () => transactions?.filter((tx) => tx.source === 'silent-payment'),
+    [transactions],
+  );
+
+  // The full set of on-chain addresses this wallet controls — used to warn
+  // when a private send is about to pay the user's own public wallet.
+  const ownPublicAddresses = useMemo<Set<string>>(() => {
+    const set = new Set<string>();
+    if (scan) {
+      for (const addr of scan.addressMap.keys()) set.add(addr);
+      for (const addr of scan.lookaheadAddresses) set.add(addr);
+    }
+    if (currentReceiveAddress) set.add(currentReceiveAddress.address);
+    return set;
+  }, [scan, currentReceiveAddress]);
+
   return {
     availability,
     currentReceiveAddress,
     silentPaymentAddress,
     scan,
     transactions,
+    publicTransactions,
+    privateTransactions,
     totalBalance: (scan?.totalBalance ?? 0) + sp.balance,
     pendingBalance: scan?.pendingBalance ?? 0,
     silentPaymentBalance: sp.balance,
+    publicBalance,
+    privateBalance,
+    ownPublicAddresses,
     silentPaymentStorage: sp.storage,
     isLoading: scanLoading,
     isFetching: scanFetching,

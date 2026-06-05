@@ -1021,7 +1021,6 @@
     "amountPending": "{{amount}} pendiente",
     "pending": "pendiente",
     "send": "Enviar",
-    "receive": "Recibir",
     "transactions": "Transacciones",
     "receiveDialog": {
       "title": "Recibir Bitcoin",
@@ -1040,7 +1039,13 @@
       "silentBadge": "silencioso",
       "silentDetectedTitle": "Detectado mediante el escaneo de pagos silenciosos BIP-352"
     },
-    "openMenu": "Menú de la cartera"
+    "openMenu": "Menú de la cartera",
+    "sendPublic": "Enviar",
+    "sendPrivate": "Enviar en privado",
+    "tabs": {
+      "public": "Pública",
+      "private": "Privada"
+    }
   },
   "walletSettings": {
     "backup": {
@@ -1332,6 +1337,15 @@
       "satsAmount": "{{sats}} sats",
       "viewTransaction": "Ver transacción",
       "done": "Hecho"
+    },
+    "titlePublic": "Enviar Bitcoin",
+    "titlePrivate": "Enviar en privado",
+    "reuse": {
+      "checking": "Verificando dirección…",
+      "sendAnyway": "Enviar de todos modos",
+      "acknowledge": "Entiendo el riesgo: enviar de todos modos",
+      "historyWarning": "Esta dirección ya se ha usado en la cadena. Enviar aquí tus fondos privados los vincula a su historial de transacciones existente y anula la privacidad de tus pagos silenciosos. Usa una dirección de pago silencioso (sp1…) en su lugar, o envía de todos modos.",
+      "ownPublicWarning": "Esta es una dirección de tu propia billetera pública. Enviarle tus fondos privados fusiona ambas billeteras y las vincula entre sí. Usa una dirección de pago silencioso (sp1…) en su lugar, o envía de todos modos."
     }
   },
   "qrScanner": {

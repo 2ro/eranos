@@ -1462,7 +1462,6 @@
     "amountPending": "{{amount}} inasubiri",
     "pending": "inasubiri",
     "send": "Tuma",
-    "receive": "Pokea",
     "transactions": "Miamala",
     "receiveDialog": {
       "title": "Pokea Bitcoin",
@@ -1480,6 +1479,12 @@
       "sent": "Imetumwa",
       "silentBadge": "kimya",
       "silentDetectedTitle": "Imegunduliwa kupitia uchanganuzi wa malipo ya kimya wa BIP-352"
+    },
+    "sendPublic": "Tuma",
+    "sendPrivate": "Tuma kwa faragha",
+    "tabs": {
+      "public": "Hadharani",
+      "private": "Faragha"
     }
   },
   "walletRecovery": {
@@ -1669,6 +1674,15 @@
       "satsAmount": "sats {{sats}}",
       "viewTransaction": "Tazama muamala",
       "done": "Imekamilika"
+    },
+    "titlePublic": "Tuma Bitcoin",
+    "titlePrivate": "Tuma kwa faragha",
+    "reuse": {
+      "checking": "Inakagua anwani…",
+      "sendAnyway": "Tuma hata hivyo",
+      "acknowledge": "Naelewa hatari — tuma hata hivyo",
+      "historyWarning": "Anwani hii tayari imetumika kwenye mnyororo. Kutuma fedha zako za faragha hapa kunaziunganisha na historia yake ya miamala iliyopo na kuondoa faragha ya malipo yako kimya. Tumia anwani ya malipo kimya (sp1…) badala yake, au tuma hata hivyo.",
+      "ownPublicWarning": "Hii ni anwani kutoka pochi yako ya hadharani. Kutuma fedha zako za faragha kwake kunaunganisha pochi zote mbili na kuziunganisha pamoja. Tumia anwani ya malipo kimya (sp1…) badala yake, au tuma hata hivyo."
     }
   },
   "qrScanner": {

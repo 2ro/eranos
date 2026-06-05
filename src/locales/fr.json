@@ -1460,7 +1460,6 @@
     "amountPending": "{{amount}} en attente",
     "pending": "en attente",
     "send": "Envoyer",
-    "receive": "Recevoir",
     "transactions": "Transactions",
     "receiveDialog": {
       "title": "Recevoir du Bitcoin",
@@ -1479,7 +1478,13 @@
       "silentBadge": "silencieux",
       "silentDetectedTitle": "Détecté via le scan de paiement silencieux BIP-352"
     },
-    "openMenu": "Menu du portefeuille"
+    "openMenu": "Menu du portefeuille",
+    "sendPublic": "Envoyer",
+    "sendPrivate": "Envoyer en privé",
+    "tabs": {
+      "public": "Public",
+      "private": "Privé"
+    }
   },
   "walletSettings": {
     "backup": {
@@ -1771,6 +1776,15 @@
       "satsAmount": "{{sats}} sats",
       "viewTransaction": "Voir la transaction",
       "done": "Terminé"
+    },
+    "titlePublic": "Envoyer du Bitcoin",
+    "titlePrivate": "Envoyer en privé",
+    "reuse": {
+      "checking": "Vérification de l’adresse…",
+      "sendAnyway": "Envoyer quand même",
+      "acknowledge": "Je comprends le risque — envoyer quand même",
+      "historyWarning": "Cette adresse a déjà été utilisée on-chain. Y envoyer vos fonds privés les lie à son historique de transactions existant et annule la confidentialité de vos paiements silencieux. Utilisez plutôt une adresse de paiement silencieux (sp1…), ou envoyez quand même.",
+      "ownPublicWarning": "Il s’agit d’une adresse de votre propre portefeuille public. Y envoyer vos fonds privés fusionne les deux portefeuilles et les relie. Utilisez plutôt une adresse de paiement silencieux (sp1…), ou envoyez quand même."
     }
   },
   "qrScanner": {

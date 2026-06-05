@@ -22,6 +22,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { BitcoinAmountPicker } from '@/components/BitcoinAmountPicker';
 import { BitcoinPublicDisclaimer } from '@/components/BitcoinPublicDisclaimer';
@@ -51,6 +52,7 @@ import {
 import { formatSats, isLargeAmount, satsToUSD } from '@/lib/bitcoin';
 import {
   broadcastBlockbookTx,
+  fetchAddressInfo,
   fetchFeeRates,
 } from '@/lib/hdwallet/blockbook';
 import {
@@ -63,6 +65,7 @@ import {
   previewHdMaxSpend,
   previewHdFee,
   signHdPsbt,
+  type WalletScope,
 } from '@/lib/hdwallet/transaction';
 import { useQuery } from '@tanstack/react-query';
 
@@ -81,6 +84,22 @@ type FeeSpeed = BitcoinFeeSpeed;
 interface HDSendBitcoinDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  /**
+   * Which wallet this dialog spends from:
+   *
+   *   - `'public'`  — spends BIP-86 on-chain UTXOs. Change → BIP-86 change
+   *     address. Shows the public-ledger privacy disclaimer for raw
+   *     addresses.
+   *   - `'private'` — spends silent-payment UTXOs only. Change → the
+   *     wallet's own `sp1` address (stays private). Warns before sending to
+   *     a reused on-chain address or to the user's own public wallet.
+   *
+   * The two scopes never share UTXOs — that isolation is enforced in the
+   * PSBT builder, but the dialog also filters its candidate input set so the
+   * balance, fee preview, and "insufficient" detection all reflect a single
+   * wallet.
+   */
+  walletScope: WalletScope;
   /** BTC/USD price — passed in to avoid duplicate fetches. */
   btcPrice?: number;
   /**
@@ -122,13 +141,14 @@ interface SendResult {
  * the HD wallet's UTXO set across many addresses, signs with per-input HD-derived
  * keys, and emits change to a fresh internal address.
  */
-export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipient }: HDSendBitcoinDialogProps) {
+export function HDSendBitcoinDialog({ isOpen, onClose, walletScope, btcPrice, initialRecipient }: HDSendBitcoinDialogProps) {
   const { t } = useTranslation();
   const availability = useHdWalletAccess();
   const {
     scan,
     silentPaymentBalance,
     silentPaymentStorage,
+    ownPublicAddresses,
     refetch: refetchWallet,
     pruneSpentSilentPaymentUtxos,
   } = useHdWallet();
@@ -138,6 +158,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
   const queryClient = useQueryClient();
 
   const isReady = availability.status === 'available';
+  const isPrivate = walletScope === 'private';
 
   const feeSpeedLabels: Record<FeeSpeed, string> = useMemo(
     () => ({
@@ -193,23 +214,30 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     [feeSpeed, feeRates, customFeeRate],
   );
 
-  // ── Owned UTXO set ───────────────────────────────────────────
+  // ── Owned UTXO set (scoped to this wallet) ───────────────────
   //
-  // Combines BIP-86 UTXOs scanned from Blockbook with silent-payment UTXOs
-  // discovered by the BIP-352 scanner and persisted via NIP-78. Both can
-  // fund a send; the PSBT builder dispatches per-input.
-  const bip86Utxos: HdSpendableUtxo[] = useMemo(() => scan?.utxos ?? [], [scan]);
+  // The public wallet spends ONLY BIP-86 UTXOs; the private wallet spends
+  // ONLY silent-payment UTXOs. We filter to the active scope here so the
+  // fee preview, "Max", and "insufficient" detection all reflect a single
+  // wallet's balance. The PSBT builder re-applies the same scope filter as a
+  // hard guarantee, but scoping here keeps the UI numbers honest.
+  const bip86Utxos: HdSpendableUtxo[] = useMemo(
+    () => (isPrivate ? [] : (scan?.utxos ?? [])),
+    [scan, isPrivate],
+  );
   const spUtxos: HdSpendableSpUtxo[] = useMemo(
     () =>
-      (silentPaymentStorage?.utxos ?? []).map((u) => ({
-        txid: u.txid,
-        vout: u.vout,
-        value: u.value,
-        tweakHex: u.tweak,
-        k: u.k,
-        height: u.height,
-      })),
-    [silentPaymentStorage],
+      isPrivate
+        ? (silentPaymentStorage?.utxos ?? []).map((u) => ({
+            txid: u.txid,
+            vout: u.vout,
+            value: u.value,
+            tweakHex: u.tweak,
+            k: u.k,
+            height: u.height,
+          }))
+        : [],
+    [silentPaymentStorage, isPrivate],
   );
   const ownedInputs: HdInput[] = useMemo(
     () => [
@@ -219,8 +247,11 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     [bip86Utxos, spUtxos],
   );
   const totalBalance = useMemo(
-    () => bip86Utxos.reduce((s, u) => s + u.value, 0) + silentPaymentBalance,
-    [bip86Utxos, silentPaymentBalance],
+    () =>
+      isPrivate
+        ? silentPaymentBalance
+        : bip86Utxos.reduce((s, u) => s + u.value, 0),
+    [bip86Utxos, silentPaymentBalance, isPrivate],
   );
 
   // ── USD → sats ───────────────────────────────────────────────
@@ -294,9 +325,77 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
   const isRawAddress = !!recipient && recipient.kind === 'address';
   const [confirmArmed, setConfirmArmed] = useState(false);
 
+  // ── Private-send address-reuse guard ─────────────────────────
+  //
+  // When the private (silent-payment) wallet sends to a bare on-chain
+  // address we check whether that address would link the payment to an
+  // existing identity: it has prior on-chain history, or it belongs to the
+  // user's own public wallet. Either case warrants an explicit "Send anyway"
+  // before we'll build the transaction. SP recipients are exempt — they're
+  // unlinkable by construction.
+  type ReuseWarning =
+    | { kind: 'history' }
+    | { kind: 'ownPublic' };
+  const [reuseWarning, setReuseWarning] = useState<ReuseWarning | null>(null);
+  const [reuseChecked, setReuseChecked] = useState(false);
+  const [reuseChecking, setReuseChecking] = useState(false);
+  const [reuseAcknowledged, setReuseAcknowledged] = useState(false);
+
+  // The private-send guard only applies to bare on-chain recipients.
+  const needsReuseCheck = isPrivate && isRawAddress;
+
   useEffect(() => {
     setConfirmArmed(false);
   }, [effectiveAmountSats, currentFeeRate, btcPrice, recipient?.address]);
+
+  // Run the private-send reuse check as soon as a bare on-chain recipient is
+  // selected — not on the first Send tap — so the user sees the privacy
+  // implication while reviewing the transaction. The Send button is disabled
+  // while the probe is in flight. The check is reset and re-run whenever the
+  // recipient changes; an in-flight probe for a previous recipient is ignored
+  // via the `cancelled` guard.
+  useEffect(() => {
+    setReuseWarning(null);
+    setReuseChecked(false);
+    setReuseChecking(false);
+    setReuseAcknowledged(false);
+
+    if (!needsReuseCheck || !recipient || recipient.kind !== 'address') {
+      return;
+    }
+
+    const addr = recipient.address;
+
+    // Synchronous: is this one of our own public-wallet addresses?
+    if (ownPublicAddresses.has(addr)) {
+      setReuseWarning({ kind: 'ownPublic' });
+      setReuseChecked(true);
+      return;
+    }
+
+    // Asynchronous: does the address have on-chain history?
+    let cancelled = false;
+    setReuseChecking(true);
+    fetchAddressInfo(blockbookBaseUrl, addr)
+      .then((info) => {
+        if (cancelled) return;
+        setReuseChecking(false);
+        setReuseChecked(true);
+        if (info.hasHistory) setReuseWarning({ kind: 'history' });
+      })
+      .catch(() => {
+        if (cancelled) return;
+        // Inconclusive lookup. Fail safe: treat as a possible-reuse warning so
+        // the user makes a deliberate choice.
+        setReuseChecking(false);
+        setReuseChecked(true);
+        setReuseWarning({ kind: 'history' });
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [recipient, needsReuseCheck, ownPublicAddresses, blockbookBaseUrl, walletScope]);
 
   // Track open transitions so we can re-key the picker on each
   // closed → open transition. Re-keying remounts the picker with a fresh
@@ -344,6 +443,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       if (sendMax) {
         const built = buildHdMaxSpendPsbt({
           account: availability.account,
+          walletScope,
           inputs: ownedInputs,
           recipient: resolvedRecipient,
           feeRate: rate,
@@ -357,6 +457,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       } else {
         const built = buildHdSpendPsbt({
           account: availability.account,
+          walletScope,
           inputs: ownedInputs,
           recipient: resolvedRecipient,
           amountSats: effectiveAmountSats,
@@ -516,6 +617,16 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       return;
     }
     if (insufficient) { setError(t('walletSend.errors.insufficient')); return; }
+
+    // Private-wallet send to a bare on-chain address: the reuse check runs
+    // automatically when the recipient is selected. Here we just enforce its
+    // outcome — block until the probe settles, and require the explicit
+    // acknowledgement when it flagged a warning.
+    if (needsReuseCheck && recipient.kind === 'address') {
+      if (reuseChecking || !reuseChecked) return; // probe not settled yet
+      if (reuseWarning && !reuseAcknowledged) return;
+    }
+
     if (requiresArm && !confirmArmed) { setConfirmArmed(true); return; }
     sendMutation.mutate();
   }, [
@@ -531,6 +642,11 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
     requiresArm,
     confirmArmed,
     sendMutation,
+    needsReuseCheck,
+    reuseChecking,
+    reuseChecked,
+    reuseWarning,
+    reuseAcknowledged,
   ]);
 
   // ── Reset on close ───────────────────────────────────────────
@@ -548,6 +664,10 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
       setConfirmArmed(false);
       setSuccess(null);
       setBroadcastError(null);
+      setReuseWarning(null);
+      setReuseChecked(false);
+      setReuseChecking(false);
+      setReuseAcknowledged(false);
       feeSpeedUserChanged.current = false;
     }, 200);
   }, [onClose, sendMutation.isPending]);
@@ -562,6 +682,8 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
         default: return t('walletSend.progress.sending');
       }
     }
+    if (reuseChecking) return t('walletSend.reuse.checking');
+    if (needsReuseCheck && reuseWarning && reuseAcknowledged) return t('walletSend.reuse.sendAnyway');
     if (confirmArmed) return t('walletSend.tapAgainToConfirm');
     if (insufficient) return t('walletSend.notEnoughBitcoin');
     return t('walletSend.send');
@@ -569,13 +691,17 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
 
   const sendDisabled =
     sendMutation.isPending ||
+    reuseChecking ||
     !recipient ||
     !btcPrice ||
     effectiveAmountSats <= 0 ||
     insufficient ||
     !ownedInputs.length ||
     !currentFeeRate ||
-    currentFeeRate < 1;
+    currentFeeRate < 1 ||
+    // Private-send reuse guard: once a warning has surfaced, the user must
+    // tick "Send anyway" before the button re-enables.
+    (needsReuseCheck && !!reuseWarning && !reuseAcknowledged);
 
   const maxAmountLabel = sendMax && effectiveAmountSats > 0 && btcPrice
     ? `${satsToUSD(effectiveAmountSats, btcPrice)} · ${t('walletSend.success.satsAmount', { sats: formatSats(effectiveAmountSats) })}`
@@ -585,7 +711,9 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
   return (
     <Dialog open={isOpen} onOpenChange={(v) => { if (!v) handleClose(); }}>
       <DialogContent className="max-w-[425px] rounded-2xl p-0 gap-0 border-border overflow-hidden max-h-[95vh] [&>button]:hidden">
-        <DialogTitle className="sr-only">{t('walletSend.title')}</DialogTitle>
+        <DialogTitle className="sr-only">
+          {isPrivate ? t('walletSend.titlePrivate') : t('walletSend.titlePublic')}
+        </DialogTitle>
 
         {success ? (
           <SuccessScreen
@@ -599,7 +727,7 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
             {/* Header */}
             <div className="flex items-center justify-between px-4 h-12">
               <h2 className="text-base font-semibold flex items-center gap-1.5">
-                {t('walletSend.title')}
+                {isPrivate ? t('walletSend.titlePrivate') : t('walletSend.titlePublic')}
                 <HelpTip faqId="send-bitcoin-onchain" />
               </h2>
               <button
@@ -649,11 +777,43 @@ export function HDSendBitcoinDialog({ isOpen, onClose, btcPrice, initialRecipien
                 initialInput={initialRecipient}
               />
 
-              {/* Privacy disclaimer for raw on-chain addresses. SP
-                  recipients produce a fresh unlinkable output per payment
-                  and don't need the warning. */}
-              {isRawAddress && (
+              {/* Privacy disclaimer for raw on-chain addresses on the PUBLIC
+                  wallet. SP recipients produce a fresh unlinkable output per
+                  payment and don't need the warning. The PRIVATE wallet uses
+                  the stronger reuse guard below instead of this soft notice. */}
+              {isRawAddress && !isPrivate && (
                 <BitcoinPublicDisclaimer tone="soft" />
+              )}
+
+              {/* Private-wallet address-reuse guard. When sending a silent
+                  payment to a bare on-chain address that has prior history,
+                  or to the user's own public wallet, paying it would relink
+                  the private funds to a known identity — defeating the whole
+                  point of the private wallet. Require an explicit
+                  acknowledgement before the Send button re-enables. */}
+              {needsReuseCheck && reuseWarning && (
+                <Alert
+                  role="alert"
+                  className="border-destructive/50 bg-destructive/5 text-destructive dark:border-destructive py-3"
+                >
+                  <AlertTriangle className="size-4 text-destructive" />
+                  <AlertDescription className="text-xs space-y-2">
+                    <p>
+                      {reuseWarning.kind === 'ownPublic'
+                        ? t('walletSend.reuse.ownPublicWarning')
+                        : t('walletSend.reuse.historyWarning')}
+                    </p>
+                    <label className="flex items-start gap-2 cursor-pointer select-none">
+                      <Checkbox
+                        checked={reuseAcknowledged}
+                        onCheckedChange={(checked) => setReuseAcknowledged(checked === true)}
+                        className="mt-0.5 border-destructive data-[state=checked]:bg-destructive data-[state=checked]:text-destructive-foreground"
+                        aria-label={t('walletSend.reuse.acknowledge')}
+                      />
+                      <span>{t('walletSend.reuse.acknowledge')}</span>
+                    </label>
+                  </AlertDescription>
+                </Alert>
               )}
 
               {/* Error */}

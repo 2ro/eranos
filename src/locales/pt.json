@@ -1465,7 +1465,6 @@
     "amountPending": "{{amount}} pendente",
     "pending": "pendente",
     "send": "Enviar",
-    "receive": "Receber",
     "transactions": "Transações",
     "receiveDialog": {
       "title": "Receber Bitcoin",
@@ -1484,7 +1483,13 @@
       "silentBadge": "silencioso",
       "silentDetectedTitle": "Detectado via escaneamento de pagamento silencioso BIP-352"
     },
-    "openMenu": "Menu da carteira"
+    "openMenu": "Menu da carteira",
+    "sendPublic": "Enviar",
+    "sendPrivate": "Enviar em privado",
+    "tabs": {
+      "public": "Pública",
+      "private": "Privada"
+    }
   },
   "walletSettings": {
     "backup": {
@@ -1776,6 +1781,15 @@
       "satsAmount": "{{sats}} sats",
       "viewTransaction": "Ver transação",
       "done": "Concluído"
+    },
+    "titlePublic": "Enviar Bitcoin",
+    "titlePrivate": "Enviar em privado",
+    "reuse": {
+      "checking": "Verificando endereço…",
+      "sendAnyway": "Enviar mesmo assim",
+      "acknowledge": "Entendo o risco — enviar mesmo assim",
+      "historyWarning": "Este endereço já foi usado on-chain. Enviar seus fundos privados para aqui os vincula ao histórico de transações existente e anula a privacidade dos seus pagamentos silenciosos. Use um endereço de pagamento silencioso (sp1…), ou envie mesmo assim.",
+      "ownPublicWarning": "Este é um endereço da sua própria carteira pública. Enviar seus fundos privados para ele mescla as duas carteiras e as vincula. Use um endereço de pagamento silencioso (sp1…), ou envie mesmo assim."
     }
   },
   "qrScanner": {

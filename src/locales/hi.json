@@ -1463,7 +1463,6 @@
     "amountPending": "{{amount}} पेंडिंग",
     "pending": "पेंडिंग",
     "send": "भेजें",
-    "receive": "पाएँ",
     "transactions": "Transactions",
     "receiveDialog": {
       "title": "Bitcoin पाएँ",
@@ -1482,7 +1481,13 @@
       "silentBadge": "silent",
       "silentDetectedTitle": "BIP-352 साइलेंट पेमेंट scan से पाया गया"
     },
-    "openMenu": "वॉलेट मेन्यू"
+    "openMenu": "वॉलेट मेन्यू",
+    "sendPublic": "भेजें",
+    "sendPrivate": "निजी रूप से भेजें",
+    "tabs": {
+      "public": "सार्वजनिक",
+      "private": "निजी"
+    }
   },
   "walletSettings": {
     "backup": {
@@ -1710,6 +1715,15 @@
       "satsAmount": "{{sats}} sats",
       "viewTransaction": "Transaction देखें",
       "done": "हो गया"
+    },
+    "titlePublic": "Bitcoin भेजें",
+    "titlePrivate": "निजी रूप से भेजें",
+    "reuse": {
+      "checking": "पता जाँचा जा रहा है…",
+      "sendAnyway": "फिर भी भेजें",
+      "acknowledge": "मैं जोखिम समझता/समझती हूँ — फिर भी भेजें",
+      "historyWarning": "यह पता ऑन-चेन पहले ही उपयोग हो चुका है. यहाँ अपने निजी फंड भेजने से वे इसके मौजूदा लेन-देन इतिहास से जुड़ जाते हैं और आपके साइलेंट पेमेंट की निजता समाप्त हो जाती है. इसके बजाय साइलेंट पेमेंट पता (sp1…) उपयोग करें, या फिर भी भेजें.",
+      "ownPublicWarning": "यह आपके अपने सार्वजनिक वॉलेट का पता है. इसमें अपने निजी फंड भेजने से दोनों वॉलेट मिल जाते हैं और आपस में जुड़ जाते हैं. इसके बजाय साइलेंट पेमेंट पता (sp1…) उपयोग करें, या फिर भी भेजें."
     }
   },
   "qrScanner": {

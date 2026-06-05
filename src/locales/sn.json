@@ -1023,7 +1023,6 @@
     "amountPending": "{{amount}} zvichakamirira",
     "pending": "zvichakamirira",
     "send": "Tumira",
-    "receive": "Gamuchira",
     "transactions": "Zvinoitwa",
     "receiveDialog": {
       "title": "Gamuchira Bitcoin",
@@ -1042,7 +1041,13 @@
       "silentBadge": "wakanyararira",
       "silentDetectedTitle": "Zvakaonekwa kuburikidza nokuongorora kwemubhadharo wakanyararira weBIP-352"
     },
-    "openMenu": "Menyu yechikwama"
+    "openMenu": "Menyu yechikwama",
+    "sendPublic": "Tumira",
+    "sendPrivate": "Tumira muchivande",
+    "tabs": {
+      "public": "Pachena",
+      "private": "Muchivande"
+    }
   },
   "walletSettings": {
     "backup": {
@@ -1334,6 +1339,15 @@
     "scanError": {
       "title": "Hatina kukwanisa kuverenga kodhi yeQR iyoyo",
       "description": "Yakanga yakatarisirwa kero yeBitcoin, kero yemubhadharo wakanyararira (sp1…), kana bitcoin: URI."
+    },
+    "titlePublic": "Tumira Bitcoin",
+    "titlePrivate": "Tumira muchivande",
+    "reuse": {
+      "checking": "Kutarisa kero…",
+      "sendAnyway": "Tumira zvakadaro",
+      "acknowledge": "Ndinonzwisisa njodzi — tumira zvakadaro",
+      "historyWarning": "Kero iyi yatoshandiswa pacheni. Kutumira mari yako yakavanzika pano kunoibatanidza nenhoroondo yayo iripo yekutengeserana uye kunopedza kuvanzika kwemibhadharo yako yekunyararira. Shandisa kero yekubhadhara kunyararira (sp1…) panzvimbo yacho, kana kutumira zvakadaro.",
+      "ownPublicWarning": "Iyi ndiyo kero yechikwama chako pachako chepachena. Kutumira mari yako yakavanzika kwairi kunobatanidza zvikwama zviviri uye kuzvibatanidza pamwe. Shandisa kero yekubhadhara kunyararira (sp1…) panzvimbo yacho, kana kutumira zvakadaro."
     }
   },
   "qrScanner": {

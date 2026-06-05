@@ -11,6 +11,7 @@ import {
   CHANGE_CHAIN,
   deriveAddress,
   deriveLeafPrivateKey,
+  deriveSilentPaymentAddress,
   type HdAccount,
   HD_WALLET_NETWORK,
 } from './derivation';
@@ -101,6 +102,57 @@ export interface HdSpendableSpUtxo {
 export type HdInput =
   | { kind: 'bip86'; utxo: HdSpendableUtxo }
   | { kind: 'sp'; utxo: HdSpendableSpUtxo };
+
+/**
+ * Which logical wallet a spend draws from.
+ *
+ * The HD wallet exposes two strictly-isolated balances:
+ *
+ *   - `'public'`  — BIP-86 on-chain UTXOs (`kind === 'bip86'`).
+ *   - `'private'` — BIP-352 silent-payment UTXOs (`kind === 'sp'`).
+ *
+ * Coin selection NEVER crosses this boundary: a public send spends only
+ * BIP-86 inputs, a private send spends only SP inputs. Mixing the two on a
+ * single transaction would permanently link the silent-payment UTXOs to the
+ * public ones on-chain, destroying the unlinkability that silent payments
+ * exist to provide. Every build / preview entry point therefore takes a
+ * `walletScope` and filters its candidate inputs down to the matching kind
+ * before coin selection runs.
+ *
+ * Change is also kept inside the originating wallet:
+ *
+ *   - public change → a fresh BIP-86 change address.
+ *   - private change → a fresh silent-payment output back to the wallet's
+ *     own `sp1` address (re-discovered by the SP scanner as a new private
+ *     UTXO), so a private send with change never creates a public output.
+ */
+export type WalletScope = 'public' | 'private';
+
+/** Restrict an input set to the kind owned by the given wallet scope. */
+function inputsForScope(
+  inputs: readonly HdInput[],
+  scope: WalletScope,
+): HdInput[] {
+  const kind = scope === 'public' ? 'bip86' : 'sp';
+  return inputs.filter((i) => i.kind === kind);
+}
+
+/**
+ * Pick the silent-payment output derived for a specific recipient out of the
+ * batch returned by {@link deriveSilentPaymentOutputs}, matching on the
+ * original `raw` string each recipient was tagged with. Throws if no match —
+ * a programming error, since we only ever look up `raw` values we passed in.
+ */
+function findSpOutput(
+  outputs: readonly SpSenderOutput[],
+  raw: string,
+): SpSenderOutput {
+  const match = outputs.find((o) => o.recipient.raw === raw);
+  if (!match) {
+    throw new Error('Silent-payment output for recipient not found.');
+  }
+  return match;
+}
 
 /** Helper: total satoshi value of a mixed input list. */
 function inputValue(input: HdInput): number {
@@ -322,8 +374,16 @@ interface BuildHdSpendArgs {
   /** HD account — used for change derivation and (for BIP-86 inputs) re-derivation of internal pubkeys. */
   account: HdAccount;
   /**
-   * Candidate inputs to spend. Mix of BIP-86 UTXOs and SP UTXOs is supported;
-   * the coin selector picks the minimum-cost set that covers `amount + fee`.
+   * Which logical wallet this spend draws from. Inputs are filtered to the
+   * matching kind (public → BIP-86, private → SP) BEFORE coin selection, so
+   * a spend can never combine public and private UTXOs. Change is routed
+   * back into the same wallet — see {@link WalletScope}.
+   */
+  walletScope: WalletScope;
+  /**
+   * Candidate inputs to spend. May contain both BIP-86 and SP UTXOs; the
+   * build filters them down to the kind owned by `walletScope` before the
+   * coin selector runs, so callers don't have to pre-filter.
    */
   inputs: readonly HdInput[];
   /** Where to send. */
@@ -337,9 +397,10 @@ interface BuildHdSpendArgs {
   /**
    * For SP-related operations ONLY: the 64-byte BIP-32 seed (the BIP-39
    * PBKDF2 output the rest of the HD wallet derives from). Required to
-   * compute `b_spend` for spending SP inputs, and to compute the
-   * per-recipient `P_k` for SP recipients (BIP-352 binds the output to
-   * the tweaked Taproot scalar of every input).
+   * compute `b_spend` for spending SP inputs, to compute the per-recipient
+   * `P_k` for SP recipients, and to derive the wallet's own `sp1` address
+   * for private-wallet change (BIP-352 binds the output to the tweaked
+   * Taproot scalar of every input).
    *
    * The buffer is read inside this function and never persisted; callers
    * should zero it after the call.
@@ -368,7 +429,7 @@ interface BuildHdSpendArgs {
  * for it anyway.
  */
 export function buildHdSpendPsbt(args: BuildHdSpendArgs): HdUnsignedPsbt {
-  const { account, inputs, recipient, amountSats, feeRate, nextChangeIndex, seed } = args;
+  const { account, walletScope, inputs, recipient, amountSats, feeRate, nextChangeIndex, seed } = args;
 
   if (!Number.isInteger(amountSats) || amountSats < BITCOIN_DUST_LIMIT) {
     throw new Error(`Amount must be at least ${BITCOIN_DUST_LIMIT} sats.`);
@@ -379,11 +440,22 @@ export function buildHdSpendPsbt(args: BuildHdSpendArgs): HdUnsignedPsbt {
   if (recipient.kind === 'address' && !validateBitcoinAddress(recipient.address)) {
     throw new Error(`Invalid Bitcoin address: ${recipient.address}`);
   }
+  // Private-wallet sends spend SP UTXOs and route change to the wallet's
+  // own `sp1` address — both require the seed to derive `b_spend`.
+  if (walletScope === 'private' && !seed) {
+    throw new Error('Private-wallet send requires the wallet seed.');
+  }
 
-  // ── Deduplicate inputs by (kind, txid, vout) ─────────────────
+  // ── Scope + deduplicate inputs by (kind, txid, vout) ─────────
+  //
+  // Filter to the wallet scope FIRST: a public send may only consume
+  // BIP-86 UTXOs, a private send only SP UTXOs. This is the core privacy
+  // guarantee — the coin selector below never sees the other wallet's
+  // inputs, so the two UTXO sets can never be combined on one transaction.
+  const scoped = inputsForScope(inputs, walletScope);
   const seen = new Set<string>();
   const dedup: HdInput[] = [];
-  for (const i of inputs) {
+  for (const i of scoped) {
     const id = inputId(i);
     if (seen.has(id)) continue;
     seen.add(id);
@@ -420,16 +492,24 @@ export function buildHdSpendPsbt(args: BuildHdSpendArgs): HdUnsignedPsbt {
   const inputDescriptors: HdInputDescriptor[] = [];
   const consumedSpUtxos: Array<{ txid: string; vout: number }> = [];
 
-  // For SP recipients we need each input's tweaked private key to derive
-  // the per-recipient output P_k. Compute and stash them up front so we
-  // can wipe the array at the end.
+  // Whether this build needs to derive any BIP-352 sender output. That is
+  // true when the recipient is itself a silent-payment address, OR when this
+  // is a private-wallet send that produces change (which we route back to
+  // the wallet's own `sp1` address as a fresh SP output rather than leaking
+  // it to a public BIP-86 change address). Both cases require the per-input
+  // tweaked private keys, so we gather them in the input loop below.
+  const needsSpOutput = recipient.kind === 'sp' || (walletScope === 'private' && hasChange);
+
+  // For SP outputs we need each input's tweaked private key to derive the
+  // per-recipient output P_k. Compute and stash them up front so we can
+  // wipe the array at the end.
   const spSenderInputs: SpSenderInput[] = [];
   const wipeAfterBuild: Uint8Array[] = [];
   const needsSpend = selected.some((i) => i.kind === 'sp');
   if (needsSpend && !seed) {
     throw new Error('SP UTXOs selected but seed was not provided.');
   }
-  const bSpend = needsSpend && seed
+  const bSpend = (needsSpend || needsSpOutput) && seed
     ? deriveSilentPaymentSpendKey(seed)
     : undefined;
   if (bSpend) wipeAfterBuild.push(bSpend);
@@ -460,7 +540,7 @@ export function buildHdSpendPsbt(args: BuildHdSpendArgs): HdUnsignedPsbt {
       });
       inputDescriptors.push({ kind: 'bip86', chain: utxo.chain, index: utxo.index });
 
-      if (recipient.kind === 'sp') {
+      if (needsSpOutput) {
         // BIP-352 sender needs the BIP-341 *tweaked* private key for every
         // taproot input. Derive it here so the build is self-contained.
         const leaf = deriveLeafPrivateKey(account, utxo.chain, utxo.index);
@@ -494,7 +574,7 @@ export function buildHdSpendPsbt(args: BuildHdSpendArgs): HdUnsignedPsbt {
       inputDescriptors.push({ kind: 'sp', tweakHex: utxo.tweakHex });
       consumedSpUtxos.push({ txid: utxo.txid, vout: utxo.vout });
 
-      if (recipient.kind === 'sp') {
+      if (needsSpOutput) {
         // An SP UTXO's on-chain output `P_k` is an ordinary P2TR key, so this
         // input is a Taproot input for BIP-352 purposes. The recipient's
         // indexer reconstructs `A` by lifting each input's on-chain x-only key
@@ -515,41 +595,89 @@ export function buildHdSpendPsbt(args: BuildHdSpendArgs): HdUnsignedPsbt {
     }
   }
 
-  // ── Build recipient output ───────────────────────────────────
+  // ── Build recipient + change outputs ─────────────────────────
+  //
+  // Private-wallet change is sent back to the wallet's own `sp1` address as
+  // a fresh BIP-352 output, NOT to a public BIP-86 change address. This is
+  // what keeps the private wallet's UTXOs isolated: the change re-enters the
+  // private wallet (the SP scanner rediscovers it) and never appears as a
+  // public output linkable to the spent SP inputs.
+  //
+  // When BOTH the recipient and the change are silent-payment outputs we
+  // derive them in a single `deriveSilentPaymentOutputs` call so they get
+  // distinct `k` indices within any shared scan-key group (required by
+  // BIP-352 when the recipient happens to be the wallet's own address).
+  const selfSpChange = walletScope === 'private' && hasChange;
+  // A raw marker that can never collide with a real address string, used to
+  // match the self-change output back out of the derivation result.
+  const SELF_CHANGE_RAW = '\u0000self-change';
+
   let resolvedRecipientAddress: string;
-  if (recipient.kind === 'address') {
-    resolvedRecipientAddress = recipient.address;
-    tx.addOutputAddress(recipient.address, BigInt(amountSats), HD_WALLET_NETWORK);
-  } else {
+  let changeAddress: string | undefined;
+
+  if (recipient.kind === 'sp' || selfSpChange) {
     if (spSenderInputs.length === 0) {
-      throw new Error('Silent-payment send needs at least one input.');
+      throw new Error('Silent-payment output needs at least one input.');
     }
-    const outputs = deriveSilentPaymentOutputs(
-      spSenderInputs,
-      [{ address: decodeSilentPaymentAddress(recipient.spAddress), raw: recipient.spAddress }],
-      { network: 'mainnet' },
-    );
-    if (outputs.length !== 1) {
+
+    const spRecipients: Array<{ address: ReturnType<typeof decodeSilentPaymentAddress>; raw: string }> = [];
+    if (recipient.kind === 'sp') {
+      spRecipients.push({
+        address: decodeSilentPaymentAddress(recipient.spAddress),
+        raw: recipient.spAddress,
+      });
+    }
+    if (selfSpChange) {
+      if (!seed) throw new Error('Private-wallet change requires the wallet seed.');
+      const ownSp = deriveSilentPaymentAddress(seed).address;
+      spRecipients.push({ address: decodeSilentPaymentAddress(ownSp), raw: SELF_CHANGE_RAW });
+    }
+
+    const outputs = deriveSilentPaymentOutputs(spSenderInputs, spRecipients, {
+      network: 'mainnet',
+    });
+    if (outputs.length !== spRecipients.length) {
       throw new Error('Silent-payment derivation returned unexpected number of outputs.');
     }
-    const out: SpSenderOutput = outputs[0];
+
     // `out.xOnlyPubKey` IS the final BIP-352 Taproot output key `P_k` and must
     // be written to the output script verbatim (`OP_1 push32 <P_k>`). It must
     // NOT be passed through `btc.p2tr()` / `addOutputAddress`, which treat the
-    // key as a Taproot *internal* key and apply the BIP-341 TapTweak again —
-    // producing `taproot_tweak(P_k)` on chain, a key the recipient's BIP-352
-    // scanner never derives (it scans for `P_k`). Build the raw P2TR script
-    // directly instead.
-    tx.addOutput({ script: spP2trScriptPubKey(out.xOnlyPubKey), amount: BigInt(amountSats) });
-    resolvedRecipientAddress = out.address;
-  }
+    // key as a Taproot *internal* key and apply the BIP-341 TapTweak again.
+    if (recipient.kind === 'sp') {
+      const out = findSpOutput(outputs, recipient.spAddress);
+      tx.addOutput({ script: spP2trScriptPubKey(out.xOnlyPubKey), amount: BigInt(amountSats) });
+      resolvedRecipientAddress = out.address;
+    } else {
+      // address recipient (private send to a bare bc1 address)
+      resolvedRecipientAddress = recipient.address;
+      tx.addOutputAddress(recipient.address, BigInt(amountSats), HD_WALLET_NETWORK);
+    }
 
-  // ── Optional change ──────────────────────────────────────────
-  let changeAddress: string | undefined;
-  if (hasChange) {
-    const changeDerived = deriveAddress(account.changeNode, CHANGE_CHAIN, nextChangeIndex);
-    changeAddress = changeDerived.address;
-    tx.addOutputAddress(changeAddress, BigInt(change), HD_WALLET_NETWORK);
+    if (selfSpChange) {
+      const changeOut = findSpOutput(outputs, SELF_CHANGE_RAW);
+      tx.addOutput({ script: spP2trScriptPubKey(changeOut.xOnlyPubKey), amount: BigInt(change) });
+      changeAddress = changeOut.address;
+    } else if (hasChange) {
+      // Public-wallet send to an SP recipient: the recipient output is SP,
+      // but the change is ordinary public-wallet change → BIP-86 change
+      // address. (Private-wallet change is handled by the `selfSpChange`
+      // branch above and never reaches here.)
+      const changeDerived = deriveAddress(account.changeNode, CHANGE_CHAIN, nextChangeIndex);
+      changeAddress = changeDerived.address;
+      tx.addOutputAddress(changeAddress, BigInt(change), HD_WALLET_NETWORK);
+    }
+  } else {
+    // No SP outputs involved: plain address recipient + optional BIP-86
+    // (public-wallet) change.
+    resolvedRecipientAddress = recipient.address;
+    tx.addOutputAddress(recipient.address, BigInt(amountSats), HD_WALLET_NETWORK);
+
+    if (hasChange) {
+      const changeDerived = deriveAddress(account.changeNode, CHANGE_CHAIN, nextChangeIndex);
+      changeAddress = changeDerived.address;
+      tx.addOutputAddress(changeAddress, BigInt(change), HD_WALLET_NETWORK);
+    }
   }
 
   // Best-effort wipe of the tweaked-key array.
@@ -681,7 +809,14 @@ export interface HdMaxSpendPreview {
 export interface BuildHdMaxSpendArgs {
   /** HD account whose keys can sign all `inputs`. */
   account: HdAccount;
-  /** Every UTXO the wallet should drain. */
+  /**
+   * Which logical wallet this max-spend drains. Inputs are filtered to the
+   * matching kind before draining, so a public max-spend never touches SP
+   * UTXOs and vice-versa. A max-spend has no change output, so there is no
+   * change-routing concern.
+   */
+  walletScope: WalletScope;
+  /** Every UTXO the wallet should drain (filtered by `walletScope`). */
   inputs: readonly HdInput[];
   /** Where to send the max amount. */
   recipient: HdRecipient;
@@ -743,7 +878,7 @@ export function previewHdMaxSpend(
  * wallet balance and no change output is created.
  */
 export function buildHdMaxSpendPsbt(args: BuildHdMaxSpendArgs): HdMaxSpendPsbt {
-  const { account, inputs, recipient, feeRate, seed } = args;
+  const { account, walletScope, inputs, recipient, feeRate, seed } = args;
 
   if (!inputs.length) throw new Error('Max spend requires at least one input.');
   if (!Number.isFinite(feeRate) || feeRate <= 0) {
@@ -753,7 +888,9 @@ export function buildHdMaxSpendPsbt(args: BuildHdMaxSpendArgs): HdMaxSpendPsbt {
     throw new Error(`Invalid Bitcoin address: ${recipient.address}`);
   }
 
-  const dedup = dedupeInputs(inputs);
+  // Scope first: a public max-spend drains only BIP-86 UTXOs, a private one
+  // only SP UTXOs. Never combine the two.
+  const dedup = dedupeInputs(inputsForScope(inputs, walletScope));
   const preview = previewHdMaxSpend(dedup, feeRate);
   if (!preview) {
     const totalInput = dedup.reduce((s, i) => s + inputValue(i), 0);
