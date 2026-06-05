@@ -120,7 +120,11 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const { user } = useCurrentUser();
   const author = useAuthor(campaign.pubkey);
   const { data: btcPrice } = useBtcPrice();
-  const { data: stats, isLoading: statsLoading } = useCampaignDonations(campaign);
+  // Detail page is a single instance, so live polling here is safe (unlike
+  // the card grids, which must not poll — see useCampaignDonations).
+  const { data: stats, isLoading: statsLoading } = useCampaignDonations(campaign, {
+    refetchInterval: 30_000,
+  });
   const navigate = useNavigate();
   const { toast } = useToast();
   const shareOrigin = useShareOrigin();

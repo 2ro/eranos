@@ -73,10 +73,36 @@ const EMPTY_RECEIPTS: NostrEvent[] = [];
  * zeros — donations are unlinkable by design, so address balance is
  * undefined.
  */
-export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
+export function useCampaignDonations(
+  campaign: ParsedCampaign | undefined,
+  options: {
+    /**
+     * Gate for *all* underlying queries — the Esplora `/address` balance
+     * lookup, the kind 8333 receipt fetch, and the per-receipt `/tx`
+     * verification fan-out. Defaults to `true`.
+     *
+     * Card grids (`/campaigns`, profile tabs, lists) render up to ~200
+     * cards at once. Running this hook eagerly for every card fired an
+     * `/address` call per card plus a `/tx` call per donation receipt, in
+     * one burst, which rate-limited every configured Esplora backend.
+     * Callers in a grid pass `enabled: <card is on screen>` (see
+     * {@link useInView}) so only visible cards talk to Esplora.
+     */
+    enabled?: boolean;
+    /**
+     * Poll interval (ms) for the Esplora `/address` balance lookup. Defaults
+     * to `false` (no polling). Only the campaign **detail** page — a single
+     * instance, never a grid — opts into live refresh; card grids must not,
+     * or the per-card polling re-creates the Esplora request storm this
+     * option's default was introduced to stop.
+     */
+    refetchInterval?: number | false;
+  } = {},
+): {
   data: CampaignDonationStats;
   isLoading: boolean;
 } {
+  const { enabled = true, refetchInterval = false } = options;
   const { nostr } = useNostr();
   const { config } = useAppContext();
   const { esploraApis } = config;
@@ -93,12 +119,18 @@ export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
   // Headline number: query the address balance directly from Esplora.
   // `totalReceived` is `chain_stats.funded_txo_sum` — sats ever sent to
   // the address. Does not regress when the beneficiary spends.
+  //
+  // No `refetchInterval` by default: a card grid mounts dozens of these,
+  // and polling every 30s turned a one-time burst into a sustained Esplora
+  // load that rate-limited every backend. The detail page opts into live
+  // refresh via `options.refetchInterval` (it's a single instance); cards
+  // read a cached snapshot (long `staleTime`) and refetch only on remount.
   const addressQuery = useQuery({
     queryKey: ['bitcoin-balance', 'campaign', esploraApis, walletValue ?? ''],
     queryFn: ({ signal }) => fetchAddressData(walletValue!, esploraApis, signal),
-    enabled: !!walletValue && hasOnchain,
-    staleTime: 30_000,
-    refetchInterval: 30_000,
+    enabled: enabled && !!walletValue && hasOnchain,
+    staleTime: 60_000,
+    refetchInterval,
   });
 
   // Donor list / breakdown: fetch kind 8333 receipts. Disabled when the
@@ -114,7 +146,7 @@ export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
       );
       return events;
     },
-    enabled: !!aTag && hasOnchain,
+    enabled: enabled && !!aTag && hasOnchain,
     staleTime: 15_000,
   });
 
@@ -142,7 +174,7 @@ export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         verifyOnchainZap(event, esploraApis, walletValue, signal),
       staleTime: 60_000,
-      enabled: !!walletValue && hasOnchain,
+      enabled: enabled && !!walletValue && hasOnchain,
     })),
   });
 
@@ -164,9 +196,15 @@ export function useCampaignDonations(campaign: ParsedCampaign | undefined): {
 
   const sortedReceipts = [...receipts].sort((a, b) => b.created_at - a.created_at);
 
+  // Treat "gated off / not yet on screen" as still-loading so a card in a
+  // grid shows its progress skeleton rather than flashing a misleading
+  // "0 raised" until it scrolls into view and the queries are allowed to
+  // run. (A disabled TanStack query reports `isLoading: false`, so we can't
+  // rely on that alone here.)
   const isVerifying =
     hasOnchain &&
-    (addressQuery.isLoading ||
+    (!enabled ||
+      addressQuery.isLoading ||
       receiptsQuery.isLoading ||
       verifications.some((v) => v.isLoading));
 

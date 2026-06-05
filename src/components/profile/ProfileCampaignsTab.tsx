@@ -163,7 +163,7 @@ function SortedByTopGrid({ campaigns }: { campaigns: ParsedCampaign[] }) {
       queryKey: ['bitcoin-balance', 'campaign', esploraApis, address],
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         fetchAddressData(address, esploraApis, signal),
-      staleTime: 30_000,
+      staleTime: 60_000,
       enabled: !!address,
     })),
   });

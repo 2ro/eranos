@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -13,6 +13,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useEventTranslation } from '@/hooks/useEventTranslation';
+import { useInView } from '@/hooks/useInView';
 import {
   type ParsedCampaign,
   encodeCampaignNaddr,
@@ -160,7 +161,18 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
   });
   const displayCampaign = parseCampaign(translatedEvent) ?? campaign;
   const author = useAuthor(campaign.pubkey);
-  const { data: stats, isLoading: donationsLoading } = useCampaignDonations(campaign);
+  // Defer the (potentially Esplora-heavy) donation lookup until the card is
+  // actually on screen. A campaigns grid mounts up to ~200 cards at once;
+  // fetching donations for every one eagerly fired an Esplora `/address`
+  // call per card plus a `/tx` call per donation receipt, all at once,
+  // which rate-limited every configured backend. `rootMargin` pre-arms the
+  // fetch just before the card scrolls into view so the number is usually
+  // already there by the time the user sees it.
+  const cardRef = useRef<HTMLAnchorElement>(null);
+  const inView = useInView(cardRef);
+  const { data: stats, isLoading: donationsLoading } = useCampaignDonations(campaign, {
+    enabled: inView,
+  });
   const { data: btcPrice } = useBtcPrice();
 
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
@@ -179,6 +191,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
 
   return (
     <Link
+      ref={cardRef}
       to={`/${naddr}`}
       className={cn(
         'group block rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-0.5',

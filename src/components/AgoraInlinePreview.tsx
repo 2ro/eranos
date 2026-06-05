@@ -1,5 +1,6 @@
 import type { NostrEvent } from '@nostrify/nostrify';
 import type { ReactNode } from 'react';
+import { useRef } from 'react';
 import { CalendarClock, HandHeart, MapPin, Megaphone, ShieldCheck, Users } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { Link } from 'react-router-dom';
@@ -8,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useAuthor } from '@/hooks/useAuthor';
+import { useInView } from '@/hooks/useInView';
 import { parseAction } from '@/hooks/useActions';
 import { getGeoDisplayName } from '@/lib/countries';
 import { parseCampaign, getCampaignCountryLabel } from '@/lib/campaign';
@@ -55,7 +57,12 @@ function InlineShell({
 export function CampaignInlinePreview({ event }: { event: NostrEvent }) {
   const campaign = parseCampaign(event);
   const { data: btcPrice } = useBtcPrice();
-  const { data: stats } = useCampaignDonations(campaign ?? undefined);
+  // Defer the Esplora-backed donation lookup until the preview scrolls into
+  // view — feeds can render many of these, and fetching all of them eagerly
+  // contributed to the Esplora rate-limiting storm.
+  const previewRef = useRef<HTMLAnchorElement>(null);
+  const inView = useInView(previewRef);
+  const { data: stats } = useCampaignDonations(campaign ?? undefined, { enabled: inView });
   const author = useAuthor(event.pubkey);
   if (!campaign) return null;
 
@@ -75,7 +82,7 @@ export function CampaignInlinePreview({ event }: { event: NostrEvent }) {
     : 0;
 
   return (
-    <Link to={`/${naddr}`} onClick={(e) => e.stopPropagation()} className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+    <Link ref={previewRef} to={`/${naddr}`} onClick={(e) => e.stopPropagation()} className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
       <InlineShell
         image={cover}
         fallbackIcon={<HandHeart className="size-12" />}
