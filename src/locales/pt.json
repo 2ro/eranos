@@ -553,7 +553,7 @@
         "description": "Doações são enviadas como pagamentos silenciosos BIP-352. Cada uma chega em uma nova saída Bitcoin inrastreável que um observador olhando para a blockchain não consegue conectar à campanha.",
         "bullet1": "O rastro de doação não pode ser reconstruído on-chain",
         "bullet2": "Protege ativistas que enfrentam adversários sérios",
-        "bullet3": "Chega diretamente na carteira do ativista, sem servidor no meio",
+        "bullet3": "Mantido em um saldo privado separado, nunca misturado com fundos públicos",
         "tradeoffTitle": "Trade-off: pagamentos silenciosos são recentes.",
         "tradeoffIntro": "A forma mais privada de receber Bitcoin on-chain, mas o ecossistema é jovem e instável hoje:",
         "tradeoffBullet1": "Poucas carteiras o suportam.",
@@ -2397,7 +2397,7 @@
         "question": "O que é a carteira no {{appName}}?",
         "answer": [
           "Sua carteira {{appName}} é uma carteira Bitcoin de **auto-custódia**, construída a partir da sua chave Nostr. O {{appName}} nunca detém seus fundos — a carteira roda no seu navegador e assina transações localmente com uma chave que somente você controla. Ela pode receber Bitcoin de duas maneiras — como um endereço público que qualquer carteira Bitcoin pode pagar, e como um código de pagamentos silenciosos que carteiras capazes podem pagar com privacidade. Não há nada para se cadastrar; ela existe no momento em que você tem uma conta.",
-          "Quando você cria uma campanha, escolhe se aceita pagamentos públicos, privados ou ambos. Para gastar o que recebe, veja o **Guia do Ativista**.",
+          "A carteira tem duas abas: **Pública** (seu endereço Bitcoin comum) e **Privada** (pagamentos silenciosos). Os dois saldos são mantidos estritamente separados e nunca podem ser gastos juntos — esse isolamento é o que mantém as doações privadas inrastreáveis on-chain. Quando você cria uma campanha, escolhe se aceita pagamentos públicos, privados ou ambos. Para gastar o que recebe, veja o **Guia do Ativista**.",
           "Você também pode exportar a frase semente de 24 palavras da sua carteira e importá-la em qualquer carteira Bitcoin padrão — veja \"Posso exportar minha carteira {{appName}} para outra carteira Bitcoin?\" abaixo."
         ]
       },
@@ -2707,7 +2707,8 @@
           "**Apenas pagamentos públicos.** Um endereço Bitcoin comum. Visível para todos, funciona com todas as carteiras.",
           "**Apenas pagamentos silenciosos.** Pagamentos silenciosos BIP-352. O lado de recebimento é inrastreável on-chain, então doações ficam fora das listas e totais públicos de doadores. Doadores precisam de uma carteira capaz de pagamentos silenciosos para enviar. Se não têm uma, a doação não pode passar.",
           "**Ambos.** O {{appName}} gera um único QR code que codifica ambos os endpoints. Carteiras de pagamentos silenciosos leem como privado; carteiras comuns pagam o endereço público. Doadores não precisam escolher.",
-          "Aceitar ambos geralmente é a escolha certa: você recebe doações privadas de apoiadores que usam carteira de pagamentos silenciosos, e permanece aberto a doadores cujo único Bitcoin está em um aplicativo de consumo."
+          "Aceitar ambos geralmente é a escolha certa: você recebe doações privadas de apoiadores que usam carteira de pagamentos silenciosos, e permanece aberto a doadores cujo único Bitcoin está em um aplicativo de consumo.",
+          "Dentro da sua carteira {{appName}}, esses fundos chegam como **dois saldos separados** — uma aba **Pública** (seu endereço Bitcoin comum) e uma aba **Privada** (pagamentos silenciosos) — exibidos nas abas Pública / Privada da carteira. O {{appName}} os mantém estritamente separados de propósito: os dois saldos nunca podem ser gastos juntos. Misturar fundos privados com públicos em uma única transação vincularia suas doações inrastreáveis de pagamentos silenciosos de volta ao seu endereço público on-chain e destruiria a privacidade que elas existem para oferecer."
         ]
       },
       "whatEveryoneSees": {
@@ -2727,6 +2728,10 @@
           "Doações em pagamentos silenciosos também chegam sem notificações push e só aparecem após você escanear sua carteira, o que pode levar minutos a horas. Nada disso afeta a segurança dos seus fundos; apenas molda a experiência do dia a dia."
         ]
       },
+      "twoWallets": {
+        "title": "Mantenha seus saldos Público e Privado separados",
+        "body": "Sua carteira {{appName}} mostra duas abas: **Pública** (seu endereço Bitcoin comum) e **Privada** (pagamentos silenciosos). Elas são mantidas estritamente separadas, e os dois saldos nunca podem ser gastos na mesma transação — esse isolamento é o que mantém suas doações privadas inrastreáveis. Quando você saca a partir da aba **Privada**, envie para um endereço de pagamentos silenciosos (**sp1…**), que permanece privado. Se em vez disso você enviar fundos privados para um endereço on-chain comum, o {{appName}} o verifica: se o endereço já foi usado antes, ou pertence à sua própria carteira pública, ele avisa você e exige que toque em **Enviar mesmo assim**, porque fazer isso vincula seus fundos privados ao histórico público desse endereço. Enviar para um endereço **sp1…** nunca dispara o aviso."
+      },
       "movePromptly": {
         "heading": "Mova as doações prontamente",
         "steps": {
@@ -2742,7 +2747,7 @@
       },
       "cashout": {
         "heading": "Sacando com privacidade",
-        "intro": "Gastar on-chain cria um rastro a menos que você o quebre primeiro. A saída mais simples para privacidade é **primeiro mover fundos para uma carteira de pagamentos silenciosos**, depois gastar; o salto quebra o vínculo entre o endereço da sua campanha e o que vem depois. As outras opções abaixo também funcionam e têm seus próprios trade-offs.",
+        "intro": "Gastar on-chain cria um rastro a menos que você o quebre primeiro. Saque a partir da aba **Privada** para manter as doações de pagamentos silenciosos inrastreáveis — envie primeiro para uma carteira de pagamentos silenciosos (um endereço **sp1…**), depois gaste em seguida; o salto quebra o vínculo entre sua campanha e o que vem depois. Não envie fundos privados para um endereço reutilizado ou público, o que os vincula novamente. As outras opções abaixo também funcionam e têm seus próprios trade-offs.",
         "options": {
           "silentHop": {
             "name": "Salto para carteira de pagamentos silenciosos",

@@ -2277,7 +2277,7 @@
         "description": "Zvipo zvinotumirwa sezvikamu zvakanyarara zveBIP-352. Chimwe nechimwe chinosvika pamuchina mutsva, usingabatanidziki, zvekuti munhu anotarisa pamuchina haakwanise kuzvibatanidza kumushando.",
         "bullet1": "Mhare yezvipo haigone kuvakwa zvakare pamuchina",
         "bullet2": "Inodzivirira vatungamiri vanotarisana nevavengi vakaisvonaka",
-        "bullet3": "Inosvika zvakananga muwallet yemutungamiri, hapana seva pakati",
+        "bullet3": "Inochengetwa muhuwandu hwakavanzika hwakaparadzana, isingatombosanganiswi nemari yeruzhinji",
         "tradeoffTitle": "Kushandura: Zvokubhadhara zvakanyarara zvichiri pakutanga.",
         "tradeoffIntro": "Nzira yakavanzika zvikuru yokugamuchira Bitcoin pamuchina, asi nharaunda yangu nhasi ichiri mudiki uye isina kunyatsoenzaniswa:",
         "tradeoffBullet1": "Mawore mashoma anotsigira.",
@@ -2397,7 +2397,7 @@
         "question": "Walleti iri pa{{appName}} chii?",
         "answer": [
           "Walleti yako ye{{appName}} iwalleti yeBitcoin **inozvichengeta** (self-custodial), yakavakwa kubva kukiyi yako yeNostr. {{appName}} haina kana nguva imwe inobata mari yako — walleti inomhanya mubrowser mako uye inosaina mishando ipapo nekiyi yaunozvidzora wega. Inogona kugashira Bitcoin nenzira mbiri — sekero yepachena inogona kubhadharwa newalleti yeBitcoin ipi zvayo, uye sekodhi yemibhadharo yakanyarara inogona kubhadharwa newalleti dzinokwanisa muchivande. Hapana chinonyoreswa; inovapo nguva yaunenge wave neakaundi.",
-          "Paunogadzira kambeni, unosarudza kuti unogamuchira mibhadharo yepachena, yakavanzika, kana zvese. Kuti ushandise zvawagamuchira, ona **Bhuku reMushanduki**.",
+          "Walleti ine matabu maviri: **Pachena** (kero yako yeBitcoin yakajairika) ne**Yakavanzika** (mibhadharo yakanyarara). Huwandu huviri uhu hunochengetwa hwakaparadzana zvachose uye hahungatombo shandiswi pamwechete — kuparadzana ikoko ndiko kunochengeta zvipo zvakavanzika zvisingabatanidziki pa-chain. Paunogadzira kambeni, unosarudza kuti unogamuchira mibhadharo yepachena, yakavanzika, kana zvese. Kuti ushandise zvawagamuchira, ona **Bhuku reMushanduki**.",
           "Unogonawo kubudisa mutsara weseed wemazwi makumi maviri nemana wewalleti yako wougopinza muwalleti yeBitcoin ipi zvayo yakajairika — ona \"Ndinogona kubudisa walleti yangu ye{{appName}} ndichiipinza mune imwe walleti yeBitcoin here?\" pazasi."
         ]
       },
@@ -2707,7 +2707,8 @@
           "**Mibhadharo yepachena chete.** Kero yeBitcoin yakajairika. Inooneka kune munhu wese, inoshanda nemawalleti ose.",
           "**Mibhadharo yakanyarara chete.** Mibhadharo yakanyarara yeBIP-352. Rutivi rwekugashira haruna kubatana pa-chain, saka zvipo zvinosara kunze kwezvinyorwa zvevapi nemihoro yepachena. Vapi vanoda walleti inokwanisa mibhadharo yakanyarara kuti vatumire. Kana vasina, chipo chavo hachigone kupinda.",
           "**Zvese.** {{appName}} inogadzira QR imwechete inonyora endpoints mbiri. MaWalleti emibhadharo yakanyarara anozviverenga sezvakavanzika; mawalleti akajairika anobhadhara kukero yepachena. Vapi havafaniri kusarudza.",
-          "Kugamuchira zvese kazhinji ndiyo sarudzo yakanaka: unowana zvipo zvakavanzika kubva kuvatsigiri vanoshandisa walleti yemibhadharo yakanyarara, uye unoramba wakavhurika kuvapi vane Bitcoin chete mu app yemumusha."
+          "Kugamuchira zvese kazhinji ndiyo sarudzo yakanaka: unowana zvipo zvakavanzika kubva kuvatsigiri vanoshandisa walleti yemibhadharo yakanyarara, uye unoramba wakavhurika kuvapi vane Bitcoin chete mu app yemumusha.",
+          "Mukati mewalleti yako ye{{appName}}, izvi zvinosvika se**huwandu huviri hwakaparadzana** — chitabu che**Pachena** (kero yako yeBitcoin yakajairika) nechitabu che**Yakavanzika** (mibhadharo yakanyarara) — zvinoratidzwa pamatabu ePachena / Yakavanzika ewalleti. {{appName}} inozvichengeta zvakaparadzana nemaune: huwandu huviri uhu hahungatombo shandiswi pamwechete. Kusanganisa mari yakavanzika neyepachena mumushando mumwechete kungabatanidza zvipo zvako zvemibhadharo yakanyarara zvisingabatanidziki kudzokera kukero yako yepachena pa-chain uye zvoparadza kuvanzika kwazviripo kupa."
         ]
       },
       "whatEveryoneSees": {
@@ -2727,6 +2728,10 @@
           "Zvipo zvemibhadharo yakanyarara zvinosvikawo pasina zviziviso zvePush uye zvinooneka chete mushure mekunge wascana walleti yako, izvo zvinogona kutora maminetiisi kusvika maawa. Hapana ne hatomwe pazvinhu izvi inopiwa kubva kuchengeteka kwemari yako; inongoita zvekuita netarisiro yezuva nezuva."
         ]
       },
+      "twoWallets": {
+        "title": "Chengeta huwandu hwako hwePachena nehweYakavanzika hwakaparadzana",
+        "body": "Walleti yako ye{{appName}} inoratidza matabu maviri: **Pachena** (kero yako yeBitcoin yakajairika) ne**Yakavanzika** (mibhadharo yakanyarara). Anochengetwa akaparadzana zvachose, uye huwandu huviri uhu hahungatombo shandiswi mumushando mumwechete — kuparadzana ikoko ndiko kunochengeta zvipo zvako zvakavanzika zvisingabatanidziki. Paunokwidza mari kubva muchitabu che**Yakavanzika**, tumira kukero yemibhadharo yakanyarara (**sp1…**), iyo inoramba yakavanzika. Kana panzvimbo pacho ukatumira mari yakavanzika kukero yepa-chain isina chinhu, {{appName}} inoiongorora: kana kero yacho yakamboshandiswa, kana iri yewalleti yako yepachena, inokuyambira uye inokuita kuti udzvanye **Tumira zvakadaro**, nekuti kuita izvozvo kunobatanidza mari yako yakavanzika kunhoroondo yepachena yekero iyoyo. Kutumira kukero ye**sp1…** hakumboita kuti yambiro iyi ibude."
+      },
       "movePromptly": {
         "heading": "Fambisa zvipo nokukurumidza",
         "steps": {
@@ -2742,7 +2747,7 @@
       },
       "cashout": {
         "heading": "Kukwidza mari nenzira yakavanzika",
-        "intro": "Kushandisa mari pa-chain kunogadzira nzira yekutevera kunze kwekunge wamboibvuna kutanga. Nzira nyore yekubuda yekuvanzika ndeyekuti **utange kufambisa mari kuwalleti yemibhadharo yakanyarara**, ushandise zvichitevera; kutsva uku kunobvuna chinongedzo pakati pekero yekambeni yako neicho chinotevera. Mamwe masarudzo apasi anoshanda zvakare uye ane kutarisana kwawo.",
+        "intro": "Kushandisa mari pa-chain kunogadzira nzira yekutevera kunze kwekunge wamboibvuna kutanga. Kwidza mari kubva muchitabu che**Yakavanzika** kuti zvipo zvemibhadharo yakanyarara zvirambe zvisingabatanidziki — tanga watumira kuwalleti yemibhadharo yakanyarara (kero ye**sp1…**), wozoshandisa zvichitevera; kutsva uku kunobvuna chinongedzo pakati pekambeni yako neicho chinotevera. Usatumira mari yakavanzika kukero yakambodzokororwa kana yepachena, izvo zvinoibatanidza zvakare. Mamwe masarudzo apasi anoshanda zvakare uye ane kutarisana kwawo.",
         "options": {
           "silentHop": {
             "name": "Kufambisa kuwalleti yemibhadharo yakanyarara",

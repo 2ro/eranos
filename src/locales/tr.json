@@ -552,7 +552,7 @@
         "description": "Bağışlar BIP-352 sessiz ödemeler olarak gönderilir. Her biri, blok zincirine bakan bir gözlemcinin kampanyaya bağlayamayacağı yeni ve izlenemez bir Bitcoin çıkışına ulaşır.",
         "bullet1": "Bağış izi zincir üstünde yeniden kurulamaz",
         "bullet2": "Ciddi hasımlarla karşılaşan aktivistleri korur",
-        "bullet3": "Aktivistin cüzdanına doğrudan ulaşır, arada sunucu yok",
+        "bullet3": "Ayrı bir gizli bakiyede tutulur, açık fonlarla asla karıştırılmaz",
         "tradeoffTitle": "Takas: Sessiz ödemeler henüz yeni.",
         "tradeoffIntro": "Zincir üstünde Bitcoin almanın en gizli yolu, ancak ekosistem genç ve bugün hâlâ pürüzlü:",
         "tradeoffBullet1": "Çok az cüzdan destekliyor.",
@@ -2332,7 +2332,7 @@
         "question": "{{appName}}'daki cüzdan nedir?",
         "answer": [
           "{{appName}} cüzdanınız, Nostr anahtarınızdan oluşturulan **öz-saklamalı** bir Bitcoin cüzdanıdır. {{appName}} fonlarınızı asla tutmaz — cüzdan tarayıcınızda çalışır ve işlemleri yalnızca sizin kontrol ettiğiniz bir anahtarla yerel olarak imzalar. Bitcoin'i iki şekilde alabilir — herhangi bir Bitcoin cüzdanının ödeme yapabileceği bir açık adres olarak ve uygun cüzdanların gizli olarak ödeme yapabileceği bir sessiz ödeme kodu olarak. Kaydolacak bir şey yoktur; hesabınız olduğu anda var olur.",
-          "Bir kampanya oluşturduğunuzda açık ödemeleri mi, gizli ödemeleri mi yoksa her ikisini mi kabul edeceğinizi seçersiniz. Aldıklarınızı harcamak için **Aktivist Rehberi**'ne bakın.",
+          "Cüzdanın iki sekmesi vardır: **Açık** (normal Bitcoin adresiniz) ve **Gizli** (sessiz ödemeler). İki bakiye kesin biçimde ayrı tutulur ve asla birlikte harcanamaz — gizli bağışları zincir üstünde izlenemez tutan şey bu yalıtımdır. Bir kampanya oluşturduğunuzda açık ödemeleri mi, gizli ödemeleri mi yoksa her ikisini mi kabul edeceğinizi seçersiniz. Aldıklarınızı harcamak için **Aktivist Rehberi**'ne bakın.",
           "Cüzdanınızın 24 kelimelik tohum cümlesini dışa aktarıp herhangi bir standart Bitcoin cüzdanına aktarabilirsiniz — aşağıdaki \"{{appName}} cüzdanımı başka bir Bitcoin cüzdanına aktarabilir miyim?\" bölümüne bakın."
         ]
       },
@@ -2642,7 +2642,8 @@
           "**Yalnızca açık ödemeler.** Normal bir Bitcoin adresi. Herkese görünür, her cüzdanla çalışır.",
           "**Yalnızca sessiz ödemeler.** BIP-352 sessiz ödemeler. Alıcı taraf zincir üstünde izlenemezdir, böylece bağışlar herkese açık bağışçı listelerinin ve toplamların dışında kalır. Bağışçıların göndermek için sessiz ödeme yetenekli bir cüzdana ihtiyacı vardır. Yoksa bağışları geçmez.",
           "**Her ikisi.** {{appName}} her iki uç noktayı kodlayan tek bir QR kod oluşturur. Sessiz ödeme cüzdanları bunu gizli olarak okur; sıradan cüzdanlar açık adrese öder. Bağışçıların seçim yapmasına gerek kalmaz.",
-          "Her ikisini de kabul etmek genellikle doğru tercihtir: sessiz ödeme cüzdanı kullanan destekçilerden gizli bağışlar alırsınız ve yalnızca tüketici uygulamasında Bitcoin'i olan bağışçılara açık kalırsınız."
+          "Her ikisini de kabul etmek genellikle doğru tercihtir: sessiz ödeme cüzdanı kullanan destekçilerden gizli bağışlar alırsınız ve yalnızca tüketici uygulamasında Bitcoin'i olan bağışçılara açık kalırsınız.",
+          "{{appName}} cüzdanınızın içinde bunlar **iki ayrı bakiye** olarak ulaşır — bir **Açık** sekmesi (normal Bitcoin adresiniz) ve bir **Gizli** sekmesi (sessiz ödemeler) — cüzdanın Açık / Gizli sekmelerinde gösterilir. {{appName}} bunları bilinçli olarak kesin biçimde ayrı tutar: iki bakiye asla birlikte harcanamaz. Gizli fonları açık fonlarla tek bir işlemde karıştırmak, izlenemez sessiz ödeme bağışlarınızı zincir üstünde açık adresinize geri bağlar ve var olma nedenleri olan gizliliği yok eder."
         ]
       },
       "whatEveryoneSees": {
@@ -2662,6 +2663,10 @@
           "Sessiz ödeme bağışları da anlık bildirimsiz ulaşır ve yalnızca siz cüzdanınızı taradıktan sonra görünür; bu da dakikalardan saatlere kadar sürebilir. Bunların hiçbiri fonlarınızın güvenliğini etkilemez; yalnızca günlük deneyimi şekillendirir."
         ]
       },
+      "twoWallets": {
+        "title": "Açık ve Gizli bakiyelerinizi ayrı tutun",
+        "body": "{{appName}} cüzdanınız iki sekme gösterir: **Açık** (normal Bitcoin adresiniz) ve **Gizli** (sessiz ödemeler). Bunlar kesin biçimde ayrı tutulur ve iki bakiye asla aynı işlemde harcanamaz — gizli bağışlarınızı izlenemez tutan şey bu yalıtımdır. **Gizli** sekmesinden nakde çevirdiğinizde, gizli kalan bir sessiz ödeme adresine (**sp1…**) gönderin. Bunun yerine gizli fonları çıplak bir zincir üstü adrese gönderirseniz, {{appName}} bunu denetler: adres daha önce kullanılmışsa veya kendi açık cüzdanınıza aitse, sizi uyarır ve **Yine de gönder**'e dokunmanızı ister, çünkü bunu yapmak gizli fonlarınızı o adresin açık geçmişine bağlar. Bir **sp1…** adresine göndermek uyarıyı asla tetiklemez."
+      },
       "movePromptly": {
         "heading": "Bağışları hızlıca taşıyın",
         "steps": {
@@ -2677,7 +2682,7 @@
       },
       "cashout": {
         "heading": "Gizli olarak nakde çevirmek",
-        "intro": "Zincir üstünde harcamak, izi önce kırmazsanız bir iz bırakır. En basit gizlilik çıkışı **fonları önce bir sessiz ödeme cüzdanına taşımak**, sonra ileri harcamaktır; bu adım kampanya adresinizle sonra gelenler arasındaki bağı kırar. Aşağıdaki diğer seçenekler de işe yarar ve kendi takasları vardır.",
+        "intro": "Zincir üstünde harcamak, izi önce kırmazsanız bir iz bırakır. Sessiz ödeme bağışlarını izlenemez tutmak için **Gizli** sekmesinden nakde çevirin — önce bir sessiz ödeme cüzdanına gönderin (bir **sp1…** adresi), sonra ileri harcayın; bu adım kampanyanızla sonra gelenler arasındaki bağı kırar. Gizli fonları yeniden kullanılmış veya açık bir adrese göndermeyin, bu onları yeniden bağlar. Aşağıdaki diğer seçenekler de işe yarar ve kendi takasları vardır.",
         "options": {
           "silentHop": {
             "name": "Sessiz ödeme cüzdan adımı",
