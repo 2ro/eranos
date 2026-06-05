@@ -12,7 +12,6 @@ import {
   PlusCircle,
 } from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
@@ -20,57 +19,45 @@ import { CampaignListsStrip } from '@/components/campaign-lists/CampaignListsStr
 import { HeroLightningMap } from '@/components/HeroLightningMap';
 import { StartCampaignLink } from '@/components/StartCampaignLink';
 import { AppDownloadNudge } from '@/components/AppDownloadNudge';
-import { useAuthor } from '@/hooks/useAuthor';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignList } from '@/hooks/useCampaignLists';
-import { genUserName } from '@/lib/genUserName';
 import { useAppContext } from '@/hooks/useAppContext';
 import { cn } from '@/lib/utils';
 import type { ParsedCampaign } from '@/lib/campaign';
 
 /**
- * Maximum number of skeleton cards to render in the WLC hero row
+ * Maximum number of skeleton cards to render in the featured hero row
  * while the campaigns are loading. The list itself can hold an
  * arbitrary number of members; the home row caps the visual count.
  */
-const WLC_SKELETON_CAP = 8;
+const FEATURED_SKELETON_CAP = 8;
 
 /**
- * Maximum number of campaigns shown in the WLC hero row on the home
- * page. The layout is two large hero cards on top followed by a
+ * Maximum number of campaigns shown in the featured hero row on the
+ * home page. The layout is two large hero cards on top followed by a
  * single 4-up row, so 6 is the visual cap. List members beyond the
  * cap are accessible from the dedicated list detail page.
  */
-const WLC_HERO_CAP = 6;
+const FEATURED_HERO_CAP = 6;
 
 /**
  * Slug of the curated list that powers the home-page hero row.
- * Matches the moderator-published kind-30003 event with
- * `d=world-liberty-congress` and `t=agora.campaign-list`.
+ * Matches the curator-published kind-30003 event with
+ * `d=featured-campaigns` and `t=agora.campaign-list`. The list's own
+ * detail page lives at `/campaigns/lists/featured-campaigns`.
  */
-const WLC_LIST_SLUG = 'world-liberty-congress';
-
-/**
- * World Liberty Congress — the partner organization whose curated
- * list powers the home-page hero row. Their pubkey and npub are
- * hard-coded here so the heading can link to their profile and
- * pull their avatar from kind 0 metadata via `useAuthor`,
- * regardless of which moderator pubkey actually authored the list
- * event.
- */
-const WLC_PUBKEY = '56b3abb9baed20b6ab81617aa519c8634e920ef0351d2962ec2951a9b233ab2f';
-const WLC_NPUB = 'npub126e6hwd6a5std2upv9a22xwgvd8fyrhsx5wjjchv99g6nv3n4vhs5fr9g3';
+const FEATURED_LIST_SLUG = 'featured-campaigns';
 
 /**
  * Home page (`/`).
  *
  * Two public sections:
  *
- *  1. **WLC hero row** — the campaigns inside the curated
- *     `world-liberty-congress` list (a moderator-published kind
- *     30003 NIP-51 bookmark set), in list order, capped at
- *     {@link WLC_HERO_CAP} for visual weight. The list's own detail
- *     page at `/campaigns/lists/world-liberty-congress` exposes the
+ *  1. **Featured hero row** — the campaigns inside the curated
+ *     `featured-campaigns` list (a curator-published kind 30003
+ *     NIP-51 bookmark set), in list order, capped at
+ *     {@link FEATURED_HERO_CAP} for visual weight. The list's own
+ *     detail page at `/campaigns/lists/featured-campaigns` exposes the
  *     full membership without a cap. Replaces the previous
  *     `featured`-label-based row — featuring is no longer a
  *     campaign-level concept; lists are.
@@ -83,8 +70,8 @@ const WLC_NPUB = 'npub126e6hwd6a5std2upv9a22xwgvd8fyrhsx5wjjchv99g6nv3n4vhs5fr9g
  * Show-hidden toggle there is available to every viewer, and the
  * moderator-only Hidden collapsible there is the structured review
  * surface. The home page applies no label-based filtering of its own:
- * the WLC hero row renders exactly what the curated list declares, in
- * list order. Curation here is the list's membership, nothing more.
+ * the featured hero row renders exactly what the curated list declares,
+ * in list order. Curation here is the list's membership, nothing more.
  *
  * Campaigns are the home page's sole focus. Groups and Pledges each
  * have their own dedicated browse pages (`/groups`, `/pledges`).
@@ -93,26 +80,19 @@ export function CampaignsPage() {
   const { t } = useTranslation();
   const { config } = useAppContext();
 
-  const wlcAuthor = useAuthor(WLC_PUBKEY);
-  const wlcName = wlcAuthor.data?.metadata?.display_name
-    || wlcAuthor.data?.metadata?.name
-    || 'World Liberty Congress';
-  const wlcPicture = wlcAuthor.data?.metadata?.picture;
-  const wlcFallback = genUserName(WLC_PUBKEY).slice(0, 2).toUpperCase();
-
   // The curated list that backs the hero row. The slug is fixed in
   // code so the home page's editorial framing doesn't drift if a
   // moderator renames or reorders other lists. The list itself can
   // still be edited freely — its title isn't read here, only its
   // membership.
-  const { list: wlcList, isLoading: listLoading } = useCampaignList(WLC_LIST_SLUG);
+  const { list: featuredList, isLoading: listLoading } = useCampaignList(FEATURED_LIST_SLUG);
 
   // Cap the displayed coords. Beyond the cap, members are still
   // visible from the dedicated list detail page; the home row
-  // shows the top {@link WLC_HERO_CAP}.
+  // shows the top {@link FEATURED_HERO_CAP}.
   const cappedCoords = useMemo(
-    () => (wlcList?.coords ?? []).slice(0, WLC_HERO_CAP),
-    [wlcList],
+    () => (featuredList?.coords ?? []).slice(0, FEATURED_HERO_CAP),
+    [featuredList],
   );
 
   // `useCampaigns` ignores `limit` when `coordinates` is set, so
@@ -144,13 +124,13 @@ export function CampaignsPage() {
     description: t('campaigns.home.seoDescription'),
   });
 
-  // Show the WLC section as long as there's something to show OR
+  // Show the featured section as long as there's something to show OR
   // the list is still loading on first paint (avoids a flash of
   // empty space for visitors who hit the page before the list
   // event arrives).
-  const listEmpty = !listLoading && (!wlcList || wlcList.coords.length === 0);
-  const showWlcSection =
-    (wlcList && wlcList.coords.length > 0) ||
+  const listEmpty = !listLoading && (!featuredList || featuredList.coords.length === 0);
+  const showFeaturedSection =
+    (featuredList && featuredList.coords.length > 0) ||
     listLoading ||
     (heroLoading && cappedCoords.length > 0);
 
@@ -159,26 +139,21 @@ export function CampaignsPage() {
       <Hero />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12" id="campaigns">
-        {showWlcSection && (
+        {showFeaturedSection && (
           <section className="space-y-5">
             <div className="flex items-end justify-between gap-4 flex-wrap">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2 flex-wrap">
                   <Link
-                    to={`/${WLC_NPUB}`}
+                    to={`/campaigns/lists/${FEATURED_LIST_SLUG}`}
                     className="inline-flex items-center gap-2 hover:underline underline-offset-4"
-                    aria-label={wlcName}
                   >
-                    <Avatar className="size-8 sm:size-9 ring-1 ring-border">
-                      <AvatarImage src={wlcPicture} alt="" />
-                      <AvatarFallback>{wlcFallback}</AvatarFallback>
-                    </Avatar>
-                    <span>{wlcName}</span>
+                    <span>{t('campaigns.home.featuredTitle')}</span>
                   </Link>
                   <BadgeCheck className="size-5 sm:size-6 text-primary shrink-0" aria-hidden="true" />
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {t('campaigns.home.wlcDesc', { appName: config.appName })}
+                  {t('campaigns.home.featuredDesc', { appName: config.appName })}
                 </p>
               </div>
               <Button asChild variant="outline" className="hidden sm:inline-flex">
@@ -205,8 +180,8 @@ export function CampaignsPage() {
             browse surface. The canonical breadth-view is /campaigns,
             which already carries search, sort, and country filters.
             Keeping the home page to one tightly curated row above
-            the strip (WLC) plus the strip itself makes the
-            editorial hierarchy obvious: WLC's chosen heroes →
+            the strip (featured) plus the strip itself makes the
+            editorial hierarchy obvious: the featured heroes →
             moderator topics → click through for the full
             catalogue. */}
         <section className="space-y-5">
@@ -385,7 +360,7 @@ function heroGridContainerClass(total: number): string {
   return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5';
 }
 
-/** Renders the WLC hero row with two large cards on top + 4-up tail. */
+/** Renders the featured hero row with two large cards on top + 4-up tail. */
 function HeroRow({
   campaigns,
   isLoading,
@@ -400,7 +375,7 @@ function HeroRow({
     // The skeleton mirrors the real layout: top two large, rest 4-up.
     // Bounded so a list with 50+ members doesn't render a screenful
     // of grey placeholders before the real cards arrive.
-    const skeletonCount = Math.max(1, Math.min(WLC_SKELETON_CAP, expectedCount));
+    const skeletonCount = Math.max(1, Math.min(FEATURED_SKELETON_CAP, expectedCount));
     return (
       <div className={heroGridContainerClass(skeletonCount)}>
         {Array.from({ length: skeletonCount }).map((_, i) => (
