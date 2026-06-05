@@ -553,7 +553,7 @@
         "description": "Donasi dikirim sebagai silent payments BIP-352. Setiap donasi mendarat di output Bitcoin yang baru dan tak terhubungkan, yang tidak bisa dikaitkan kembali ke kampanye oleh pengamat yang menatap blockchain.",
         "bullet1": "Jejak donasi tidak bisa direkonstruksi di on-chain",
         "bullet2": "Melindungi aktivis yang menghadapi musuh serius",
-        "bullet3": "Mendarat langsung di dompet aktivis, tanpa server di tengah",
+        "bullet3": "Disimpan dalam saldo privat terpisah, tidak pernah dicampur dengan dana publik",
         "tradeoffTitle": "Konsekuensi: Silent payments masih dini.",
         "tradeoffIntro": "Cara paling privat untuk menerima Bitcoin secara on-chain, namun ekosistemnya masih muda dan kasar saat ini:",
         "tradeoffBullet1": "Sedikit dompet yang mendukungnya.",
@@ -2330,7 +2330,7 @@
         "question": "Apa itu dompet di {{appName}}?",
         "answer": [
           "Dompet {{appName}} Anda adalah dompet Bitcoin **self-custodial**, dibangun dari kunci Nostr Anda. {{appName}} tidak pernah menahan dana Anda — dompet berjalan di peramban Anda dan menandatangani transaksi secara lokal dengan kunci yang hanya Anda kendalikan. Ia dapat menerima Bitcoin dengan kedua cara — sebagai alamat publik yang bisa dibayar dompet Bitcoin apa pun, dan sebagai kode silent-payments yang bisa dibayar oleh dompet yang mendukung secara privat. Tidak ada yang perlu didaftarkan; dompet ada sejak Anda memiliki akun.",
-          "Saat Anda membuat kampanye, Anda memilih apakah menerima pembayaran publik, pembayaran privat, atau keduanya. Untuk membelanjakan apa yang Anda terima, lihat **Panduan Aktivis**.",
+          "Dompet memiliki dua tab: **Publik** (alamat Bitcoin biasa Anda) dan **Privat** (silent payments). Kedua saldo dipisahkan secara ketat dan tidak pernah bisa dibelanjakan bersama — isolasi itulah yang menjaga donasi privat tetap tak terhubungkan di on-chain. Saat Anda membuat kampanye, Anda memilih apakah menerima pembayaran publik, pembayaran privat, atau keduanya. Untuk membelanjakan apa yang Anda terima, lihat **Panduan Aktivis**.",
           "Anda juga bisa mengekspor frasa seed 24 kata dari dompet Anda dan mengimpornya ke dompet Bitcoin standar apa pun — lihat \"Bisakah saya mengekspor dompet {{appName}} saya ke dompet Bitcoin lain?\" di bawah."
         ]
       },
@@ -2640,7 +2640,8 @@
           "**Hanya pembayaran publik.** Alamat Bitcoin biasa. Terlihat oleh semua orang, berfungsi dengan setiap dompet.",
           "**Hanya silent payments.** Silent payments BIP-352. Sisi penerima tak terhubungkan di on-chain, sehingga donasi tetap di luar daftar donatur publik dan jumlah total. Donatur perlu dompet yang mendukung silent-payments untuk mengirim. Jika mereka tidak punya, donasi mereka tidak bisa sampai.",
           "**Keduanya.** {{appName}} membuat satu kode QR yang mengencode kedua titik. Dompet silent-payments membacanya sebagai privat; dompet biasa membayar alamat publik. Donatur tidak perlu memilih.",
-          "Menerima keduanya biasanya pilihan tepat: Anda mendapat donasi privat dari pendukung yang menggunakan dompet silent-payments, dan Anda tetap terbuka bagi donatur yang Bitcoin satu-satunya ada di aplikasi konsumen."
+          "Menerima keduanya biasanya pilihan tepat: Anda mendapat donasi privat dari pendukung yang menggunakan dompet silent-payments, dan Anda tetap terbuka bagi donatur yang Bitcoin satu-satunya ada di aplikasi konsumen.",
+          "Di dalam dompet {{appName}} Anda, donasi ini tiba sebagai **dua saldo terpisah** — tab **Publik** (alamat Bitcoin biasa Anda) dan tab **Privat** (silent payments) — yang ditampilkan pada tab Publik / Privat dompet. {{appName}} sengaja memisahkannya secara ketat: kedua saldo tidak pernah bisa dibelanjakan bersama. Mencampur dana privat dengan dana publik dalam satu transaksi akan menautkan donasi silent-payment Anda yang tak terhubungkan kembali ke alamat publik Anda di on-chain dan menghancurkan privasi yang menjadi alasan keberadaannya."
         ]
       },
       "whatEveryoneSees": {
@@ -2660,6 +2661,10 @@
           "Donasi silent-payment juga tiba tanpa notifikasi push dan hanya muncul setelah Anda memindai dompet, yang bisa memakan menit hingga jam. Semua ini tidak memengaruhi keamanan dana Anda; ini hanya membentuk pengalaman sehari-hari."
         ]
       },
+      "twoWallets": {
+        "title": "Pisahkan saldo Publik dan Privat Anda",
+        "body": "Dompet {{appName}} Anda menampilkan dua tab: **Publik** (alamat Bitcoin biasa Anda) dan **Privat** (silent payments). Keduanya dipisahkan secara ketat, dan kedua saldo tidak pernah bisa dibelanjakan dalam transaksi yang sama — isolasi itulah yang menjaga donasi privat Anda tetap tak terhubungkan. Saat Anda mencairkan dari tab **Privat**, kirim ke alamat silent-payment (**sp1…**), yang tetap privat. Jika Anda malah mengirim dana privat ke alamat on-chain biasa, {{appName}} memeriksanya: jika alamat itu pernah dipakai sebelumnya, atau milik dompet publik Anda sendiri, {{appName}} memperingatkan Anda dan mengharuskan Anda menekan **Tetap kirim**, karena melakukannya menautkan dana privat Anda ke riwayat publik alamat tersebut. Mengirim ke alamat **sp1…** tidak pernah memicu peringatan itu."
+      },
       "movePromptly": {
         "heading": "Pindahkan donasi segera",
         "steps": {
@@ -2675,7 +2680,7 @@
       },
       "cashout": {
         "heading": "Mencairkan secara privat",
-        "intro": "Membelanjakan secara on-chain menciptakan jejak kecuali Anda memutuskannya dulu. Jalan keluar privasi paling sederhana adalah **memindahkan dana ke dompet silent-payments terlebih dahulu**, lalu belanjakan lebih lanjut; lompatan itu memutus tautan antara alamat kampanye Anda dan apa yang datang berikutnya. Opsi lain di bawah juga berfungsi dan memiliki konsekuensinya sendiri.",
+        "intro": "Membelanjakan secara on-chain menciptakan jejak kecuali Anda memutuskannya dulu. Cairkan dari tab **Privat** agar donasi silent-payment tetap tak terhubungkan — kirim ke dompet silent-payments terlebih dahulu (alamat **sp1…**), lalu belanjakan lebih lanjut; lompatan itu memutus tautan antara kampanye Anda dan apa yang datang berikutnya. Jangan kirim dana privat ke alamat yang dipakai ulang atau alamat publik, yang akan menautkannya kembali. Opsi lain di bawah juga berfungsi dan memiliki konsekuensinya sendiri.",
         "options": {
           "silentHop": {
             "name": "Lompatan dompet silent-payments",

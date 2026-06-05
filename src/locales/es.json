@@ -2274,7 +2274,7 @@
         "description": "Las donaciones se envían como pagos silenciosos BIP-352. Cada una llega a una salida de Bitcoin nueva y no enlazable que un observador mirando la blockchain no puede vincular con la campaña.",
         "bullet1": "El rastro de donaciones no puede reconstruirse en la blockchain",
         "bullet2": "Protege a activistas que enfrentan adversarios serios",
-        "bullet3": "Llega directo a la billetera del activista, sin servidor intermedio",
+        "bullet3": "Se guarda en un saldo privado separado, nunca mezclado con los fondos públicos",
         "tradeoffTitle": "Compromiso: los pagos silenciosos son una tecnología nueva.",
         "tradeoffIntro": "La forma más privada de recibir Bitcoin on-chain, pero el ecosistema es joven y áspero hoy:",
         "tradeoffBullet1": "Pocas billeteras lo soportan.",
@@ -2394,7 +2394,7 @@
         "question": "¿Qué es la wallet en {{appName}}?",
         "answer": [
           "Tu wallet de {{appName}} es una wallet de Bitcoin **autocustodial**, construida a partir de tu clave de Nostr. {{appName}} nunca retiene tus fondos — la wallet se ejecuta en tu navegador y firma las transacciones localmente con una clave que solo tú controlas. Puede recibir Bitcoin de dos maneras: como dirección pública que cualquier wallet de Bitcoin puede pagar, y como código de silent payments al que las wallets compatibles pueden pagar de forma privada. No hay nada que registrar; existe en cuanto tienes una cuenta.",
-          "Al crear una campaña, eliges si aceptar pagos públicos, privados o ambos. Para gastar lo que recibes, consulta la **Guía del activista**.",
+          "La wallet tiene dos pestañas: **Pública** (tu dirección de Bitcoin normal) y **Privada** (silent payments). Los dos saldos se mantienen estrictamente separados y nunca pueden gastarse juntos: ese aislamiento es lo que mantiene no enlazables on-chain las donaciones privadas. Al crear una campaña, eliges si aceptar pagos públicos, privados o ambos. Para gastar lo que recibes, consulta la **Guía del activista**.",
           "También puedes exportar la frase semilla de 24 palabras de tu wallet e importarla en cualquier wallet de Bitcoin estándar — consulta \"¿Puedo exportar mi wallet de {{appName}} a otra wallet de Bitcoin?\" más abajo."
         ]
       },
@@ -2704,7 +2704,8 @@
           "**Solo pagos públicos.** Una dirección de Bitcoin normal. Visible para todo el mundo, funciona con cualquier wallet.",
           "**Solo silent payments.** Silent payments BIP-352. El lado receptor es no vinculable en la cadena, así que las donaciones quedan fuera de las listas y los totales públicos de donantes. Los donantes necesitan una wallet con soporte de silent payments para enviar. Si no la tienen, su donación no puede pasar.",
           "**Ambos.** {{appName}} genera un único código QR que codifica los dos endpoints. Las wallets de silent payments lo leen como privado; las wallets normales pagan a la dirección pública. Los donantes no tienen que elegir.",
-          "Aceptar ambos suele ser la opción correcta: recibes donaciones privadas de quienes usen una wallet de silent payments y sigues abierto a donantes cuyo único Bitcoin está en una app para el público general."
+          "Aceptar ambos suele ser la opción correcta: recibes donaciones privadas de quienes usen una wallet de silent payments y sigues abierto a donantes cuyo único Bitcoin está en una app para el público general.",
+          "Dentro de tu wallet de {{appName}}, estas llegan como **dos saldos separados**: una pestaña **Pública** (tu dirección de Bitcoin normal) y una pestaña **Privada** (silent payments), que se muestran en las pestañas Pública / Privada de la wallet. {{appName}} las mantiene estrictamente separadas a propósito: los dos saldos nunca pueden gastarse juntos. Mezclar fondos privados con públicos en una sola transacción vincularía tus donaciones por silent payments, que son no enlazables, de vuelta a tu dirección pública en la cadena y destruiría la privacidad que existen para ofrecer."
         ]
       },
       "whatEveryoneSees": {
@@ -2724,6 +2725,10 @@
           "Las donaciones por silent payments también llegan sin notificaciones push y solo aparecen después de que escanees tu wallet, lo que puede tardar minutos u horas. Nada de esto afecta a la seguridad de tus fondos; solo modela la experiencia del día a día."
         ]
       },
+      "twoWallets": {
+        "title": "Mantén separados tus saldos Público y Privado",
+        "body": "Tu wallet de {{appName}} muestra dos pestañas: **Pública** (tu dirección de Bitcoin normal) y **Privada** (silent payments). Se mantienen estrictamente separadas, y los dos saldos nunca pueden gastarse en la misma transacción: ese aislamiento es lo que mantiene no enlazables tus donaciones privadas. Cuando cobras desde la pestaña **Privada**, envía a una dirección de silent payments (**sp1…**), que sigue siendo privada. Si en cambio envías fondos privados a una dirección on-chain simple, {{appName}} la verifica: si la dirección se ha usado antes, o pertenece a tu propia wallet pública, te advierte y te obliga a tocar **Enviar de todos modos**, porque hacerlo vincula tus fondos privados al historial público de esa dirección. Enviar a una dirección **sp1…** nunca activa la advertencia."
+      },
       "movePromptly": {
         "heading": "Mueve las donaciones rápido",
         "steps": {
@@ -2739,7 +2744,7 @@
       },
       "cashout": {
         "heading": "Cobrar de forma privada",
-        "intro": "Gastar en la cadena crea un rastro a menos que lo rompas antes. La salida de privacidad más simple es **mover primero los fondos a una wallet de silent payments**, y a partir de ahí gastar; el salto rompe el vínculo entre la dirección de tu campaña y lo que venga después. Las otras opciones de abajo también funcionan y tienen sus propias contrapartidas.",
+        "intro": "Gastar en la cadena crea un rastro a menos que lo rompas antes. Cobra desde la pestaña **Privada** para mantener no enlazables las donaciones por silent payments: envía primero a una wallet de silent payments (una dirección **sp1…**) y luego gasta a partir de ahí; el salto rompe el vínculo entre tu campaña y lo que venga después. No envíes fondos privados a una dirección reutilizada o pública, ya que vuelve a vincularlos. Las otras opciones de abajo también funcionan y tienen sus propias contrapartidas.",
         "options": {
           "silentHop": {
             "name": "Salto a wallet de silent payments",

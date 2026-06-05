@@ -552,7 +552,7 @@
         "description": "Les dons sont envoyés sous forme de paiements silencieux BIP-352. Chacun arrive à une nouvelle sortie Bitcoin non-traçable qu'un observateur regardant la blockchain ne peut pas relier à la campagne.",
         "bullet1": "La trace des dons ne peut pas être reconstituée sur la chaîne",
         "bullet2": "Protège les activistes face à des adversaires sérieux",
-        "bullet3": "Arrive directement dans le portefeuille de l'activiste, sans serveur intermédiaire",
+        "bullet3": "Conservés dans un solde privé séparé, jamais mélangés aux fonds publics",
         "tradeoffTitle": "Compromis : les paiements silencieux sont récents.",
         "tradeoffIntro": "La façon la plus privée de recevoir du Bitcoin sur la chaîne, mais l'écosystème est jeune et imparfait aujourd'hui :",
         "tradeoffBullet1": "Peu de portefeuilles le prennent en charge.",
@@ -2391,7 +2391,7 @@
         "question": "Qu'est-ce que le portefeuille sur {{appName}} ?",
         "answer": [
           "Votre portefeuille {{appName}} est un portefeuille Bitcoin **auto-hébergé**, construit à partir de votre clé Nostr. {{appName}} ne détient jamais vos fonds — le portefeuille fonctionne dans votre navigateur et signe les transactions localement avec une clé que vous seul contrôlez. Il peut recevoir du Bitcoin de deux façons — comme une adresse publique que n'importe quel portefeuille Bitcoin peut payer, et comme un code de paiements silencieux que les portefeuilles compatibles peuvent payer en privé. Il n'y a rien à créer ; il existe dès l'instant où vous avez un compte.",
-          "Quand vous créez une campagne, vous choisissez si vous acceptez les paiements publics, les paiements privés, ou les deux. Pour dépenser ce que vous recevez, consultez le **Guide de l'activiste**.",
+          "Le portefeuille a deux onglets : **Public** (votre adresse Bitcoin classique) et **Privé** (paiements silencieux). Les deux soldes sont gardés strictement séparés et ne peuvent jamais être dépensés ensemble — c'est cette isolation qui garde les dons privés non-traçables on-chain. Quand vous créez une campagne, vous choisissez si vous acceptez les paiements publics, les paiements privés, ou les deux. Pour dépenser ce que vous recevez, consultez le **Guide de l'activiste**.",
           "Vous pouvez également exporter la phrase de récupération de 24 mots de votre portefeuille et l'importer dans n'importe quel portefeuille Bitcoin standard — voir « Puis-je exporter mon portefeuille {{appName}} vers un autre portefeuille Bitcoin ? » ci-dessous."
         ]
       },
@@ -2701,7 +2701,8 @@
           "**Paiements publics uniquement.** Une adresse Bitcoin classique. Visible par tous, fonctionne avec tous les portefeuilles.",
           "**Paiements silencieux uniquement.** Paiements silencieux BIP-352. Le côté réception est non-traçable on-chain, donc les dons restent hors des listes et totaux publics de donateurs. Les donateurs ont besoin d'un portefeuille compatible avec les paiements silencieux pour envoyer. S'ils n'en ont pas, leur don ne peut pas passer.",
           "**Les deux.** {{appName}} génère un seul QR code qui encode les deux points de terminaison. Les portefeuilles de paiements silencieux le lisent comme privé ; les portefeuilles ordinaires paient l'adresse publique. Les donateurs n'ont pas à choisir.",
-          "Accepter les deux est généralement le bon choix : vous obtenez des dons privés de soutiens qui utilisent un portefeuille de paiements silencieux, et vous restez ouvert aux donateurs dont le seul Bitcoin est dans une application grand public."
+          "Accepter les deux est généralement le bon choix : vous obtenez des dons privés de soutiens qui utilisent un portefeuille de paiements silencieux, et vous restez ouvert aux donateurs dont le seul Bitcoin est dans une application grand public.",
+          "Dans votre portefeuille {{appName}}, ces fonds arrivent sous forme de **deux soldes séparés** — un onglet **Public** (votre adresse Bitcoin classique) et un onglet **Privé** (paiements silencieux) — affichés sur les onglets Public / Privé du portefeuille. {{appName}} les garde strictement à part volontairement : les deux soldes ne peuvent jamais être dépensés ensemble. Mélanger des fonds privés avec des fonds publics dans une seule transaction relierait vos dons par paiement silencieux, autrement non-traçables, à votre adresse publique on-chain et détruirait la confidentialité qu'ils existent pour offrir."
         ]
       },
       "whatEveryoneSees": {
@@ -2721,6 +2722,10 @@
           "Les dons silencieux arrivent également sans notifications push et n'apparaissent qu'après que vous avez scanné votre portefeuille, ce qui peut prendre minutes à heures. Rien de tout cela n'affecte la sécurité de vos fonds ; cela façonne seulement l'expérience quotidienne."
         ]
       },
+      "twoWallets": {
+        "title": "Gardez vos soldes Public et Privé séparés",
+        "body": "Votre portefeuille {{appName}} affiche deux onglets : **Public** (votre adresse Bitcoin classique) et **Privé** (paiements silencieux). Ils sont gardés strictement à part, et les deux soldes ne peuvent jamais être dépensés dans la même transaction — c'est cette isolation qui garde vos dons privés non-traçables. Quand vous retirez depuis l'onglet **Privé**, envoyez vers une adresse de paiement silencieux (**sp1…**), qui reste privée. Si à la place vous envoyez des fonds privés vers une adresse on-chain nue, {{appName}} la vérifie : si l'adresse a déjà été utilisée, ou appartient à votre propre portefeuille public, il vous avertit et vous oblige à appuyer sur **Envoyer quand même**, car faire cela relie vos fonds privés à l'historique public de cette adresse. Envoyer vers une adresse **sp1…** ne déclenche jamais l'avertissement."
+      },
       "movePromptly": {
         "heading": "Déplacez les dons rapidement",
         "steps": {
@@ -2736,7 +2741,7 @@
       },
       "cashout": {
         "heading": "Retirer en privé",
-        "intro": "Dépenser on-chain crée une trace à moins que vous ne la brisiez d'abord. La sortie de confidentialité la plus simple est de **déplacer d'abord les fonds vers un portefeuille de paiements silencieux**, puis de dépenser ensuite ; le saut brise le lien entre votre adresse de campagne et ce qui vient après. Les autres options ci-dessous fonctionnent également et ont leurs propres compromis.",
+        "intro": "Dépenser on-chain crée une trace à moins que vous ne la brisiez d'abord. Retirez depuis l'onglet **Privé** pour garder vos dons par paiement silencieux non-traçables — envoyez d'abord vers un portefeuille de paiements silencieux (une adresse **sp1…**), puis dépensez ensuite ; le saut brise le lien entre votre campagne et ce qui vient après. N'envoyez pas de fonds privés vers une adresse réutilisée ou publique, ce qui les relierait à nouveau. Les autres options ci-dessous fonctionnent également et ont leurs propres compromis.",
         "options": {
           "silentHop": {
             "name": "Saut vers un portefeuille de paiements silencieux",

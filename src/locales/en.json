@@ -545,7 +545,7 @@
         "description": "Donations are sent as BIP-352 silent payments. Each one lands at a fresh, unlinkable Bitcoin output that an observer staring at the blockchain can't tie back to the campaign.",
         "bullet1": "Donation trail can't be reconstructed on-chain",
         "bullet2": "Protects activists facing serious adversaries",
-        "bullet3": "Lands directly in the activist's wallet, no server in the middle",
+        "bullet3": "Kept in a separate private balance, never mixed with public funds",
         "tradeoffTitle": "Trade-off: Silent payments are early.",
         "tradeoffIntro": "The most private way to receive Bitcoin on-chain, but the ecosystem is young and rough today:",
         "tradeoffBullet1": "Few wallets support it.",
@@ -2451,7 +2451,7 @@
         "question": "What is the wallet on {{appName}}?",
         "answer": [
           "Your {{appName}} wallet is a **self-custodial** Bitcoin wallet, built from your Nostr key. {{appName}} never holds your funds — the wallet runs in your browser and signs transactions locally with a key only you control. It can receive Bitcoin both ways — as a public address that any Bitcoin wallet can pay, and as a silent-payments code that capable wallets can pay privately. There's nothing to sign up for; it exists the moment you have an account.",
-          "When you create a campaign, you pick whether to accept public payments, private payments, or both. To spend what you receive, see the **Activist Guide**.",
+          "The wallet has two tabs: **Public** (your regular Bitcoin address) and **Private** (silent payments). The two balances are kept strictly separate and can never be spent together — that isolation is what keeps private donations unlinkable on-chain. When you create a campaign, you pick whether to accept public payments, private payments, or both. To spend what you receive, see the **Activist Guide**.",
           "You can also export your wallet's 24-word seed phrase and import it into any standard Bitcoin wallet — see \"Can I export my {{appName}} wallet to another Bitcoin wallet?\" below."
         ]
       },
@@ -2761,7 +2761,8 @@
           "**Public payments only.** A regular Bitcoin address. Visible to everyone, works with every wallet.",
           "**Silent payments only.** BIP-352 silent payments. The receiving side is unlinkable on-chain, so donations stay out of public donor lists and totals. Donors need a silent-payments-capable wallet to send. If they don't have one, their donation can't go through.",
           "**Both.** {{appName}} generates a single QR code that encodes both endpoints. Silent-payments wallets read it as private; ordinary wallets pay the public address. Donors don't have to choose.",
-          "Accepting both is usually the right call: you get private donations from supporters who use a silent-payments wallet, and you stay open to donors whose only Bitcoin is in a consumer app."
+          "Accepting both is usually the right call: you get private donations from supporters who use a silent-payments wallet, and you stay open to donors whose only Bitcoin is in a consumer app.",
+          "Inside your {{appName}} wallet, these arrive as **two separate balances** — a **Public** tab (your regular Bitcoin address) and a **Private** tab (silent payments) — shown on the wallet's Public / Private tabs. {{appName}} keeps them strictly apart on purpose: the two balances can never be spent together. Mixing private funds with public ones in a single transaction would link your unlinkable silent-payment donations back to your public address on-chain and destroy the privacy they exist to provide."
         ]
       },
       "whatEveryoneSees": {
@@ -2781,6 +2782,10 @@
           "Silent-payment donations also arrive without push notifications and only appear after you scan your wallet, which can take minutes to hours. None of this affects the safety of your funds; it just shapes the day-to-day experience."
         ]
       },
+      "twoWallets": {
+        "title": "Keep your Public and Private balances separate",
+        "body": "Your {{appName}} wallet shows two tabs: **Public** (your regular Bitcoin address) and **Private** (silent payments). They're kept strictly apart, and the two balances can never be spent in the same transaction — that isolation is what keeps your private donations unlinkable. When you cash out from the **Private** tab, send to a silent-payment address (**sp1…**), which stays private. If you instead send private funds to a bare on-chain address, {{appName}} checks it: if the address has been used before, or belongs to your own public wallet, it warns you and makes you tap **Send anyway**, because doing so links your private funds to that address's public history. Sending to an **sp1…** address never triggers the warning."
+      },
       "movePromptly": {
         "heading": "Move donations promptly",
         "steps": {
@@ -2796,7 +2801,7 @@
       },
       "cashout": {
         "heading": "Cashing out privately",
-        "intro": "Spending on-chain creates a trail unless you break it first. The simplest privacy exit is to **move funds into a silent-payments wallet first**, then spend onward; the hop breaks the link between your campaign address and what comes next. The other options below also work and have their own trade-offs.",
+        "intro": "Spending on-chain creates a trail unless you break it first. Cash out from the **Private** tab to keep silent-payment donations unlinkable — send to a silent-payments wallet first (an **sp1…** address), then spend onward; the hop breaks the link between your campaign and what comes next. Don't send private funds to a reused or public address, which re-links them. The other options below also work and have their own trade-offs.",
         "options": {
           "silentHop": {
             "name": "Silent-payments wallet hop",

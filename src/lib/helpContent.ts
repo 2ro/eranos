@@ -382,10 +382,11 @@ const DONOR_GUIDE_STRUCTURE: GuideBlockStructure[] = [
 
 const ACTIVIST_GUIDE_STRUCTURE: GuideBlockStructure[] = [
   { kind: 'tldr', id: 'tldr' },
-  { kind: 'prose', id: 'howReceiving', paragraphCount: 5, hasHeading: true },
+  { kind: 'prose', id: 'howReceiving', paragraphCount: 6, hasHeading: true },
   { kind: 'prose', id: 'whatEveryoneSees', paragraphCount: 2, hasHeading: true },
   { kind: 'paymentComparison', id: 'comparison', audience: 'activist', hasFootnote: true },
   { kind: 'prose', id: 'silentToday', paragraphCount: 2, hasHeading: true },
+  { kind: 'callout', id: 'twoWallets', variant: 'info' },
   {
     kind: 'steps',
     id: 'movePromptly',

@@ -552,7 +552,7 @@
         "description": "Michango hutumwa kama malipo ya kimya ya BIP-352. Kila moja huingia kwenye matokeo mapya ya Bitcoin yasiyounganika ambayo mtazamaji anayechunguza mnyororo hawezi kuyaunganisha tena na kampeni.",
         "bullet1": "Njia ya mchango haiwezi kujengwa upya katika mnyororo",
         "bullet2": "Inalinda wanaharakati wanaokabili maadui makubwa",
-        "bullet3": "Inaingia moja kwa moja kwenye pochi ya mwanaharakati, hakuna seva katikati",
+        "bullet3": "Huhifadhiwa katika salio la faragha lililo tofauti, kamwe halichanganywi na fedha za umma",
         "tradeoffTitle": "Athari: Malipo ya kimya bado ni mapya.",
         "tradeoffIntro": "Njia ya faragha zaidi ya kupokea Bitcoin katika mnyororo, lakini mfumo bado ni mchanga na mbaya leo:",
         "tradeoffBullet1": "Pochi chache zinaiunga mkono.",
@@ -2289,7 +2289,7 @@
         "question": "Pochi ya {{appName}} ni nini?",
         "answer": [
           "Pochi yako ya {{appName}} ni pochi ya Bitcoin ya **kujihifadhi**, iliyojengwa kutoka kwa funguo yako ya Nostr. {{appName}} kamwe haishiki fedha zako — pochi inaendesha katika kivinjari chako na kusaini miamala ndani ya nchi kwa funguo unayoidhibiti wewe tu. Inaweza kupokea Bitcoin njia zote mbili — kama anwani ya umma ambayo pochi yoyote ya Bitcoin inaweza kulipa, na kama msimbo wa malipo ya kimya ambao pochi zenye uwezo zinaweza kulipa kwa faragha. Hakuna cha kujisajilia; ipo wakati una akaunti.",
-          "Unapounda kampeni, unachagua kukubali malipo ya umma, malipo ya faragha, au zote mbili. Kutumia unachopokea, ona **Mwongozo wa Mwanaharakati**.",
+          "Pochi ina vichupo viwili: **Umma** (anwani yako ya kawaida ya Bitcoin) na **Faragha** (malipo ya kimya). Masalio hayo mawili huwekwa tofauti kabisa na kamwe hayawezi kutumika pamoja — utengano huo ndio unaofanya michango ya faragha isiunganike katika mnyororo. Unapounda kampeni, unachagua kama utakubali malipo ya umma, malipo ya faragha, au zote mbili. Kutumia unachopokea, ona **Mwongozo wa Mwanaharakati**.",
           "Unaweza pia kuhamisha kifungu cha maneno 24 cha mbegu ya pochi yako na kukileta katika pochi yoyote ya kawaida ya Bitcoin — ona \"Je, naweza kuhamisha pochi yangu ya {{appName}} kwa pochi nyingine ya Bitcoin?\" hapa chini."
         ]
       },
@@ -2599,7 +2599,8 @@
           "**Malipo ya umma pekee.** Anwani ya kawaida ya Bitcoin. Inaonekana kwa kila mtu, inafanya kazi na kila pochi.",
           "**Malipo ya kimya pekee.** Malipo ya kimya ya BIP-352. Upande wa kupokea hauunganiki katika mnyororo, kwa hivyo michango inabaki nje ya orodha za wafadhili za umma na jumla. Wafadhili wanahitaji pochi yenye uwezo wa malipo ya kimya kutuma. Ikiwa hawana, mchango wao hauwezi kupita.",
           "**Zote mbili.** {{appName}} hutoa msimbo mmoja wa QR unaosimba ncha zote mbili. Pochi za malipo ya kimya huusoma kama wa faragha; pochi za kawaida hulipa anwani ya umma. Wafadhili hawana haja ya kuchagua.",
-          "Kukubali zote mbili kawaida ndio uamuzi sahihi: unapata michango ya faragha kutoka kwa wafuasi wanaotumia pochi ya malipo ya kimya, na unabaki wazi kwa wafadhili ambao Bitcoin yao pekee iko kwenye programu ya watumiaji."
+          "Kukubali zote mbili kawaida ndio uamuzi sahihi: unapata michango ya faragha kutoka kwa wafuasi wanaotumia pochi ya malipo ya kimya, na unabaki wazi kwa wafadhili ambao Bitcoin yao pekee iko kwenye programu ya watumiaji.",
+          "Ndani ya pochi yako ya {{appName}}, hizi hufika kama **masalio mawili tofauti** — kichupo cha **Umma** (anwani yako ya kawaida ya Bitcoin) na kichupo cha **Faragha** (malipo ya kimya) — vinavyoonyeshwa kwenye vichupo vya Umma / Faragha vya pochi. {{appName}} huviweka tofauti kabisa kwa makusudi: masalio hayo mawili kamwe hayawezi kutumika pamoja. Kuchanganya fedha za faragha na za umma katika muamala mmoja kungeunganisha tena michango yako ya malipo ya kimya isiyounganika na anwani yako ya umma katika mnyororo na kuharibu faragha waliyo nayo ili kuitoa."
         ]
       },
       "whatEveryoneSees": {
@@ -2619,6 +2620,10 @@
           "Michango ya malipo ya kimya pia hufika bila arifa za kusukuma na huonekana tu baada ya kuchanganua pochi yako, ambayo inaweza kuchukua dakika hadi saa. Hakuna kati ya hii inayoathiri usalama wa fedha zako; inaunda tu uzoefu wa kila siku."
         ]
       },
+      "twoWallets": {
+        "title": "Weka masalio yako ya Umma na Faragha tofauti",
+        "body": "Pochi yako ya {{appName}} huonyesha vichupo viwili: **Umma** (anwani yako ya kawaida ya Bitcoin) na **Faragha** (malipo ya kimya). Vinawekwa tofauti kabisa, na masalio hayo mawili kamwe hayawezi kutumika katika muamala mmoja — utengano huo ndio unaofanya michango yako ya faragha isiunganike. Unapotoa pesa kutoka kichupo cha **Faragha**, tuma kwa anwani ya malipo ya kimya (**sp1…**), ambayo hubaki ya faragha. Ikiwa badala yake utatuma fedha za faragha kwa anwani tupu ya katika-mnyororo, {{appName}} huikagua: ikiwa anwani imetumika hapo awali, au ni ya pochi yako mwenyewe ya umma, hukuonya na kukulazimu kugusa **Send anyway**, kwa sababu kufanya hivyo huunganisha fedha zako za faragha na historia ya umma ya anwani hiyo. Kutuma kwa anwani ya **sp1…** kamwe hakusababishi onyo."
+      },
       "movePromptly": {
         "heading": "Hamisha michango haraka",
         "steps": {
@@ -2634,7 +2639,7 @@
       },
       "cashout": {
         "heading": "Kutoa pesa kwa faragha",
-        "intro": "Kutumia katika mnyororo huunda njia isipokuwa uvunje kwanza. Njia rahisi ya faragha ya kutoka ni **kuhamisha fedha kwenye pochi ya malipo ya kimya kwanza**, kisha kutumia mbele; mruko huvunja kiungo kati ya anwani yako ya kampeni na kile kinachofuata. Chaguzi zingine hapa chini pia hufanya kazi na zina athari zao.",
+        "intro": "Kutumia katika mnyororo huunda njia isipokuwa uvunje kwanza. Toa pesa kutoka kichupo cha **Faragha** ili michango ya malipo ya kimya ibaki isiyounganika — tuma kwanza kwa pochi ya malipo ya kimya (anwani ya **sp1…**), kisha tumia mbele; mruko huvunja kiungo kati ya kampeni yako na kile kinachofuata. Usitume fedha za faragha kwa anwani iliyotumika tena au ya umma, jambo ambalo linaziunganisha tena. Chaguzi zingine hapa chini pia hufanya kazi na zina athari zao.",
         "options": {
           "silentHop": {
             "name": "Mruko wa pochi ya malipo ya kimya",
