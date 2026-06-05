@@ -33,14 +33,6 @@ import type { ParsedCampaign } from '@/lib/campaign';
 const FEATURED_SKELETON_CAP = 8;
 
 /**
- * Maximum number of campaigns shown in the featured hero row on the
- * home page. The layout is two large hero cards on top followed by a
- * single 4-up row, so 6 is the visual cap. List members beyond the
- * cap are accessible from the dedicated list detail page.
- */
-const FEATURED_HERO_CAP = 6;
-
-/**
  * Slug of the curated list that powers the home-page hero row.
  * Matches the curator-published kind-30003 event with
  * `d=featured-campaigns` and `t=agora.campaign-list`. The list's own
@@ -53,14 +45,15 @@ const FEATURED_LIST_SLUG = 'featured-campaigns';
  *
  * Two public sections:
  *
- *  1. **Featured hero row** — the campaigns inside the curated
+ *  1. **Featured hero row** — every campaign inside the curated
  *     `featured-campaigns` list (a curator-published kind 30003
- *     NIP-51 bookmark set), in list order, capped at
- *     {@link FEATURED_HERO_CAP} for visual weight. The list's own
- *     detail page at `/campaigns/lists/featured-campaigns` exposes the
- *     full membership without a cap. Replaces the previous
- *     `featured`-label-based row — featuring is no longer a
- *     campaign-level concept; lists are.
+ *     NIP-51 bookmark set), in list order. The hero layout gives the
+ *     first two cards extra visual weight (column-spanning) and flows
+ *     the rest in a 4-up grid, so the row scales to however many
+ *     campaigns the curator has added. The list's own detail page at
+ *     `/campaigns/lists/featured-campaigns` shows the same membership.
+ *     Replaces the previous `featured`-label-based row — featuring is
+ *     no longer a campaign-level concept; lists are.
  *  2. **Topic-list strip + Browse all** — the curated
  *     {@link CampaignListsStrip} (moderator-managed topic pills) plus
  *     a single CTA to `/campaigns`, the full discoverable set with
@@ -87,11 +80,11 @@ export function CampaignsPage() {
   // membership.
   const { list: featuredList, isLoading: listLoading } = useCampaignList(FEATURED_LIST_SLUG);
 
-  // Cap the displayed coords. Beyond the cap, members are still
-  // visible from the dedicated list detail page; the home row
-  // shows the top {@link FEATURED_HERO_CAP}.
-  const cappedCoords = useMemo(
-    () => (featuredList?.coords ?? []).slice(0, FEATURED_HERO_CAP),
+  // All coords declared by the list, in order. The hero row shows
+  // every featured campaign — the layout (two large cards + 4-up
+  // tail) scales to whatever the curator has added, so we don't cap.
+  const coords = useMemo(
+    () => featuredList?.coords ?? [],
     [featuredList],
   );
 
@@ -100,8 +93,8 @@ export function CampaignsPage() {
   // result when the list isn't loaded yet (so we don't fire a
   // useless fan-out before the list event arrives).
   const { data: heroCampaigns, isLoading: heroLoading } = useCampaigns(
-    cappedCoords.length > 0
-      ? { coordinates: cappedCoords }
+    coords.length > 0
+      ? { coordinates: coords }
       : { coordinates: [] },
   );
 
@@ -109,15 +102,15 @@ export function CampaignsPage() {
   // events in network order which we override here so the hero row
   // always reflects the curator's intent.
   const orderedCampaigns = useMemo<ParsedCampaign[]>(() => {
-    if (!heroCampaigns || cappedCoords.length === 0) return [];
+    if (!heroCampaigns || coords.length === 0) return [];
     const byCoord = new Map(heroCampaigns.map((c) => [c.aTag, c]));
     const out: ParsedCampaign[] = [];
-    for (const coord of cappedCoords) {
+    for (const coord of coords) {
       const found = byCoord.get(coord);
       if (found) out.push(found);
     }
     return out;
-  }, [heroCampaigns, cappedCoords]);
+  }, [heroCampaigns, coords]);
 
   useSeoMeta({
     title: `${t('campaigns.home.seoTitle')} | ${config.appName}`,
@@ -132,7 +125,7 @@ export function CampaignsPage() {
   const showFeaturedSection =
     (featuredList && featuredList.coords.length > 0) ||
     listLoading ||
-    (heroLoading && cappedCoords.length > 0);
+    (heroLoading && coords.length > 0);
 
   return (
     <main className="min-h-screen">
@@ -170,7 +163,7 @@ export function CampaignsPage() {
               <HeroRow
                 campaigns={orderedCampaigns}
                 isLoading={heroLoading || listLoading}
-                expectedCount={cappedCoords.length || 2}
+                expectedCount={coords.length || 2}
               />
             )}
           </section>
