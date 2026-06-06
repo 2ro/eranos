@@ -247,11 +247,16 @@ function CampaignItemsInner(props: {
   //
   // The verification row is gated separately (by the labeler allowlist,
   // not the moderator pack), so it's rendered here as a sibling rather
-  // than inside the shell. The moderator rows only render when the user
-  // is a mod; the verify row only when they're a labeler — the two sets
-  // can differ, and either alone is enough to mount this menu.
+  // than inside the shell. It sits at the TOP of the menu; the moderator
+  // rows (when present) follow below a separator. The verify row only
+  // renders for labelers, the moderator rows only for mods — the two
+  // sets can differ, and either alone is enough to mount this menu.
   return (
     <>
+      <CampaignVerifyItem
+        coord={props.coord}
+        entityTitle={props.entityTitle}
+      />
       {isMod && (
         <ModerationItemsShell
           coord={props.coord}
@@ -262,11 +267,6 @@ function CampaignItemsInner(props: {
           onAddToList={props.onAddToList}
         />
       )}
-      <CampaignVerifyItem
-        coord={props.coord}
-        entityTitle={props.entityTitle}
-        showLeadingSeparator={isMod}
-      />
     </>
   );
 }
@@ -280,12 +280,9 @@ function CampaignItemsInner(props: {
 function CampaignVerifyItem({
   coord,
   entityTitle,
-  showLeadingSeparator,
 }: {
   coord: string;
   entityTitle: string;
-  /** Render a separator above the row (when moderator rows precede it). */
-  showLeadingSeparator: boolean;
 }) {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -328,7 +325,6 @@ function CampaignVerifyItem({
 
   return (
     <>
-      {showLeadingSeparator && <DropdownMenuSeparator />}
       {mine ? (
         <DropdownMenuItem onClick={onUnverify} disabled={busy}>
           <BadgeCheck className="h-4 w-4 mr-2" />
