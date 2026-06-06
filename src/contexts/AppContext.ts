@@ -291,6 +291,18 @@ export interface AppConfig {
   /** Hex pubkey of the curator whose follow list defines the curated feed. */
   curatorPubkey?: string;
   /**
+   * Hex pubkeys trusted to issue `agora.verified` campaign-verification labels
+   * (NIP-32 kind 1985, value `verified`). A labeler's avatar is shown as a
+   * badge over campaigns it has verified; multiple labelers stack. When a
+   * labeler is logged in they gain verify / unverify controls.
+   *
+   * This is a trust allowlist — the verification query filters by
+   * `authors: labelers`, so a `verified` label from anyone outside this list
+   * is never read. Default: the same Team Soapbox curator pubkey used
+   * elsewhere.
+   */
+  labelers: string[];
+  /**
    * Ordered list of base URLs for Esplora-compatible Bitcoin REST APIs. Used
    * by the wallet, on-chain zap flows, and NIP-73 Bitcoin tx/address pages.
    * Each URL is the standard Esplora REST root (no version segment, no

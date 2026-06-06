@@ -1107,6 +1107,21 @@
     "openInWallet": "Open in wallet",
     "payWithAgoraWallet": "Pay with Agora"
   },
+  "campaignVerification": {
+    "verifiedBy": "Verified by",
+    "verifiedByCount_zero": "Verified by {{count}} labelers",
+    "verifiedByCount_one": "Verified by {{count}} labeler",
+    "verifiedByCount_two": "Verified by {{count}} labelers",
+    "verifiedByCount_few": "Verified by {{count}} labelers",
+    "verifiedByCount_many": "Verified by {{count}} labelers",
+    "verifiedByCount_other": "Verified by {{count}} labelers",
+    "notVerified": "Not yet verified",
+    "verifyCampaign": "Verify this campaign",
+    "removeVerification": "Remove my verification",
+    "verified": "Campaign verified",
+    "unverified": "Verification removed",
+    "actionFailed": "Action failed"
+  },
   "calendarEvents": {
     "create": {
       "seoTitle": "Create event",

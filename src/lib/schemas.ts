@@ -151,6 +151,8 @@ export const AppConfigSchema = z.object({
   imageProxy: z.string(),
   lowBandwidthMode: z.boolean(),
   curatorPubkey: z.string().regex(/^[0-9a-f]{64}$/i).optional(),
+  /** Hex pubkeys trusted to issue `agora.verified` campaign-verification labels. */
+  labelers: z.array(z.string().regex(/^[0-9a-f]{64}$/i)).optional().default([]),
   /**
    * Ordered list of Esplora REST roots tried in failover order. Accepts the
    * legacy single-string form and normalizes it to a one-element array so

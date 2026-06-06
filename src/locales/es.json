@@ -668,6 +668,17 @@
     "payWithAgoraWallet": "Pagar con Agora",
     "openExternalWallet": "Abrir cartera externa"
   },
+  "campaignVerification": {
+    "verifiedBy": "Verificado por",
+    "verifiedByCount_one": "Verificado por {{count}} verificador",
+    "verifiedByCount_other": "Verificado por {{count}} verificadores",
+    "notVerified": "Aún sin verificar",
+    "verifyCampaign": "Verificar esta campaña",
+    "removeVerification": "Quitar mi verificación",
+    "verified": "Campaña verificada",
+    "unverified": "Verificación eliminada",
+    "actionFailed": "La acción falló"
+  },
   "calendarEvents": {
     "create": {
       "seoTitle": "Crear evento",

@@ -1109,6 +1109,17 @@
     "payWithAgoraWallet": "Agora से भुगतान करें",
     "openExternalWallet": "बाहरी वॉलेट खोलें"
   },
+  "campaignVerification": {
+    "verifiedBy": "द्वारा सत्यापित",
+    "verifiedByCount_one": "{{count}} सत्यापनकर्ता द्वारा सत्यापित",
+    "verifiedByCount_other": "{{count}} सत्यापनकर्ताओं द्वारा सत्यापित",
+    "notVerified": "अभी तक सत्यापित नहीं",
+    "verifyCampaign": "इस अभियान को सत्यापित करें",
+    "removeVerification": "मेरा सत्यापन हटाएँ",
+    "verified": "अभियान सत्यापित",
+    "unverified": "सत्यापन हटाया गया",
+    "actionFailed": "कार्रवाई विफल"
+  },
   "calendarEvents": {
     "create": {
       "seoTitle": "इवेंट बनाएँ",

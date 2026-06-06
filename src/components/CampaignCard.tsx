@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { HandHeart, ShieldCheck } from 'lucide-react';
 
 import { AuthorByline } from '@/components/AuthorByline';
+import { CampaignVerificationBadge } from '@/components/CampaignVerificationBadge';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -242,6 +243,15 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
           <div
             aria-hidden
             className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 to-transparent"
+          />
+
+          {/* Top-left verification badge — stacked labeler avatars for
+              campaigns vouched for by trusted labelers. Renders nothing
+              for unverified campaigns unless the viewer is a labeler. */}
+          <CampaignVerificationBadge
+            coord={campaign.aTag}
+            title={campaign.title}
+            className="absolute top-3 left-3 z-10"
           />
 
           {/* Bottom-left meta chips — country. */}

@@ -101,6 +101,14 @@ const NostrProvider: React.FC<NostrProviderProps> = (props) => {
           return new Map(DITTO_RELAYS.map(url => [url, filters]));
         }
 
+        // Route NIP-32 label requests (kind 1985) to the search relays.
+        // Agora's moderation and verification labels live on relay.ditto.pub
+        // / relay.dreamith.to; pinning the read here keeps label coverage
+        // predictable and off the general read pool.
+        if (filters.every((f) => f?.kinds?.length === 1 && f?.kinds[0] === 1985)) {
+          return new Map(DITTO_RELAYS.map(url => [url, filters]));
+        }
+
         // Include divine relay for kind 34236 queries, which are addressable short videos
         if (filters.every((f) => f?.kinds?.length === 1 && f?.kinds[0] === 34236)) {
           return new Map([...DITTO_RELAYS, DIVINE_RELAY].map(url => [url, filters]));

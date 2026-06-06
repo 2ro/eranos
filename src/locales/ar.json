@@ -658,6 +658,21 @@
     "payWithAgoraWallet": "الدفع عبر Agora",
     "openExternalWallet": "فتح محفظة خارجية"
   },
+  "campaignVerification": {
+    "verifiedBy": "موثّق من قبل",
+    "verifiedByCount_zero": "لم يوثّقها أحد",
+    "verifiedByCount_one": "موثّقة من قبل موثِّق واحد",
+    "verifiedByCount_two": "موثّقة من قبل موثِّقَين",
+    "verifiedByCount_few": "موثّقة من قبل {{count}} موثِّقين",
+    "verifiedByCount_many": "موثّقة من قبل {{count}} موثِّقًا",
+    "verifiedByCount_other": "موثّقة من قبل {{count}} موثِّق",
+    "notVerified": "لم تُوثّق بعد",
+    "verifyCampaign": "وثّق هذه الحملة",
+    "removeVerification": "إزالة توثيقي",
+    "verified": "تم توثيق الحملة",
+    "unverified": "تمت إزالة التوثيق",
+    "actionFailed": "فشل الإجراء"
+  },
   "calendarEvents": {
     "create": {
       "seoTitle": "إنشاء حدث",

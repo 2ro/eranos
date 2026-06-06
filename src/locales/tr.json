@@ -1110,6 +1110,17 @@
     "payWithAgoraWallet": "Agora ile öde",
     "openExternalWallet": "Harici cüzdanı aç"
   },
+  "campaignVerification": {
+    "verifiedBy": "Doğrulayan",
+    "verifiedByCount_one": "{{count}} doğrulayıcı tarafından doğrulandı",
+    "verifiedByCount_other": "{{count}} doğrulayıcı tarafından doğrulandı",
+    "notVerified": "Henüz doğrulanmadı",
+    "verifyCampaign": "Bu kampanyayı doğrula",
+    "removeVerification": "Doğrulamamı kaldır",
+    "verified": "Kampanya doğrulandı",
+    "unverified": "Doğrulama kaldırıldı",
+    "actionFailed": "İşlem başarısız oldu"
+  },
   "calendarEvents": {
     "create": {
       "seoTitle": "Etkinlik oluştur",

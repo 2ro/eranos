@@ -670,6 +670,17 @@
     "payWithAgoraWallet": "Bhadhara neAgora",
     "openExternalWallet": "Vhura chikwama chekunze"
   },
+  "campaignVerification": {
+    "verifiedBy": "Yasimbiswa na",
+    "verifiedByCount_one": "Yasimbiswa nemusimbisi {{count}}",
+    "verifiedByCount_other": "Yasimbiswa nevasimbisi {{count}}",
+    "notVerified": "Haisati yasimbiswa",
+    "verifyCampaign": "Simbisa mushandirapamwe uyu",
+    "removeVerification": "Bvisa kusimbisa kwangu",
+    "verified": "Mushandirapamwe wasimbiswa",
+    "unverified": "Kusimbisa kwabviswa",
+    "actionFailed": "Chiito chatadza"
+  },
   "calendarEvents": {
     "create": {
       "seoTitle": "Gadzira chiitiko",

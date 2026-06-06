@@ -1111,6 +1111,17 @@
     "payWithAgoraWallet": "Pagar com Agora",
     "openExternalWallet": "Abrir carteira externa"
   },
+  "campaignVerification": {
+    "verifiedBy": "Verificado por",
+    "verifiedByCount_one": "Verificado por {{count}} verificador",
+    "verifiedByCount_other": "Verificado por {{count}} verificadores",
+    "notVerified": "Ainda não verificado",
+    "verifyCampaign": "Verificar esta campanha",
+    "removeVerification": "Remover minha verificação",
+    "verified": "Campanha verificada",
+    "unverified": "Verificação removida",
+    "actionFailed": "Falha na ação"
+  },
   "calendarEvents": {
     "create": {
       "seoTitle": "Criar evento",

@@ -115,6 +115,7 @@ export function TestApp({ children }: TestAppProps) {
     imageQuality: 'compressed',
     imageProxy: '',
     lowBandwidthMode: false,
+    labelers: ['932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d'],
     esploraApis: ['https://mempool.space/api'],
     blockbookBaseUrl: 'https://btc.trezor.io',
     bip352IndexerUrl: '',

@@ -1109,6 +1109,19 @@
     "payWithAgoraWallet": "Оплатить через Agora",
     "openExternalWallet": "Открыть внешний кошелёк"
   },
+  "campaignVerification": {
+    "verifiedBy": "Проверено",
+    "verifiedByCount_one": "Проверено {{count}} проверяющим",
+    "verifiedByCount_few": "Проверено {{count}} проверяющими",
+    "verifiedByCount_many": "Проверено {{count}} проверяющими",
+    "verifiedByCount_other": "Проверено {{count}} проверяющими",
+    "notVerified": "Ещё не проверено",
+    "verifyCampaign": "Проверить эту кампанию",
+    "removeVerification": "Убрать мою проверку",
+    "verified": "Кампания проверена",
+    "unverified": "Проверка удалена",
+    "actionFailed": "Не удалось выполнить действие"
+  },
   "calendarEvents": {
     "create": {
       "seoTitle": "Создать событие",

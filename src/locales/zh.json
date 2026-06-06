@@ -670,6 +670,17 @@
     "payWithAgoraWallet": "使用 Agora 支付",
     "openExternalWallet": "打开外部钱包"
   },
+  "campaignVerification": {
+    "verifiedBy": "验证者",
+    "verifiedByCount_one": "已由 {{count}} 位验证者验证",
+    "verifiedByCount_other": "已由 {{count}} 位验证者验证",
+    "notVerified": "尚未验证",
+    "verifyCampaign": "验证此活动",
+    "removeVerification": "移除我的验证",
+    "verified": "活动已验证",
+    "unverified": "验证已移除",
+    "actionFailed": "操作失败"
+  },
   "calendarEvents": {
     "create": {
       "seoTitle": "创建事件",

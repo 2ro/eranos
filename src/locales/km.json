@@ -668,6 +668,17 @@
     "payWithAgoraWallet": "បង់ដោយ Agora",
     "openExternalWallet": "បើកកាបូបខាងក្រៅ"
   },
+  "campaignVerification": {
+    "verifiedBy": "បានផ្ទៀងផ្ទាត់ដោយ",
+    "verifiedByCount_one": "បានផ្ទៀងផ្ទាត់ដោយអ្នកផ្ទៀងផ្ទាត់ {{count}} នាក់",
+    "verifiedByCount_other": "បានផ្ទៀងផ្ទាត់ដោយអ្នកផ្ទៀងផ្ទាត់ {{count}} នាក់",
+    "notVerified": "មិនទាន់បានផ្ទៀងផ្ទាត់",
+    "verifyCampaign": "ផ្ទៀងផ្ទាត់យុទ្ធនាការនេះ",
+    "removeVerification": "លុបការផ្ទៀងផ្ទាត់របស់ខ្ញុំ",
+    "verified": "យុទ្ធនាការត្រូវបានផ្ទៀងផ្ទាត់",
+    "unverified": "ការផ្ទៀងផ្ទាត់ត្រូវបានលុប",
+    "actionFailed": "សកម្មភាពបានបរាជ័យ"
+  },
   "calendarEvents": {
     "create": {
       "seoTitle": "បង្កើតព្រឹត្តិការណ៍",

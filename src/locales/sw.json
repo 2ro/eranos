@@ -1108,6 +1108,17 @@
     "payWithAgoraWallet": "Lipa kwa Agora",
     "openExternalWallet": "Fungua pochi ya nje"
   },
+  "campaignVerification": {
+    "verifiedBy": "Imethibitishwa na",
+    "verifiedByCount_one": "Imethibitishwa na mthibitishaji {{count}}",
+    "verifiedByCount_other": "Imethibitishwa na wathibitishaji {{count}}",
+    "notVerified": "Bado haijathibitishwa",
+    "verifyCampaign": "Thibitisha kampeni hii",
+    "removeVerification": "Ondoa uthibitisho wangu",
+    "verified": "Kampeni imethibitishwa",
+    "unverified": "Uthibitisho umeondolewa",
+    "actionFailed": "Kitendo kimeshindwa"
+  },
   "calendarEvents": {
     "create": {
       "seoTitle": "Unda tukio",

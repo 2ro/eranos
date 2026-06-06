@@ -668,6 +668,17 @@
     "payWithAgoraWallet": "پرداخت با Agora",
     "openExternalWallet": "باز کردن کیف پول خارجی"
   },
+  "campaignVerification": {
+    "verifiedBy": "تأییدشده توسط",
+    "verifiedByCount_one": "تأییدشده توسط {{count}} تأییدکننده",
+    "verifiedByCount_other": "تأییدشده توسط {{count}} تأییدکننده",
+    "notVerified": "هنوز تأیید نشده",
+    "verifyCampaign": "این کمپین را تأیید کنید",
+    "removeVerification": "حذف تأیید من",
+    "verified": "کمپین تأیید شد",
+    "unverified": "تأیید حذف شد",
+    "actionFailed": "عملیات ناموفق بود"
+  },
   "calendarEvents": {
     "create": {
       "seoTitle": "ایجاد رویداد",
