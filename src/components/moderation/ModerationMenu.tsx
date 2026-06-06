@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Check, EyeOff, Eye, ListPlus, MoreHorizontal,
+  BadgeCheck, Check, EyeOff, Eye, ListPlus, MoreHorizontal,
   Sparkles, SparklesIcon,
 } from 'lucide-react';
 
@@ -16,9 +16,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { CampaignListMembershipDialog } from '@/components/campaign-lists/CampaignListMembershipDialog';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
+import { useCampaignLabelers } from '@/hooks/useCampaignLabelers';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useToast } from '@/hooks/useToast';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
+import { useCampaignVerifications } from '@/hooks/useCampaignVerifications';
 import { useOrganizationModeration } from '@/hooks/useOrganizationModeration';
 import { usePledgeModeration } from '@/hooks/usePledgeModeration';
 import type { ModerationLabel } from '@/lib/agoraModeration';
@@ -234,20 +236,114 @@ function CampaignItemsInner(props: {
   onAddToList?: () => void;
 }) {
   const { data, moderate } = useCampaignModeration();
+  const { user } = useCurrentUser();
+  const { data: moderators } = useCampaignModerators();
+  const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
   // The campaign surface stopped exposing the `featured` axis when
   // the curated Lists feature replaced campaign-level featuring, so
   // the rank computation is dead weight here. We still pass through
   // the shared shell because the shell drives the "Add to list…" row
   // plus Hide / Unhide.
+  //
+  // The verification row is gated separately (by the labeler allowlist,
+  // not the moderator pack), so it's rendered here as a sibling rather
+  // than inside the shell. The moderator rows only render when the user
+  // is a mod; the verify row only when they're a labeler — the two sets
+  // can differ, and either alone is enough to mount this menu.
   return (
-    <ModerationItemsShell
-      coord={props.coord}
-      entityTitle={props.entityTitle}
-      axes={props.axes}
-      moderation={data}
-      moderate={moderate}
-      onAddToList={props.onAddToList}
-    />
+    <>
+      {isMod && (
+        <ModerationItemsShell
+          coord={props.coord}
+          entityTitle={props.entityTitle}
+          axes={props.axes}
+          moderation={data}
+          moderate={moderate}
+          onAddToList={props.onAddToList}
+        />
+      )}
+      <CampaignVerifyItem
+        coord={props.coord}
+        entityTitle={props.entityTitle}
+        showLeadingSeparator={isMod}
+      />
+    </>
+  );
+}
+
+/**
+ * Verify / remove-verification row for the campaign moderation menu.
+ * Gated by the labeler allowlist (distinct from the moderator pack) —
+ * renders `null` for everyone else. Publishes an `agora.verified` label
+ * on verify and a kind 5 deletion of the labeler's own label on remove.
+ */
+function CampaignVerifyItem({
+  coord,
+  entityTitle,
+  showLeadingSeparator,
+}: {
+  coord: string;
+  entityTitle: string;
+  /** Render a separator above the row (when moderator rows precede it). */
+  showLeadingSeparator: boolean;
+}) {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const { user } = useCurrentUser();
+  const { data, isLabeler, verify, unverify } = useCampaignVerifications();
+
+  if (!isLabeler) return null;
+
+  const mine = user
+    ? (data.byCoord.get(coord) ?? []).find((v) => v.pubkey === user.pubkey)
+    : undefined;
+  const busy = verify.isPending || unverify.isPending;
+
+  const onVerify = async () => {
+    try {
+      await verify.mutateAsync({ coord });
+      toast({ title: t('campaignVerification.verified'), description: entityTitle });
+    } catch (error) {
+      toast({
+        title: t('campaignVerification.actionFailed'),
+        description: error instanceof Error ? error.message : undefined,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const onUnverify = async () => {
+    if (!mine) return;
+    try {
+      await unverify.mutateAsync({ verification: mine });
+      toast({ title: t('campaignVerification.unverified'), description: entityTitle });
+    } catch (error) {
+      toast({
+        title: t('campaignVerification.actionFailed'),
+        description: error instanceof Error ? error.message : undefined,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  return (
+    <>
+      {showLeadingSeparator && <DropdownMenuSeparator />}
+      {mine ? (
+        <DropdownMenuItem onClick={onUnverify} disabled={busy}>
+          <BadgeCheck className="h-4 w-4 mr-2" />
+          {t('campaignVerification.removeVerification')}
+          <span className="ml-auto text-xs text-muted-foreground inline-flex items-center gap-1">
+            <Check className="h-3 w-3" /> {t('campaignVerification.verifiedState')}
+          </span>
+        </DropdownMenuItem>
+      ) : (
+        <DropdownMenuItem onClick={onVerify} disabled={busy}>
+          <BadgeCheck className="h-4 w-4 mr-2" />
+          {t('campaignVerification.verifyCampaign')}
+        </DropdownMenuItem>
+      )}
+    </>
   );
 }
 
@@ -307,9 +403,15 @@ export function ModerationMenuItems(
 ) {
   const { user } = useCurrentUser();
   const { data: moderators } = useCampaignModerators();
+  const labelers = useCampaignLabelers();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
+  const isLabeler = !!user && labelers.includes(user.pubkey);
 
-  if (!isMod) return null;
+  // The campaign surface also exposes a verify row to labelers, who are a
+  // distinct allowlist from the moderator pack — so a labeler who isn't a
+  // moderator still gets the campaign menu. Other surfaces are mod-only.
+  const canShow = props.surface === 'campaign' ? isMod || isLabeler : isMod;
+  if (!canShow) return null;
 
   switch (props.surface) {
     case 'campaign':
@@ -365,10 +467,15 @@ export function ModerationMenu({ className, ...rest }: ModerationMenuProps) {
   const { t } = useTranslation();
   const { user } = useCurrentUser();
   const { data: moderators } = useCampaignModerators();
+  const labelers = useCampaignLabelers();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
+  const isLabeler = !!user && labelers.includes(user.pubkey);
   const [membershipOpen, setMembershipOpen] = useState(false);
 
-  if (!isMod) return null;
+  // Campaigns mount the menu for labelers too (verify row); other
+  // surfaces stay moderator-only.
+  const canShow = rest.surface === 'campaign' ? isMod || isLabeler : isMod;
+  if (!canShow) return null;
 
   return (
     <>

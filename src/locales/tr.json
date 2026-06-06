@@ -1117,6 +1117,7 @@
     "notVerified": "Henüz doğrulanmadı",
     "verifyCampaign": "Bu kampanyayı doğrula",
     "removeVerification": "Doğrulamamı kaldır",
+    "verifiedState": "Doğrulandı",
     "verified": "Kampanya doğrulandı",
     "unverified": "Doğrulama kaldırıldı",
     "actionFailed": "İşlem başarısız oldu"

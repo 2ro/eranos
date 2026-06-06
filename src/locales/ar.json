@@ -669,6 +669,7 @@
     "notVerified": "لم تُوثّق بعد",
     "verifyCampaign": "وثّق هذه الحملة",
     "removeVerification": "إزالة توثيقي",
+    "verifiedState": "موثَّقة",
     "verified": "تم توثيق الحملة",
     "unverified": "تمت إزالة التوثيق",
     "actionFailed": "فشل الإجراء"

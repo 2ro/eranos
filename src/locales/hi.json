@@ -1116,6 +1116,7 @@
     "notVerified": "अभी तक सत्यापित नहीं",
     "verifyCampaign": "इस अभियान को सत्यापित करें",
     "removeVerification": "मेरा सत्यापन हटाएँ",
+    "verifiedState": "सत्यापित",
     "verified": "अभियान सत्यापित",
     "unverified": "सत्यापन हटाया गया",
     "actionFailed": "कार्रवाई विफल"

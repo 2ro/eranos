@@ -1116,6 +1116,7 @@
     "notVerified": "Belum diverifikasi",
     "verifyCampaign": "Verifikasi kampanye ini",
     "removeVerification": "Hapus verifikasi saya",
+    "verifiedState": "Terverifikasi",
     "verified": "Kampanye terverifikasi",
     "unverified": "Verifikasi dihapus",
     "actionFailed": "Tindakan gagal"

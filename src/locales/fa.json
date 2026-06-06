@@ -675,6 +675,7 @@
     "notVerified": "هنوز تأیید نشده",
     "verifyCampaign": "این کمپین را تأیید کنید",
     "removeVerification": "حذف تأیید من",
+    "verifiedState": "تأییدشده",
     "verified": "کمپین تأیید شد",
     "unverified": "تأیید حذف شد",
     "actionFailed": "عملیات ناموفق بود"

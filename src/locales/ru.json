@@ -1118,6 +1118,7 @@
     "notVerified": "Ещё не проверено",
     "verifyCampaign": "Проверить эту кампанию",
     "removeVerification": "Убрать мою проверку",
+    "verifiedState": "Проверено",
     "verified": "Кампания проверена",
     "unverified": "Проверка удалена",
     "actionFailed": "Не удалось выполнить действие"

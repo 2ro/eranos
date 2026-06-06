@@ -677,6 +677,7 @@
     "notVerified": "تر اوسه تصدیق شوی نه دی",
     "verifyCampaign": "دا کمپاین تصدیق کړئ",
     "removeVerification": "زما تصدیق لرې کړئ",
+    "verifiedState": "تصدیق شوی",
     "verified": "کمپاین تصدیق شو",
     "unverified": "تصدیق لرې شو",
     "actionFailed": "کړنه ناکامه شوه"

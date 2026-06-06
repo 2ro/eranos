@@ -675,6 +675,7 @@
     "notVerified": "Aún sin verificar",
     "verifyCampaign": "Verificar esta campaña",
     "removeVerification": "Quitar mi verificación",
+    "verifiedState": "Verificada",
     "verified": "Campaña verificada",
     "unverified": "Verificación eliminada",
     "actionFailed": "La acción falló"

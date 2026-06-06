@@ -677,6 +677,7 @@
     "notVerified": "尚未驗證",
     "verifyCampaign": "驗證此活動",
     "removeVerification": "移除我的驗證",
+    "verifiedState": "已驗證",
     "verified": "活動已驗證",
     "unverified": "驗證已移除",
     "actionFailed": "操作失敗"

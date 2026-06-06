@@ -1118,6 +1118,7 @@
     "notVerified": "Not yet verified",
     "verifyCampaign": "Verify this campaign",
     "removeVerification": "Remove my verification",
+    "verifiedState": "Verified",
     "verified": "Campaign verified",
     "unverified": "Verification removed",
     "actionFailed": "Action failed"
