@@ -672,6 +672,7 @@
   },
   "campaignVerification": {
     "verifiedBy": "تصدیق شوی د",
+    "verifiedLabel": "تصدیق شوی",
     "verifiedByCount_one": "د {{count}} اعتدال کوونکي لخوا تصدیق شوی",
     "verifiedByCount_other": "د {{count}} اعتدال کوونکو لخوا تصدیق شوی",
     "verifyCampaign": "دا کمپاین تصدیق کړئ",

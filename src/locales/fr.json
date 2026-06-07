@@ -1108,6 +1108,7 @@
   },
   "campaignVerification": {
     "verifiedBy": "Vérifié par",
+    "verifiedLabel": "Vérifiée",
     "verifiedByCount_one": "Vérifié par {{count}} modérateur",
     "verifiedByCount_other": "Vérifié par {{count}} modérateurs",
     "verifyCampaign": "Vérifier cette campagne",

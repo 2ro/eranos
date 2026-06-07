@@ -672,6 +672,7 @@
   },
   "campaignVerification": {
     "verifiedBy": "Yasimbiswa na",
+    "verifiedLabel": "Yasimbiswa",
     "verifiedByCount_one": "Yasimbiswa nemudzori {{count}}",
     "verifiedByCount_other": "Yasimbiswa nevadzori {{count}}",
     "verifyCampaign": "Simbisa mushandirapamwe uyu",

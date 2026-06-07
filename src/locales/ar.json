@@ -660,6 +660,7 @@
   },
   "campaignVerification": {
     "verifiedBy": "موثّق من قبل",
+    "verifiedLabel": "موثَّقة",
     "verifiedByCount_zero": "لم يوثّقها أحد",
     "verifiedByCount_one": "موثّقة من قبل مشرف واحد",
     "verifiedByCount_two": "موثّقة من قبل مشرفَين",

@@ -1111,6 +1111,7 @@
   },
   "campaignVerification": {
     "verifiedBy": "द्वारा सत्यापित",
+    "verifiedLabel": "सत्यापित",
     "verifiedByCount_one": "{{count}} मॉडरेटर द्वारा सत्यापित",
     "verifiedByCount_other": "{{count}} मॉडरेटरों द्वारा सत्यापित",
     "verifyCampaign": "इस अभियान को सत्यापित करें",

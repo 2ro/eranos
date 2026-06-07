@@ -1111,6 +1111,7 @@
   },
   "campaignVerification": {
     "verifiedBy": "Проверено",
+    "verifiedLabel": "Проверено",
     "verifiedByCount_one": "Проверено {{count}} модератором",
     "verifiedByCount_few": "Проверено {{count}} модераторами",
     "verifiedByCount_many": "Проверено {{count}} модераторами",

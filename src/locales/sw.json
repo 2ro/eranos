@@ -1110,6 +1110,7 @@
   },
   "campaignVerification": {
     "verifiedBy": "Imethibitishwa na",
+    "verifiedLabel": "Imethibitishwa",
     "verifiedByCount_one": "Imethibitishwa na msimamizi {{count}}",
     "verifiedByCount_other": "Imethibitishwa na wasimamizi {{count}}",
     "verifyCampaign": "Thibitisha kampeni hii",

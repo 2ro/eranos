@@ -1112,6 +1112,7 @@
   },
   "campaignVerification": {
     "verifiedBy": "Doğrulayan",
+    "verifiedLabel": "Doğrulandı",
     "verifiedByCount_one": "{{count}} moderatör tarafından doğrulandı",
     "verifiedByCount_other": "{{count}} moderatör tarafından doğrulandı",
     "verifyCampaign": "Bu kampanyayı doğrula",

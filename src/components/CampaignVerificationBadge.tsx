@@ -70,6 +70,14 @@ interface CampaignVerificationBadgeProps {
   coord: string;
   /** Campaign title, used for accessible labels. */
   title?: string;
+  /**
+   * Visual variant.
+   * - `overlay` (default): dark translucent pill, for placement over a
+   *   banner / cover image on campaign cards.
+   * - `inline`: bordered chip that reads on a light page surface, with a
+   *   "Verified" label. Used on the campaign detail page heading.
+   */
+  variant?: 'overlay' | 'inline';
   className?: string;
 }
 
@@ -85,7 +93,7 @@ interface CampaignVerificationBadgeProps {
  * Renders nothing when the campaign has no verifications — there's nothing
  * to show.
  */
-export function CampaignVerificationBadge({ coord, title, className }: CampaignVerificationBadgeProps) {
+export function CampaignVerificationBadge({ coord, title, variant = 'overlay', className }: CampaignVerificationBadgeProps) {
   const { t } = useTranslation();
   const { data } = useCampaignVerifications();
   const [open, setOpen] = useState(false);
@@ -98,6 +106,7 @@ export function CampaignVerificationBadge({ coord, title, className }: CampaignV
 
   const shown = verifications.slice(0, 3);
   const extra = count - shown.length;
+  const isInline = variant === 'inline';
 
   const triggerLabel = t('campaignVerification.verifiedByCount', {
     count,
@@ -113,7 +122,10 @@ export function CampaignVerificationBadge({ coord, title, className }: CampaignV
           onClick={swallow}
           onMouseEnter={() => setOpen(true)}
           className={cn(
-            'inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-md px-1.5 py-1 text-white motion-safe:transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+            'inline-flex items-center gap-1 rounded-full px-1.5 py-1 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+            isInline
+              ? 'border border-border bg-background pr-2.5 text-foreground hover:bg-accent'
+              : 'bg-black/40 backdrop-blur-md text-white hover:bg-black/55',
             className,
           )}
         >
@@ -122,9 +134,12 @@ export function CampaignVerificationBadge({ coord, title, className }: CampaignV
               <ModeratorAvatar key={v.pubkey} pubkey={v.pubkey} />
             ))}
           </span>
-          <span className="ml-0.5 inline-flex items-center gap-0.5 pr-1 text-xs font-semibold">
-            <BadgeCheck className="size-4 text-sky-300" />
-            {extra > 0 ? `+${extra}` : null}
+          <span className="ml-0.5 inline-flex items-center gap-1 pr-1 text-xs font-semibold">
+            <BadgeCheck className={cn('size-4', isInline ? 'text-sky-500' : 'text-sky-300')} />
+            {isInline
+              ? t('campaignVerification.verifiedLabel', 'Verified')
+              : (extra > 0 ? `+${extra}` : null)}
+            {isInline && extra > 0 ? ` +${extra}` : null}
           </span>
         </button>
       </PopoverTrigger>

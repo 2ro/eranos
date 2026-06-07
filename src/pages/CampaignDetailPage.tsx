@@ -17,6 +17,7 @@ import {
 
 import { AuthorByline } from '@/components/AuthorByline';
 import { CampaignLedger } from '@/components/CampaignLedger';
+import { CampaignVerificationBadge } from '@/components/CampaignVerificationBadge';
 import { CommentsSection } from '@/components/CommentsSection';
 import {
   CampaignWalletDonatePanel,
@@ -963,8 +964,13 @@ function CampaignHeading({
         </p>
       )}
 
-      <div className="mt-5">
+      <div className="mt-5 flex flex-wrap items-center gap-3">
         <AuthorByline pubkey={creatorPubkey} />
+        <CampaignVerificationBadge
+          coord={campaign.aTag}
+          title={campaign.title}
+          variant="inline"
+        />
       </div>
 
       {(countryLabel) && (

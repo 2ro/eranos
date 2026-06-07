@@ -670,6 +670,7 @@
   },
   "campaignVerification": {
     "verifiedBy": "បានផ្ទៀងផ្ទាត់ដោយ",
+    "verifiedLabel": "បានផ្ទៀងផ្ទាត់",
     "verifiedByCount_one": "បានផ្ទៀងផ្ទាត់ដោយអ្នកសម្របសម្រួល {{count}} នាក់",
     "verifiedByCount_other": "បានផ្ទៀងផ្ទាត់ដោយអ្នកសម្របសម្រួល {{count}} នាក់",
     "verifyCampaign": "ផ្ទៀងផ្ទាត់យុទ្ធនាការនេះ",

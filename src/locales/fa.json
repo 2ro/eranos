@@ -670,6 +670,7 @@
   },
   "campaignVerification": {
     "verifiedBy": "تأییدشده توسط",
+    "verifiedLabel": "تأییدشده",
     "verifiedByCount_one": "تأییدشده توسط {{count}} ناظر",
     "verifiedByCount_other": "تأییدشده توسط {{count}} ناظر",
     "verifyCampaign": "این کمپین را تأیید کنید",

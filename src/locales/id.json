@@ -1111,6 +1111,7 @@
   },
   "campaignVerification": {
     "verifiedBy": "Diverifikasi oleh",
+    "verifiedLabel": "Terverifikasi",
     "verifiedByCount_one": "Diverifikasi oleh {{count}} moderator",
     "verifiedByCount_other": "Diverifikasi oleh {{count}} moderator",
     "verifyCampaign": "Verifikasi kampanye ini",

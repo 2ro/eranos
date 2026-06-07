@@ -672,6 +672,7 @@
   },
   "campaignVerification": {
     "verifiedBy": "验证者",
+    "verifiedLabel": "已验证",
     "verifiedByCount_one": "已由 {{count}} 位审核员验证",
     "verifiedByCount_other": "已由 {{count}} 位审核员验证",
     "verifyCampaign": "验证此活动",
