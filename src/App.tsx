@@ -146,10 +146,6 @@ const hardcodedConfig: AppConfig = {
   imageProxy: 'https://wsrv.nl',
   lowBandwidthMode: false,
   curatorPubkey: '932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d',
-  labelers: [
-    '0461fcbecc4c3374439932d6b8f11269ccdb7cc973ad7a50ae362db135a474dd',
-    '932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d',
-  ],
   esploraApis: [
     'https://mempool.emzy.de/api',
     'https://mempool.space/api',

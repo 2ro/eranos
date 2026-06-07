@@ -1111,14 +1111,12 @@
   },
   "campaignVerification": {
     "verifiedBy": "Проверено",
-    "verifiedByCount_one": "Проверено {{count}} проверяющим",
-    "verifiedByCount_few": "Проверено {{count}} проверяющими",
-    "verifiedByCount_many": "Проверено {{count}} проверяющими",
-    "verifiedByCount_other": "Проверено {{count}} проверяющими",
-    "notVerified": "Ещё не проверено",
+    "verifiedByCount_one": "Проверено {{count}} модератором",
+    "verifiedByCount_few": "Проверено {{count}} модераторами",
+    "verifiedByCount_many": "Проверено {{count}} модераторами",
+    "verifiedByCount_other": "Проверено {{count}} модераторами",
     "verifyCampaign": "Проверить эту кампанию",
     "removeVerification": "Убрать мою проверку",
-    "verifiedState": "Проверено",
     "verified": "Кампания проверена",
     "unverified": "Проверка удалена",
     "actionFailed": "Не удалось выполнить действие"

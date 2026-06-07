@@ -1,6 +1,5 @@
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
-import { useCampaignLabelers } from '@/hooks/useCampaignLabelers';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useOrganizationModeration } from '@/hooks/useOrganizationModeration';
 import { usePledgeModeration } from '@/hooks/usePledgeModeration';
@@ -109,15 +108,9 @@ function GroupOverlay(props: ModerationOverlayProps) {
 export function ModerationOverlay(props: ModerationOverlayProps) {
   const { user } = useCurrentUser();
   const { data: moderators } = useCampaignModerators();
-  const labelers = useCampaignLabelers();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
-  const isLabeler = !!user && labelers.includes(user.pubkey);
 
-  // Campaigns also surface the kebab to labelers (for the verify row),
-  // which are a distinct allowlist from the moderator pack. Other
-  // surfaces remain moderator-only.
-  const canShow = props.surface === 'campaign' ? isMod || isLabeler : isMod;
-  if (!canShow) return null;
+  if (!isMod) return null;
 
   switch (props.surface) {
     case 'campaign': return <CampaignOverlay {...props} />;

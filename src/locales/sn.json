@@ -672,12 +672,10 @@
   },
   "campaignVerification": {
     "verifiedBy": "Yasimbiswa na",
-    "verifiedByCount_one": "Yasimbiswa nemusimbisi {{count}}",
-    "verifiedByCount_other": "Yasimbiswa nevasimbisi {{count}}",
-    "notVerified": "Haisati yasimbiswa",
+    "verifiedByCount_one": "Yasimbiswa nemudzori {{count}}",
+    "verifiedByCount_other": "Yasimbiswa nevadzori {{count}}",
     "verifyCampaign": "Simbisa mushandirapamwe uyu",
     "removeVerification": "Bvisa kusimbisa kwangu",
-    "verifiedState": "Yasimbiswa",
     "verified": "Mushandirapamwe wasimbiswa",
     "unverified": "Kusimbisa kwabviswa",
     "actionFailed": "Chiito chatadza"

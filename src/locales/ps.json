@@ -672,12 +672,10 @@
   },
   "campaignVerification": {
     "verifiedBy": "تصدیق شوی د",
-    "verifiedByCount_one": "د {{count}} تصدیق کوونکي لخوا تصدیق شوی",
-    "verifiedByCount_other": "د {{count}} تصدیق کوونکو لخوا تصدیق شوی",
-    "notVerified": "تر اوسه تصدیق شوی نه دی",
+    "verifiedByCount_one": "د {{count}} اعتدال کوونکي لخوا تصدیق شوی",
+    "verifiedByCount_other": "د {{count}} اعتدال کوونکو لخوا تصدیق شوی",
     "verifyCampaign": "دا کمپاین تصدیق کړئ",
     "removeVerification": "زما تصدیق لرې کړئ",
-    "verifiedState": "تصدیق شوی",
     "verified": "کمپاین تصدیق شو",
     "unverified": "تصدیق لرې شو",
     "actionFailed": "کړنه ناکامه شوه"

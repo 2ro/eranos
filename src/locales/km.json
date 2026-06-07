@@ -670,12 +670,10 @@
   },
   "campaignVerification": {
     "verifiedBy": "បានផ្ទៀងផ្ទាត់ដោយ",
-    "verifiedByCount_one": "បានផ្ទៀងផ្ទាត់ដោយអ្នកផ្ទៀងផ្ទាត់ {{count}} នាក់",
-    "verifiedByCount_other": "បានផ្ទៀងផ្ទាត់ដោយអ្នកផ្ទៀងផ្ទាត់ {{count}} នាក់",
-    "notVerified": "មិនទាន់បានផ្ទៀងផ្ទាត់",
+    "verifiedByCount_one": "បានផ្ទៀងផ្ទាត់ដោយអ្នកសម្របសម្រួល {{count}} នាក់",
+    "verifiedByCount_other": "បានផ្ទៀងផ្ទាត់ដោយអ្នកសម្របសម្រួល {{count}} នាក់",
     "verifyCampaign": "ផ្ទៀងផ្ទាត់យុទ្ធនាការនេះ",
     "removeVerification": "លុបការផ្ទៀងផ្ទាត់របស់ខ្ញុំ",
-    "verifiedState": "បានផ្ទៀងផ្ទាត់",
     "verified": "យុទ្ធនាការត្រូវបានផ្ទៀងផ្ទាត់",
     "unverified": "ការផ្ទៀងផ្ទាត់ត្រូវបានលុប",
     "actionFailed": "សកម្មភាពបានបរាជ័យ"

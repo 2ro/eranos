@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useNostrPublish } from './useNostrPublish';
 import { useCurrentUser } from './useCurrentUser';
-import { useCampaignLabelers } from './useCampaignLabelers';
+import { useCampaignModerators } from './useCampaignModerators';
 import { CAMPAIGN_KIND } from '@/lib/campaign';
 import { LABEL_KIND } from '@/lib/agoraModeration';
 import {
@@ -17,45 +17,54 @@ import {
 
 /**
  * Fetches and folds campaign **verification** label events (NIP-32 kind
- * 1985 in the `agora.verified` namespace) authored by the configured
- * labeler allowlist ({@link useCampaignLabelers}). Returns a per-coordinate
- * map of which labelers have verified each campaign — the UI stacks their
- * avatars into a badge.
+ * 1985 in the `agora.verified` namespace) authored by the campaign
+ * moderators ({@link useCampaignModerators}). Returns a per-coordinate
+ * map of which moderators have verified each campaign — the UI stacks
+ * their avatars into a badge.
  *
- * The mutations let a logged-in labeler vouch for or retract verification:
+ * Verification is a moderator action, gated by the same moderator pack
+ * that governs hide / feature labels. It just rides a different NIP-32
+ * namespace (`agora.verified`) so it's an independent, additive trust
+ * signal rather than a discovery decision.
+ *
+ * The mutations let a logged-in moderator vouch for or retract verification:
  * - `verify({ coord })` publishes a kind 1985 label in the verified namespace.
  * - `unverify({ event })` publishes a NIP-09 kind 5 deletion of that
- *   labeler's own prior label event.
+ *   moderator's own prior label event.
  *
- * As with moderation labels, the read query filters by `authors: labelers`,
- * so a `verified` label signed by anyone outside the allowlist is ignored —
- * the verification badge can never be forged by an untrusted pubkey.
+ * As with moderation labels, the read query filters by `authors:
+ * moderators`, so a `verified` label signed by anyone outside the pack is
+ * ignored — the verification badge can never be forged by an untrusted
+ * pubkey.
  */
 export function useCampaignVerifications() {
   const { nostr } = useNostr();
   const queryClient = useQueryClient();
   const { user } = useCurrentUser();
   const { mutateAsync: publishEvent } = useNostrPublish();
-  const labelers = useCampaignLabelers();
+  const { data: moderators } = useCampaignModerators();
 
-  // Stable key so the query refetches when the labeler set changes.
-  const labelersKey = [...labelers].sort().join(',');
+  // Stable key so the query refetches when the moderator set changes.
+  const moderatorsKey = moderators ? [...moderators].sort().join(',') : '';
 
-  // True when the logged-in user is an authorized labeler. Gates the
-  // verify / unverify controls in the UI.
-  const isLabeler = !!user && labelers.includes(user.pubkey);
+  // True when the logged-in user is a moderator. Gates the verify /
+  // unverify controls in the UI.
+  const isModerator = !!user && !!moderators && moderators.includes(user.pubkey);
 
   const verificationQuery = useQuery({
-    queryKey: ['campaign-verifications', labelersKey],
+    queryKey: ['campaign-verifications', moderatorsKey],
     // Never fire with an empty `authors:` filter — that would match every
     // `agora.verified` label from any author and break the trust model.
-    enabled: labelers.length > 0,
+    enabled: moderators !== undefined,
     queryFn: async ({ signal }): Promise<VerificationData> => {
+      if (!moderators || moderators.length === 0) {
+        return { ...EMPTY_VERIFICATION_DATA, moderators: [] };
+      }
       const events = await nostr.query(
         [
           {
             kinds: [LABEL_KIND],
-            authors: labelers,
+            authors: moderators,
             '#L': [AGORA_VERIFIED_NAMESPACE],
             '#l': [AGORA_VERIFIED_VALUE],
             limit: 2000,
@@ -63,7 +72,7 @@ export function useCampaignVerifications() {
         ],
         { signal },
       );
-      return foldVerificationLabels(events, labelers, CAMPAIGN_KIND);
+      return foldVerificationLabels(events, moderators, CAMPAIGN_KIND);
     },
     staleTime: 30_000,
   });
@@ -71,8 +80,8 @@ export function useCampaignVerifications() {
   const verify = useMutation({
     mutationFn: async ({ coord }: { coord: string }) => {
       if (!user) throw new Error('You must be logged in to verify a campaign.');
-      if (!labelers.includes(user.pubkey)) {
-        throw new Error('Only authorized labelers can verify campaigns.');
+      if (!moderators?.includes(user.pubkey)) {
+        throw new Error('Only moderators can verify campaigns.');
       }
       if (!coord.startsWith(`${CAMPAIGN_KIND}:`)) {
         throw new Error(`Coordinate must start with ${CAMPAIGN_KIND}:`);
@@ -97,7 +106,7 @@ export function useCampaignVerifications() {
     mutationFn: async ({ verification }: { verification: CampaignVerification }) => {
       if (!user) throw new Error('You must be logged in to unverify a campaign.');
       if (verification.pubkey !== user.pubkey) {
-        // A labeler can only retract their own verification — a kind 5
+        // A moderator can only retract their own verification — a kind 5
         // deletion only takes effect on events the signer authored.
         throw new Error('You can only remove your own verification.');
       }
@@ -122,7 +131,7 @@ export function useCampaignVerifications() {
     isLoading: verificationQuery.isLoading,
     isReady: verificationQuery.isSuccess,
     /** Whether the logged-in user may verify / unverify campaigns. */
-    isLabeler,
+    isModerator,
     verify,
     unverify,
   };

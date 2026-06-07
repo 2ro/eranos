@@ -1111,12 +1111,10 @@
   },
   "campaignVerification": {
     "verifiedBy": "Diverifikasi oleh",
-    "verifiedByCount_one": "Diverifikasi oleh {{count}} pemverifikasi",
-    "verifiedByCount_other": "Diverifikasi oleh {{count}} pemverifikasi",
-    "notVerified": "Belum diverifikasi",
+    "verifiedByCount_one": "Diverifikasi oleh {{count}} moderator",
+    "verifiedByCount_other": "Diverifikasi oleh {{count}} moderator",
     "verifyCampaign": "Verifikasi kampanye ini",
     "removeVerification": "Hapus verifikasi saya",
-    "verifiedState": "Terverifikasi",
     "verified": "Kampanye terverifikasi",
     "unverified": "Verifikasi dihapus",
     "actionFailed": "Tindakan gagal"

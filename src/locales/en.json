@@ -25,7 +25,7 @@
     "donors_one": "{{count}} donor",
     "donors_other": "{{count}} donors",
     "clearSearch": "Clear search",
-    "searching": "Searching\u2026",
+    "searching": "Searching…",
     "searchResultsCount_one": "{{count}} result",
     "searchResultsCount_other": "{{count}} results",
     "sortAriaLabel": "Sort order",
@@ -35,7 +35,7 @@
     "showHidden": "Show hidden",
     "filtersAriaLabel": "Search filters",
     "countryFilterAriaLabel": "Filter by country",
-    "countrySearchPlaceholder": "Search countries\u2026",
+    "countrySearchPlaceholder": "Search countries…",
     "countryNoResults": "No countries found.",
     "countryGlobal": "Global"
   },
@@ -300,9 +300,18 @@
       "unknown": "UNKNOWN"
     },
     "kindHeader": {
-      "photo": { "action": "shared a", "noun": "photo" },
-      "encryptedMessage": { "action": "sent an", "noun": "encrypted message" },
-      "letter": { "action": "sent a", "noun": "letter" },
+      "photo": {
+        "action": "shared a",
+        "noun": "photo"
+      },
+      "encryptedMessage": {
+        "action": "sent an",
+        "noun": "encrypted message"
+      },
+      "letter": {
+        "action": "sent a",
+        "noun": "letter"
+      },
       "treasureHidCreated": "hid a",
       "treasureHidUpdated": "updated a",
       "treasureNoun": "treasure",
@@ -566,7 +575,7 @@
           "body": "No payment processor sits in the middle, so no Stripe, no Visa, no bank can cut you off mid-campaign."
         },
         "otherBitcoin": {
-          "heading": "Unlike other \u2018Bitcoin\u2019 platforms",
+          "heading": "Unlike other ‘Bitcoin’ platforms",
           "body": "No central Lightning node, custodian, or LSP to fail or go offline. Funds settle directly on-chain to a wallet you control."
         }
       }
@@ -673,9 +682,9 @@
       "sectionPast": "Past pledges",
       "sectionDefault": "Pledges",
       "sectionTagline": "Help fund the actions worth making.",
-      "searchPlaceholder": "Search pledges\u2026",
+      "searchPlaceholder": "Search pledges…",
       "searchAriaLabel": "Search pledges",
-      "noMatch": "No pledges match \u201c{{query}}\u201d",
+      "noMatch": "No pledges match “{{query}}”",
       "noMatchHint": "Try a different search term, or clear the search.",
       "sortAriaLabel": "Sort",
       "sortBy": "Sort by",
@@ -808,9 +817,9 @@
       "featuredGroupsTagline": "Standout groups worth your attention.",
       "allGroups": "Groups",
       "allGroupsTagline": "Highlighted by moderators. Search or sort to browse every group.",
-      "searchPlaceholder": "Search groups\u2026",
+      "searchPlaceholder": "Search groups…",
       "searchAriaLabel": "Search groups",
-      "noMatch": "No groups match \u201c{{query}}\u201d",
+      "noMatch": "No groups match “{{query}}”",
       "noMatchHint": "Try a different search term, or clear the search.",
       "loginToSeeTitle": "Log in to see your groups",
       "loginToSeeBody": "Groups you've founded or moderate will appear here.",
@@ -974,8 +983,8 @@
     "onchainInvalid": "Not a recognized mainnet Bitcoin address (bc1q… / bc1p…).",
     "spInvalid": "Not a recognized BIP-352 silent-payment code (sp1…).",
     "country": "Country",
-      "countryPlaceholder": "Search countries",
-      "tags": "Tags",
+    "countryPlaceholder": "Search countries",
+    "tags": "Tags",
     "tagsPlaceholder": "legal-defense, mutual-aid, local-news",
     "categories": {
       "humanRights": "Human Rights",
@@ -1109,16 +1118,14 @@
   },
   "campaignVerification": {
     "verifiedBy": "Verified by",
-    "verifiedByCount_zero": "Verified by {{count}} labelers",
-    "verifiedByCount_one": "Verified by {{count}} labeler",
-    "verifiedByCount_two": "Verified by {{count}} labelers",
-    "verifiedByCount_few": "Verified by {{count}} labelers",
-    "verifiedByCount_many": "Verified by {{count}} labelers",
-    "verifiedByCount_other": "Verified by {{count}} labelers",
-    "notVerified": "Not yet verified",
+    "verifiedByCount_zero": "Verified by {{count}} moderators",
+    "verifiedByCount_one": "Verified by {{count}} moderator",
+    "verifiedByCount_two": "Verified by {{count}} moderators",
+    "verifiedByCount_few": "Verified by {{count}} moderators",
+    "verifiedByCount_many": "Verified by {{count}} moderators",
+    "verifiedByCount_other": "Verified by {{count}} moderators",
     "verifyCampaign": "Verify this campaign",
     "removeVerification": "Remove my verification",
-    "verifiedState": "Verified",
     "verified": "Campaign verified",
     "unverified": "Verification removed",
     "actionFailed": "Action failed"
@@ -1211,13 +1218,12 @@
       "exploreCampaigns": "Explore campaigns",
       "featuredTitle": "Featured Campaigns",
       "featuredDesc": "Campaigns hand-picked by the {{appName}} team.",
-
       "allCampaigns": "All campaigns",
       "allCampaignsDesc": "Every campaign on the network, in chronological order.",
       "browseAll": "Browse all campaigns",
-      "searchPlaceholder": "Search campaigns\u2026",
+      "searchPlaceholder": "Search campaigns…",
       "searchAriaLabel": "Search campaigns",
-      "noMatch": "No campaigns match \u201c{{query}}\u201d",
+      "noMatch": "No campaigns match “{{query}}”",
       "noMatchHint": "Try a different search term, or clear the search.",
       "hidden": "Hidden",
       "hiddenDesc": "Campaigns suppressed from public discovery. Use the kebab menu on a card to unhide.",
@@ -1233,12 +1239,12 @@
         "block1": {
           "heading": "Unlike GoFundMe",
           "body": "No platform can freeze your donations, demand refunds, or terminate your campaign over policy disagreements. No Stripe, no Visa, no bank sits in the middle and can cut you off mid-campaign.",
-          "bullet1": "Freeze-proof \u2014 no platform veto",
+          "bullet1": "Freeze-proof — no platform veto",
           "bullet2": "No payment processor can pull the plug",
           "bullet3": "Zero platform fees"
         },
         "block2": {
-          "heading": "Unlike other \u2018Bitcoin\u2019 platforms",
+          "heading": "Unlike other ‘Bitcoin’ platforms",
           "body": "No central Lightning node, custodian, or LSP to fail or go offline. Funds settle directly on Bitcoin to a wallet you control. If {{appName}} disappeared tomorrow, every campaign would keep working.",
           "bullet1": "No custodial wallet to drain or freeze",
           "bullet2": "Settles on-chain to a wallet you own",
@@ -1274,10 +1280,10 @@
       "sortNew": "New",
       "showHidden": "Show hidden",
       "startCampaign": "Start a campaign",
-      "noMatch": "No campaigns match \u201c{{query}}\u201d",
+      "noMatch": "No campaigns match “{{query}}”",
       "noMatchHint": "Try a different search term, or clear the search to see every campaign.",
       "allHidden": "No campaigns to show",
-      "allHiddenHint": "Every campaign on the network has been hidden by moderators. Toggle \u201cShow hidden\u201d to view them.",
+      "allHiddenHint": "Every campaign on the network has been hidden by moderators. Toggle “Show hidden” to view them.",
       "empty": "No campaigns yet",
       "emptyHint": "No campaigns have been published yet. Be the first."
     },
@@ -2431,10 +2437,18 @@
   },
   "faq": {
     "categories": {
-      "getting-started": { "label": "About Agora" },
-      "payments": { "label": "Bitcoin Donations on Agora" },
-      "about-nostr": { "label": "About Nostr" },
-      "legacy": { "label": "Legacy" }
+      "getting-started": {
+        "label": "About Agora"
+      },
+      "payments": {
+        "label": "Bitcoin Donations on Agora"
+      },
+      "about-nostr": {
+        "label": "About Nostr"
+      },
+      "legacy": {
+        "label": "Legacy"
+      }
     },
     "items": {
       "what-is-ditto": {

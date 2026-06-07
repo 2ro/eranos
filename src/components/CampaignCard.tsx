@@ -245,9 +245,10 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 to-transparent"
           />
 
-          {/* Top-left verification badge — stacked labeler avatars for
-              campaigns vouched for by trusted labelers. Renders nothing
-              for unverified campaigns unless the viewer is a labeler. */}
+          {/* Top-left verification badge — stacked moderator avatars for
+              campaigns a moderator has verified. Renders nothing for
+              unverified campaigns. Display-only; the verify action lives in
+              the moderation kebab. */}
           <CampaignVerificationBadge
             coord={campaign.aTag}
             title={campaign.title}

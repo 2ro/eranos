@@ -670,12 +670,10 @@
   },
   "campaignVerification": {
     "verifiedBy": "تأییدشده توسط",
-    "verifiedByCount_one": "تأییدشده توسط {{count}} تأییدکننده",
-    "verifiedByCount_other": "تأییدشده توسط {{count}} تأییدکننده",
-    "notVerified": "هنوز تأیید نشده",
+    "verifiedByCount_one": "تأییدشده توسط {{count}} ناظر",
+    "verifiedByCount_other": "تأییدشده توسط {{count}} ناظر",
     "verifyCampaign": "این کمپین را تأیید کنید",
     "removeVerification": "حذف تأیید من",
-    "verifiedState": "تأییدشده",
     "verified": "کمپین تأیید شد",
     "unverified": "تأیید حذف شد",
     "actionFailed": "عملیات ناموفق بود"

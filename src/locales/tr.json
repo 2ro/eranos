@@ -1112,12 +1112,10 @@
   },
   "campaignVerification": {
     "verifiedBy": "Doğrulayan",
-    "verifiedByCount_one": "{{count}} doğrulayıcı tarafından doğrulandı",
-    "verifiedByCount_other": "{{count}} doğrulayıcı tarafından doğrulandı",
-    "notVerified": "Henüz doğrulanmadı",
+    "verifiedByCount_one": "{{count}} moderatör tarafından doğrulandı",
+    "verifiedByCount_other": "{{count}} moderatör tarafından doğrulandı",
     "verifyCampaign": "Bu kampanyayı doğrula",
     "removeVerification": "Doğrulamamı kaldır",
-    "verifiedState": "Doğrulandı",
     "verified": "Kampanya doğrulandı",
     "unverified": "Doğrulama kaldırıldı",
     "actionFailed": "İşlem başarısız oldu"

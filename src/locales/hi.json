@@ -1111,12 +1111,10 @@
   },
   "campaignVerification": {
     "verifiedBy": "द्वारा सत्यापित",
-    "verifiedByCount_one": "{{count}} सत्यापनकर्ता द्वारा सत्यापित",
-    "verifiedByCount_other": "{{count}} सत्यापनकर्ताओं द्वारा सत्यापित",
-    "notVerified": "अभी तक सत्यापित नहीं",
+    "verifiedByCount_one": "{{count}} मॉडरेटर द्वारा सत्यापित",
+    "verifiedByCount_other": "{{count}} मॉडरेटरों द्वारा सत्यापित",
     "verifyCampaign": "इस अभियान को सत्यापित करें",
     "removeVerification": "मेरा सत्यापन हटाएँ",
-    "verifiedState": "सत्यापित",
     "verified": "अभियान सत्यापित",
     "unverified": "सत्यापन हटाया गया",
     "actionFailed": "कार्रवाई विफल"

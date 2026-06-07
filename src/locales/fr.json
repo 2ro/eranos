@@ -1108,12 +1108,10 @@
   },
   "campaignVerification": {
     "verifiedBy": "Vérifié par",
-    "verifiedByCount_one": "Vérifié par {{count}} vérificateur",
-    "verifiedByCount_other": "Vérifié par {{count}} vérificateurs",
-    "notVerified": "Pas encore vérifié",
+    "verifiedByCount_one": "Vérifié par {{count}} modérateur",
+    "verifiedByCount_other": "Vérifié par {{count}} modérateurs",
     "verifyCampaign": "Vérifier cette campagne",
     "removeVerification": "Retirer ma vérification",
-    "verifiedState": "Vérifiée",
     "verified": "Campagne vérifiée",
     "unverified": "Vérification retirée",
     "actionFailed": "Échec de l’action"

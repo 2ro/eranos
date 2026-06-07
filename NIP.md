@@ -23,7 +23,7 @@
 | Flat Communities | 34550, 30009, 8, 1111, 1984 | One-level badge membership with explicit moderators (NIP-72 ext) |
 | Community Chat | 34550, 1311 | Realtime member chat scoped to a NIP-72 community |
 | Campaign Moderation | 33863, 34550, 36639, 1985, 39089 | Discovery curation (hidden + featured axes) via moderator-signed labels in the `agora.moderation` namespace, gated by a follow-pack moderator roster. Covers campaigns, organizations, and pledges identically. |
-| Campaign Verification | 33863, 1985 | Positive trust signal: trusted *labeler*-signed NIP-32 labels in the `agora.verified` namespace (value `verified`) vouching for a campaign. Gated by the `labelers` allowlist; retracted via kind 5 deletion. |
+| Campaign Verification | 33863, 1985 | Positive trust signal: moderator-signed NIP-32 labels in the `agora.verified` namespace (value `verified`) vouching for a campaign. Gated by the same moderator pack as hide/feature; retracted via kind 5 deletion. |
 | HD Wallet Derivation | — | BIP-39 mnemonic deterministically derived from the user's nsec via HKDF; seeds a BIP-86 Taproot + BIP-352 silent-payment wallet importable into any BIP-39-compatible wallet (see [Agora HD Wallet](#agora-hd-wallet-derivation) below). |
 
 ### Agora Content Marker
@@ -698,7 +698,7 @@ Step 3 — fold by `(coord, axis)`, latest-`created_at`-wins, filtering to the r
 
 #### Campaign Verification Labels (`agora.verified`)
 
-Separately from the hide/feature moderation axes above, Agora supports a positive **verification** signal: a trusted *labeler* vouches for a specific campaign. Verification is a distinct NIP-32 label namespace, `agora.verified`, with a single value `verified`. It rides the same kind 1985 label kind but is otherwise independent of `agora.moderation` — a different (and typically narrower) signer set, no axes, no rank.
+Separately from the hide/feature moderation axes above, Agora supports a positive **verification** signal: a campaign moderator vouches for a specific campaign. Verification is a distinct NIP-32 label namespace, `agora.verified`, with a single value `verified`. It rides the same kind 1985 label kind and the **same moderator pack** as the hide/feature labels, but is otherwise independent of `agora.moderation` — no axes, no rank, purely additive.
 
 A verification label points at one campaign coordinate (`33863:<pubkey>:<d>`):
 
@@ -715,26 +715,26 @@ A verification label points at one campaign coordinate (`33863:<pubkey>:<d>`):
 }
 ```
 
-**Trust model.** The set of pubkeys whose `agora.verified` labels are honored is the client-configured *labeler* allowlist (`AppConfig.labelers`; default: the Team Soapbox curator pubkey). Clients MUST filter the read query by `authors: <labelers>` — a `verified` label signed by any pubkey outside the allowlist MUST be ignored, otherwise the badge is forgeable by anyone. As with moderation labels, clients MUST NOT run the query with an empty `authors:` filter.
+**Trust model.** The set of pubkeys whose `agora.verified` labels are honored is the campaign moderator pack — the same allowlist that governs hide/feature labels (the Team Soapbox follow pack `p` tags). Clients MUST filter the read query by `authors: <moderators>` — a `verified` label signed by any pubkey outside the pack MUST be ignored, otherwise the badge is forgeable by anyone. As with moderation labels, clients MUST NOT run the query with an empty `authors:` filter.
 
-**Reading.** One filter fetches every verification across all labelers:
+**Reading.** One filter fetches every verification across all moderators:
 
 ```json
 {
   "kinds": [1985],
-  "authors": ["<labeler-1>", "<labeler-2>"],
+  "authors": ["<moderator-1>", "<moderator-2>"],
   "#L": ["agora.verified"],
   "#l": ["verified"],
   "limit": 2000
 }
 ```
 
-Fold by `(coord, labeler)`, keeping the newest label per pair. A campaign is "verified by" the set of labelers with a surviving label; clients SHOULD render the labelers' avatars stacked as a badge, with multiple labelers forming a stack.
+Fold by `(coord, moderator)`, keeping the newest label per pair. A campaign is "verified by" the set of moderators with a surviving label; clients SHOULD render the moderators' avatars stacked as a badge, with multiple moderators forming a stack.
 
-**Retraction.** There is no `unverified` value. A labeler retracts a verification by publishing a NIP-09 kind 5 deletion of their own label event (referenced by `e` tag plus `k: 1985`). A kind 5 only takes effect on events authored by the signer, so a labeler can only remove their own verification.
+**Retraction.** There is no `unverified` value. A moderator retracts a verification by publishing a NIP-09 kind 5 deletion of their own label event (referenced by `e` tag plus `k: 1985`). A kind 5 only takes effect on events authored by the signer, so a moderator can only remove their own verification.
 
 **Client behavior.**
-- Clients SHOULD render verify / remove-verification controls only for a logged-in user whose pubkey appears in the labeler allowlist.
+- Verification is a moderator action: clients SHOULD render the verify / remove-verification control inside the campaign moderator menu (alongside hide / add-to-list), gated on moderator membership.
 - Verification is purely additive — it never hides or promotes a campaign on its own. It is a trust hint layered over whatever moderation/discovery state already applies.
 - The label kind 1985 read is routed to Agora's search relays (`relay.ditto.pub`, `relay.dreamith.to`) where these labels are published.
 

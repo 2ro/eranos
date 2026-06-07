@@ -19,8 +19,8 @@ function swallow(e: { preventDefault: () => void; stopPropagation: () => void })
   e.stopPropagation();
 }
 
-/** One labeler avatar in the stacked badge. */
-function LabelerAvatar({ pubkey, className }: { pubkey: string; className?: string }) {
+/** One moderator avatar in the stacked badge. */
+function ModeratorAvatar({ pubkey, className }: { pubkey: string; className?: string }) {
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
   const picture = sanitizeUrl(metadata?.picture);
@@ -35,7 +35,7 @@ function LabelerAvatar({ pubkey, className }: { pubkey: string; className?: stri
   );
 }
 
-/** A single verifier row inside the popover — links to the labeler's profile. */
+/** A single verifier row inside the popover — links to the moderator's profile. */
 function VerifierRow({ verification }: { verification: CampaignVerification }) {
   const navigate = useNavigate();
   const author = useAuthor(verification.pubkey);
@@ -74,8 +74,8 @@ interface CampaignVerificationBadgeProps {
 }
 
 /**
- * Display-only badge: a stack of labeler avatars over a campaign — one
- * avatar per trusted labeler that has issued an `agora.verified` label for
+ * Display-only badge: a stack of moderator avatars over a campaign — one
+ * avatar per moderator that has issued an `agora.verified` label for
  * it. Hovering / clicking opens a popover listing the verifiers, each
  * linking to its profile.
  *
@@ -101,7 +101,7 @@ export function CampaignVerificationBadge({ coord, title, className }: CampaignV
 
   const triggerLabel = t('campaignVerification.verifiedByCount', {
     count,
-    defaultValue: 'Verified by {{count}} labeler',
+    defaultValue: 'Verified by {{count}} moderator',
   });
 
   return (
@@ -119,7 +119,7 @@ export function CampaignVerificationBadge({ coord, title, className }: CampaignV
         >
           <span className="flex items-center -space-x-2">
             {shown.map((v) => (
-              <LabelerAvatar key={v.pubkey} pubkey={v.pubkey} />
+              <ModeratorAvatar key={v.pubkey} pubkey={v.pubkey} />
             ))}
           </span>
           <span className="ml-0.5 inline-flex items-center gap-0.5 pr-1 text-xs font-semibold">

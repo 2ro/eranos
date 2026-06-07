@@ -1110,12 +1110,10 @@
   },
   "campaignVerification": {
     "verifiedBy": "Imethibitishwa na",
-    "verifiedByCount_one": "Imethibitishwa na mthibitishaji {{count}}",
-    "verifiedByCount_other": "Imethibitishwa na wathibitishaji {{count}}",
-    "notVerified": "Bado haijathibitishwa",
+    "verifiedByCount_one": "Imethibitishwa na msimamizi {{count}}",
+    "verifiedByCount_other": "Imethibitishwa na wasimamizi {{count}}",
     "verifyCampaign": "Thibitisha kampeni hii",
     "removeVerification": "Ondoa uthibitisho wangu",
-    "verifiedState": "Imethibitishwa",
     "verified": "Kampeni imethibitishwa",
     "unverified": "Uthibitisho umeondolewa",
     "actionFailed": "Kitendo kimeshindwa"
