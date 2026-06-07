@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { CampaignListMembershipDialog } from '@/components/campaign-lists/CampaignListMembershipDialog';
+import { VerificationDialog } from '@/components/VerificationDialog';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useToast } from '@/hooks/useToast';
@@ -250,6 +251,13 @@ function CampaignItemsInner(props: {
    * state instead — see {@link ModerationMenu}.
    */
   onAddToList?: () => void;
+  /**
+   * Called when the moderator clicks "Verify this campaign". The host
+   * owns the confirmation dialog (same reason as `onAddToList`). When
+   * absent, the verify row is omitted — only hosts that render the
+   * dialog ({@link ModerationMenu}) opt in.
+   */
+  onRequestVerify?: () => void;
 }) {
   const { data, moderate } = useCampaignModeration();
   const { user } = useCurrentUser();
@@ -275,10 +283,13 @@ function CampaignItemsInner(props: {
       moderate={moderate}
       onAddToList={props.onAddToList}
       leadingExtra={
-        <CampaignVerifyItem
-          coord={props.coord}
-          entityTitle={props.entityTitle}
-        />
+        props.onRequestVerify ? (
+          <CampaignVerifyItem
+            coord={props.coord}
+            entityTitle={props.entityTitle}
+            onRequestVerify={props.onRequestVerify}
+          />
+        ) : undefined
       }
     />
   );
@@ -287,15 +298,20 @@ function CampaignItemsInner(props: {
 /**
  * Verify / remove-verification row for the campaign moderation menu.
  * Gated by the moderator pack — renders `null` for non-moderators.
- * Publishes an `agora.verified` label on verify and a kind 5 deletion of
- * the moderator's own label on remove.
+ *
+ * Verifying opens a confirmation dialog (owned by {@link ModerationMenu}),
+ * so this row only signals intent via `onRequestVerify`. Removing a
+ * verification publishes a kind 5 deletion inline — no confirmation needed.
  */
 function CampaignVerifyItem({
   coord,
   entityTitle,
+  onRequestVerify,
 }: {
   coord: string;
   entityTitle: string;
+  /** Open the verification confirmation dialog (hoisted to the menu host). */
+  onRequestVerify: () => void;
 }) {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -308,19 +324,6 @@ function CampaignVerifyItem({
     ? (data.byCoord.get(coord) ?? []).find((v) => v.pubkey === user.pubkey)
     : undefined;
   const busy = verify.isPending || unverify.isPending;
-
-  const onVerify = async () => {
-    try {
-      await verify.mutateAsync({ coord });
-      toast({ title: t('campaignVerification.verified'), description: entityTitle });
-    } catch (error) {
-      toast({
-        title: t('campaignVerification.actionFailed'),
-        description: error instanceof Error ? error.message : undefined,
-        variant: 'destructive',
-      });
-    }
-  };
 
   const onUnverify = async () => {
     if (!mine) return;
@@ -344,7 +347,7 @@ function CampaignVerifyItem({
           {t('campaignVerification.removeVerification')}
         </DropdownMenuItem>
       ) : (
-        <DropdownMenuItem onClick={onVerify} disabled={busy}>
+        <DropdownMenuItem onClick={onRequestVerify} disabled={busy}>
           <BadgeCheck className="h-4 w-4 mr-2" />
           {t('campaignVerification.verifyCampaign')}
         </DropdownMenuItem>
@@ -405,7 +408,7 @@ function GroupItemsInner(props: {
  * to pass the callback if they want the row inline.
  */
 export function ModerationMenuItems(
-  props: ModerationItemsProps & { onAddToList?: () => void },
+  props: ModerationItemsProps & { onAddToList?: () => void; onRequestVerify?: () => void },
 ) {
   const { user } = useCurrentUser();
   const { data: moderators } = useCampaignModerators();
@@ -421,6 +424,7 @@ export function ModerationMenuItems(
           entityTitle={props.entityTitle}
           axes={props.axes}
           onAddToList={props.onAddToList}
+          onRequestVerify={props.onRequestVerify}
         />
       );
     case 'pledge':
@@ -465,12 +469,29 @@ export function ModerationMenuItems(
  */
 export function ModerationMenu({ className, ...rest }: ModerationMenuProps) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const { user } = useCurrentUser();
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
   const [membershipOpen, setMembershipOpen] = useState(false);
+  const [verifyOpen, setVerifyOpen] = useState(false);
+  const { verify } = useCampaignVerifications();
 
   if (!isMod) return null;
+
+  const onConfirmVerify = async () => {
+    try {
+      await verify.mutateAsync({ coord: rest.coord });
+      toast({ title: t('campaignVerification.verified'), description: rest.entityTitle });
+      setVerifyOpen(false);
+    } catch (error) {
+      toast({
+        title: t('campaignVerification.actionFailed'),
+        description: error instanceof Error ? error.message : undefined,
+        variant: 'destructive',
+      });
+    }
+  };
 
   return (
     <>
@@ -493,16 +514,30 @@ export function ModerationMenu({ className, ...rest }: ModerationMenuProps) {
                 ? () => setMembershipOpen(true)
                 : undefined
             }
+            onRequestVerify={
+              rest.surface === 'campaign'
+                ? () => setVerifyOpen(true)
+                : undefined
+            }
           />
         </DropdownMenuContent>
       </DropdownMenu>
       {rest.surface === 'campaign' && (
-        <CampaignListMembershipDialog
-          open={membershipOpen}
-          onOpenChange={setMembershipOpen}
-          campaignCoord={rest.coord}
-          campaignTitle={rest.entityTitle}
-        />
+        <>
+          <CampaignListMembershipDialog
+            open={membershipOpen}
+            onOpenChange={setMembershipOpen}
+            campaignCoord={rest.coord}
+            campaignTitle={rest.entityTitle}
+          />
+          <VerificationDialog
+            open={verifyOpen}
+            onOpenChange={setVerifyOpen}
+            campaignTitle={rest.entityTitle}
+            isPending={verify.isPending}
+            onConfirm={onConfirmVerify}
+          />
+        </>
       )}
     </>
   );

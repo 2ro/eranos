@@ -676,6 +676,8 @@
     "verifiedByCount_other": "已由 {{count}} 位審核員驗證",
     "verifyCampaign": "驗證此活動",
     "removeVerification": "移除我的驗證",
+    "dialogTitle": "驗證此活動",
+    "attestation": "驗證此活動即表示您證實該活動真實可信。您本人認識活動組織者，或已切實核實其聲明屬實。謹防冒充者和騙子。",
     "verified": "活動已驗證",
     "unverified": "驗證已移除",
     "actionFailed": "操作失敗"

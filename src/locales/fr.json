@@ -1112,6 +1112,8 @@
     "verifiedByCount_other": "Vérifié par {{count}} modérateurs",
     "verifyCampaign": "Vérifier cette campagne",
     "removeVerification": "Retirer ma vérification",
+    "dialogTitle": "Vérifier cette campagne",
+    "attestation": "En vérifiant cette campagne, vous attestez qu'elle est authentique et véridique. Vous connaissez personnellement l'organisateur de la campagne ou vous avez vérifié de manière sérieuse que ses affirmations sont vraies. Méfiez-vous des usurpateurs d'identité et des escrocs.",
     "verified": "Campagne vérifiée",
     "unverified": "Vérification retirée",
     "actionFailed": "Échec de l’action"

@@ -1126,6 +1126,8 @@
     "verifiedByCount_other": "Verified by {{count}} moderators",
     "verifyCampaign": "Verify this campaign",
     "removeVerification": "Remove my verification",
+    "dialogTitle": "Verify this campaign",
+    "attestation": "By verifying this campaign you attest that the campaign is authentic and true. You know the campaign organizer personally or have verified meaningfully that their claims are true. Beware of impersonators and scammers.",
     "verified": "Campaign verified",
     "unverified": "Verification removed",
     "actionFailed": "Action failed"

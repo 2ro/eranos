@@ -676,6 +676,8 @@
     "verifiedByCount_other": "Yasimbiswa nevadzori {{count}}",
     "verifyCampaign": "Simbisa mushandirapamwe uyu",
     "removeVerification": "Bvisa kusimbisa kwangu",
+    "dialogTitle": "Simbisa mushandirapamwe uyu",
+    "attestation": "Nekusimbisa mushandirapamwe uyu unopupura kuti mushandirapamwe ndewechokwadi uye wechokwadi. Unoziva mukuru wemushandirapamwe pachako kana kuti wakasimbisa zvine musoro kuti zvavanotaura ndezvechokwadi. Chenjera vanhu vanonyepedzera uye makororo.",
     "verified": "Mushandirapamwe wasimbiswa",
     "unverified": "Kusimbisa kwabviswa",
     "actionFailed": "Chiito chatadza"

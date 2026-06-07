@@ -1116,6 +1116,8 @@
     "verifiedByCount_other": "{{count}} moderatör tarafından doğrulandı",
     "verifyCampaign": "Bu kampanyayı doğrula",
     "removeVerification": "Doğrulamamı kaldır",
+    "dialogTitle": "Bu kampanyayı doğrula",
+    "attestation": "Bu kampanyayı doğrulayarak kampanyanın gerçek ve doğru olduğunu beyan edersiniz. Kampanya düzenleyicisini şahsen tanıyorsunuz veya iddialarının doğru olduğunu anlamlı bir şekilde doğruladınız. Sahtekarlardan ve dolandırıcılardan sakının.",
     "verified": "Kampanya doğrulandı",
     "unverified": "Doğrulama kaldırıldı",
     "actionFailed": "İşlem başarısız oldu"

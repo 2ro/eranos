@@ -674,6 +674,8 @@
     "verifiedByCount_other": "Verificado por {{count}} moderadores",
     "verifyCampaign": "Verificar esta campaña",
     "removeVerification": "Quitar mi verificación",
+    "dialogTitle": "Verificar esta campaña",
+    "attestation": "Al verificar esta campaña, declaras que la campaña es auténtica y veraz. Conoces personalmente al organizador de la campaña o has verificado de forma significativa que sus afirmaciones son ciertas. Ten cuidado con los impostores y estafadores.",
     "verified": "Campaña verificada",
     "unverified": "Verificación eliminada",
     "actionFailed": "La acción falló"

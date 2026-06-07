@@ -1115,6 +1115,8 @@
     "verifiedByCount_other": "Diverifikasi oleh {{count}} moderator",
     "verifyCampaign": "Verifikasi kampanye ini",
     "removeVerification": "Hapus verifikasi saya",
+    "dialogTitle": "Verifikasi kampanye ini",
+    "attestation": "Dengan memverifikasi kampanye ini, Anda menyatakan bahwa kampanye ini asli dan benar. Anda mengenal penyelenggara kampanye secara pribadi atau telah memverifikasi secara meyakinkan bahwa klaim mereka benar. Waspadalah terhadap peniru dan penipu.",
     "verified": "Kampanye terverifikasi",
     "unverified": "Verifikasi dihapus",
     "actionFailed": "Tindakan gagal"

@@ -676,6 +676,8 @@
     "verifiedByCount_other": "已由 {{count}} 位审核员验证",
     "verifyCampaign": "验证此活动",
     "removeVerification": "移除我的验证",
+    "dialogTitle": "验证此活动",
+    "attestation": "验证此活动即表示您证实该活动真实可信。您本人认识活动组织者，或已切实核实其声明属实。谨防冒充者和骗子。",
     "verified": "活动已验证",
     "unverified": "验证已移除",
     "actionFailed": "操作失败"

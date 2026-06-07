@@ -1114,6 +1114,8 @@
     "verifiedByCount_other": "Imethibitishwa na wasimamizi {{count}}",
     "verifyCampaign": "Thibitisha kampeni hii",
     "removeVerification": "Ondoa uthibitisho wangu",
+    "dialogTitle": "Thibitisha kampeni hii",
+    "attestation": "Kwa kuthibitisha kampeni hii unashuhudia kwamba kampeni ni halisi na ya kweli. Unamfahamu mwandaaji wa kampeni binafsi au umethibitisha kwa kina kwamba madai yao ni ya kweli. Jihadhari na waigizaji na walaghai.",
     "verified": "Kampeni imethibitishwa",
     "unverified": "Uthibitisho umeondolewa",
     "actionFailed": "Kitendo kimeshindwa"
