@@ -1433,7 +1433,19 @@
       "checked_other": "បានពិនិត្យ UTXO {{count}} · បានកាត់ {{pruned}}។",
       "reconciling": "កំពុងត្រួតពិនិត្យ…",
       "reconcileNow": "ត្រួតពិនិត្យឥឡូវ"
+    },
+    "autoScan": {
+      "label": "ស្កេនដោយស្វ័យប្រវត្តិ",
+      "description": "បន្តពិនិត្យរកការទូទាត់ឯកជនថ្មីនៅផ្ទៃខាងក្រោយ ទោះបីជាអ្នកចាកចេញពីទំព័រនេះក៏ដោយ។"
     }
+  },
+  "spAutoScan": {
+    "scanning": "កំពុងស្កេន… ប្លុក {{current}} / {{to}}",
+    "caughtUp": "ថ្មីបំផុត",
+    "neverScanned": "មិនទាន់ស្កេន",
+    "lastScanned": "បានស្កេនដល់ប្លុក {{height}}",
+    "paused": "ការស្កេនដោយស្វ័យប្រវត្តិបានបិទ",
+    "manualLink": "ជម្រើសស្កេន"
   },
   "notifications": {
     "seoTitle": "ការជូនដំណឹង",

@@ -19,6 +19,7 @@ import { useNsecPasteGuard } from "@/hooks/useNsecPasteGuard";
 import type { AppConfig } from "@/contexts/AppContext";
 import { NWCProvider } from "@/contexts/NWCContext";
 import { OnboardingProvider } from "@/contexts/OnboardingProvider";
+import { HdWalletSpProvider } from "@/contexts/HdWalletSpProvider";
 import { BuildConfigSchema, type BuildConfig } from "@/lib/schemas";
 import { secureStorage } from "@/lib/secureStorage";
 import AppRouter from "./AppRouter";
@@ -211,7 +212,9 @@ export function App() {
                     <NWCProvider>
                       <OnboardingProvider>
                         <TooltipProvider>
-                          <AppRouter />
+                          <HdWalletSpProvider>
+                            <AppRouter />
+                          </HdWalletSpProvider>
                         </TooltipProvider>
                       </OnboardingProvider>
                   </NWCProvider>

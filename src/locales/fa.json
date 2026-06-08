@@ -1433,7 +1433,19 @@
       "checked_other": "{{count}} UTXO بررسی شد · {{pruned}} هرس شد.",
       "reconciling": "در حال تطبیق…",
       "reconcileNow": "تطبیق اکنون"
+    },
+    "autoScan": {
+      "label": "پویش خودکار",
+      "description": "حتی وقتی این صفحه را ترک می‌کنی، پرداخت‌های خصوصی جدید را در پس‌زمینه پیوسته بررسی کن."
     }
+  },
+  "spAutoScan": {
+    "scanning": "در حال پویش… بلوک {{current}} / {{to}}",
+    "caughtUp": "به‌روز",
+    "neverScanned": "هنوز پویش نشده",
+    "lastScanned": "تا بلوک {{height}} پویش شد",
+    "paused": "پویش خودکار خاموش است",
+    "manualLink": "گزینه‌های پویش"
   },
   "notifications": {
     "seoTitle": "اعلان‌ها",

@@ -23,7 +23,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useHdWalletSp } from '@/hooks/useHdWalletSp';
+import { Switch } from '@/components/ui/switch';
+import { useHdWalletSp } from '@/hooks/useHdWalletSpContext';
 import { useToast } from '@/hooks/useToast';
 
 // ---------------------------------------------------------------------------
@@ -283,6 +284,27 @@ export function HDSilentPaymentScanDialog({ open, onOpenChange }: HDSilentPaymen
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Automatic background scanning toggle. When on, the provider
+              quietly resumes scanning from the last block and keeps up with
+              the tip without the user opening this dialog. The manual
+              controls below remain available for targeted/deep rescans. */}
+          <div className="flex items-start justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2.5">
+            <div className="space-y-0.5">
+              <Label htmlFor="sp-auto-scan" className="text-sm cursor-pointer">
+                {t('spScan.autoScan.label')}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {t('spScan.autoScan.description')}
+              </p>
+            </div>
+            <Switch
+              id="sp-auto-scan"
+              checked={sp.autoScanEnabled}
+              onCheckedChange={(v) => sp.setAutoScanEnabled(v)}
+              className="mt-0.5"
+            />
+          </div>
+
           {/* Primary control: relative time window. */}
           <div className="space-y-1.5">
             <Label htmlFor="sp-scan-since" className="text-xs">

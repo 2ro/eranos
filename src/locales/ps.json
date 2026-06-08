@@ -1435,7 +1435,19 @@
       "checked_other": "{{count}} UTXOs وکتل شول · {{pruned}} پرې شول.",
       "reconciling": "سمول کیږي…",
       "reconcileNow": "اوس سمول"
+    },
+    "autoScan": {
+      "label": "په اوتومات ډول سکن کول",
+      "description": "په شالید کې د نویو خصوصي ورکړو کتنه دوام ورکوي، حتی کله چې تاسو دا پاڼه پرېږدئ."
     }
+  },
+  "spAutoScan": {
+    "scanning": "سکن کیږي… بلاک {{current}} / {{to}}",
+    "caughtUp": "تر اوسني حال پورې",
+    "neverScanned": "لا تر اوسه سکن شوی نه دی",
+    "lastScanned": "تر بلاک {{height}} پورې سکن شوی",
+    "paused": "اوتومات سکن بند دی",
+    "manualLink": "د سکن اختیارونه"
   },
   "notifications": {
     "seoTitle": "خبرتیاوې",

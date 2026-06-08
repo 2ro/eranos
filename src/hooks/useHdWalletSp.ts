@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useHdWalletAccess } from '@/hooks/useHdWalletAccess';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import {
   deriveSilentPaymentKeys,
@@ -48,6 +49,17 @@ import {
 const DEFAULT_RECENT_SCAN_BLOCKS = 144; // ~24 hours of mainnet blocks.
 
 /**
+ * How far back the *automatic* background scanner reaches on a wallet that
+ * has never been scanned (`scanHeight === 0`). Bounds the very first
+ * unattended pass so a fresh wallet doesn't try to walk the chain from
+ * genesis (hundreds of thousands of per-block round trips). ~1 week of
+ * mainnet blocks covers the common "I just set this up and someone paid me
+ * recently" case; deeper history is available via a manual scan from the
+ * dialog, which then lets auto-scan resume contiguously from `scanHeight`.
+ */
+const AUTO_SCAN_INITIAL_WINDOW_BLOCKS = 1008; // ~7 days of mainnet blocks.
+
+/**
  * Maximum distinct txids to check per manual reconcile click. Bounds the
  * Blockbook WS fan-out on wallets with many stored SP UTXOs — remaining
  * entries are picked up on subsequent clicks.
@@ -70,6 +82,14 @@ const MAX_RECONCILE_UTXOS = 50;
  * the old sequential behaviour.
  */
 const SCAN_FETCH_CONCURRENCY = 8;
+
+/**
+ * Local-storage key for the per-device "auto-scan enabled" preference.
+ * Plain UX flag (not secret), so it lives in `localStorage` rather than the
+ * encrypted NIP-78 document — a user who disables background scanning on a
+ * shared/low-power device shouldn't have that choice fan out to every device.
+ */
+const AUTO_SCAN_PREF_KEY = 'hdwallet:sp:auto-scan';
 
 interface UseHdWalletSpResult {
   /** Whether the feature is usable. False when not logged in with nsec, or no indexer configured. */
@@ -96,8 +116,25 @@ interface UseHdWalletSpResult {
   };
   /** True while `scanRange` (or a derived helper) is running. */
   isScanning: boolean;
+  /**
+   * True when the currently running scan was started automatically by the
+   * background auto-scanner rather than by an explicit user action. Lets the
+   * UI distinguish "we're quietly catching up in the background" from "you
+   * pressed Scan". `false` whenever `isScanning` is `false`.
+   */
+  isAutoScanning: boolean;
   /** Error from the most recent scan, if it failed. Cleared on next scan start. */
   scanError?: Error;
+
+  /**
+   * Whether automatic background scanning is enabled. When `true`, the
+   * provider resumes scanning from the last persisted `scanHeight` on load
+   * and keeps up with the chain tip without any user interaction. Persisted
+   * per-device in local storage; defaults to `true`.
+   */
+  autoScanEnabled: boolean;
+  /** Toggle automatic background scanning on/off (persisted per-device). */
+  setAutoScanEnabled: (enabled: boolean) => void;
 
   /** Tip height as reported by the indexer (cached, lightly refreshed). */
   tipHeight?: number;
@@ -167,6 +204,9 @@ const EMPTY_RESULT: UseHdWalletSpResult = {
   balance: 0,
   isLoading: false,
   isScanning: false,
+  isAutoScanning: false,
+  autoScanEnabled: true,
+  setAutoScanEnabled: () => {},
   scanRange: async () => {},
   scanRecent: async () => {},
   cancelScan: () => {},
@@ -175,7 +215,7 @@ const EMPTY_RESULT: UseHdWalletSpResult = {
   reconcileSpentUtxos: async () => 0,
 };
 
-export function useHdWalletSp(): UseHdWalletSpResult {
+export function useHdWalletSpInternal(): UseHdWalletSpResult {
   const { config } = useAppContext();
   const { user } = useCurrentUser();
   const { nostr } = useNostr();
@@ -398,6 +438,12 @@ export function useHdWalletSp(): UseHdWalletSpResult {
   const [scanProgress, setScanProgress] = useState<UseHdWalletSpResult['scanProgress']>();
   const [scanError, setScanError] = useState<Error | undefined>();
   const [isScanning, setIsScanning] = useState(false);
+  // True when the currently running scan was kicked off by the background
+  // auto-scanner rather than an explicit user action. Tracked separately from
+  // `isScanning` so the UI can show a quieter "catching up" affordance for
+  // automatic passes while still surfacing a full progress bar for manual
+  // ones. Always reset to `false` when a scan finishes.
+  const [isAutoScanning, setIsAutoScanning] = useState(false);
   const scanAbortRef = useRef<AbortController | null>(null);
   // Throttle timer for republishing storage during a long scan. Armed once
   // when there's unpublished progress; subsequent `scheduleRepublish` calls
@@ -446,8 +492,22 @@ export function useHdWalletSp(): UseHdWalletSpResult {
   }, [publishStorage]);
 
   // ── The core scan loop ───────────────────────────────────────
-  const scanRange = useCallback<UseHdWalletSpResult['scanRange']>(
-    async ({ fromHeight, toHeight, includeSpent = false }) => {
+  //
+  // `auto` distinguishes a background auto-scan pass (driven by the effect
+  // below) from a user-initiated scan. It only affects the `isAutoScanning`
+  // flag the UI reads — the actual scan work is identical.
+  const runScan = useCallback(
+    async ({
+      fromHeight,
+      toHeight,
+      includeSpent = false,
+      auto = false,
+    }: {
+      fromHeight: number;
+      toHeight?: number;
+      includeSpent?: boolean;
+      auto?: boolean;
+    }) => {
       if (!enabled || !keys) return;
       if (!storage) return; // Wait for the first load — caller can retry.
       if (!Number.isInteger(fromHeight) || fromHeight < 0) {
@@ -467,6 +527,7 @@ export function useHdWalletSp(): UseHdWalletSpResult {
 
       setScanError(undefined);
       setIsScanning(true);
+      setIsAutoScanning(auto);
       setScanProgress({
         fromHeight,
         toHeight: resolvedTo,
@@ -654,6 +715,7 @@ export function useHdWalletSp(): UseHdWalletSpResult {
           inflight.clear();
         }
         setIsScanning(false);
+        setIsAutoScanning(false);
         // Final flush — make sure the last scan progress reaches relays.
         flushRepublish();
         if (scanAbortRef.current === controller) {
@@ -662,6 +724,12 @@ export function useHdWalletSp(): UseHdWalletSpResult {
       }
     },
     [enabled, keys, storage, tipHeight, indexerUrl, blockbookUrl, scheduleRepublish, flushRepublish],
+  );
+
+  // Public scan API — always a user-initiated (non-auto) scan.
+  const scanRange = useCallback<UseHdWalletSpResult['scanRange']>(
+    (args) => runScan({ ...args, auto: false }),
+    [runScan],
   );
 
   const scanRecent = useCallback<UseHdWalletSpResult['scanRecent']>(async () => {
@@ -678,6 +746,74 @@ export function useHdWalletSp(): UseHdWalletSpResult {
   // see the freshest UTXO set without forcing the callback to re-create.
   const storageRef = useRef<SPStorageDocument | undefined>(storage);
   storageRef.current = storage;
+
+  // ── Automatic background scanning ────────────────────────────
+  //
+  // The whole point of the provider lifting: scanning should "just happen"
+  // without the user opening a dialog and pressing a button. We resume from
+  // the last persisted `scanHeight` (so we never re-scan blocks we've
+  // already covered) and walk forward to the current tip. As the tip query
+  // refreshes (every 60s) and advances, this effect re-fires and scans only
+  // the newly mined blocks.
+  //
+  // For a *never-scanned* wallet (`scanHeight === 0`) we deliberately do NOT
+  // walk the entire chain from genesis — that's hundreds of thousands of
+  // per-block round trips. We bound the initial automatic pass to the last
+  // `AUTO_SCAN_INITIAL_WINDOW_BLOCKS` blocks; a user who expects older
+  // payments can run a deeper manual scan from the dialog (which sets
+  // `scanHeight` and lets subsequent auto-scans resume contiguously).
+  //
+  // Persisted per-device so a user can opt out (e.g. on a metered/low-power
+  // device) without affecting their other devices.
+  const [autoScanEnabled, setAutoScanEnabledRaw] = useLocalStorage<boolean>(
+    AUTO_SCAN_PREF_KEY,
+    true,
+  );
+  const setAutoScanEnabled = useCallback(
+    (next: boolean) => setAutoScanEnabledRaw(next),
+    [setAutoScanEnabledRaw],
+  );
+
+  // Highest tip we've already auto-scanned up to (or kicked off a scan for),
+  // so a tip refresh that doesn't actually advance the chain doesn't restart
+  // a scan, and a manual scan in between doesn't get clobbered by a redundant
+  // auto pass. Reset when the wallet identity changes.
+  const autoScannedToRef = useRef(0);
+  useEffect(() => {
+    autoScannedToRef.current = 0;
+  }, [pubkey, indexerUrl]);
+
+  useEffect(() => {
+    if (!enabled) return;
+    if (!autoScanEnabled) return;
+    if (!storage) return; // Wait for the first storage load.
+    if (tipHeight === undefined) return; // Need a known tip to bound the scan.
+    if (isScanning) return; // Never interrupt an in-flight scan (manual or auto).
+
+    // Resume from the block after the last fully-scanned one. For a
+    // never-scanned wallet (`scanHeight === 0`), bound the very first
+    // automatic pass to a recent window rather than walking from genesis.
+    const resumeFrom =
+      storage.scanHeight > 0
+        ? storage.scanHeight + 1
+        : Math.max(0, tipHeight - AUTO_SCAN_INITIAL_WINDOW_BLOCKS + 1);
+
+    // Nothing new to scan — we're already caught up to the tip.
+    if (resumeFrom > tipHeight) return;
+
+    // Don't re-trigger for a tip we've already launched a scan for. This
+    // guards against the effect re-running (e.g. a benign `storage` identity
+    // change) and spawning duplicate scans for the same range.
+    if (tipHeight <= autoScannedToRef.current) return;
+    autoScannedToRef.current = tipHeight;
+
+    void runScan({ fromHeight: resumeFrom, toHeight: tipHeight, auto: true }).catch((err) => {
+      // Surfaced via `scanError`; also reset the guard so a later tip
+      // refresh retries from the same point rather than silently giving up.
+      console.warn('Automatic SP scan failed:', err);
+      autoScannedToRef.current = 0;
+    });
+  }, [enabled, autoScanEnabled, storage, tipHeight, isScanning, runScan]);
 
   // ── Prune spent SP UTXOs after a successful broadcast ────────
   //
@@ -895,7 +1031,10 @@ export function useHdWalletSp(): UseHdWalletSpResult {
     isLoading: storageEventQuery.isLoading || storageDocQuery.isLoading,
     scanProgress,
     isScanning,
+    isAutoScanning,
     scanError,
+    autoScanEnabled,
+    setAutoScanEnabled,
     tipHeight,
     scanRange,
     scanRecent,

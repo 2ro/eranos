@@ -6,6 +6,7 @@ import { AppProvider } from "@/components/AppProvider";
 import NostrProvider from "@/components/NostrProvider";
 import type { AppConfig } from "@/contexts/AppContext";
 import { NWCProvider } from "@/contexts/NWCContext";
+import { HdWalletSpProvider } from "@/contexts/HdWalletSpProvider";
 
 interface TestAppProps {
   children: React.ReactNode;
@@ -133,7 +134,9 @@ export function TestApp({ children }: TestAppProps) {
           <NostrLoginProvider storageKey="test-login">
             <NostrProvider>
               <NWCProvider>
-                <BrowserRouter>{children}</BrowserRouter>
+                <HdWalletSpProvider>
+                  <BrowserRouter>{children}</BrowserRouter>
+                </HdWalletSpProvider>
               </NWCProvider>
             </NostrProvider>
           </NostrLoginProvider>

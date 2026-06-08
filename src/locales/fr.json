@@ -1872,7 +1872,19 @@
       "checked_other": "{{count}} UTXO vérifiés · {{pruned}} élagués.",
       "reconciling": "Réconciliation…",
       "reconcileNow": "Réconcilier maintenant"
+    },
+    "autoScan": {
+      "label": "Scanner automatiquement",
+      "description": "Continue à vérifier les nouveaux paiements privés en arrière-plan, même lorsque vous quittez cette page."
     }
+  },
+  "spAutoScan": {
+    "scanning": "Scan en cours… bloc {{current}} / {{to}}",
+    "caughtUp": "À jour",
+    "neverScanned": "Pas encore scanné",
+    "lastScanned": "Scanné jusqu'au bloc {{height}}",
+    "paused": "Le scan automatique est désactivé",
+    "manualLink": "Options de scan"
   },
   "notifications": {
     "seoTitle": "Notifications",

@@ -29,11 +29,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
 import { HDSilentPaymentScanDialog } from '@/components/HDSilentPaymentScanDialog';
+import { SilentPaymentScanStatus } from '@/components/SilentPaymentScanStatus';
 import { WalletBackupMnemonicDialog } from '@/components/WalletBackupMnemonic';
 import { PendingBadge } from '@/components/PendingBadge';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useHdWallet } from '@/hooks/useHdWallet';
-import { useHdWalletSp } from '@/hooks/useHdWalletSp';
+import { useHdWalletSp } from '@/hooks/useHdWalletSpContext';
 import { useHdBtcPrice } from '@/hooks/useHdBtcPrice';
 import { satsToUSD, formatBTC } from '@/lib/bitcoin';
 import type { WalletScope } from '@/lib/hdwallet/transaction';
@@ -214,13 +215,7 @@ export function WalletPage() {
             onSend={() => openSend('private')}
             footer={
               sp.enabled && spAddress ? (
-                <button
-                  type="button"
-                  onClick={() => setSpScanOpen(true)}
-                  className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm cursor-pointer"
-                >
-                  {t('wallet.receiveDialog.scanForNew')}
-                </button>
+                <SilentPaymentScanStatus onOpenScanDialog={() => setSpScanOpen(true)} />
               ) : null
             }
           />

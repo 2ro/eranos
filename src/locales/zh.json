@@ -1435,7 +1435,19 @@
       "checked_other": "已检查 {{count}} 个 UTXO · 已清理 {{pruned}}。",
       "reconciling": "正在对账…",
       "reconcileNow": "立即对账"
+    },
+    "autoScan": {
+      "label": "自动扫描",
+      "description": "在后台持续检查新的私密支付，即使你离开此页面也会继续。"
     }
+  },
+  "spAutoScan": {
+    "scanning": "正在扫描…区块 {{current}} / {{to}}",
+    "caughtUp": "已是最新",
+    "neverScanned": "尚未扫描",
+    "lastScanned": "已扫描至区块 {{height}}",
+    "paused": "自动扫描已关闭",
+    "manualLink": "扫描选项"
   },
   "notifications": {
     "seoTitle": "通知",

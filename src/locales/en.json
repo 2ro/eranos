@@ -1953,7 +1953,19 @@
       "checked_other": "Checked {{count}} UTXOs · pruned {{pruned}}.",
       "reconciling": "Reconciling…",
       "reconcileNow": "Reconcile now"
+    },
+    "autoScan": {
+      "label": "Scan automatically",
+      "description": "Keep checking for new private payments in the background, even when you leave this page."
     }
+  },
+  "spAutoScan": {
+    "scanning": "Scanning… block {{current}} / {{to}}",
+    "caughtUp": "Up to date",
+    "neverScanned": "Not scanned yet",
+    "lastScanned": "Scanned to block {{height}}",
+    "paused": "Automatic scanning is off",
+    "manualLink": "Scan options"
   },
   "notifications": {
     "seoTitle": "Notifications",

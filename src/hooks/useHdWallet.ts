@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useSecureLocalStorage } from '@/hooks/useSecureLocalStorage';
 import { useHdWalletAccess, type HdWalletAvailability } from '@/hooks/useHdWalletAccess';
-import { useHdWalletSp } from '@/hooks/useHdWalletSp';
+import { useHdWalletSp } from '@/hooks/useHdWalletSpContext';
 import {
   deriveReceiveAddress,
   deriveSilentPaymentAddress,

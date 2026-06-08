@@ -1433,7 +1433,19 @@
       "checked_other": "Comprobados {{count}} UTXOs · podados {{pruned}}.",
       "reconciling": "Reconciliando…",
       "reconcileNow": "Reconciliar ahora"
+    },
+    "autoScan": {
+      "label": "Escanear automáticamente",
+      "description": "Sigue comprobando nuevos pagos privados en segundo plano, incluso cuando salgas de esta página."
     }
+  },
+  "spAutoScan": {
+    "scanning": "Escaneando… bloque {{current}} / {{to}}",
+    "caughtUp": "Al día",
+    "neverScanned": "Aún sin escanear",
+    "lastScanned": "Escaneado hasta el bloque {{height}}",
+    "paused": "El escaneo automático está desactivado",
+    "manualLink": "Opciones de escaneo"
   },
   "notifications": {
     "seoTitle": "Notificaciones",

@@ -1435,7 +1435,19 @@
       "checked_other": "Dzatariswa UTXOs {{count}} · dzapfupiswa {{pruned}}.",
       "reconciling": "Kureconcile…",
       "reconcileNow": "Reconcile zvino"
+    },
+    "autoScan": {
+      "label": "Tarisa woga",
+      "description": "Ramba uchitsvaga mibhadharo mitsva yakavanzika mushure, kunyange iwe wabva papeji ino."
     }
+  },
+  "spAutoScan": {
+    "scanning": "Kutarisa… bhuroka {{current}} / {{to}}",
+    "caughtUp": "Yagara pamberi pose",
+    "neverScanned": "Haisati yatariswa",
+    "lastScanned": "Yatariswa kusvika pabhuroka {{height}}",
+    "paused": "Kutarisa kwoga kwakadzimwa",
+    "manualLink": "Sarudzo dzokutarisa"
   },
   "notifications": {
     "seoTitle": "Zviziviso",

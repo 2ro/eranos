@@ -1423,7 +1423,19 @@
       "checked_other": "تم فحص {{count}} UTXOات · تم تقليم {{pruned}}.",
       "reconciling": "جارٍ المطابقة…",
       "reconcileNow": "مطابقة الآن"
+    },
+    "autoScan": {
+      "label": "الفحص تلقائياً",
+      "description": "استمر في التحقق من المدفوعات الخاصة الجديدة في الخلفية، حتى عند مغادرة هذه الصفحة."
     }
+  },
+  "spAutoScan": {
+    "scanning": "جارٍ الفحص… الكتلة {{current}} / {{to}}",
+    "caughtUp": "محدَّث",
+    "neverScanned": "لم يُفحص بعد",
+    "lastScanned": "تم الفحص حتى الكتلة {{height}}",
+    "paused": "الفحص التلقائي متوقف",
+    "manualLink": "خيارات الفحص"
   },
   "notifications": {
     "seoTitle": "الإشعارات",
