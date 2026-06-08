@@ -91,6 +91,56 @@ const SCAN_FETCH_CONCURRENCY = 8;
  */
 const AUTO_SCAN_PREF_KEY = 'hdwallet:sp:auto-scan';
 
+/**
+ * How often, at most, to checkpoint the advancing `scanHeight` to
+ * localStorage during a scan. Publishing the encrypted NIP-78 doc to relays
+ * costs an encrypt + signEvent (possibly a signer prompt) + broadcast, so we
+ * deliberately do NOT do that every few seconds — relay publishes stay gated
+ * to matches and end-of-scan. The local checkpoint is free and synchronous,
+ * so a tight 5s cadence bounds how much a mid-scan refresh has to re-scan
+ * (≈ the blocks scanned in the last 5s) without any signer/relay traffic.
+ */
+const LOCAL_CHECKPOINT_THROTTLE_MS = 5000;
+
+/**
+ * Per-(pubkey, indexer) localStorage key for the locally-checkpointed
+ * `scanHeight`. Scoped by indexer because two indexers can disagree on tip,
+ * and by pubkey so switching accounts doesn't resume from the wrong cursor.
+ */
+function localCheckpointKey(pubkey: string, indexerUrl: string): string {
+  return `hdwallet:sp:checkpoint:${pubkey}:${indexerUrl}`;
+}
+
+/** Read the locally-checkpointed scanHeight, or 0 if absent/unparseable. */
+function readLocalCheckpoint(pubkey: string, indexerUrl: string): number {
+  if (!pubkey || !indexerUrl) return 0;
+  try {
+    const raw = localStorage.getItem(localCheckpointKey(pubkey, indexerUrl));
+    if (raw === null) return 0;
+    const n = Number(raw);
+    return Number.isInteger(n) && n >= 0 ? n : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Persist a locally-checkpointed scanHeight. Monotonic: never lowers the
+ * stored value, so a stale write (or a relay copy that's actually further
+ * ahead) can't drag the resume cursor backward.
+ */
+function writeLocalCheckpoint(pubkey: string, indexerUrl: string, height: number): void {
+  if (!pubkey || !indexerUrl) return;
+  try {
+    const key = localCheckpointKey(pubkey, indexerUrl);
+    if (height <= readLocalCheckpoint(pubkey, indexerUrl)) return;
+    localStorage.setItem(key, String(height));
+  } catch {
+    // localStorage unavailable (private mode, quota) — degrade gracefully to
+    // the relay-only checkpoint. Worst case is the pre-existing behaviour.
+  }
+}
+
 interface UseHdWalletSpResult {
   /** Whether the feature is usable. False when not logged in with nsec, or no indexer configured. */
   enabled: boolean;
@@ -457,6 +507,10 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
   // empty blocks. The final flush in `scanRange`'s `finally` publishes
   // unconditionally so the advanced `scanHeight` still gets checkpointed.
   const republishDirtyRef = useRef(false);
+  // Wall-clock timestamp (ms) of the last local scanHeight checkpoint write,
+  // so the scan loop can throttle localStorage writes to once per
+  // `LOCAL_CHECKPOINT_THROTTLE_MS` instead of once per block.
+  const lastLocalCheckpointAtRef = useRef(0);
 
   const cancelScan = useCallback(() => {
     scanAbortRef.current?.abort();
@@ -528,6 +582,9 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
       setScanError(undefined);
       setIsScanning(true);
       setIsAutoScanning(auto);
+      // Reset the local-checkpoint throttle so this scan can checkpoint
+      // promptly rather than inheriting a recent timestamp from a prior scan.
+      lastLocalCheckpointAtRef.current = 0;
       setScanProgress({
         fromHeight,
         toHeight: resolvedTo,
@@ -677,6 +734,17 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
               ...opt,
               scanHeight: Math.max(opt.scanHeight, highestContiguousScanned),
             };
+
+            // Throttled *local* checkpoint of the advancing scanHeight. This
+            // is free (synchronous localStorage, no signer/relay) so it runs
+            // independently of the match-gated relay republish below — a
+            // mid-scan refresh resumes from here, re-scanning at most the
+            // blocks covered in the last `LOCAL_CHECKPOINT_THROTTLE_MS`.
+            const now = Date.now();
+            if (now - lastLocalCheckpointAtRef.current >= LOCAL_CHECKPOINT_THROTTLE_MS) {
+              lastLocalCheckpointAtRef.current = now;
+              writeLocalCheckpoint(pubkey, indexerUrl, highestContiguousScanned);
+            }
           }
 
           setScanProgress({
@@ -716,6 +784,12 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
         }
         setIsScanning(false);
         setIsAutoScanning(false);
+        // Final local checkpoint — capture the last blocks scanned since the
+        // throttled write above, so even a clean finish leaves an accurate
+        // local resume cursor without waiting on the relay round-trip.
+        if (optimisticRef.current) {
+          writeLocalCheckpoint(pubkey, indexerUrl, optimisticRef.current.scanHeight);
+        }
         // Final flush — make sure the last scan progress reaches relays.
         flushRepublish();
         if (scanAbortRef.current === controller) {
@@ -723,7 +797,7 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
         }
       }
     },
-    [enabled, keys, storage, tipHeight, indexerUrl, blockbookUrl, scheduleRepublish, flushRepublish],
+    [enabled, keys, storage, tipHeight, indexerUrl, blockbookUrl, pubkey, scheduleRepublish, flushRepublish],
   );
 
   // Public scan API — always a user-initiated (non-auto) scan.
@@ -790,12 +864,18 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
     if (tipHeight === undefined) return; // Need a known tip to bound the scan.
     if (isScanning) return; // Never interrupt an in-flight scan (manual or auto).
 
-    // Resume from the block after the last fully-scanned one. For a
-    // never-scanned wallet (`scanHeight === 0`), bound the very first
-    // automatic pass to a recent window rather than walking from genesis.
+    // Resume from the block after the last fully-scanned one. The effective
+    // scan cursor is the furthest of the relay-persisted `scanHeight` and the
+    // local checkpoint — the local copy is usually ahead after a mid-scan
+    // refresh (it's written every few seconds, whereas the relay copy is only
+    // published on matches and end-of-scan). For a never-scanned wallet
+    // (cursor 0), bound the very first automatic pass to a recent window
+    // rather than walking from genesis.
+    const localCheckpoint = readLocalCheckpoint(pubkey, indexerUrl);
+    const effectiveScanHeight = Math.max(storage.scanHeight, localCheckpoint);
     const resumeFrom =
-      storage.scanHeight > 0
-        ? storage.scanHeight + 1
+      effectiveScanHeight > 0
+        ? effectiveScanHeight + 1
         : Math.max(0, tipHeight - AUTO_SCAN_INITIAL_WINDOW_BLOCKS + 1);
 
     // Nothing new to scan — we're already caught up to the tip.
@@ -813,7 +893,7 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
       console.warn('Automatic SP scan failed:', err);
       autoScannedToRef.current = 0;
     });
-  }, [enabled, autoScanEnabled, storage, tipHeight, isScanning, runScan]);
+  }, [enabled, autoScanEnabled, storage, tipHeight, isScanning, runScan, pubkey, indexerUrl]);
 
   // ── Prune spent SP UTXOs after a successful broadcast ────────
   //
