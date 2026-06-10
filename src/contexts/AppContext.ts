@@ -364,6 +364,15 @@ export interface AppConfig {
    */
   bip352IndexerUrl: string;
   /**
+   * How many per-block fetches the silent-payment scanner keeps in flight at
+   * once. The BlindBit Oracle exposes only per-block endpoints, so scan speed
+   * is dominated by HTTP latency, not compute — higher concurrency hides that
+   * latency. The default (8) is a polite value for the shared public indexer;
+   * a fast self-hosted endpoint can take much higher. Clamped at runtime to
+   * [1, 32]. Optional — omit to use the default.
+   */
+  bip352ScanConcurrency?: number;
+  /**
    * Display preference for monetary amounts (zap totals, balances, send forms).
    * - "usd" (default): convert sats to USD using the live BTC price.
    * - "sats": always show raw satoshi counts.

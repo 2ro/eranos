@@ -12,8 +12,10 @@ import {
   type SilentPaymentKeys,
 } from '@/lib/hdwallet/derivation';
 import { fetchBlockTime, fetchUtxoSpentStatus } from '@/lib/hdwallet/blockbook';
-import { fetchBlockEntries, fetchTipHeight } from '@/lib/hdwallet/sp/indexer';
+import { fetchTipHeight } from '@/lib/hdwallet/sp/indexer';
+import { fetchBlockEntriesCached } from '@/lib/hdwallet/sp/blockCache';
 import { scanBatch, type SPMatchedUtxo } from '@/lib/hdwallet/sp/scanner';
+import { createSpScanWorker } from '@/lib/hdwallet/sp/scanWorkerClient';
 import {
   EMPTY_SP_STORAGE,
   archiveSpentUtxos,
@@ -67,7 +69,7 @@ const AUTO_SCAN_INITIAL_WINDOW_BLOCKS = 1008; // ~7 days of mainnet blocks.
 const MAX_RECONCILE_UTXOS = 50;
 
 /**
- * How many block fetches to keep in flight at once during a scan.
+ * Default for how many block fetches to keep in flight at once during a scan.
  *
  * The BlindBit Oracle exposes only per-block endpoints (`/tweaks/:H`,
  * `/utxos/:H`), so a 144-block "recent" scan does up to ~288 HTTP round
@@ -77,11 +79,24 @@ const MAX_RECONCILE_UTXOS = 50;
  * concurrency 8 finishes in ~25s while still being polite to the indexer
  * (anecdotally ~6× speedup at concurrency 10 against the public host).
  *
- * Tunable: higher values keep the indexer hotter but risk rate-limiting or
- * TCP-level head-of-line blocking on slow links. Lower values trend toward
- * the old sequential behaviour.
+ * Tunable via `AppConfig.bip352ScanConcurrency`: higher values keep the
+ * indexer hotter but risk rate-limiting or TCP-level head-of-line blocking on
+ * slow links. Lower values trend toward the old sequential behaviour. Users
+ * with a fast self-hosted indexer can crank it up; the public host is best
+ * left near the default. Clamped to [1, 32].
  */
-const SCAN_FETCH_CONCURRENCY = 8;
+const DEFAULT_SCAN_FETCH_CONCURRENCY = 8;
+const MIN_SCAN_FETCH_CONCURRENCY = 1;
+const MAX_SCAN_FETCH_CONCURRENCY = 32;
+
+/** Clamp a configured concurrency to the safe range, falling back to the default. */
+function resolveScanConcurrency(configured: number | undefined): number {
+  if (!Number.isInteger(configured)) return DEFAULT_SCAN_FETCH_CONCURRENCY;
+  return Math.min(
+    MAX_SCAN_FETCH_CONCURRENCY,
+    Math.max(MIN_SCAN_FETCH_CONCURRENCY, configured as number),
+  );
+}
 
 /**
  * Local-storage key for the per-device "auto-scan enabled" preference.
@@ -274,6 +289,7 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
 
   const indexerUrl = (config.bip352IndexerUrl ?? '').trim();
   const blockbookUrl = (config.blockbookBaseUrl ?? '').trim();
+  const scanConcurrency = resolveScanConcurrency(config.bip352ScanConcurrency);
   const pubkey = access.status === 'available' ? access.pubkey : '';
   const seed = access.status === 'available' ? access.seed : undefined;
 
@@ -604,11 +620,20 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
       let matchesFound = 0;
       let highestContiguousScanned = fromHeight - 1;
 
+      // ── ECDH scan worker ─────────────────────────────────────
+      //
+      // Offload the secp256k1 ECDH + per-output `Pₖ` derivation to a worker
+      // so it doesn't compete with React renders / user input on the main
+      // thread, and so it overlaps with the fetch pipeline below. `null`
+      // means no worker could be constructed (e.g. environment without the
+      // `Worker` global) — we fall back to scanning on the main thread.
+      const scanWorker = createSpScanWorker(keys.bscan, keys.Bspend);
+
       // ── Sliding-window pipeline state ────────────────────────
       //
       // Declared outside the try block so the `finally` cleanup can drain
       // any still-pending fetches if we exit via cancel or error.
-      const inflight = new Map<number, Promise<Awaited<ReturnType<typeof fetchBlockEntries>>>>();
+      const inflight = new Map<number, Promise<Awaited<ReturnType<typeof fetchBlockEntriesCached>>>>();
       let nextToSchedule = fromHeight;
 
       const scheduleUpTo = (limit: number) => {
@@ -620,7 +645,7 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
           const h = nextToSchedule++;
           inflight.set(
             h,
-            fetchBlockEntries(indexerUrl, h, controller.signal, includeSpent),
+            fetchBlockEntriesCached(indexerUrl, h, controller.signal, includeSpent),
           );
         }
       };
@@ -630,13 +655,15 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
         //
         // The indexer exposes only per-block endpoints, so a long scan is
         // dominated by HTTP latency rather than ECDH compute. We keep up
-        // to SCAN_FETCH_CONCURRENCY `fetchBlockEntries` calls in flight at
+        // to `scanConcurrency` `fetchBlockEntriesCached` calls in flight at
         // once, but PROCESS the results strictly in height order — this
         // keeps `optimisticRef`, `matchesFound`, scan-progress, and the
         // contiguous `scanHeight` advancement single-writer and monotonic.
+        // Already-fetched blocks are served from the IndexedDB cache, so a
+        // repeat scan over an overlapping range costs zero round-trips.
 
         // Prime the pipeline.
-        scheduleUpTo(SCAN_FETCH_CONCURRENCY);
+        scheduleUpTo(scanConcurrency);
 
         for (let h = fromHeight; h <= resolvedTo; h++) {
           if (controller.signal.aborted) break;
@@ -649,7 +676,7 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
           }
           inflight.delete(h);
 
-          let entries: Awaited<ReturnType<typeof fetchBlockEntries>>;
+          let entries: Awaited<ReturnType<typeof fetchBlockEntriesCached>>;
           try {
             entries = await pending;
           } catch (err) {
@@ -663,13 +690,17 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
 
           // A slot has freed — keep the window topped up before we spend
           // time on ECDH for this block.
-          scheduleUpTo(SCAN_FETCH_CONCURRENCY);
+          scheduleUpTo(scanConcurrency);
 
           let blockMatches: SPMatchedUtxo[] = [];
           if (entries.length > 0) {
-            blockMatches = await scanBatch(entries, keys.bscan, keys.Bspend, {
-              signal: controller.signal,
-            });
+            // Run the ECDH in the worker when available; the worker client
+            // transparently falls back to a main-thread scan on any failure.
+            blockMatches = scanWorker
+              ? await scanWorker.scanEntries(entries)
+              : await scanBatch(entries, keys.bscan, keys.Bspend, {
+                  signal: controller.signal,
+                });
           }
 
           // Merge matches into the optimistic doc.
@@ -770,6 +801,9 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
           setScanError(err instanceof Error ? err : new Error(String(err)));
         }
       } finally {
+        // Tear down the ECDH worker (if any) — rejects any stragglers and
+        // frees the thread. A fresh worker is created per scan.
+        scanWorker?.terminate();
         // Drain any still-pending fetches — they'll reject (because we
         // aborted the controller in the error path, or because the user
         // called cancelScan) and we don't want unhandled rejection noise.
@@ -797,7 +831,7 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
         }
       }
     },
-    [enabled, keys, storage, tipHeight, indexerUrl, blockbookUrl, pubkey, scheduleRepublish, flushRepublish],
+    [enabled, keys, storage, tipHeight, indexerUrl, blockbookUrl, pubkey, scanConcurrency, scheduleRepublish, flushRepublish],
   );
 
   // Public scan API — always a user-initiated (non-auto) scan.

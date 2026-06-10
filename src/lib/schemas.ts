@@ -169,6 +169,11 @@ export const AppConfigSchema = z.object({
     z.literal(''),
     z.string().url(),
   ]).optional().default(''),
+  /**
+   * Silent-payment scan fetch concurrency. Clamped to [1, 32] at runtime in
+   * `useHdWalletSp`; the schema only enforces a positive integer.
+   */
+  bip352ScanConcurrency: z.number().int().positive().optional(),
   currencyDisplay: z.enum(['usd', 'sats']).optional(),
   sidebarWidgets: z.array(z.object({
     id: z.string(),
