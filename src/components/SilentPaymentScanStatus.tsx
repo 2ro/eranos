@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Loader2, CheckCircle2, PauseCircle } from 'lucide-react';
 
+import { Progress } from '@/components/ui/progress';
 import { useHdWalletSp } from '@/hooks/useHdWalletSpContext';
 
 interface SilentPaymentScanStatusProps {
@@ -25,18 +26,48 @@ export function SilentPaymentScanStatus({ onOpenScanDialog }: SilentPaymentScanS
 
   const scanHeight = sp.storage?.scanHeight ?? 0;
 
-  let content: React.ReactNode;
+  const scanOptionsButton = (
+    <button
+      type="button"
+      onClick={onOpenScanDialog}
+      className="text-muted-foreground hover:text-foreground underline underline-offset-4 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm cursor-pointer"
+    >
+      {t('spAutoScan.manualLink')}
+    </button>
+  );
+
+  // While scanning, surface a proper progress bar (matching the scan dialog)
+  // instead of a lone spinner, so completeness is visible at a glance.
   if (sp.isScanning && sp.scanProgress) {
-    content = (
-      <span className="flex items-center gap-1.5 text-muted-foreground">
-        <Loader2 className="size-3 animate-spin" />
-        {t('spAutoScan.scanning', {
-          current: sp.scanProgress.currentHeight.toLocaleString(),
-          to: sp.scanProgress.toHeight.toLocaleString(),
-        })}
-      </span>
+    const { currentHeight, fromHeight, toHeight } = sp.scanProgress;
+    const progressPercent = Math.min(
+      100,
+      Math.round(
+        ((currentHeight - fromHeight + 1) /
+          Math.max(1, toHeight - fromHeight + 1)) *
+          100,
+      ),
     );
-  } else if (!sp.autoScanEnabled) {
+
+    return (
+      <div className="space-y-2">
+        <Progress value={progressPercent} className="h-2" />
+        <div className="flex items-center justify-between gap-2 text-xs">
+          <span className="flex items-center gap-1.5 text-muted-foreground">
+            <Loader2 className="size-3 animate-spin" />
+            {t('spAutoScan.scanning', {
+              current: currentHeight.toLocaleString(),
+              to: toHeight.toLocaleString(),
+            })}
+          </span>
+          {scanOptionsButton}
+        </div>
+      </div>
+    );
+  }
+
+  let content: React.ReactNode;
+  if (!sp.autoScanEnabled) {
     content = (
       <span className="flex items-center gap-1.5 text-muted-foreground">
         <PauseCircle className="size-3" />
@@ -68,13 +99,7 @@ export function SilentPaymentScanStatus({ onOpenScanDialog }: SilentPaymentScanS
       <span aria-hidden className="text-muted-foreground/40">
         ·
       </span>
-      <button
-        type="button"
-        onClick={onOpenScanDialog}
-        className="text-muted-foreground hover:text-foreground underline underline-offset-4 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm cursor-pointer"
-      >
-        {t('spAutoScan.manualLink')}
-      </button>
+      {scanOptionsButton}
     </div>
   );
 }
