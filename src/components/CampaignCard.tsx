@@ -148,13 +148,22 @@ interface CampaignCardProps {
   className?: string;
   /** Optional footer affordance rendered opposite the author line. */
   footerBadge?: ReactNode;
+  /**
+   * When false, the moderator kebab inside the card overlay is suppressed.
+   * The "Hidden" badge still renders so mods can see hide state, but the
+   * menu trigger is omitted. Pass false when the card is wrapped by a
+   * parent (e.g. `ListMemberCard`) that already provides its own combined
+   * kebab containing the moderation actions — avoids two overlapping menus
+   * in the same top-right corner.
+   */
+  showModerationMenu?: boolean;
 }
 
 /**
  * Renders a single campaign as a clickable card. The whole card is a
  * `<Link>` to the campaign's naddr-based detail route.
  */
-export function CampaignCard({ campaign, variant = 'compact', className, footerBadge }: CampaignCardProps) {
+export function CampaignCard({ campaign, variant = 'compact', className, footerBadge, showModerationMenu = true }: CampaignCardProps) {
   const { t } = useTranslation();
   const { translatedEvent, translateAction } = useEventTranslation(campaign.event, {
     iconOnly: true,
@@ -272,6 +281,7 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
             surface="campaign"
             axes={['hide']}
             badgeSize="default"
+            showMenu={showModerationMenu}
             className="absolute top-3 right-3 z-10 flex items-center gap-2"
           />
         </div>

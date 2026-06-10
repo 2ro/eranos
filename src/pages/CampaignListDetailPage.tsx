@@ -20,16 +20,21 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { ListFormDialog } from '@/components/campaign-lists/ListFormDialog';
 import { AddCampaignToListDialog } from '@/components/campaign-lists/AddCampaignToListDialog';
+import { CampaignListMembershipDialog } from '@/components/campaign-lists/CampaignListMembershipDialog';
+import { VerificationDialog } from '@/components/VerificationDialog';
+import { ModerationMenuItems } from '@/components/moderation';
 import { LucideIcon } from '@/components/LucideIcon';
 import { useCampaignList } from '@/hooks/useCampaignLists';
 import { useCampaignListActions } from '@/hooks/useCampaignListActions';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
+import { useCampaignVerifications } from '@/hooks/useCampaignVerifications';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useAppContext } from '@/hooks/useAppContext';
 import { toast } from '@/hooks/useToast';
@@ -430,6 +435,9 @@ function ListMemberCard({
 }: ListMemberCardProps) {
   const { t } = useTranslation();
   const [isOver, setIsOver] = useState(false);
+  const [membershipOpen, setMembershipOpen] = useState(false);
+  const [verifyOpen, setVerifyOpen] = useState(false);
+  const { verify } = useCampaignVerifications();
 
   if (!isMod) {
     return <CampaignCard campaign={campaign} />;
@@ -454,60 +462,98 @@ function ListMemberCard({
         },
       };
 
+  const onConfirmVerify = async () => {
+    try {
+      await verify.mutateAsync({ coord: campaign.aTag });
+      toast({ title: t('campaignVerification.verified'), description: campaign.title });
+      setVerifyOpen(false);
+    } catch (error) {
+      toast({
+        title: t('campaignVerification.actionFailed'),
+        description: error instanceof Error ? error.message : undefined,
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
-    <div
-      className={cn(
-        'relative group/list-member motion-safe:transition-shadow',
-        isOver && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-xl shadow-lg',
-      )}
-      {...desktopDropHandlers}
-    >
-      {!isMobile && (
-        <DragHandle
-          coord={campaign.aTag}
-          index={index}
-          mimeType={DRAG_MIME}
-          ariaLabel={t('moderation.menu.dragHandle', { index: index + 1 })}
-        />
-      )}
+    <>
+      <div
+        className={cn(
+          'relative group/list-member motion-safe:transition-shadow',
+          isOver && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-xl shadow-lg',
+        )}
+        {...desktopDropHandlers}
+      >
+        {!isMobile && (
+          <DragHandle
+            coord={campaign.aTag}
+            index={index}
+            mimeType={DRAG_MIME}
+            ariaLabel={t('moderation.menu.dragHandle', { index: index + 1 })}
+          />
+        )}
 
-      <div className="absolute top-3 right-3 z-20 opacity-0 group-hover/list-member:opacity-100 focus-within:opacity-100 motion-safe:transition-opacity">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              aria-label={t('campaigns.lists.memberMenuAria')}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-background/80 backdrop-blur text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <MoreVertical className="size-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem disabled={!canMoveUp} onSelect={() => onMoveToTop()}>
-              {t('moderation.menu.moveToTop')}
-            </DropdownMenuItem>
-            <DropdownMenuItem disabled={!canMoveUp} onSelect={() => onMoveUp()}>
-              {t('moderation.menu.moveUp')}
-            </DropdownMenuItem>
-            <DropdownMenuItem disabled={!canMoveDown} onSelect={() => onMoveDown()}>
-              {t('moderation.menu.moveDown')}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={() => onRemove()}
-              className="text-destructive focus:text-destructive"
-            >
-              {t('campaigns.lists.removeFromList')}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="absolute top-3 right-3 z-20 opacity-0 group-hover/list-member:opacity-100 focus-within:opacity-100 motion-safe:transition-opacity">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                aria-label={t('campaigns.lists.memberMenuAria')}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-background/80 backdrop-blur text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <MoreVertical className="size-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+              <DropdownMenuItem disabled={!canMoveUp} onSelect={() => onMoveToTop()}>
+                {t('moderation.menu.moveToTop')}
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled={!canMoveUp} onSelect={() => onMoveUp()}>
+                {t('moderation.menu.moveUp')}
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled={!canMoveDown} onSelect={() => onMoveDown()}>
+                {t('moderation.menu.moveDown')}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => onRemove()}
+                className="text-destructive focus:text-destructive"
+              >
+                {t('campaigns.lists.removeFromList')}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <ModerationMenuItems
+                coord={campaign.aTag}
+                entityTitle={campaign.title}
+                surface="campaign"
+                axes={['hide']}
+                onAddToList={() => setMembershipOpen(true)}
+                onRequestVerify={() => setVerifyOpen(true)}
+              />
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        <CampaignCard campaign={campaign} showModerationMenu={false} />
       </div>
-
-      <CampaignCard campaign={campaign} />
-    </div>
+      <CampaignListMembershipDialog
+        open={membershipOpen}
+        onOpenChange={setMembershipOpen}
+        campaignCoord={campaign.aTag}
+        campaignTitle={campaign.title}
+      />
+      <VerificationDialog
+        open={verifyOpen}
+        onOpenChange={setVerifyOpen}
+        campaignTitle={campaign.title}
+        isPending={verify.isPending}
+        onConfirm={onConfirmVerify}
+      />
+    </>
   );
 }
 
