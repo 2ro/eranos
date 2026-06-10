@@ -453,10 +453,10 @@
       "title": "Guide du donateur",
       "subtitle": "Du vrai Bitcoin, envoyé directement. Tout le processus en une courte page."
     },
-    "activistGuide": {
-      "seoTitle": "Guide de l'activiste",
+    "recipientGuide": {
+      "seoTitle": "Guide du bénéficiaire",
       "seoDescription": "Comment recevoir des dons sur {{appName}} et retirer des fonds en privé.",
-      "title": "Guide de l'activiste",
+      "title": "Guide du bénéficiaire",
       "subtitle": "Choisissez ce que vous acceptez, recevez des dons, retirez."
     },
     "changelog": {
@@ -483,7 +483,7 @@
   },
   "about": {
     "seoTitle": "À propos",
-    "seoDescription": "Comment fonctionne {{appName}} : connecter les activistes à un financement inarrêtable grâce au Bitcoin et à Nostr.",
+    "seoDescription": "Comment fonctionne {{appName}} : connecter les bénéficiaires à un financement inarrêtable grâce au Bitcoin et à Nostr.",
     "hero": {
       "eyebrow": "À propos de {{appName}}",
       "headlinePart1": "Comment",
@@ -496,11 +496,11 @@
         "censorshipResistant": "Résistante à la censure"
       },
       "ctaDonor": "Lire le Guide du donateur",
-      "ctaActivist": "Lire le Guide de l'activiste",
+      "ctaRecipient": "Lire le Guide du bénéficiaire",
       "sampleCard": {
         "countryName": "Venezuela",
         "public": "Public",
-        "imageAlt": "Activistes vénézuéliens lors d'une veillée aux chandelles tenant une pancarte « Liberen a todos los presos políticos · ¡Cese la represión! »",
+        "imageAlt": "Vénézuéliens lors d'une veillée aux chandelles tenant une pancarte « Liberen a todos los presos políticos · ¡Cese la represión! »",
         "orgName": "Venezolanos Libres",
         "title": "Libérer les prisonniers politiques du Venezuela",
         "description": "Défense juridique et soutien familial pour plus de 800 prisonniers politiques détenus par le régime Maduro.",
@@ -516,34 +516,34 @@
       "lede": "Pas de banques, pas de frontières, pas d'autorisation.",
       "step1": {
         "imageAlt": "Une clé cryptographique orange lumineuse flottant dans l'espace sombre, symbolisant l'identité auto-souveraine",
-        "title": "Les activistes s'inscrivent en quelques secondes.",
-        "body": "Pas de banque. Pas de paperasse. Pas d'approbation. Dès qu'un activiste crée un compte sur {{appName}}, il dispose d'une adresse Bitcoin prête à recevoir du soutien, n'importe où dans le monde."
+        "title": "Les bénéficiaires s'inscrivent en quelques secondes.",
+        "body": "Pas de banque. Pas de paperasse. Pas d'approbation. Dès qu'un bénéficiaire crée un compte sur {{appName}}, il dispose d'une adresse Bitcoin prête à recevoir du soutien, n'importe où dans le monde."
       },
       "step2": {
         "imageAlt": "Une pièce Bitcoin lumineuse traversant l'air à travers une carte du monde sombre, symbolisant un paiement transfrontalier instantané",
         "title": "Les donateurs envoient du Bitcoin directement.",
-        "body": "Les donateurs envoient du Bitcoin depuis n'importe quel portefeuille qu'ils utilisent déjà (Cash App, Coinbase, Strike, un portefeuille matériel) directement à l'activiste. {{appName}} ne touche jamais l'argent. Aucun serveur intermédiaire, aucun dépositaire."
+        "body": "Les donateurs envoient du Bitcoin depuis n'importe quel portefeuille qu'ils utilisent déjà (Cash App, Coinbase, Strike, un portefeuille matériel) directement au bénéficiaire. {{appName}} ne touche jamais l'argent. Aucun serveur intermédiaire, aucun dépositaire."
       },
       "step3": {
         "imageAlt": "Une main ouverte avec une lumière orange chaleureuse rayonnant de la paume, symbolisant la réception et l'autonomie",
         "title": "Le soutien arrive là où il compte.",
-        "body": "Les fonds arrivent directement à l'activiste. Il garde la garde, il garde le contrôle. Déplacez-les, échangez-les ou dépensez-les ; les guides ci-dessous expliquent comment le faire en privé et en toute sécurité."
+        "body": "Les fonds arrivent directement au bénéficiaire. Il garde la garde, il garde le contrôle. Déplacez-les, échangez-les ou dépensez-les ; les guides ci-dessous expliquent comment le faire en privé et en toute sécurité."
       }
     },
     "twoWays": {
       "eyebrow": "Bitcoin · Un QR code, deux options",
       "title": "Deux façons d'être payé.",
-      "lede": "Les deux options sont du Bitcoin. La différence réside dans ce que vous échangez contre la confidentialité. Quand un activiste crée une campagne, il choisit les options à accepter. Si les deux, la page de don affiche un seul QR code qui fonctionne pour n'importe quel portefeuille.",
+      "lede": "Les deux options sont du Bitcoin. La différence réside dans ce que vous échangez contre la confidentialité. Quand un bénéficiaire crée une campagne, il choisit les options à accepter. Si les deux, la page de don affiche un seul QR code qui fonctionne pour n'importe quel portefeuille.",
       "public": {
         "kicker": "Paiements Bitcoin publics",
         "tagline": "Universels · Rapides · Transparents",
         "title": "Fonctionne avec tous les portefeuilles du monde.",
-        "description": "Les dons arrivent à une adresse Bitcoin classique contrôlée par l'activiste. N'importe qui avec n'importe quel portefeuille Bitcoin peut envoyer. Aucune nouvelle application, aucun nouveau compte, aucune courbe d'apprentissage.",
+        "description": "Les dons arrivent à une adresse Bitcoin classique contrôlée par le bénéficiaire. N'importe qui avec n'importe quel portefeuille Bitcoin peut envoyer. Aucune nouvelle application, aucun nouveau compte, aucune courbe d'apprentissage.",
         "bullet1": "Fonctionne dans tous les portefeuilles Bitcoin : Cash App, Coinbase, Strike, matériel",
         "bullet2": "Règlement le plus rapide : uniquement les confirmations Bitcoin",
-        "bullet3": "Vérifiable sur la chaîne : tout le monde peut voir ce qu'un activiste a reçu",
+        "bullet3": "Vérifiable sur la chaîne : tout le monde peut voir ce qu'un bénéficiaire a reçu",
         "tradeoffTitle": "Compromis : public sur la blockchain.",
-        "tradeoffIntro": "Chaque don est public sur la blockchain Bitcoin et sur Nostr. {{appName}} est recommandé uniquement pour l'activisme ouvert. Si vous ou vos donateurs avez besoin d'une confidentialité extrême, y compris vis-à-vis des acteurs étatiques, lisez le <0>Guide du donateur</0> et le <1>Guide de l'activiste</1> avant de participer."
+        "tradeoffIntro": "Chaque don est public sur la blockchain Bitcoin et sur Nostr. {{appName}} est recommandé uniquement pour les campagnes ouvertes. Si vous ou vos donateurs avez besoin d'une confidentialité extrême, y compris vis-à-vis des acteurs étatiques, lisez le <0>Guide du donateur</0> et le <1>Guide du bénéficiaire</1> avant de participer."
       },
       "silent": {
         "kicker": "Paiements Bitcoin silencieux",
@@ -551,7 +551,7 @@
         "title": "Non-traçables, sur la chaîne, directs.",
         "description": "Les dons sont envoyés sous forme de paiements silencieux BIP-352. Chacun arrive à une nouvelle sortie Bitcoin non-traçable qu'un observateur regardant la blockchain ne peut pas relier à la campagne.",
         "bullet1": "La trace des dons ne peut pas être reconstituée sur la chaîne",
-        "bullet2": "Protège les activistes face à des adversaires sérieux",
+        "bullet2": "Protège les bénéficiaires face à des adversaires sérieux",
         "bullet3": "Conservés dans un solde privé séparé, jamais mélangés aux fonds publics",
         "tradeoffTitle": "Compromis : les paiements silencieux sont récents.",
         "tradeoffIntro": "La façon la plus privée de recevoir du Bitcoin sur la chaîne, mais l'écosystème est jeune et imparfait aujourd'hui :",
@@ -563,7 +563,7 @@
       },
       "noCustody": {
         "title": "Pas de garde. Pas d'intermédiaire.",
-        "body": "{{appName}} ne détient jamais les fonds. Les dons passent de portefeuille à portefeuille sur Bitcoin. Aucun serveur ne se trouve entre le donateur et l'activiste sur l'une ou l'autre option. Si {{appName}} disparaissait demain, toutes les campagnes continueraient de fonctionner.",
+        "body": "{{appName}} ne détient jamais les fonds. Les dons passent de portefeuille à portefeuille sur Bitcoin. Aucun serveur ne se trouve entre le donateur et le bénéficiaire sur l'une ou l'autre option. Si {{appName}} disparaissait demain, toutes les campagnes continueraient de fonctionner.",
         "gofundme": {
           "heading": "Contrairement à GoFundMe",
           "body": "Aucune plateforme ne peut geler vos dons, exiger des remboursements ou mettre fin à votre campagne pour des désaccords politiques."
@@ -602,21 +602,21 @@
         "imageAlt": "Manifestants encapuchonnés marchant dans une rue de ville européenne au crépuscule, tenant des fusées rouges allumées et des banderoles « FREEDOM » et « LIBERTAD »",
         "role": "Pour les donateurs",
         "title": "Soutenez les causes que les banques ne soutiennent pas.",
-        "description": "Envoyez du Bitcoin directement aux activistes et aux mouvements partout dans le monde, sans demander la permission à un processeur de paiement.",
+        "description": "Envoyez du Bitcoin directement aux bénéficiaires et aux mouvements partout dans le monde, sans demander la permission à un processeur de paiement.",
         "bullet1": "Utilisez n'importe quel portefeuille Bitcoin que vous avez déjà.",
-        "bullet2": "Les dons arrivent directement à l'activiste. Pas de dépositaire, pas d'intermédiaire.",
+        "bullet2": "Les dons arrivent directement au bénéficiaire. Pas de dépositaire, pas d'intermédiaire.",
         "bullet3": "Pour la confidentialité, utilisez un portefeuille qui prend en charge les paiements silencieux.",
         "cta": "Lire le Guide du donateur"
       },
-      "activist": {
+      "recipient": {
         "imageAlt": "Vue aérienne de milliers de manifestants rassemblés la nuit sur une place de ville avec des fusées rouges allumées, sous une banderole « UNITY IN DARKNESS » projetée sur les bâtiments environnants",
-        "role": "Pour les activistes",
+        "role": "Pour les bénéficiaires",
         "title": "Obtenez un financement sans autorisation.",
         "description": "Recevez un soutien direct de personnes qui croient en votre cause. Pas de compte bancaire, pas de formulaire de demande, pas d'entreprise au milieu.",
         "bullet1": "Commencez à recevoir des dons dès votre inscription.",
         "bullet2": "Choisissez les types de paiement à accepter : public, paiements silencieux, ou les deux.",
         "bullet3": "Pour un retrait privé, envoyez d'abord vers un portefeuille de paiements silencieux, puis transférez n'importe où.",
-        "cta": "Lire le Guide de l'activiste"
+        "cta": "Lire le Guide du bénéficiaire"
       },
       "stillStuck": "Toujours bloqué ?",
       "followTeam": "Suivez Team Soapbox sur Nostr",
@@ -1220,7 +1220,7 @@
       "whyDifferent": {
         "eyebrow": "Pourquoi {{appName}}",
         "title": "Conçu différemment.",
-        "lede": "Du Bitcoin en direct, du donateur à l'activiste. Aucune plateforme au milieu, aucun dépositaire pour assumer le risque, aucune permission à demander.",
+        "lede": "Du Bitcoin en direct, du donateur au bénéficiaire. Aucune plateforme au milieu, aucun dépositaire pour assumer le risque, aucune permission à demander.",
         "block1": {
           "heading": "Contrairement à GoFundMe",
           "body": "Aucune plateforme ne peut geler vos dons, exiger des remboursements ou mettre fin à votre campagne pour des désaccords politiques. Ni Stripe, ni Visa, ni banque ne se trouve au milieu et ne peut vous couper en pleine campagne.",
@@ -1237,7 +1237,7 @@
         },
         "block3": {
           "heading": "Public ou privé. À vous de choisir.",
-          "body": "Les activistes choisissent l'option de réception qui correspond à leur modèle de menace. Les donateurs voient un seul QR ; le portefeuille choisit le bon protocole.",
+          "body": "Les bénéficiaires choisissent l'option de réception qui correspond à leur modèle de menace. Les donateurs voient un seul QR ; le portefeuille choisit le bon protocole.",
           "publicLabel": "Public",
           "publicSummary": "Fonctionne dans tous les portefeuilles Bitcoin. Rapide et vérifiable sur la chaîne.",
           "privateLabel": "Privé",
@@ -2388,7 +2388,7 @@
       "what-is-ditto": {
         "question": "Qu'est-ce que {{appName}} ?",
         "answer": [
-          "{{appName}} est une plateforme pour envoyer des dons en Bitcoin — publics ou privés — directement aux activistes. Il n'y a pas d'intermédiaire, pas de processeur de paiement, et pas de compte qui peut être gelé.",
+          "{{appName}} est une plateforme pour envoyer des dons en Bitcoin — publics ou privés — directement aux bénéficiaires. Il n'y a pas d'intermédiaire, pas de processeur de paiement, et pas de compte qui peut être gelé.",
           "{{appName}} est bâtie sur Nostr, donc votre identité n'est pas verrouillée à ce site — elle vous appartient."
         ]
       },
@@ -2407,18 +2407,18 @@
       "send-bitcoin-onchain": {
         "question": "Comment fonctionne l'envoi de Bitcoin ?",
         "answer": [
-          "Quand un activiste crée une campagne, il choisit quels types de paiements accepter : **publics**, **privés**, ou **les deux**.",
+          "Quand un bénéficiaire crée une campagne, il choisit quels types de paiements accepter : **publics**, **privés**, ou **les deux**.",
           "Les dons **publics** sont du vrai Bitcoin on-chain. Ils sont réglés sur la blockchain publique, fonctionnent dans tous les portefeuilles Bitcoin, et sont visibles par n'importe qui.",
-          "Les dons **privés** utilisent des **paiements silencieux** (BIP-352). Ils sont aussi réglés on-chain, mais la transaction ne peut pas être reliée au code de donation de l'activiste — ils restent donc hors des listes et totaux publics de donateurs. Le donateur a besoin d'un portefeuille qui prend en charge les paiements silencieux — nous recommandons [Ditto Wallet](https://ditto.pub) ou [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
+          "Les dons **privés** utilisent des **paiements silencieux** (BIP-352). Ils sont aussi réglés on-chain, mais la transaction ne peut pas être reliée au code de donation du bénéficiaire — ils restent donc hors des listes et totaux publics de donateurs. Le donateur a besoin d'un portefeuille qui prend en charge les paiements silencieux — nous recommandons [Ditto Wallet](https://ditto.pub) ou [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
           "Quand une campagne accepte **les deux**, {{appName}} affiche un seul QR code qui encode les deux points de terminaison. Les portefeuilles de paiements silencieux le lisent comme privé ; les autres portefeuilles se rabattent sur l'adresse publique. Les donateurs n'ont pas à choisir — leur portefeuille sélectionne automatiquement le bon chemin.",
-          "Dans tous les cas, le paiement va directement à l'activiste. {{appName}} ne touche jamais les fonds."
+          "Dans tous les cas, le paiement va directement au bénéficiaire. {{appName}} ne touche jamais les fonds."
         ]
       },
       "connect-wallet": {
         "question": "Qu'est-ce que le portefeuille sur {{appName}} ?",
         "answer": [
           "Votre portefeuille {{appName}} est un portefeuille Bitcoin **auto-hébergé**, construit à partir de votre clé Nostr. {{appName}} ne détient jamais vos fonds — le portefeuille fonctionne dans votre navigateur et signe les transactions localement avec une clé que vous seul contrôlez. Il peut recevoir du Bitcoin de deux façons — comme une adresse publique que n'importe quel portefeuille Bitcoin peut payer, et comme un code de paiements silencieux que les portefeuilles compatibles peuvent payer en privé. Il n'y a rien à créer ; il existe dès l'instant où vous avez un compte.",
-          "Le portefeuille a deux onglets : **Public** (votre adresse Bitcoin classique) et **Privé** (paiements silencieux). Les deux soldes sont gardés strictement séparés et ne peuvent jamais être dépensés ensemble — c'est cette isolation qui garde les dons privés non-traçables on-chain. Quand vous créez une campagne, vous choisissez si vous acceptez les paiements publics, les paiements privés, ou les deux. Pour dépenser ce que vous recevez, consultez le **Guide de l'activiste**.",
+          "Le portefeuille a deux onglets : **Public** (votre adresse Bitcoin classique) et **Privé** (paiements silencieux). Les deux soldes sont gardés strictement séparés et ne peuvent jamais être dépensés ensemble — c'est cette isolation qui garde les dons privés non-traçables on-chain. Quand vous créez une campagne, vous choisissez si vous acceptez les paiements publics, les paiements privés, ou les deux. Pour dépenser ce que vous recevez, consultez le **Guide du bénéficiaire**.",
           "Vous pouvez également exporter la phrase de récupération de 24 mots de votre portefeuille et l'importer dans n'importe quel portefeuille Bitcoin standard — voir « Puis-je exporter mon portefeuille {{appName}} vers un autre portefeuille Bitcoin ? » ci-dessous."
         ]
       },
@@ -2435,10 +2435,10 @@
       "donations-are-public-general": {
         "question": "Les dons sur {{appName}} sont-ils publics ?",
         "answer": [
-          "Cela dépend du type de paiement que l'activiste accepte.",
+          "Cela dépend du type de paiement que le bénéficiaire accepte.",
           "**Les dons publics** sont enregistrés sur la blockchain Bitcoin et sur Nostr. N'importe qui peut voir les montants, les horaires et les adresses.",
-          "**Les dons privés** utilisent les paiements silencieux. Ils ne sont pas publiquement liables au code de donation de l'activiste, n'apparaissent pas dans les listes de donateurs, et ne comptent pas dans les totaux publics.",
-          "Quand une campagne accepte les deux, le portefeuille du donateur décide quel chemin utiliser — les portefeuilles compatibles paient en privé, les autres paient l'adresse publique. Lisez le **Guide du donateur** et le **Guide de l'activiste** pour le tableau complet."
+          "**Les dons privés** utilisent les paiements silencieux. Ils ne sont pas publiquement liables au code de donation du bénéficiaire, n'apparaissent pas dans les listes de donateurs, et ne comptent pas dans les totaux publics.",
+          "Quand une campagne accepte les deux, le portefeuille du donateur décide quel chemin utiliser — les portefeuilles compatibles paient en privé, les autres paient l'adresse publique. Lisez le **Guide du donateur** et le **Guide du bénéficiaire** pour le tableau complet."
         ]
       },
       "why-donations-pending": {
@@ -2446,13 +2446,13 @@
         "answer": [
           "Un don **en attente** est du vrai Bitcoin qui a déjà été envoyé — il attend simplement d'être confirmé par le réseau. Le portefeuille du donateur a diffusé la transaction, mais elle n'a pas encore été incluse dans un bloc.",
           "Bitcoin produit un nouveau bloc environ toutes les 10 minutes, et les mineurs sélectionnent les transactions en fonction des frais payés par le donateur. La plupart des dons sont confirmés en moins d'une heure ; ceux avec des frais plus bas peuvent prendre plus de temps lorsque le réseau est saturé. {{appName}} revérifie automatiquement l'état de confirmation, donc l'étiquette **en attente** disparaît d'elle-même dès qu'un bloc arrive.",
-          "Les fonds sont en route — l'activiste verra le don compter dans le total de la campagne dès qu'il sera confirmé. Ni l'activiste ni {{appName}} ne peuvent accélérer le processus ; seul le portefeuille du donateur peut augmenter les frais."
+          "Les fonds sont en route — le bénéficiaire verra le don compter dans le total de la campagne dès qu'il sera confirmé. Ni le bénéficiaire ni {{appName}} ne peuvent accélérer le processus ; seul le portefeuille du donateur peut augmenter les frais."
         ]
       },
       "censorship-resistance": {
         "question": "Que signifie « résistant à la censure » ici ?",
         "answer": [
-          "Aucune entreprise ne se place entre un donateur et un activiste. {{appName}} ne détient pas les fonds et ne peut pas geler l'adresse.",
+          "Aucune entreprise ne se place entre un donateur et un bénéficiaire. {{appName}} ne détient pas les fonds et ne peut pas geler l'adresse.",
           "Tant que le réseau Bitcoin fonctionne, les dons peuvent être envoyés et reçus. Le fait que {{appName}} elle-même soit hors ligne ne les arrêterait pas."
         ]
       },
@@ -2460,17 +2460,17 @@
         "question": "Pourquoi Bitcoin ?",
         "answer": [
           "Bitcoin est le rail de paiement le plus largement pris en charge et le plus résistant à la censure au monde. Tous les portefeuilles Bitcoin peuvent l'envoyer.",
-          "Sur {{appName}}, les activistes choisissent comment recevoir : **public** (une adresse Bitcoin classique) pour une portée maximale, **privé** (paiements silencieux) pour des dons non-traçables, ou **les deux** afin que le portefeuille de chaque donateur sélectionne automatiquement le bon chemin. Les donateurs qui n'ont qu'une application Bitcoin grand public peuvent quand même contribuer ; les donateurs avec un portefeuille de paiements silencieux obtiennent la confidentialité par défaut.",
-          "Le compromis est que les transactions Bitcoin publiques sont visibles sur la blockchain et paient des frais de mineur. Les guides Donateur et Activiste expliquent comment gérer les deux."
+          "Sur {{appName}}, les bénéficiaires choisissent comment recevoir : **public** (une adresse Bitcoin classique) pour une portée maximale, **privé** (paiements silencieux) pour des dons non-traçables, ou **les deux** afin que le portefeuille de chaque donateur sélectionne automatiquement le bon chemin. Les donateurs qui n'ont qu'une application Bitcoin grand public peuvent quand même contribuer ; les donateurs avec un portefeuille de paiements silencieux obtiennent la confidentialité par défaut.",
+          "Le compromis est que les transactions Bitcoin publiques sont visibles sur la blockchain et paient des frais de mineur. Les guides Donateur et Bénéficiaire expliquent comment gérer les deux."
         ]
       },
       "why-not-silent-payments": {
         "question": "Est-ce que {{appName}} prend en charge les paiements silencieux ?",
         "answer": [
-          "Oui — des deux côtés. Le portefeuille Bitcoin intégré de {{appName}} prend en charge BIP-352, donc quand vous envoyez du Bitcoin depuis votre portefeuille {{appName}}, vous pouvez payer n'importe quelle adresse de paiement silencieux (`sp1…`) directement. Et quand un activiste crée une campagne, il peut accepter les paiements silencieux à la place ou en plus des paiements Bitcoin publics.",
-          "Les dons en paiements silencieux sont quand même réglés on-chain, mais la transaction ne peut pas être reliée au code de donation de l'activiste — ils n'apparaissent donc pas dans les listes ou les totaux publics de donateurs.",
+          "Oui — des deux côtés. Le portefeuille Bitcoin intégré de {{appName}} prend en charge BIP-352, donc quand vous envoyez du Bitcoin depuis votre portefeuille {{appName}}, vous pouvez payer n'importe quelle adresse de paiement silencieux (`sp1…`) directement. Et quand un bénéficiaire crée une campagne, il peut accepter les paiements silencieux à la place ou en plus des paiements Bitcoin publics.",
+          "Les dons en paiements silencieux sont quand même réglés on-chain, mais la transaction ne peut pas être reliée au code de donation du bénéficiaire — ils n'apparaissent donc pas dans les listes ou les totaux publics de donateurs.",
           "Envoyer un paiement silencieux depuis l'extérieur de {{appName}} nécessite un portefeuille qui prend en charge BIP-352. La plupart des applications grand public ne le font pas encore, mais [Ditto Wallet](https://ditto.pub) et [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) le font.",
-          "Quand une campagne accepte les deux types de paiement, {{appName}} les encode dans un seul QR code. Les portefeuilles compatibles paient en privé ; les autres paient l'adresse publique. Aucun donateur n'est exclu, et aucun activiste n'est forcé de choisir entre portée et confidentialité."
+          "Quand une campagne accepte les deux types de paiement, {{appName}} les encode dans un seul QR code. Les portefeuilles compatibles paient en privé ; les autres paient l'adresse publique. Aucun donateur n'est exclu, et aucun bénéficiaire n'est forcé de choisir entre portée et confidentialité."
         ]
       },
       "why-not-lightning": {
@@ -2483,15 +2483,15 @@
       "why-not-rotating-addresses": {
         "question": "Pourquoi {{appName}} ne génère-t-il pas une nouvelle adresse pour chaque don ?",
         "answer": [
-          "Faire cela exigerait que {{appName}} agisse comme un intermédiaire d'échange d'argent — prenant d'abord la garde du Bitcoin puis le transférant à l'activiste.",
+          "Faire cela exigerait que {{appName}} agisse comme un intermédiaire d'échange d'argent — prenant d'abord la garde du Bitcoin puis le transférant au bénéficiaire.",
           "Cela ferait de nous un transmetteur d'argent, soumis aux réglementations qui l'accompagnent, et un point unique de défaillance : fermez le serveur de {{appName}} et vous avez fermé chaque don qui le traverse.",
-          "À la place, l'adresse de donation de chaque utilisateur est dérivée de sa clé secrète Nostr (nsec) — la même clé avec laquelle vous vous connectez. Les donateurs envoient directement à l'activiste, {{appName}} ne touche jamais les fonds, et la plateforme elle-même ne peut pas être éteinte pour censurer qui que ce soit. Les activistes qui veulent de la confidentialité par don peuvent accepter les paiements silencieux, qui offrent la même non-traçabilité sans que personne ne détienne l'argent au milieu."
+          "À la place, l'adresse de donation de chaque utilisateur est dérivée de sa clé secrète Nostr (nsec) — la même clé avec laquelle vous vous connectez. Les donateurs envoient directement au bénéficiaire, {{appName}} ne touche jamais les fonds, et la plateforme elle-même ne peut pas être éteinte pour censurer qui que ce soit. Les bénéficiaires qui veulent de la confidentialité par don peuvent accepter les paiements silencieux, qui offrent la même non-traçabilité sans que personne ne détienne l'argent au milieu."
         ]
       },
       "why-not-other-crypto": {
         "question": "Pourquoi pas Monero ou une autre crypto-monnaie ?",
         "answer": [
-          "Bitcoin est de loin la crypto-monnaie la plus largement adoptée. Cela signifie qu'elle est la plus facile à acheter et à envoyer pour les donateurs, et la plus facile à recevoir, détenir et dépenser pour les activistes.",
+          "Bitcoin est de loin la crypto-monnaie la plus largement adoptée. Cela signifie qu'elle est la plus facile à acheter et à envoyer pour les donateurs, et la plus facile à recevoir, détenir et dépenser pour les bénéficiaires.",
           "Les pièces axées sur la confidentialité comme Monero offrent des compromis de confidentialité différents de Bitcoin, mais elles ne sont pas prises en charge par la plupart des applications grand public et sont plus difficiles à reconvertir en monnaie locale. Demander à l'une ou l'autre des parties d'un don d'acquérir d'abord une crypto-monnaie de niche est une barrière que {{appName}} n'imposera pas. Pour les dons Bitcoin eux-mêmes, les paiements silencieux couvrent le cas d'usage de la non-traçabilité sans quitter l'écosystème Bitcoin."
         ]
       },
@@ -2583,7 +2583,7 @@
       },
       "paymentComparison": {
         "donorHeader": "Quand vous donnez",
-        "activistHeader": "Quand vous créez",
+        "recipientHeader": "Quand vous créez",
         "donorRows": {
           "whatYouSee": {
             "label": "Ce que vous voyez",
@@ -2603,10 +2603,10 @@
           "settlement": {
             "label": "Règlement",
             "public": "Confirmations Bitcoin normales.",
-            "silent": "Mêmes confirmations on-chain, mais l'activiste doit scanner son portefeuille pour le trouver."
+            "silent": "Mêmes confirmations on-chain, mais le bénéficiaire doit scanner son portefeuille pour le trouver."
           }
         },
-        "activistRows": {
+        "recipientRows": {
           "whatDonorsSee": {
             "label": "Ce que voient les donateurs",
             "public": "Une adresse Bitcoin classique. Fonctionne avec tous les portefeuilles de la planète.",
@@ -2635,12 +2635,12 @@
           "bestFor": {
             "label": "Idéal pour",
             "public": "Collectes ouvertes où la preuve sociale et la visibilité aident.",
-            "silent": "Campagnes où la confidentialité du donateur ou de l'activiste compte plus que le total visible."
+            "silent": "Campagnes où la confidentialité du donateur ou du bénéficiaire compte plus que le total visible."
           },
           "watchOutFor": {
             "label": "À surveiller",
             "public": "Trace publique permanente de chaque donateur.",
-            "silent": "Expérience utilisateur cahoteuse aujourd'hui. Certains dons n'apparaîtront qu'au moment du scan par l'activiste."
+            "silent": "Expérience utilisateur cahoteuse aujourd'hui. Certains dons n'apparaîtront qu'au moment du scan par le bénéficiaire."
           }
         }
       }
@@ -2667,7 +2667,7 @@
           },
           "arrivesDirectly": {
             "title": "Il arrive directement",
-            "body": "Les fonds sont réglés directement à l'activiste. {{appName}} ne les détient ni ne les achemine, et l'adresse est dérivée de la clé secrète Nostr de l'activiste."
+            "body": "Les fonds sont réglés directement au bénéficiaire. {{appName}} ne les détient ni ne les achemine, et l'adresse est dérivée de la clé secrète Nostr du bénéficiaire."
           }
         }
       },
@@ -2708,11 +2708,11 @@
         "heading": "Une note sur les paiements silencieux aujourd'hui",
         "paragraphs": [
           "Les paiements silencieux sont la façon la plus privée de recevoir du Bitcoin on-chain, mais l'écosystème est jeune. La plupart des portefeuilles populaires ne peuvent pas encore envoyer vers un point de terminaison de paiement silencieux, donc quand un portefeuille ne le peut pas, le don se rabat sur une transaction Bitcoin classique vers l'adresse publique de la campagne (si la campagne accepte les deux).",
-          "Pour les activistes, les dons silencieux arrivent également sans notifications push et n'apparaissent qu'après que l'activiste a scanné son portefeuille, ce qui peut prendre minutes à heures. Rien de tout cela n'affecte la sécurité de vos fonds ; cela façonne seulement l'expérience."
+          "Pour les bénéficiaires, les dons silencieux arrivent également sans notifications push et n'apparaissent qu'après que le bénéficiaire a scanné son portefeuille, ce qui peut prendre minutes à heures. Rien de tout cela n'affecte la sécurité de vos fonds ; cela façonne seulement l'expérience."
         ]
       }
     },
-    "activist": {
+    "recipient": {
       "tldr": {
         "lede": "Choisissez ce que vous acceptez en créant votre campagne : Public, Silencieux, ou les deux. Chaque option est non-dépositaire. {{appName}} ne détient jamais vos fonds.",
         "nextActions": [

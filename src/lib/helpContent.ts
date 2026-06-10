@@ -200,10 +200,10 @@ export function getFAQItem(appName: string, itemId: string): FAQItem | undefined
  */
 export { TEAM_SOAPBOX as TEAM_SOAPBOX_PACK } from '@/lib/agoraDefaults';
 
-// ── Donor / Activist guide content ────────────────────────────────────────────
+// ── Donor / Recipient guide content ──────────────────────────────────────────
 
 /**
- * The Donor Guide and Activist Guide pages are composed from a typed
+ * The Donor Guide and Recipient Guide pages are composed from a typed
  * sequence of {@link GuideBlock}s. Each block kind is rendered by a
  * dedicated component from `@/components/guide/`. The page just
  * dispatches on `block.kind`.
@@ -211,7 +211,7 @@ export { TEAM_SOAPBOX as TEAM_SOAPBOX_PACK } from '@/lib/agoraDefaults';
  * The structure (block order, block kinds, paymentComparison audience,
  * callout variant, optionGrid hrefs and chips) lives in this file. The
  * user-visible strings live under the `guides.donor.*` and
- * `guides.activist.*` namespaces in `src/locales/*.json`, keyed by the
+ * `guides.recipient.*` namespaces in `src/locales/*.json`, keyed by the
  * `id` on each structural block below.
  *
  * Strings may contain the inline markup supported by `renderInlineMarkup`
@@ -221,7 +221,7 @@ export { TEAM_SOAPBOX as TEAM_SOAPBOX_PACK } from '@/lib/agoraDefaults';
  * technical terms), hrefs because they're external URLs.
  *
  * Callers must trigger a re-render when the active i18n language
- * changes; both `DonorGuidePage` and `ActivistGuidePage` do this via
+ * changes; both `DonorGuidePage` and `RecipientGuidePage` do this via
  * `useTranslation()` whose `i18n.language` dep feeds a `useMemo`.
  */
 
@@ -257,12 +257,12 @@ export interface GuideStepsBlock {
  * Side-by-side comparison of Public Payments vs. Silent Payments.
  * Rendered as a real two-column table on desktop and as two stacked
  * tinted cards on mobile (no sideways scroll). Audience controls row
- * copy: donors see "what to expect when paying," activists see "what
+ * copy: donors see "what to expect when paying," recipients see "what
  * to choose."
  */
 export interface GuidePaymentComparisonBlock {
   kind: 'paymentComparison';
-  audience: 'donor' | 'activist';
+  audience: 'donor' | 'recipient';
   /** Optional one-line footnote rendered under the table. */
   footnote?: string;
 }
@@ -324,7 +324,7 @@ export type GuideBlock =
 type GuideBlockStructure =
   | { kind: 'tldr'; id: string }
   | { kind: 'steps'; id: string; stepIds: string[] }
-  | { kind: 'paymentComparison'; id: string; audience: 'donor' | 'activist'; hasFootnote?: boolean }
+  | { kind: 'paymentComparison'; id: string; audience: 'donor' | 'recipient'; hasFootnote?: boolean }
   | { kind: 'callout'; id: string; variant: 'info' | 'warning' | 'danger' | 'success' }
   | { kind: 'prose'; id: string; paragraphCount: number; hasHeading?: boolean }
   | {
@@ -380,11 +380,11 @@ const DONOR_GUIDE_STRUCTURE: GuideBlockStructure[] = [
   { kind: 'prose', id: 'silentToday', paragraphCount: 2, hasHeading: true },
 ];
 
-const ACTIVIST_GUIDE_STRUCTURE: GuideBlockStructure[] = [
+const RECIPIENT_GUIDE_STRUCTURE: GuideBlockStructure[] = [
   { kind: 'tldr', id: 'tldr' },
   { kind: 'prose', id: 'howReceiving', paragraphCount: 6, hasHeading: true },
   { kind: 'prose', id: 'whatEveryoneSees', paragraphCount: 2, hasHeading: true },
-  { kind: 'paymentComparison', id: 'comparison', audience: 'activist', hasFootnote: true },
+  { kind: 'paymentComparison', id: 'comparison', audience: 'recipient', hasFootnote: true },
   { kind: 'prose', id: 'silentToday', paragraphCount: 2, hasHeading: true },
   { kind: 'callout', id: 'twoWallets', variant: 'info' },
   {
@@ -439,7 +439,7 @@ function tParams(appName: string): Record<string, string> {
 /** Resolve a single structural guide block to its translated `GuideBlock`. */
 function resolveGuideBlock(
   structure: GuideBlockStructure,
-  guide: 'donor' | 'activist',
+  guide: 'donor' | 'recipient',
   appName: string,
 ): GuideBlock {
   const params = tParams(appName);
@@ -509,7 +509,7 @@ export function getDonorGuideBlocks(appName: string): GuideBlock[] {
   return DONOR_GUIDE_STRUCTURE.map((b) => resolveGuideBlock(b, 'donor', appName));
 }
 
-/** Activist guide blocks — same contract as `getDonorGuideBlocks`. */
-export function getActivistGuideBlocks(appName: string): GuideBlock[] {
-  return ACTIVIST_GUIDE_STRUCTURE.map((b) => resolveGuideBlock(b, 'activist', appName));
+/** Recipient guide blocks — same contract as `getDonorGuideBlocks`. */
+export function getRecipientGuideBlocks(appName: string): GuideBlock[] {
+  return RECIPIENT_GUIDE_STRUCTURE.map((b) => resolveGuideBlock(b, 'recipient', appName));
 }

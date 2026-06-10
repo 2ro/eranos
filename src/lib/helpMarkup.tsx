@@ -1,6 +1,6 @@
 /**
  * Shared inline-markup renderer used by Help/FAQ surfaces and the
- * Donor / Activist guide pages.
+ * Donor / Recipient guide pages.
  *
  * Supports a deliberately tiny syntax so authors can write content in plain
  * strings without pulling in a full markdown parser:

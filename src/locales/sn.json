@@ -784,7 +784,7 @@
       "whyDifferent": {
         "eyebrow": "Sei {{appName}}",
         "title": "Yakavakwa zvakasiyana.",
-        "lede": "Bitcoin yakananga kubva kumupi ichienda kumutungamiri. Hapana puratifomu pakati, hapana muchengeti akabata homwe, hapana mvumo inodiwa.",
+        "lede": "Bitcoin yakananga kubva kumupi ichienda kumugamuchiri. Hapana puratifomu pakati, hapana muchengeti akabata homwe, hapana mvumo inodiwa.",
         "block1": {
           "heading": "Kusiyana neGoFundMe",
           "body": "Hapana puratifomu inogona kudzivirira zvipo zvako, kukumbira kudzoserwa kwemari, kana kupedza mushandirapamwe wako pamusoro pekusawirirana kwemitemo. Hapana Stripe, hapana Visa, hapana bhanga riri pakati ringakucherekedza pakati pemushandirapamwe.",
@@ -801,7 +801,7 @@
         },
         "block3": {
           "heading": "Yeruzhinji kana yakavanzika. Kusarudza ndokwako.",
-          "body": "Vatungamiri vanosarudza nzira yokugamuchira inoenderana nemamiriro avo enjodzi. Vapi vanoona QR imwe chete; wallet ndiyo inosarudza pirotokori yakakodzera.",
+          "body": "Vagamuchiri vanosarudza nzira yokugamuchira inoenderana nemamiriro avo enjodzi. Vapi vanoona QR imwe chete; wallet ndiyo inosarudza pirotokori yakakodzera.",
           "publicLabel": "Yeruzhinji",
           "publicSummary": "Inoshanda muwallet yose yeBitcoin. Yokukurumidza uye inoonekwa pamuchina.",
           "privateLabel": "Yakavanzika",
@@ -2204,10 +2204,10 @@
       "title": "Gwaro romupi",
       "subtitle": "Bitcoin chaiyo, yakatumirwa zvakananga. Yose miitiro mupeji pfupi imwe."
     },
-    "activistGuide": {
-      "seoTitle": "Gwaro romukuru",
+    "recipientGuide": {
+      "seoTitle": "Gwaro romugamuchiri",
       "seoDescription": "Maitiro okugamuchira zvipo pa{{appName}} uye kuzvibvisa muchivande.",
-      "title": "Gwaro romukuru",
+      "title": "Gwaro romugamuchiri",
       "subtitle": "Sarudza chaunoda kugamuchira, gamuchira zvipo, bvisa."
     },
     "changelog": {
@@ -2234,7 +2234,7 @@
   },
   "about": {
     "seoTitle": "Pamusoro",
-    "seoDescription": "Maitiro {{appName}} anoshanda nawo: kubatanidza vatungamiri kune mari isingadziviswi kuburikidza neBitcoin neNostr.",
+    "seoDescription": "Maitiro {{appName}} anoshanda nawo: kubatanidza vagamuchiri kune mari isingadziviswi kuburikidza neBitcoin neNostr.",
     "hero": {
       "eyebrow": "Pamusoro pe{{appName}}",
       "headlinePart1": "Maitiro",
@@ -2247,11 +2247,11 @@
         "censorshipResistant": "Inodzivirira kudziviswa"
       },
       "ctaDonor": "Verenga Gwaro romupi",
-      "ctaActivist": "Verenga Gwaro romukuru",
+      "ctaRecipient": "Verenga Gwaro romugamuchiri",
       "sampleCard": {
         "countryName": "Venezuela",
         "public": "Yeruzhinji",
-        "imageAlt": "Vatungamiri veVenezuela panhongedzo yemakenduru vakabata chiratidzo chinoti 'Liberen a todos los presos políticos · ¡Cese la represión!'",
+        "imageAlt": "Vanhu veVenezuela panhongedzo yemakenduru vakabata chiratidzo chinoti 'Liberen a todos los presos políticos · ¡Cese la represión!'",
         "orgName": "Venezolanos Libres",
         "title": "Sunungura Vasungwa vezvematongerwo enyika veVenezuela",
         "description": "Kuchengetedzwa kwemutemo neruzhinji rwemhuri kune vanopfuura 800 vasungwa vezvematongerwo enyika vakavharwa nehurumende yaMaduro.",
@@ -2267,34 +2267,34 @@
       "lede": "Hapana mabanga, hapana miganhu, hapana mvumo.",
       "step1": {
         "imageAlt": "Kiyi yecryptographic yakapenya yeorange iri kuyangarara munzvimbo yerima, ichireva kuzvitonga",
-        "title": "Vatungamiri vanonyora mukati memamiriro ekunze.",
-        "body": "Hapana bhanga. Hapana mapepa. Hapana kubvumirwa. Pakarepo kana mutungamiri akaita akaundi pa{{appName}}, anenge ane kero yeBitcoin yakagadzirira kugamuchira rutsigiro, chero kupi munyika."
+        "title": "Vagamuchiri vanonyora mukati memamiriro ekunze.",
+        "body": "Hapana bhanga. Hapana mapepa. Hapana kubvumirwa. Pakarepo kana mugamuchiri akaita akaundi pa{{appName}}, anenge ane kero yeBitcoin yakagadzirira kugamuchira rutsigiro, chero kupi munyika."
       },
       "step2": {
         "imageAlt": "Mari yeBitcoin yakapenya iri kubhururuka mumhepo nepamepe rerima renyika, ichireva mubhadharo wokukurumidza wepasi rose",
         "title": "Vapi vanotumira Bitcoin zvakananga.",
-        "body": "Vapi vanotumira Bitcoin kubva mukati memawore chero ipi yavanoshandisa (Cash App, Coinbase, Strike, hardware wallet) zvakananga kumutungamiri. {{appName}} haitombobati mari. Hapana seva pakati, hapana muchengeti."
+        "body": "Vapi vanotumira Bitcoin kubva mukati memawore chero ipi yavanoshandisa (Cash App, Coinbase, Strike, hardware wallet) zvakananga kumugamuchiri. {{appName}} haitombobati mari. Hapana seva pakati, hapana muchengeti."
       },
       "step3": {
         "imageAlt": "Ruoko rwakavhurwa rwune chiedza chinodziya cheorange chichipenya kubva mukati medziva ruoko, chichireva kugamuchira nesimba",
         "title": "Rutsigiro runomira pakakosha.",
-        "body": "Mari inosvika kumutungamiri zvakananga. Vanochengeta umiriri, vanochengeta kutonga. Famba nayo, chinjana, kana kushandisa; magwaro ari pasi anotsanangura maitiro okuita zvakavanzika uye zvakachengeteka."
+        "body": "Mari inosvika kumugamuchiri zvakananga. Vanochengeta umiriri, vanochengeta kutonga. Famba nayo, chinjana, kana kushandisa; magwaro ari pasi anotsanangura maitiro okuita zvakavanzika uye zvakachengeteka."
       }
     },
     "twoWays": {
       "eyebrow": "Bitcoin · QR imwe, zvisarudzo zviviri",
       "title": "Nzira mbiri dzokubhadharwa.",
-      "lede": "Zvisarudzo zviviri zviri Bitcoin. Musiyano ndowekuti chii chaunoshandura nezvakavanzika. Apo mutungamiri anogadzira mushando, anosarudza zvinopiwa zvinogamuchirwa. Kana iri yose, peji yokupa inoratidza QR imwe inoshanda neyose wallet.",
+      "lede": "Zvisarudzo zviviri zviri Bitcoin. Musiyano ndowekuti chii chaunoshandura nezvakavanzika. Apo mugamuchiri anogadzira mushando, anosarudza zvinopiwa zvinogamuchirwa. Kana iri yose, peji yokupa inoratidza QR imwe inoshanda neyose wallet.",
       "public": {
         "kicker": "Bitcoin Yokubhadhara Yeruzhinji",
         "tagline": "Yepasi rose · Yokukurumidza · Yakajeka",
         "title": "Inoshanda neyose wallet pasi rose.",
-        "description": "Zvipo zvinosvika kukero yeBitcoin yakajairika iyo mutungamiri anotonga. Munhu wose ane wallet yeBitcoin anogona kutumira. Hapana app itsva, hapana akaundi itsva, hapana muraira wokudzidza.",
+        "description": "Zvipo zvinosvika kukero yeBitcoin yakajairika iyo mugamuchiri anotonga. Munhu wose ane wallet yeBitcoin anogona kutumira. Hapana app itsva, hapana akaundi itsva, hapana muraira wokudzidza.",
         "bullet1": "Inoshanda muwallet yose yeBitcoin: Cash App, Coinbase, Strike, hardware",
         "bullet2": "Kutsoropodza kunokurumidza zvikuru: zvichangotokyrigwa neBitcoin chete",
-        "bullet3": "Inogonzwa kushandiswa pamuchina: munhu wose anogona kuona zvinhu zvakagamuchirwa nemutungamiri",
+        "bullet3": "Inogonzwa kushandiswa pamuchina: munhu wose anogona kuona zvinhu zvakagamuchirwa nemugamuchiri",
         "tradeoffTitle": "Kushandura: Yeruzhinji pamuchina.",
-        "tradeoffIntro": "Chero chipo chiri pacheni cheBitcoin uye paNostr. {{appName}} inokurudzirwa chete kuna vanoshanda pachena. Kana iwe kana vapi vako vachida zvakavanzika zvikuru, kusanganisira kubva kuvashori vehurumende, verenga <0>Gwaro romupi</0> ne<1>Gwaro romukuru</1> usati wapinda."
+        "tradeoffIntro": "Chero chipo chiri pacheni cheBitcoin uye paNostr. {{appName}} inokurudzirwa chete makambeni epachena. Kana iwe kana vapi vako vachida zvakavanzika zvikuru, kusanganisira kubva kuvashori vehurumende, verenga <0>Gwaro romupi</0> ne<1>Gwaro romugamuchiri</1> usati wapinda."
       },
       "silent": {
         "kicker": "Bitcoin Yokubhadhara Yakanyarara",
@@ -2302,7 +2302,7 @@
         "title": "Isingabatanidziki, pamuchina, zvakananga.",
         "description": "Zvipo zvinotumirwa sezvikamu zvakanyarara zveBIP-352. Chimwe nechimwe chinosvika pamuchina mutsva, usingabatanidziki, zvekuti munhu anotarisa pamuchina haakwanise kuzvibatanidza kumushando.",
         "bullet1": "Mhare yezvipo haigone kuvakwa zvakare pamuchina",
-        "bullet2": "Inodzivirira vatungamiri vanotarisana nevavengi vakaisvonaka",
+        "bullet2": "Inodzivirira vagamuchiri vanotarisana nevavengi vakaisvonaka",
         "bullet3": "Inochengetwa muhuwandu hwakavanzika hwakaparadzana, isingatombosanganiswi nemari yeruzhinji",
         "tradeoffTitle": "Kushandura: Zvokubhadhara zvakanyarara zvichiri pakutanga.",
         "tradeoffIntro": "Nzira yakavanzika zvikuru yokugamuchira Bitcoin pamuchina, asi nharaunda yangu nhasi ichiri mudiki uye isina kunyatsoenzaniswa:",
@@ -2314,7 +2314,7 @@
       },
       "noCustody": {
         "title": "Hapana kuchengetedza. Hapana mumiriri.",
-        "body": "{{appName}} haichengete mari. Zvipo zvinofamba kubva muwallet kuenda muwallet paBitcoin. Hapana seva inomira pakati pemupi nemutungamiri pachisarudzo chero chipi. Kana {{appName}} ikanyangarika mangwana, mushando wose unoramba uchishanda.",
+        "body": "{{appName}} haichengete mari. Zvipo zvinofamba kubva muwallet kuenda muwallet paBitcoin. Hapana seva inomira pakati pemupi nemugamuchiri pachisarudzo chero chipi. Kana {{appName}} ikanyangarika mangwana, mushando wose unoramba uchishanda.",
         "gofundme": {
           "heading": "Kusiyana neGoFundMe",
           "body": "Hapana puratifomu ingadzivirira zvipo zvako, kukumbira kudzoserwa, kana kupedza mushando wako pamusoro pekusawirirana kwemitemo."
@@ -2353,21 +2353,21 @@
         "imageAlt": "Vapikise vakapfeka chigwedu vachifamba mumugwagwa weguta reEurope panguva yemanheru, vakabata mwenje mitsvuku inopfuta nemibhureti 'FREEDOM' ne'LIBERTAD'",
         "role": "Kuvapi",
         "title": "Tsigira zvinangwa zvisinga tsigirwi nemabhanga.",
-        "description": "Tumira Bitcoin zvakananga kuvatungamiri uye mafambiro kwese kupi pasi rose, usingabvunza mvumo kumutsigiri wokubhadhara.",
+        "description": "Tumira Bitcoin zvakananga kuvagamuchiri uye mafambiro kwese kupi pasi rose, usingabvunza mvumo kumutsigiri wokubhadhara.",
         "bullet1": "Shandisa chero wallet yeBitcoin yauno tora.",
-        "bullet2": "Zvipo zvinosvika zvakananga kumutungamiri. Hapana muchengeti, hapana mumiriri.",
+        "bullet2": "Zvipo zvinosvika zvakananga kumugamuchiri. Hapana muchengeti, hapana mumiriri.",
         "bullet3": "Kune zvakavanzika, shandisa wallet inotsigira mubhadharo wakanyarara.",
         "cta": "Verenga Gwaro romupi"
       },
-      "activist": {
+      "recipient": {
         "imageAlt": "Mufananidzo wokumusoro wezviuru zvevapikise vakaunganidzwa pausiku padare reguta nemwenje mitsvuku inopfuta, pasi peronde 'UNITY IN DARKNESS' yakatumirwa pamigovera",
-        "role": "Kuvatungamiri",
+        "role": "Kuvagamuchiri",
         "title": "Wana mari pasina mvumo.",
         "description": "Gamuchira rutsigiro zvakananga kubva kuvanhu vanotenda mukuda kwako. Hapana akaundi yebhanga, hapana fomu yekukumbira, hapana kambani pakati.",
         "bullet1": "Tanga kugamuchira zvipo pakarepo kana waitsa.",
         "bullet2": "Sarudza marudzi emubhadharo aunogamuchira: zveruzhinji, zvokubhadhara zvakanyarara, kana zvose zviviri.",
         "bullet3": "Kana iri yekubvisa zvakavanzika, tumira kune wallet yokubhadhara yakanyarara pakutanga, ipapo tumira kwese kwese.",
-        "cta": "Verenga Gwaro romukuru"
+        "cta": "Verenga Gwaro romugamuchiri"
       },
       "stillStuck": "Wakanamatira here?",
       "followTeam": "Tevera Team Soapbox paNostr",
@@ -2393,7 +2393,7 @@
       "what-is-ditto": {
         "question": "Chii chinonzi {{appName}}?",
         "answer": [
-          "{{appName}} ipuratifomu yekutumira zvipo zveBitcoin — pachena kana zvakavanzika — zvakananga kuvashanduki. Hapana mukuvadzi wepakati, hapana mubati wemari, uye hapana akaundi rinogona kurambidzwa.",
+          "{{appName}} ipuratifomu yekutumira zvipo zveBitcoin — pachena kana zvakavanzika — zvakananga kuvagamuchiri. Hapana mukuvadzi wepakati, hapana mubati wemari, uye hapana akaundi rinogona kurambidzwa.",
           "{{appName}} yakavakwa pamusoro peNostr, saka hunhu hwako hahubatani nehurongwa hweno — iwe une humambo hwacho."
         ]
       },
@@ -2412,18 +2412,18 @@
       "send-bitcoin-onchain": {
         "question": "Kutumira Bitcoin kunoshanda sei?",
         "answer": [
-          "Apo mushanduki anogadzira kambeni, anosarudza mhando dzemubhadharo dzaanozogamuchira: **pachena**, **zvakavanzika**, kana **zvese**.",
+          "Apo mugamuchiri anogadzira kambeni, anosarudza mhando dzemubhadharo dzaanozogamuchira: **pachena**, **zvakavanzika**, kana **zvese**.",
           "Zvipo **zvepachena** chaizvo Bitcoin pa-chain. Zvinopedzwa pabhirochaina yepachena, zvinoshanda mu walleti yose yeBitcoin, uye zvinooneka kunemumwe nemumwe.",
-          "Zvipo **zvakavanzika** zvinoshandisa **mubhadharo wakanyarara** (BIP-352). Zvinopedzwa pa-chain zvakare, asi chibvumirano hachikwanise kubatanidzwa kudzokera kuchidimbu chechipo chemushanduki — saka hazvionekwe muzvinyorwa zvevapi zvepachena uye zvionekwa zvepachena. Mupi anoda walleti inotsigira mibhadharo yakanyarara — tinokurudzira [Ditto Wallet](https://ditto.pub) kana [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
+          "Zvipo **zvakavanzika** zvinoshandisa **mubhadharo wakanyarara** (BIP-352). Zvinopedzwa pa-chain zvakare, asi chibvumirano hachikwanise kubatanidzwa kudzokera kuchidimbu chechipo chemugamuchiri — saka hazvionekwe muzvinyorwa zvevapi zvepachena uye zvionekwa zvepachena. Mupi anoda walleti inotsigira mibhadharo yakanyarara — tinokurudzira [Ditto Wallet](https://ditto.pub) kana [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
           "Apo kambeni inogamuchira **zvese**, {{appName}} inoratidza imwe kodhi yeQR ine zvinyorwa zvese zviri zviviri. MaWalleti emibhadharo yakanyarara anozviverenga sezvakavanzika; mamwe maWalleti anodzokera kukero yepachena. Vapi havatare kusarudza — walleti yavo inotora nzira yakakodzera ichizvichaira.",
-          "Pari pose, mubhadharo unoenda zvakananga kumushanduki. {{appName}} haina kana nguva imwe inobata mari iyi."
+          "Pari pose, mubhadharo unoenda zvakananga kumugamuchiri. {{appName}} haina kana nguva imwe inobata mari iyi."
         ]
       },
       "connect-wallet": {
         "question": "Walleti iri pa{{appName}} chii?",
         "answer": [
           "Walleti yako ye{{appName}} iwalleti yeBitcoin **inozvichengeta** (self-custodial), yakavakwa kubva kukiyi yako yeNostr. {{appName}} haina kana nguva imwe inobata mari yako — walleti inomhanya mubrowser mako uye inosaina mishando ipapo nekiyi yaunozvidzora wega. Inogona kugashira Bitcoin nenzira mbiri — sekero yepachena inogona kubhadharwa newalleti yeBitcoin ipi zvayo, uye sekodhi yemibhadharo yakanyarara inogona kubhadharwa newalleti dzinokwanisa muchivande. Hapana chinonyoreswa; inovapo nguva yaunenge wave neakaundi.",
-          "Walleti ine matabu maviri: **Pachena** (kero yako yeBitcoin yakajairika) ne**Yakavanzika** (mibhadharo yakanyarara). Huwandu huviri uhu hunochengetwa hwakaparadzana zvachose uye hahungatombo shandiswi pamwechete — kuparadzana ikoko ndiko kunochengeta zvipo zvakavanzika zvisingabatanidziki pa-chain. Paunogadzira kambeni, unosarudza kuti unogamuchira mibhadharo yepachena, yakavanzika, kana zvese. Kuti ushandise zvawagamuchira, ona **Bhuku reMushanduki**.",
+          "Walleti ine matabu maviri: **Pachena** (kero yako yeBitcoin yakajairika) ne**Yakavanzika** (mibhadharo yakanyarara). Huwandu huviri uhu hunochengetwa hwakaparadzana zvachose uye hahungatombo shandiswi pamwechete — kuparadzana ikoko ndiko kunochengeta zvipo zvakavanzika zvisingabatanidziki pa-chain. Paunogadzira kambeni, unosarudza kuti unogamuchira mibhadharo yepachena, yakavanzika, kana zvese. Kuti ushandise zvawagamuchira, ona **Bhuku reMugamuchiri**.",
           "Unogonawo kubudisa mutsara weseed wemazwi makumi maviri nemana wewalleti yako wougopinza muwalleti yeBitcoin ipi zvayo yakajairika — ona \"Ndinogona kubudisa walleti yangu ye{{appName}} ndichiipinza mune imwe walleti yeBitcoin here?\" pazasi."
         ]
       },
@@ -2440,10 +2440,10 @@
       "donations-are-public-general": {
         "question": "Ko zvipo paAgora zvinoonekwa nemunhu wese here?",
         "answer": [
-          "Zvinoenderana nemhando yemubhadharo yamushanduki anogamuchira.",
+          "Zvinoenderana nemhando yemubhadharo yamugamuchiri anogamuchira.",
           "**Zvipo zvepachena** zvinonyorwa pabhirochaina yeBitcoin uye paNostr. Munhu wese anogona kuona huwandu, nguva, uye makero.",
-          "**Zvipo zvakavanzika** zvinoshandisa mibhadharo yakanyarara. Hazvigone kubatanidzwa pachena kuchidimbu chechipo chemushanduki, hazvioneki muzvinyorwa zvevapi, uye hazviverengwe muzvionekwa zvepachena.",
-          "Apo kambeni inogamuchira zvese, walleti yemupi inosarudza nzira yekushandisa — maWalleti anokwanisa mibhadharo yakanyarara anobhadhara muchivande, mamwe anobhadhara kero yepachena. Verenga **Bhuku reMupi** ne**Bhuku reMushanduki** kuti uone mufananidzo wakazara."
+          "**Zvipo zvakavanzika** zvinoshandisa mibhadharo yakanyarara. Hazvigone kubatanidzwa pachena kuchidimbu chechipo chemugamuchiri, hazvioneki muzvinyorwa zvevapi, uye hazviverengwe muzvionekwa zvepachena.",
+          "Apo kambeni inogamuchira zvese, walleti yemupi inosarudza nzira yekushandisa — maWalleti anokwanisa mibhadharo yakanyarara anobhadhara muchivande, mamwe anobhadhara kero yepachena. Verenga **Bhuku reMupi** ne**Bhuku reMugamuchiri** kuti uone mufananidzo wakazara."
         ]
       },
       "why-donations-pending": {
@@ -2451,13 +2451,13 @@
         "answer": [
           "Chipo che**pending** iBitcoin chaiyo yatotumirwa — chiri kungomirira kusimbiswa nenetiweki. Walleti yemupi yakaparadzira chibvumirano, asi hachisati chabatanidzwa mubhirochaina.",
           "Bitcoin inoburitsa bhirochaina itsva pamwe chete maminitsi gumi oga oga, uye vacheri vanosarudza zvibvumirano zvichienderana nemubhadharo wakabhadharwa nemupi. Zvipo zvakawanda zvinosimbiswa muawa imwe; zvine fee diki zvinogona kutora nguva refu apo netiweki yakabatikana. {{appName}} inocheka zvakare mamiriro ekusimbiswa ichizvichaira, saka chiratidzo che**pending** chinonyangarika choga kana bhirochaina yauya.",
-          "Mari iri munzira — mushanduki achaona chipo chichiverengwa muhuwandu hwekambeni kanongochisimbiswa. Hapana chimwe chinogona kuitwa nemushanduki kana {{appName}} kuti vamhanyise zvinhu; walleti yemupi chete ndiyo inogona kuwedzera fee."
+          "Mari iri munzira — mugamuchiri achaona chipo chichiverengwa muhuwandu hwekambeni kanongochisimbiswa. Hapana chimwe chinogona kuitwa nemugamuchiri kana {{appName}} kuti vamhanyise zvinhu; walleti yemupi chete ndiyo inogona kuwedzera fee."
         ]
       },
       "censorship-resistance": {
         "question": "\"Kushinga kucensorship\" pano kunorevei?",
         "answer": [
-          "Hapana kambani inomira pakati pemupi nemushanduki. {{appName}} haichengete mari uye haigone kurambidza kero.",
+          "Hapana kambani inomira pakati pemupi nemugamuchiri. {{appName}} haichengete mari uye haigone kurambidza kero.",
           "Kana netiweki yeBitcoin ichishanda, zvipo zvinogona kutumirwa uye kugamuchirwa. Kunyange {{appName}} pachayo kana ikamisikidzwa, hazvigone kuzvimisa."
         ]
       },
@@ -2465,17 +2465,17 @@
         "question": "Sei Bitcoin?",
         "answer": [
           "Bitcoin ndiyo nzira yemubhadharo inotsigirwa zvakanyanya uye yakashinga kucensorship pasi rose. Walleti yose yeBitcoin inogona kuitumira.",
-          "Pa{{appName}}, vashanduki vanosarudza nzira yokugamuchira: **pachena** (kero yeBitcoin yakajairika) yekusvika kwakanyanya, **zvakavanzika** (mibhadharo yakanyarara) yezvipo zvisingatevedzeke, kana **zvese** kuitira kuti walleti yemupi mumwe nemumwe isarudze nzira yakakodzera zvakazvimirira. Vapi vane chete app yeBitcoin yemumusha vanogona kupawo; vapi vane walleti yemibhadharo yakanyarara vanogashira hukama hwakavanzika sezvakajairika.",
-          "Chiri kunopikiswa ndechokuti zvibvumirano zveBitcoin zvepachena zvinooneka pabhirochaina uye zvinobhadhara mari kuvachera. Bhuku reMupi nereMushanduki zvinotsanangura nzira yokubata zvese."
+          "Pa{{appName}}, vagamuchiri vanosarudza nzira yokugamuchira: **pachena** (kero yeBitcoin yakajairika) yekusvika kwakanyanya, **zvakavanzika** (mibhadharo yakanyarara) yezvipo zvisingatevedzeke, kana **zvese** kuitira kuti walleti yemupi mumwe nemumwe isarudze nzira yakakodzera zvakazvimirira. Vapi vane chete app yeBitcoin yemumusha vanogona kupawo; vapi vane walleti yemibhadharo yakanyarara vanogashira hukama hwakavanzika sezvakajairika.",
+          "Chiri kunopikiswa ndechokuti zvibvumirano zveBitcoin zvepachena zvinooneka pabhirochaina uye zvinobhadhara mari kuvachera. Bhuku reMupi nereMugamuchiri zvinotsanangura nzira yokubata zvese."
         ]
       },
       "why-not-silent-payments": {
         "question": "Ko {{appName}} inotsigira mibhadharo yakanyarara here?",
         "answer": [
-          "Hongu — kumativi ese ari maviri. Walleti yeBitcoin yakavakirwa mukati me{{appName}} inotsigira BIP-352, saka paunotumira Bitcoin kubva muwalleti yako ye{{appName}} unogona kubhadhara kero yemubhadharo wakanyarara (`sp1…`) zvakananga. Uye apo mushanduki anogadzira kambeni, anogona kugamuchira mibhadharo yakanyarara pamwe chete, kana panzvimbo, yemibhadharo yepachena yeBitcoin.",
-          "Zvipo zvemibhadharo yakanyarara zvichiri kupedzwa pa-chain, asi chibvumirano hachikwanise kubatanidzwa kudzokera kuchidimbu chechipo chemushanduki — saka hazvioneke muzvinyorwa zvevapi kana zvionekwa zvepachena.",
+          "Hongu — kumativi ese ari maviri. Walleti yeBitcoin yakavakirwa mukati me{{appName}} inotsigira BIP-352, saka paunotumira Bitcoin kubva muwalleti yako ye{{appName}} unogona kubhadhara kero yemubhadharo wakanyarara (`sp1…`) zvakananga. Uye apo mugamuchiri anogadzira kambeni, anogona kugamuchira mibhadharo yakanyarara pamwe chete, kana panzvimbo, yemibhadharo yepachena yeBitcoin.",
+          "Zvipo zvemibhadharo yakanyarara zvichiri kupedzwa pa-chain, asi chibvumirano hachikwanise kubatanidzwa kudzokera kuchidimbu chechipo chemugamuchiri — saka hazvioneke muzvinyorwa zvevapi kana zvionekwa zvepachena.",
           "Kutumira mubhadharo wakanyarara kubva kunze kwe{{appName}} kunoda walleti inotsigira BIP-352. Mamwe app emumusha haasati achitsigira, asi [Ditto Wallet](https://ditto.pub) ne[Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) zvinotsigira.",
-          "Apo kambeni inogamuchira mhando dzese mbiri dzemubhadharo, {{appName}} inozvinyora mukodhi imwe yeQR. MaWalleti anokwanisa mibhadharo yakanyarara anobhadhara muchivande; mamwe ese anobhadhara kero yepachena. Hapana mupi anosiyiwa, uye hapana mushanduki anomanikidzwa kusarudza pakati pekusvika nekuvanzika."
+          "Apo kambeni inogamuchira mhando dzese mbiri dzemubhadharo, {{appName}} inozvinyora mukodhi imwe yeQR. MaWalleti anokwanisa mibhadharo yakanyarara anobhadhara muchivande; mamwe ese anobhadhara kero yepachena. Hapana mupi anosiyiwa, uye hapana mugamuchiri anomanikidzwa kusarudza pakati pekusvika nekuvanzika."
         ]
       },
       "why-not-lightning": {
@@ -2488,15 +2488,15 @@
       "why-not-rotating-addresses": {
         "question": "Sei {{appName}} isina kugadzira kero itsva pachipo chega chega?",
         "answer": [
-          "Kuita izvi kungada {{appName}} ishande semuchina wepakati wekutsinhanisa mari — yotanga kuchengeta Bitcoin uye kuyitakurira kumushanduki.",
+          "Kuita izvi kungada {{appName}} ishande semuchina wepakati wekutsinhanisa mari — yotanga kuchengeta Bitcoin uye kuyitakurira kumugamuchiri.",
           "Izvi zvingatiita vakatumira mari, vari pasi pemitemo inouya pamwe chete naizvozvo, uye nzvimbo imwe yokukundikana: vhara seva ye{{appName}} ndokuvhara chipo chega chega chinopfuura nemo.",
-          "Pachinzvimbo chacho, kero yechipo yemumwe nemumwe inotorwa kubva kukiyi yake yakavanzika yeNostr (nsec) — kiyi imwechete yaunoshandisa kupinda. Vapi vanotumira zvakananga kumushanduki, {{appName}} haina kana kubata mari, uye puratifomu pachayo haigone kuvharwa kurambidza chero ani zvake. Vashanduki vanoda kuvanzika kwechipo chega chega vanogona kugamuchira mibhadharo yakanyarara, inopa kusabatanidzika kumwechete pasina munhu anobata mari pakati."
+          "Pachinzvimbo chacho, kero yechipo yemumwe nemumwe inotorwa kubva kukiyi yake yakavanzika yeNostr (nsec) — kiyi imwechete yaunoshandisa kupinda. Vapi vanotumira zvakananga kumugamuchiri, {{appName}} haina kana kubata mari, uye puratifomu pachayo haigone kuvharwa kurambidza chero ani zvake. Vagamuchiri vanoda kuvanzika kwechipo chega chega vanogona kugamuchira mibhadharo yakanyarara, inopa kusabatanidzika kumwechete pasina munhu anobata mari pakati."
         ]
       },
       "why-not-other-crypto": {
         "question": "Sei kusiri Monero kana imwe cryptocurrency?",
         "answer": [
-          "Bitcoin ndiyo cryptocurrency inozivikanwa zvakanyanya. Izvi zvinoreva kuti iri nyore kuvapi kutenga uye kutumira, uye iri nyore kuvashanduki kugashira, kuchengeta, uye kushandisa.",
+          "Bitcoin ndiyo cryptocurrency inozivikanwa zvakanyanya. Izvi zvinoreva kuti iri nyore kuvapi kutenga uye kutumira, uye iri nyore kuvagamuchiri kugashira, kuchengeta, uye kushandisa.",
           "Macoin akatarisana nekuvanzika kwakaita seMonero anopa kupokana kwakavanzika kwakasiyana neBitcoin, asi haatsigirwe nemamwe app emumusha uye akaoma kushandurira kumari yenyika. Kukumbira kumwe kwemativi maviri echipo kuti chitange chawana cryptocurrency isingazivikanwe imhura iyo {{appName}} haisi kuzoisa panzira. Kuzvipo zveBitcoin pachezvazvo, mibhadharo yakanyarara inovharidzira nyaya yekusabatanidzika pasina kubuda muhupfumi hweBitcoin."
         ]
       },
@@ -2588,7 +2588,7 @@
       },
       "paymentComparison": {
         "donorHeader": "Paunopa chipo",
-        "activistHeader": "Paunogadzira kambeni",
+        "recipientHeader": "Paunogadzira kambeni",
         "donorRows": {
           "whatYouSee": {
             "label": "Zvauunoona",
@@ -2608,10 +2608,10 @@
           "settlement": {
             "label": "Kupedzwa",
             "public": "Zvichaonekedzwa zvakajairika zveBitcoin.",
-            "silent": "Zvichaonekedzwa zvimwechete pa-chain, asi mushanduki anofanira kuscan walleti yake kuti aione."
+            "silent": "Zvichaonekedzwa zvimwechete pa-chain, asi mugamuchiri anofanira kuscan walleti yake kuti aione."
           }
         },
-        "activistRows": {
+        "recipientRows": {
           "whatDonorsSee": {
             "label": "Zvinoonekwa nevapi",
             "public": "Kero yeBitcoin yakajairika. Inoshanda nemawalleti ose pasi rose.",
@@ -2640,12 +2640,12 @@
           "bestFor": {
             "label": "Zvinokwana zvakanyanya",
             "public": "Kuunganidza mari kwepachena uko humbowo huzhinji nekuonekwa zvinobatsira.",
-            "silent": "Makambeni umo kuvanzika kwemupi kana mushanduki kwakakosha kupfuura huwandu hunoonekwa."
+            "silent": "Makambeni umo kuvanzika kwemupi kana mugamuchiri kwakakosha kupfuura huwandu hunoonekwa."
           },
           "watchOutFor": {
             "label": "Ngwarira",
             "public": "Rekodhi yepachena yenguva yose yemupi mumwe nemumwe.",
-            "silent": "UX isina kunaka nhasi. Zvimwe zvipo hazvioneki kusvikira mushanduki ascana."
+            "silent": "UX isina kunaka nhasi. Zvimwe zvipo hazvioneki kusvikira mugamuchiri ascana."
           }
         }
       }
@@ -2672,7 +2672,7 @@
           },
           "arrivesDirectly": {
             "title": "Inosvika zvakananga",
-            "body": "Mari inoenda zvakananga kumushanduki. {{appName}} haina kana kubata kana kuviga, uye kero inotorwa kubva kukiyi yakavanzika yeNostr yemushanduki."
+            "body": "Mari inoenda zvakananga kumugamuchiri. {{appName}} haina kana kubata kana kuviga, uye kero inotorwa kubva kukiyi yakavanzika yeNostr yemugamuchiri."
           }
         }
       },
@@ -2713,11 +2713,11 @@
         "heading": "Chinyorwa nezvemibhadharo yakanyarara nhasi",
         "paragraphs": [
           "Mibhadharo yakanyarara ndiyo nzira yakavanzika kwazvo yokugashira Bitcoin pa-chain, asi ecosystem ichiri pwere. MaWalleti akakurumbira mazhinji haasati achikwanisa kutumira ku-endpoint yemibhadharo yakanyarara, saka kana walleti isingakwanisi, chipo chinodzokera kuchibvumirano cheBitcoin chakajairika kukero yepachena yekambeni (kana kambeni ichigamuchira zvese).",
-          "Kuvashanduki, zvipo zvemibhadharo yakanyarara zvinosvikawo pasina zviziviso zvePush uye zvinooneka chete mushure mekunge mushanduki ascana walleti yake, izvo zvinogona kutora maminetiisi kusvika maawa. Hapana ne hatomwe pazvinhu izvi inopiwa kubva kuchengeteka kwemari yako; inongoita zvekuita netarisiro."
+          "Kuvagamuchiri, zvipo zvemibhadharo yakanyarara zvinosvikawo pasina zviziviso zvePush uye zvinooneka chete mushure mekunge mugamuchiri ascana walleti yake, izvo zvinogona kutora maminetiisi kusvika maawa. Hapana ne hatomwe pazvinhu izvi inopiwa kubva kuchengeteka kwemari yako; inongoita zvekuita netarisiro."
         ]
       }
     },
-    "activist": {
+    "recipient": {
       "tldr": {
         "lede": "Sarudza zvaunogamuchira paunogadzira kambeni: Pachena, Yakanyarara, kana zvese. Zvese hazvichengetwe. {{appName}} haichengete mari yako nekupi.",
         "nextActions": [

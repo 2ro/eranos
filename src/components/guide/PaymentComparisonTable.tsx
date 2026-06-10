@@ -26,7 +26,7 @@ const DONOR_ROW_IDS: { id: string; Icon: LucideIcon }[] = [
   { id: 'settlement', Icon: Gauge },
 ];
 
-const ACTIVIST_ROW_IDS: { id: string; Icon: LucideIcon }[] = [
+const RECIPIENT_ROW_IDS: { id: string; Icon: LucideIcon }[] = [
   { id: 'whatDonorsSee', Icon: Sparkles },
   { id: 'receivingSpeed', Icon: Gauge },
   { id: 'pushNotifications', Icon: Bell },
@@ -44,7 +44,7 @@ const ACTIVIST_ROW_IDS: { id: string; Icon: LucideIcon }[] = [
  * - Mobile: collapses to two stacked tinted cards (one per option) with
  *   the same row labels inside each card. No sideways scrolling.
  *
- * Row content is driven by the `audience` flag so donors and activists
+ * Row content is driven by the `audience` flag so donors and recipients
  * get row copy tuned to what they care about. All strings are read from
  * i18n keyed by audience-specific row IDs in `helpContent.ts`'s
  * structural template.
@@ -55,8 +55,8 @@ export function PaymentComparisonTable({
   block: GuidePaymentComparisonBlock;
 }) {
   const { t } = useTranslation();
-  const rowIds = block.audience === 'donor' ? DONOR_ROW_IDS : ACTIVIST_ROW_IDS;
-  const audienceKey = block.audience === 'donor' ? 'donorRows' : 'activistRows';
+  const rowIds = block.audience === 'donor' ? DONOR_ROW_IDS : RECIPIENT_ROW_IDS;
+  const audienceKey = block.audience === 'donor' ? 'donorRows' : 'recipientRows';
 
   const rows: Row[] = rowIds.map(({ id, Icon }) => ({
     label: t(`guides.shared.paymentComparison.${audienceKey}.${id}.label`),
@@ -68,7 +68,7 @@ export function PaymentComparisonTable({
   const headerText = t(
     block.audience === 'donor'
       ? 'guides.shared.paymentComparison.donorHeader'
-      : 'guides.shared.paymentComparison.activistHeader',
+      : 'guides.shared.paymentComparison.recipientHeader',
   );
 
   return (

@@ -455,10 +455,10 @@
       "title": "Donor Guide",
       "subtitle": "Real Bitcoin, sent directly. The whole flow in one short page."
     },
-    "activistGuide": {
-      "seoTitle": "Activist Guide",
+    "recipientGuide": {
+      "seoTitle": "Recipient Guide",
       "seoDescription": "How to receive donations on {{appName}} and cash out privately.",
-      "title": "Activist Guide",
+      "title": "Recipient Guide",
       "subtitle": "Pick what to accept, receive donations, cash out."
     },
     "changelog": {
@@ -485,7 +485,7 @@
   },
   "about": {
     "seoTitle": "About",
-    "seoDescription": "How {{appName}} works: connecting activists to unstoppable funding through Bitcoin and Nostr.",
+    "seoDescription": "How {{appName}} works: connecting recipients to unstoppable funding through Bitcoin and Nostr.",
     "hero": {
       "eyebrow": "About {{appName}}",
       "headlinePart1": "How",
@@ -498,11 +498,11 @@
         "censorshipResistant": "Censorship resistant"
       },
       "ctaDonor": "Read the Donor Guide",
-      "ctaActivist": "Read the Activist Guide",
+      "ctaRecipient": "Read the Recipient Guide",
       "sampleCard": {
         "countryName": "Venezuela",
         "public": "Public",
-        "imageAlt": "Venezuelan activists at a candlelight vigil holding a sign reading 'Liberen a todos los presos políticos · ¡Cese la represión!'",
+        "imageAlt": "Venezuelans at a candlelight vigil holding a sign reading 'Liberen a todos los presos políticos · ¡Cese la represión!'",
         "orgName": "Venezolanos Libres",
         "title": "Free Venezuela's Political Prisoners",
         "description": "Legal defense and family support for 800+ political prisoners detained by the Maduro regime.",
@@ -518,34 +518,34 @@
       "lede": "No banks, no borders, no permission.",
       "step1": {
         "imageAlt": "A glowing orange cryptographic key floating in dark space, symbolizing self-sovereign identity",
-        "title": "Activists sign up in seconds.",
-        "body": "No bank. No paperwork. No approval. The moment an activist creates an account on {{appName}}, they have a Bitcoin address ready to receive support, anywhere in the world."
+        "title": "Recipients sign up in seconds.",
+        "body": "No bank. No paperwork. No approval. The moment a recipient creates an account on {{appName}}, they have a Bitcoin address ready to receive support, anywhere in the world."
       },
       "step2": {
         "imageAlt": "A glowing Bitcoin coin flying through the air across a dark world map, symbolizing instant cross-border payment",
         "title": "Donors send Bitcoin directly.",
-        "body": "Donors send Bitcoin from any wallet they already use (Cash App, Coinbase, Strike, a hardware wallet) straight to the activist. {{appName}} never touches the money. No server in the middle, no custodian."
+        "body": "Donors send Bitcoin from any wallet they already use (Cash App, Coinbase, Strike, a hardware wallet) straight to the recipient. {{appName}} never touches the money. No server in the middle, no custodian."
       },
       "step3": {
         "imageAlt": "An open hand with warm orange light radiating from the palm, symbolizing receiving and agency",
         "title": "Support lands where it matters.",
-        "body": "Funds arrive at the activist directly. They keep custody, they keep control. Move it, swap it, or spend it; the guides below explain how to do it privately and safely."
+        "body": "Funds arrive at the recipient directly. They keep custody, they keep control. Move it, swap it, or spend it; the guides below explain how to do it privately and safely."
       }
     },
     "twoWays": {
       "eyebrow": "Bitcoin · One QR, two options",
       "title": "Two ways to get paid.",
-      "lede": "Both options are Bitcoin. The difference is what you trade off for privacy. When an activist creates a campaign, they choose which options to accept. If both, the donation page shows a single QR code that works for any wallet.",
+      "lede": "Both options are Bitcoin. The difference is what you trade off for privacy. When a recipient creates a campaign, they choose which options to accept. If both, the donation page shows a single QR code that works for any wallet.",
       "public": {
         "kicker": "Bitcoin Public Payments",
         "tagline": "Universal · Fast · Transparent",
         "title": "Works with every wallet on earth.",
-        "description": "Donations land at a regular Bitcoin address the activist controls. Anyone with any Bitcoin wallet can send. No new app, no new account, no learning curve.",
+        "description": "Donations land at a regular Bitcoin address the recipient controls. Anyone with any Bitcoin wallet can send. No new app, no new account, no learning curve.",
         "bullet1": "Works in every Bitcoin wallet: Cash App, Coinbase, Strike, hardware",
         "bullet2": "Fastest settlement: Bitcoin confirmations only",
-        "bullet3": "Verifiable on-chain: anyone can see what an activist has received",
+        "bullet3": "Verifiable on-chain: anyone can see what a recipient has received",
         "tradeoffTitle": "Trade-off: Public on-chain.",
-        "tradeoffIntro": "Every donation is public on the Bitcoin blockchain and on Nostr. {{appName}} is recommended only for above-ground activism. If you or your donors require extreme privacy, including from state actors, read the <0>Donor Guide</0> and <1>Activist Guide</1> before participating."
+        "tradeoffIntro": "Every donation is public on the Bitcoin blockchain and on Nostr. {{appName}} is recommended only for above-ground campaigns. If you or your donors require extreme privacy, including from state actors, read the <0>Donor Guide</0> and <1>Recipient Guide</1> before participating."
       },
       "silent": {
         "kicker": "Bitcoin Silent Payments",
@@ -553,7 +553,7 @@
         "title": "Unlinkable, on-chain, direct.",
         "description": "Donations are sent as BIP-352 silent payments. Each one lands at a fresh, unlinkable Bitcoin output that an observer staring at the blockchain can't tie back to the campaign.",
         "bullet1": "Donation trail can't be reconstructed on-chain",
-        "bullet2": "Protects activists facing serious adversaries",
+        "bullet2": "Protects recipients facing serious adversaries",
         "bullet3": "Kept in a separate private balance, never mixed with public funds",
         "tradeoffTitle": "Trade-off: Silent payments are early.",
         "tradeoffIntro": "The most private way to receive Bitcoin on-chain, but the ecosystem is young and rough today:",
@@ -565,7 +565,7 @@
       },
       "noCustody": {
         "title": "No custody. No middleman.",
-        "body": "{{appName}} never holds funds. Donations move wallet-to-wallet on Bitcoin. There's no server standing between donor and activist on either option. If {{appName}} disappeared tomorrow, every campaign would keep working.",
+        "body": "{{appName}} never holds funds. Donations move wallet-to-wallet on Bitcoin. There's no server standing between donor and recipient on either option. If {{appName}} disappeared tomorrow, every campaign would keep working.",
         "gofundme": {
           "heading": "Unlike GoFundMe",
           "body": "No platform can freeze your donations, demand refunds, or terminate your campaign over policy disagreements."
@@ -604,21 +604,21 @@
         "imageAlt": "Hooded protesters marching through a European city street at dusk, holding burning red flares and 'FREEDOM' and 'LIBERTAD' banners",
         "role": "For Donors",
         "title": "Support causes the banks won't.",
-        "description": "Send Bitcoin directly to activists and movements anywhere in the world, without asking a payment processor for permission.",
+        "description": "Send Bitcoin directly to recipients and movements anywhere in the world, without asking a payment processor for permission.",
         "bullet1": "Use any Bitcoin wallet you already have.",
-        "bullet2": "Donations land directly with the activist. No custodian, no middleman.",
+        "bullet2": "Donations land directly with the recipient. No custodian, no middleman.",
         "bullet3": "For privacy, use a wallet that supports silent payments.",
         "cta": "Read the Donor Guide"
       },
-      "activist": {
+      "recipient": {
         "imageAlt": "Aerial view of thousands of protesters gathered at night in a city square with burning red flares, beneath a 'UNITY IN DARKNESS' banner projected on the surrounding buildings",
-        "role": "For Activists",
+        "role": "For Recipients",
         "title": "Get funded without permission.",
         "description": "Receive support directly from people who believe in your cause. No bank account, no application form, no company in the middle.",
         "bullet1": "Start receiving donations as soon as you sign up.",
         "bullet2": "Pick which payment types to accept: public, silent payments, or both.",
         "bullet3": "For private cash-out, send to a silent-payments wallet first, then forward anywhere.",
-        "cta": "Read the Activist Guide"
+        "cta": "Read the Recipient Guide"
       },
       "stillStuck": "Still stuck?",
       "followTeam": "Follow Team Soapbox on Nostr",
@@ -1238,7 +1238,7 @@
       "whyDifferent": {
         "eyebrow": "Why {{appName}}",
         "title": "Built different.",
-        "lede": "Direct Bitcoin from donor to activist. No platform in the way, no custodian holding the bag, no permission required.",
+        "lede": "Direct Bitcoin from donor to recipient. No platform in the way, no custodian holding the bag, no permission required.",
         "block1": {
           "heading": "Unlike GoFundMe",
           "body": "No platform can freeze your donations, demand refunds, or terminate your campaign over policy disagreements. No Stripe, no Visa, no bank sits in the middle and can cut you off mid-campaign.",
@@ -1255,7 +1255,7 @@
         },
         "block3": {
           "heading": "Public or private. Your choice.",
-          "body": "Activists pick the receiving option that matches their threat model. Donors see a single QR; the wallet picks the right protocol.",
+          "body": "Recipients pick the receiving option that matches their threat model. Donors see a single QR; the wallet picks the right protocol.",
           "publicLabel": "Public",
           "publicSummary": "Works in every Bitcoin wallet. Fast and verifiable on-chain.",
           "privateLabel": "Private",
@@ -2469,7 +2469,7 @@
       "what-is-ditto": {
         "question": "What is {{appName}}?",
         "answer": [
-          "{{appName}} is a platform for sending Bitcoin donations — public or private — directly to activists. There's no middleman, no payment processor, and no account that can be frozen.",
+          "{{appName}} is a platform for sending Bitcoin donations — public or private — directly to recipients. There's no middleman, no payment processor, and no account that can be frozen.",
           "{{appName}} is built on Nostr, so your identity isn't locked to this site — you own it."
         ]
       },
@@ -2488,18 +2488,18 @@
       "send-bitcoin-onchain": {
         "question": "How does sending Bitcoin work?",
         "answer": [
-          "When an activist creates a campaign, they choose what kinds of payments to accept: **public**, **private**, or **both**.",
+          "When a recipient creates a campaign, they choose what kinds of payments to accept: **public**, **private**, or **both**.",
           "**Public** donations are real Bitcoin on-chain. They settle on the public blockchain, work in every Bitcoin wallet, and are visible to anyone.",
-          "**Private** donations use **silent payments** (BIP-352). They settle on-chain too, but the transaction can't be linked back to the activist's donation code — so they stay out of public donor lists and totals. The donor needs a wallet that supports silent payments — we recommend [Ditto Wallet](https://ditto.pub) or [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
+          "**Private** donations use **silent payments** (BIP-352). They settle on-chain too, but the transaction can't be linked back to the recipient's donation code — so they stay out of public donor lists and totals. The donor needs a wallet that supports silent payments — we recommend [Ditto Wallet](https://ditto.pub) or [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
           "When a campaign accepts **both**, {{appName}} shows a single QR code that encodes both endpoints. Silent-payment wallets read it as private; other wallets fall back to the public address. Donors don't have to choose — their wallet picks the right path automatically.",
-          "Either way, the payment goes straight to the activist. {{appName}} never touches the funds."
+          "Either way, the payment goes straight to the recipient. {{appName}} never touches the funds."
         ]
       },
       "connect-wallet": {
         "question": "What is the wallet on {{appName}}?",
         "answer": [
           "Your {{appName}} wallet is a **self-custodial** Bitcoin wallet, built from your Nostr key. {{appName}} never holds your funds — the wallet runs in your browser and signs transactions locally with a key only you control. It can receive Bitcoin both ways — as a public address that any Bitcoin wallet can pay, and as a silent-payments code that capable wallets can pay privately. There's nothing to sign up for; it exists the moment you have an account.",
-          "The wallet has two tabs: **Public** (your regular Bitcoin address) and **Private** (silent payments). The two balances are kept strictly separate and can never be spent together — that isolation is what keeps private donations unlinkable on-chain. When you create a campaign, you pick whether to accept public payments, private payments, or both. To spend what you receive, see the **Activist Guide**.",
+          "The wallet has two tabs: **Public** (your regular Bitcoin address) and **Private** (silent payments). The two balances are kept strictly separate and can never be spent together — that isolation is what keeps private donations unlinkable on-chain. When you create a campaign, you pick whether to accept public payments, private payments, or both. To spend what you receive, see the **Recipient Guide**.",
           "You can also export your wallet's 24-word seed phrase and import it into any standard Bitcoin wallet — see \"Can I export my {{appName}} wallet to another Bitcoin wallet?\" below."
         ]
       },
@@ -2516,10 +2516,10 @@
       "donations-are-public-general": {
         "question": "Are donations on {{appName}} public?",
         "answer": [
-          "It depends on which kind of payment the activist accepts.",
+          "It depends on which kind of payment the recipient accepts.",
           "**Public donations** are recorded on the Bitcoin blockchain and on Nostr. Anyone can see the amounts, timing, and addresses.",
-          "**Private donations** use silent payments. They're not publicly linkable to the activist's donation code, don't appear in donor lists, and don't count toward public totals.",
-          "When a campaign accepts both, the donor's wallet decides which path to use — silent-payment-capable wallets pay privately, others pay the public address. Read the **Donor Guide** and **Activist Guide** for the full picture."
+          "**Private donations** use silent payments. They're not publicly linkable to the recipient's donation code, don't appear in donor lists, and don't count toward public totals.",
+          "When a campaign accepts both, the donor's wallet decides which path to use — silent-payment-capable wallets pay privately, others pay the public address. Read the **Donor Guide** and **Recipient Guide** for the full picture."
         ]
       },
       "why-donations-pending": {
@@ -2527,13 +2527,13 @@
         "answer": [
           "A **pending** donation is real Bitcoin that's already been sent — it's just waiting to be confirmed by the network. The donor's wallet has broadcast the transaction, but it hasn't been included in a block yet.",
           "Bitcoin produces a new block roughly every 10 minutes, and miners pick transactions based on the fee the donor paid. Most donations confirm within an hour; lower-fee ones can take longer when the network is busy. {{appName}} re-checks confirmation status automatically, so the **pending** label disappears on its own once a block lands.",
-          "The funds are on the way — the activist will see the donation count toward the campaign total as soon as it confirms. There's nothing the activist or {{appName}} can do to speed it up; only the donor's wallet can bump the fee."
+          "The funds are on the way — the recipient will see the donation count toward the campaign total as soon as it confirms. There's nothing the recipient or {{appName}} can do to speed it up; only the donor's wallet can bump the fee."
         ]
       },
       "censorship-resistance": {
         "question": "What does \"censorship-resistant\" mean here?",
         "answer": [
-          "No company sits between a donor and an activist. {{appName}} doesn't hold the funds and can't freeze the address.",
+          "No company sits between a donor and a recipient. {{appName}} doesn't hold the funds and can't freeze the address.",
           "As long as the Bitcoin network is running, donations can be sent and received. {{appName}} itself going offline wouldn't stop them."
         ]
       },
@@ -2541,17 +2541,17 @@
         "question": "Why Bitcoin?",
         "answer": [
           "Bitcoin is the most widely supported and censorship-resistant payment rail in the world. Every Bitcoin wallet can send it.",
-          "On {{appName}}, activists choose how to receive: **public** (a regular Bitcoin address) for maximum reach, **private** (silent payments) for unlinkable donations, or **both** so each donor's wallet picks the right path automatically. Donors who only have a consumer Bitcoin app can still contribute; donors with a silent-payments wallet get privacy by default.",
-          "The tradeoff is that public Bitcoin transactions are visible on the blockchain and pay a miner fee. The Donor and Activist guides explain how to handle both."
+          "On {{appName}}, recipients choose how to receive: **public** (a regular Bitcoin address) for maximum reach, **private** (silent payments) for unlinkable donations, or **both** so each donor's wallet picks the right path automatically. Donors who only have a consumer Bitcoin app can still contribute; donors with a silent-payments wallet get privacy by default.",
+          "The tradeoff is that public Bitcoin transactions are visible on the blockchain and pay a miner fee. The Donor and Recipient guides explain how to handle both."
         ]
       },
       "why-not-silent-payments": {
         "question": "Does {{appName}} support silent payments?",
         "answer": [
-          "Yes — on both sides. {{appName}}'s built-in Bitcoin wallet supports BIP-352, so when you send Bitcoin from your {{appName}} wallet you can pay any silent-payment address (`sp1…`) directly. And when an activist creates a campaign, they can accept silent payments alongside, or instead of, public Bitcoin payments.",
-          "Silent-payment donations still settle on-chain, but the transaction can't be linked back to the activist's donation code — so they don't appear in public donor lists or totals.",
+          "Yes — on both sides. {{appName}}'s built-in Bitcoin wallet supports BIP-352, so when you send Bitcoin from your {{appName}} wallet you can pay any silent-payment address (`sp1…`) directly. And when a recipient creates a campaign, they can accept silent payments alongside, or instead of, public Bitcoin payments.",
+          "Silent-payment donations still settle on-chain, but the transaction can't be linked back to the recipient's donation code — so they don't appear in public donor lists or totals.",
           "Sending a silent payment from outside {{appName}} requires a wallet that supports BIP-352. Most consumer apps don't yet, but [Ditto Wallet](https://ditto.pub) and [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) do.",
-          "When a campaign accepts both kinds of payment, {{appName}} encodes them in a single QR code. Silent-payment-capable wallets pay privately; everyone else pays the public address. No donor is shut out, and no activist is forced to choose between reach and privacy."
+          "When a campaign accepts both kinds of payment, {{appName}} encodes them in a single QR code. Silent-payment-capable wallets pay privately; everyone else pays the public address. No donor is shut out, and no recipient is forced to choose between reach and privacy."
         ]
       },
       "why-not-lightning": {
@@ -2564,15 +2564,15 @@
       "why-not-rotating-addresses": {
         "question": "Why doesn't {{appName}} generate a new address for every donation?",
         "answer": [
-          "Doing this would require {{appName}} to act as a money-exchanging middleman — taking custody of the Bitcoin first and then forwarding it on to the activist.",
+          "Doing this would require {{appName}} to act as a money-exchanging middleman — taking custody of the Bitcoin first and then forwarding it on to the recipient.",
           "That would make us a money transmitter, subject to the regulations that come with that, and a single point of failure: shut down {{appName}}'s server and you've shut down every donation flowing through it.",
-          "Instead, each user's donation address is derived from their Nostr secret key (nsec) — the same key you sign in with. Donors send directly to the activist, {{appName}} never touches the funds, and the platform itself can't be turned off to censor anyone. Activists who want per-donation privacy can accept silent payments, which give the same unlinkability without anyone holding the money in the middle."
+          "Instead, each user's donation address is derived from their Nostr secret key (nsec) — the same key you sign in with. Donors send directly to the recipient, {{appName}} never touches the funds, and the platform itself can't be turned off to censor anyone. Recipients who want per-donation privacy can accept silent payments, which give the same unlinkability without anyone holding the money in the middle."
         ]
       },
       "why-not-other-crypto": {
         "question": "Why not Monero or another cryptocurrency?",
         "answer": [
-          "Bitcoin is by far the most widely adopted cryptocurrency. That means it's the easiest for donors to buy and send, and the easiest for activists to receive, hold, and spend.",
+          "Bitcoin is by far the most widely adopted cryptocurrency. That means it's the easiest for donors to buy and send, and the easiest for recipients to receive, hold, and spend.",
           "Privacy-focused coins like Monero offer different privacy tradeoffs than Bitcoin, but they're unsupported by most consumer apps and harder to convert back to local currency. Asking either side of a donation to first acquire a niche cryptocurrency is a barrier {{appName}} won't put in the way. For Bitcoin donations themselves, silent payments cover the unlinkability use case without leaving the Bitcoin ecosystem."
         ]
       },
@@ -2664,7 +2664,7 @@
       },
       "paymentComparison": {
         "donorHeader": "When you donate",
-        "activistHeader": "When you create",
+        "recipientHeader": "When you create",
         "donorRows": {
           "whatYouSee": {
             "label": "What you see",
@@ -2684,10 +2684,10 @@
           "settlement": {
             "label": "Settlement",
             "public": "Normal Bitcoin confirmations.",
-            "silent": "Same on-chain confirmations, but the activist has to scan their wallet to find it."
+            "silent": "Same on-chain confirmations, but the recipient has to scan their wallet to find it."
           }
         },
-        "activistRows": {
+        "recipientRows": {
           "whatDonorsSee": {
             "label": "What donors see",
             "public": "A regular Bitcoin address. Works with every wallet on earth.",
@@ -2716,12 +2716,12 @@
           "bestFor": {
             "label": "Best for",
             "public": "Above-ground fundraisers where social proof and visibility help.",
-            "silent": "Campaigns where donor or activist privacy matters more than the visible total."
+            "silent": "Campaigns where donor or recipient privacy matters more than the visible total."
           },
           "watchOutFor": {
             "label": "Watch out for",
             "public": "Permanent public record of every donor.",
-            "silent": "Bumpy UX today. Some donations won't show until the activist scans."
+            "silent": "Bumpy UX today. Some donations won't show until the recipient scans."
           }
         }
       }
@@ -2748,7 +2748,7 @@
           },
           "arrivesDirectly": {
             "title": "It arrives directly",
-            "body": "Funds settle straight to the activist. {{appName}} doesn't hold or route them, and the address is derived from the activist's Nostr secret key."
+            "body": "Funds settle straight to the recipient. {{appName}} doesn't hold or route them, and the address is derived from the recipient's Nostr secret key."
           }
         }
       },
@@ -2789,11 +2789,11 @@
         "heading": "A note on silent payments today",
         "paragraphs": [
           "Silent payments are the most private way to receive Bitcoin on-chain, but the ecosystem is young. Most popular wallets can't send to a silent-payment endpoint yet, so when a wallet can't, the donation falls back to a regular Bitcoin transaction to the campaign's public address (if the campaign accepts both).",
-          "For activists, silent-payment donations also arrive without push notifications and only appear after the activist scans their wallet, which can take minutes to hours. None of this affects the safety of your funds; it just shapes the experience."
+          "For recipients, silent-payment donations also arrive without push notifications and only appear after the recipient scans their wallet, which can take minutes to hours. None of this affects the safety of your funds; it just shapes the experience."
         ]
       }
     },
-    "activist": {
+    "recipient": {
       "tldr": {
         "lede": "Pick what to accept when you create your campaign: Public, Silent, or both. Either option is non-custodial. {{appName}} never holds your funds.",
         "nextActions": [

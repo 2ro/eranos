@@ -1,5 +1,5 @@
 /**
- * Block primitives for the Donor Guide and Activist Guide pages. Each
+ * Block primitives for the Donor Guide and Recipient Guide pages. Each
  * component takes the matching {@link GuideBlock} variant and renders it.
  * The page just dispatches on `block.kind`.
  */

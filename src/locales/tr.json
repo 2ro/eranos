@@ -453,10 +453,10 @@
       "title": "Bağışçı Rehberi",
       "subtitle": "Gerçek Bitcoin, doğrudan gönderim. Tüm süreç tek bir kısa sayfada."
     },
-    "activistGuide": {
-      "seoTitle": "Aktivist Rehberi",
+    "recipientGuide": {
+      "seoTitle": "Alıcı Rehberi",
       "seoDescription": "{{appName}}'da bağış nasıl alınır ve gizlilik içinde nasıl nakde dönüştürülür.",
-      "title": "Aktivist Rehberi",
+      "title": "Alıcı Rehberi",
       "subtitle": "Ne kabul edeceğinizi seçin, bağış alın, nakde dönüştürün."
     },
     "changelog": {
@@ -483,7 +483,7 @@
   },
   "about": {
     "seoTitle": "Hakkında",
-    "seoDescription": "{{appName}} nasıl çalışır: Bitcoin ve Nostr aracılığıyla aktivistleri durdurulamaz finansmana bağlamak.",
+    "seoDescription": "{{appName}} nasıl çalışır: Bitcoin ve Nostr aracılığıyla alıcıları durdurulamaz finansmana bağlamak.",
     "hero": {
       "eyebrow": "{{appName}} hakkında",
       "headlinePart1": "",
@@ -496,11 +496,11 @@
         "censorshipResistant": "Sansüre dayanıklı"
       },
       "ctaDonor": "Bağışçı Rehberi'ni oku",
-      "ctaActivist": "Aktivist Rehberi'ni oku",
+      "ctaRecipient": "Alıcı Rehberi'ni oku",
       "sampleCard": {
         "countryName": "Venezuela",
         "public": "Açık",
-        "imageAlt": "Venezuelalı aktivistler bir mum nöbeti sırasında 'Liberen a todos los presos políticos · ¡Cese la represión!' yazılı bir tabela taşıyor",
+        "imageAlt": "Venezuelalı alıcılar bir mum nöbeti sırasında 'Liberen a todos los presos políticos · ¡Cese la represión!' yazılı bir tabela taşıyor",
         "orgName": "Venezolanos Libres",
         "title": "Venezuela'nın Siyasi Tutuklularını Özgür Bırakın",
         "description": "Maduro rejimi tarafından tutuklanan 800'den fazla siyasi tutuklu için yasal savunma ve aile desteği.",
@@ -516,34 +516,34 @@
       "lede": "Banka yok, sınır yok, izin yok.",
       "step1": {
         "imageAlt": "Karanlık uzayda yüzen parlak turuncu kriptografik bir anahtar, kendine egemen kimliği simgeliyor",
-        "title": "Aktivistler saniyeler içinde kaydolur.",
-        "body": "Banka yok. Belge yok. Onay yok. Bir aktivist {{appName}}'da hesap oluşturduğu anda, dünyanın her yerinden destek almaya hazır bir Bitcoin adresine sahip olur."
+        "title": "Alıcılar saniyeler içinde kaydolur.",
+        "body": "Banka yok. Belge yok. Onay yok. Bir alıcı {{appName}}'da hesap oluşturduğu anda, dünyanın her yerinden destek almaya hazır bir Bitcoin adresine sahip olur."
       },
       "step2": {
         "imageAlt": "Karanlık bir dünya haritası üzerinden uçan parlak bir Bitcoin sikkesi, anında sınır ötesi ödemeyi simgeliyor",
         "title": "Bağışçılar Bitcoin'i doğrudan gönderir.",
-        "body": "Bağışçılar zaten kullandıkları herhangi bir cüzdandan (Cash App, Coinbase, Strike, donanım cüzdanı) doğrudan aktiviste Bitcoin gönderir. {{appName}} paraya hiç dokunmaz. Arada sunucu yok, saklayıcı yok."
+        "body": "Bağışçılar zaten kullandıkları herhangi bir cüzdandan (Cash App, Coinbase, Strike, donanım cüzdanı) doğrudan alıcıya Bitcoin gönderir. {{appName}} paraya hiç dokunmaz. Arada sunucu yok, saklayıcı yok."
       },
       "step3": {
         "imageAlt": "Avucundan sıcak turuncu ışık yayılan açık bir el, alma ve özgürlüğü simgeliyor",
         "title": "Destek önemli olduğu yere ulaşır.",
-        "body": "Fonlar doğrudan aktiviste ulaşır. Saklama da kontrol de aktivistte kalır. Taşı, takas et veya harca; aşağıdaki rehberler bunu gizlilik içinde ve güvenle nasıl yapacağınızı anlatıyor."
+        "body": "Fonlar doğrudan alıcıya ulaşır. Saklama da kontrol de alıcıda kalır. Taşı, takas et veya harca; aşağıdaki rehberler bunu gizlilik içinde ve güvenle nasıl yapacağınızı anlatıyor."
       }
     },
     "twoWays": {
       "eyebrow": "Bitcoin · Tek QR, iki seçenek",
       "title": "Ödeme almanın iki yolu.",
-      "lede": "Her iki seçenek de Bitcoin. Aradaki fark, gizlilik için neyi takas ettiğiniz. Bir aktivist kampanya oluştururken hangi seçenekleri kabul edeceğini seçer. İkisini birden seçerse, bağış sayfası herhangi bir cüzdanla çalışan tek bir QR kod gösterir.",
+      "lede": "Her iki seçenek de Bitcoin. Aradaki fark, gizlilik için neyi takas ettiğiniz. Bir alıcı kampanya oluştururken hangi seçenekleri kabul edeceğini seçer. İkisini birden seçerse, bağış sayfası herhangi bir cüzdanla çalışan tek bir QR kod gösterir.",
       "public": {
         "kicker": "Bitcoin Açık Ödemeler",
         "tagline": "Evrensel · Hızlı · Şeffaf",
         "title": "Dünyadaki her cüzdanla çalışır.",
-        "description": "Bağışlar, aktivistin kontrolündeki normal bir Bitcoin adresine ulaşır. Herhangi bir Bitcoin cüzdanı olan herkes gönderebilir. Yeni uygulama yok, yeni hesap yok, öğrenme eğrisi yok.",
+        "description": "Bağışlar, alıcının kontrolündeki normal bir Bitcoin adresine ulaşır. Herhangi bir Bitcoin cüzdanı olan herkes gönderebilir. Yeni uygulama yok, yeni hesap yok, öğrenme eğrisi yok.",
         "bullet1": "Her Bitcoin cüzdanında çalışır: Cash App, Coinbase, Strike, donanım",
         "bullet2": "En hızlı uzlaşma: yalnızca Bitcoin onayları",
-        "bullet3": "Zincir üstünde doğrulanabilir: herkes bir aktivistin ne aldığını görebilir",
+        "bullet3": "Zincir üstünde doğrulanabilir: herkes bir alıcının ne aldığını görebilir",
         "tradeoffTitle": "Takas: Zincir üstünde açık.",
-        "tradeoffIntro": "Her bağış, Bitcoin blok zincirinde ve Nostr'da açıktır. {{appName}}, yalnızca açıkça yürütülen aktivizm için önerilir. Siz veya bağışçılarınız devlet aktörleri dahil aşırı gizlilik gerektiriyorsanız, katılmadan önce <0>Bağışçı Rehberi</0>'ni ve <1>Aktivist Rehberi</1>'ni okuyun."
+        "tradeoffIntro": "Her bağış, Bitcoin blok zincirinde ve Nostr'da açıktır. {{appName}}, yalnızca açıkça yürütülen aktivizm için önerilir. Siz veya bağışçılarınız devlet aktörleri dahil aşırı gizlilik gerektiriyorsanız, katılmadan önce <0>Bağışçı Rehberi</0>'ni ve <1>Alıcı Rehberi</1>'ni okuyun."
       },
       "silent": {
         "kicker": "Bitcoin Sessiz Ödemeler",
@@ -551,7 +551,7 @@
         "title": "İzlenemez, zincir üstünde, doğrudan.",
         "description": "Bağışlar BIP-352 sessiz ödemeler olarak gönderilir. Her biri, blok zincirine bakan bir gözlemcinin kampanyaya bağlayamayacağı yeni ve izlenemez bir Bitcoin çıkışına ulaşır.",
         "bullet1": "Bağış izi zincir üstünde yeniden kurulamaz",
-        "bullet2": "Ciddi hasımlarla karşılaşan aktivistleri korur",
+        "bullet2": "Ciddi hasımlarla karşılaşan alıcıları korur",
         "bullet3": "Ayrı bir gizli bakiyede tutulur, açık fonlarla asla karıştırılmaz",
         "tradeoffTitle": "Takas: Sessiz ödemeler henüz yeni.",
         "tradeoffIntro": "Zincir üstünde Bitcoin almanın en gizli yolu, ancak ekosistem genç ve bugün hâlâ pürüzlü:",
@@ -563,7 +563,7 @@
       },
       "noCustody": {
         "title": "Saklama yok. Aracı yok.",
-        "body": "{{appName}} hiçbir zaman fon tutmaz. Bağışlar, Bitcoin üzerinden cüzdandan cüzdana hareket eder. İki seçenekte de bağışçı ile aktivist arasında bir sunucu yoktur. {{appName}} yarın yok olsa bile her kampanya çalışmaya devam eder.",
+        "body": "{{appName}} hiçbir zaman fon tutmaz. Bağışlar, Bitcoin üzerinden cüzdandan cüzdana hareket eder. İki seçenekte de bağışçı ile alıcı arasında bir sunucu yoktur. {{appName}} yarın yok olsa bile her kampanya çalışmaya devam eder.",
         "gofundme": {
           "heading": "GoFundMe'den farkı",
           "body": "Hiçbir platform bağışlarınızı donduramaz, iade talep edemez veya politika anlaşmazlıkları nedeniyle kampanyanızı sonlandıramaz."
@@ -602,21 +602,21 @@
         "imageAlt": "Akşamüstü bir Avrupa şehrinin sokaklarında yürüyen kapüşonlu protestocular, yanan kırmızı meşaleler ve 'FREEDOM' ile 'LIBERTAD' pankartları taşıyor",
         "role": "Bağışçılar için",
         "title": "Bankaların desteklemediği davaları destekleyin.",
-        "description": "Bir ödeme işlemcisinden izin istemeden, dünyanın herhangi bir yerindeki aktivistlere ve hareketlere doğrudan Bitcoin gönderin.",
+        "description": "Bir ödeme işlemcisinden izin istemeden, dünyanın herhangi bir yerindeki alıcılara ve hareketlere doğrudan Bitcoin gönderin.",
         "bullet1": "Zaten sahip olduğunuz herhangi bir Bitcoin cüzdanını kullanın.",
-        "bullet2": "Bağışlar doğrudan aktiviste ulaşır. Saklayıcı yok, aracı yok.",
+        "bullet2": "Bağışlar doğrudan alıcıya ulaşır. Saklayıcı yok, aracı yok.",
         "bullet3": "Gizlilik için sessiz ödemeleri destekleyen bir cüzdan kullanın.",
         "cta": "Bağışçı Rehberi'ni oku"
       },
-      "activist": {
+      "recipient": {
         "imageAlt": "Çevredeki binalara yansıtılan 'UNITY IN DARKNESS' pankartının altında, gece bir şehir meydanında yanan kırmızı meşalelerle toplanmış binlerce protestocunun havadan görünümü",
-        "role": "Aktivistler için",
+        "role": "Alıcılar için",
         "title": "İzin almadan fonlanın.",
         "description": "Davanıza inanan insanlardan doğrudan destek alın. Banka hesabı yok, başvuru formu yok, arada şirket yok.",
         "bullet1": "Kayıt olur olmaz bağış almaya başlayın.",
         "bullet2": "Hangi ödeme türlerini kabul edeceğinizi seçin: açık, sessiz ödemeler veya her ikisi.",
         "bullet3": "Gizli nakit çıkışı için fonu önce bir sessiz ödeme cüzdanına gönderin, sonra istediğiniz yere iletin.",
-        "cta": "Aktivist Rehberi'ni oku"
+        "cta": "Alıcı Rehberi'ni oku"
       },
       "stillStuck": "Hâlâ takıldınız mı?",
       "followTeam": "Team Soapbox'ı Nostr'da takip edin",
@@ -1203,8 +1203,8 @@
   "campaigns": {
     "home": {
       "seoTitle": "Fon Toplama Kampanyaları",
-      "seoDescription": "Aktivistleri durdurulamaz finansmana bağlıyoruz.",
-      "heroTagline": "Aktivistleri<1></1><0>durdurulamaz</0> finansmana bağlıyoruz.",
+      "seoDescription": "Dünyayı durdurulamaz finansmana bağlıyoruz.",
+      "heroTagline": "Dünyayı<1></1><0>durdurulamaz</0> finansmana bağlıyoruz.",
       "heroBody": "Bitcoin'i doğrudan dünyanın her yerindeki destekçilerden toplayın. Her bağış cüzdanınıza doğrudan ulaşır; aracı yok, geri ödeme yok, fonlarınızı tutan bir platform yok.",
       "startCampaign": "Kampanya başlat",
       "howItWorks": "Nasıl çalışır",
@@ -1228,7 +1228,7 @@
       "whyDifferent": {
         "eyebrow": "Neden {{appName}}",
         "title": "Farklı inşa edildi.",
-        "lede": "Bağışçıdan aktiviste doğrudan Bitcoin. Arada platform yok, parayı tutan emanetçi yok, izin gerekmiyor.",
+        "lede": "Bağışçıdan alıcıya doğrudan Bitcoin. Arada platform yok, parayı tutan emanetçi yok, izin gerekmiyor.",
         "block1": {
           "heading": "GoFundMe'den farklı",
           "body": "Hiçbir platform bağışlarınızı donduramaz, iade talep edemez veya politika anlaşmazlıkları nedeniyle kampanyanızı sonlandıramaz. Arada Stripe, Visa veya banka yok; kampanya ortasında sizi kesemezler.",
@@ -1245,7 +1245,7 @@
         },
         "block3": {
           "heading": "Herkese açık veya özel. Seçim sizin.",
-          "body": "Aktivistler tehdit modellerine uygun alım seçeneğini seçer. Bağışçılar tek bir QR görür; cüzdan doğru protokolü seçer.",
+          "body": "Alıcılar tehdit modellerine uygun alım seçeneğini seçer. Bağışçılar tek bir QR görür; cüzdan doğru protokolü seçer.",
           "publicLabel": "Herkese açık",
           "publicSummary": "Her Bitcoin cüzdanında çalışır. Hızlıdır ve on-chain doğrulanabilir.",
           "privateLabel": "Özel",
@@ -2316,7 +2316,7 @@
       "what-is-ditto": {
         "question": "{{appName}} nedir?",
         "answer": [
-          "{{appName}}, doğrudan aktivistlere — açık ya da gizli — Bitcoin bağışları göndermek için bir platformdur. Arada hiçbir aracı, ödeme işlemcisi ya da dondurulabilecek bir hesap yoktur.",
+          "{{appName}}, doğrudan alıcılara — açık ya da gizli — Bitcoin bağışları göndermek için bir platformdur. Arada hiçbir aracı, ödeme işlemcisi ya da dondurulabilecek bir hesap yoktur.",
           "{{appName}} Nostr üzerine kuruludur, bu yüzden kimliğiniz bu siteye kilitli değildir — size aittir."
         ]
       },
@@ -2335,18 +2335,18 @@
       "send-bitcoin-onchain": {
         "question": "Bitcoin göndermek nasıl çalışır?",
         "answer": [
-          "Bir aktivist kampanya oluşturduğunda hangi tür ödemeleri kabul edeceğini seçer: **açık**, **gizli** ya da **her ikisi**.",
+          "Bir alıcı kampanya oluşturduğunda hangi tür ödemeleri kabul edeceğini seçer: **açık**, **gizli** ya da **her ikisi**.",
           "**Açık** bağışlar zincir üstündeki gerçek Bitcoin'lerdir. Herkese açık blok zincirinde uzlaşır, her Bitcoin cüzdanında çalışır ve herkese görünürdür.",
-          "**Gizli** bağışlar **sessiz ödemeleri** (BIP-352) kullanır. Bunlar da zincir üstünde uzlaşır, ancak işlem aktivistin bağış koduna bağlanamaz — bu nedenle herkese açık bağışçı listelerinin ve toplamların dışında kalırlar. Bağışçının sessiz ödemeleri destekleyen bir cüzdana ihtiyacı vardır — [Ditto Wallet](https://ditto.pub) veya [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) öneriyoruz.",
+          "**Gizli** bağışlar **sessiz ödemeleri** (BIP-352) kullanır. Bunlar da zincir üstünde uzlaşır, ancak işlem alıcının bağış koduna bağlanamaz — bu nedenle herkese açık bağışçı listelerinin ve toplamların dışında kalırlar. Bağışçının sessiz ödemeleri destekleyen bir cüzdana ihtiyacı vardır — [Ditto Wallet](https://ditto.pub) veya [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) öneriyoruz.",
           "Bir kampanya **her ikisini** kabul ettiğinde, {{appName}} her iki uç noktayı kodlayan tek bir QR kod gösterir. Sessiz ödeme cüzdanları bunu gizli olarak okur; diğer cüzdanlar açık adrese geri döner. Bağışçıların seçim yapmasına gerek yoktur — cüzdanları otomatik olarak doğru yolu seçer.",
-          "Her durumda ödeme doğrudan aktiviste gider. {{appName}} fonlara hiçbir zaman dokunmaz."
+          "Her durumda ödeme doğrudan alıcıya gider. {{appName}} fonlara hiçbir zaman dokunmaz."
         ]
       },
       "connect-wallet": {
         "question": "{{appName}}'daki cüzdan nedir?",
         "answer": [
           "{{appName}} cüzdanınız, Nostr anahtarınızdan oluşturulan **öz-saklamalı** bir Bitcoin cüzdanıdır. {{appName}} fonlarınızı asla tutmaz — cüzdan tarayıcınızda çalışır ve işlemleri yalnızca sizin kontrol ettiğiniz bir anahtarla yerel olarak imzalar. Bitcoin'i iki şekilde alabilir — herhangi bir Bitcoin cüzdanının ödeme yapabileceği bir açık adres olarak ve uygun cüzdanların gizli olarak ödeme yapabileceği bir sessiz ödeme kodu olarak. Kaydolacak bir şey yoktur; hesabınız olduğu anda var olur.",
-          "Cüzdanın iki sekmesi vardır: **Açık** (normal Bitcoin adresiniz) ve **Gizli** (sessiz ödemeler). İki bakiye kesin biçimde ayrı tutulur ve asla birlikte harcanamaz — gizli bağışları zincir üstünde izlenemez tutan şey bu yalıtımdır. Bir kampanya oluşturduğunuzda açık ödemeleri mi, gizli ödemeleri mi yoksa her ikisini mi kabul edeceğinizi seçersiniz. Aldıklarınızı harcamak için **Aktivist Rehberi**'ne bakın.",
+          "Cüzdanın iki sekmesi vardır: **Açık** (normal Bitcoin adresiniz) ve **Gizli** (sessiz ödemeler). İki bakiye kesin biçimde ayrı tutulur ve asla birlikte harcanamaz — gizli bağışları zincir üstünde izlenemez tutan şey bu yalıtımdır. Bir kampanya oluşturduğunuzda açık ödemeleri mi, gizli ödemeleri mi yoksa her ikisini mi kabul edeceğinizi seçersiniz. Aldıklarınızı harcamak için **Alıcı Rehberi**'ne bakın.",
           "Cüzdanınızın 24 kelimelik tohum cümlesini dışa aktarıp herhangi bir standart Bitcoin cüzdanına aktarabilirsiniz — aşağıdaki \"{{appName}} cüzdanımı başka bir Bitcoin cüzdanına aktarabilir miyim?\" bölümüne bakın."
         ]
       },
@@ -2363,10 +2363,10 @@
       "donations-are-public-general": {
         "question": "{{appName}}'daki bağışlar herkese açık mı?",
         "answer": [
-          "Aktivistin hangi tür ödemeyi kabul ettiğine bağlıdır.",
+          "Alıcının hangi tür ödemeyi kabul ettiğine bağlıdır.",
           "**Açık bağışlar** Bitcoin blok zincirinde ve Nostr'da kaydedilir. Herkes tutarları, zamanlamayı ve adresleri görebilir.",
-          "**Gizli bağışlar** sessiz ödemeleri kullanır. Bunlar herkese açık olarak aktivistin bağış koduna bağlanabilir değildir, bağışçı listelerinde görünmez ve herkese açık toplamlara sayılmaz.",
-          "Bir kampanya her ikisini de kabul ettiğinde, hangi yolun kullanılacağına bağışçının cüzdanı karar verir — sessiz ödemeleri destekleyen cüzdanlar gizli olarak öder, diğerleri açık adrese öder. Tam görüntü için **Bağışçı Rehberi**'ni ve **Aktivist Rehberi**'ni okuyun."
+          "**Gizli bağışlar** sessiz ödemeleri kullanır. Bunlar herkese açık olarak alıcının bağış koduna bağlanabilir değildir, bağışçı listelerinde görünmez ve herkese açık toplamlara sayılmaz.",
+          "Bir kampanya her ikisini de kabul ettiğinde, hangi yolun kullanılacağına bağışçının cüzdanı karar verir — sessiz ödemeleri destekleyen cüzdanlar gizli olarak öder, diğerleri açık adrese öder. Tam görüntü için **Bağışçı Rehberi**'ni ve **Alıcı Rehberi**'ni okuyun."
         ]
       },
       "why-donations-pending": {
@@ -2374,13 +2374,13 @@
         "answer": [
           "**Beklemede** olan bir bağış, zaten gönderilmiş gerçek Bitcoin'dir — yalnızca ağ tarafından onaylanmayı beklemektedir. Bağışçının cüzdanı işlemi yayımlamıştır, ancak işlem henüz bir bloğa dahil edilmemiştir.",
           "Bitcoin yaklaşık her 10 dakikada bir yeni bir blok üretir ve madenciler işlemleri bağışçının ödediği ücrete göre seçer. Bağışların çoğu bir saat içinde onaylanır; düşük ücretli olanlar ağ yoğun olduğunda daha uzun sürebilir. {{appName}} onay durumunu otomatik olarak yeniden kontrol eder, bu yüzden bir blok geldiğinde **beklemede** etiketi kendiliğinden kaybolur.",
-          "Fonlar yoldadır — bağış onaylandığı anda aktivist, bağışın kampanya toplamına eklendiğini görecektir. Aktivistin veya {{appName}}'in işlemi hızlandırmak için yapabileceği hiçbir şey yoktur; yalnızca bağışçının cüzdanı ücreti artırabilir."
+          "Fonlar yoldadır — bağış onaylandığı anda alıcı, bağışın kampanya toplamına eklendiğini görecektir. Alıcının veya {{appName}}'in işlemi hızlandırmak için yapabileceği hiçbir şey yoktur; yalnızca bağışçının cüzdanı ücreti artırabilir."
         ]
       },
       "censorship-resistance": {
         "question": "Buradaki \"sansüre dayanıklı\" ne anlama geliyor?",
         "answer": [
-          "Bağışçı ile aktivist arasında hiçbir şirket yer almaz. {{appName}} fonları tutmaz ve adresi donduramaz.",
+          "Bağışçı ile alıcı arasında hiçbir şirket yer almaz. {{appName}} fonları tutmaz ve adresi donduramaz.",
           "Bitcoin ağı çalıştığı sürece bağışlar gönderilebilir ve alınabilir. {{appName}}'nın kendisinin çevrimdışı olması bunları durdurmaz."
         ]
       },
@@ -2388,17 +2388,17 @@
         "question": "Neden Bitcoin?",
         "answer": [
           "Bitcoin dünyadaki en yaygın desteklenen ve sansüre en dayanıklı ödeme altyapısıdır. Her Bitcoin cüzdanı bunu gönderebilir.",
-          "{{appName}}'da aktivistler nasıl alacaklarını seçer: maksimum erişim için **açık** (normal bir Bitcoin adresi), izlenemez bağışlar için **gizli** (sessiz ödemeler) ya da her bağışçının cüzdanı doğru yolu otomatik seçsin diye **her ikisi**. Yalnızca tüketici düzeyinde bir Bitcoin uygulaması olan bağışçılar da katkıda bulunabilir; sessiz ödeme cüzdanı olan bağışçılar varsayılan olarak gizlilik elde eder.",
-          "Takas, açık Bitcoin işlemlerinin blok zincirinde görünür olması ve bir madenci ücreti ödemesidir. Bağışçı ve Aktivist rehberleri her iki durumun nasıl yönetileceğini açıklar."
+          "{{appName}}'da alıcılar nasıl alacaklarını seçer: maksimum erişim için **açık** (normal bir Bitcoin adresi), izlenemez bağışlar için **gizli** (sessiz ödemeler) ya da her bağışçının cüzdanı doğru yolu otomatik seçsin diye **her ikisi**. Yalnızca tüketici düzeyinde bir Bitcoin uygulaması olan bağışçılar da katkıda bulunabilir; sessiz ödeme cüzdanı olan bağışçılar varsayılan olarak gizlilik elde eder.",
+          "Takas, açık Bitcoin işlemlerinin blok zincirinde görünür olması ve bir madenci ücreti ödemesidir. Bağışçı ve Alıcı rehberleri her iki durumun nasıl yönetileceğini açıklar."
         ]
       },
       "why-not-silent-payments": {
         "question": "{{appName}} sessiz ödemeleri destekliyor mu?",
         "answer": [
-          "Evet — her iki tarafta da. {{appName}}'nın yerleşik Bitcoin cüzdanı BIP-352'yi destekler, bu nedenle {{appName}} cüzdanınızdan Bitcoin gönderdiğinizde herhangi bir sessiz ödeme adresine (`sp1…`) doğrudan ödeme yapabilirsiniz. Bir aktivist kampanya oluşturduğunda da, sessiz ödemeleri açık Bitcoin ödemelerinin yanında ya da onların yerine kabul edebilir.",
-          "Sessiz ödeme bağışları yine zincir üstünde uzlaşır, ancak işlem aktivistin bağış koduna bağlanamaz — bu nedenle herkese açık bağışçı listelerinde veya toplamlarda görünmezler.",
+          "Evet — her iki tarafta da. {{appName}}'nın yerleşik Bitcoin cüzdanı BIP-352'yi destekler, bu nedenle {{appName}} cüzdanınızdan Bitcoin gönderdiğinizde herhangi bir sessiz ödeme adresine (`sp1…`) doğrudan ödeme yapabilirsiniz. Bir alıcı kampanya oluşturduğunda da, sessiz ödemeleri açık Bitcoin ödemelerinin yanında ya da onların yerine kabul edebilir.",
+          "Sessiz ödeme bağışları yine zincir üstünde uzlaşır, ancak işlem alıcının bağış koduna bağlanamaz — bu nedenle herkese açık bağışçı listelerinde veya toplamlarda görünmezler.",
           "{{appName}} dışından sessiz ödeme göndermek BIP-352'yi destekleyen bir cüzdan gerektirir. Tüketici uygulamalarının çoğu henüz desteklemiyor, ancak [Ditto Wallet](https://ditto.pub) ve [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) destekliyor.",
-          "Bir kampanya her iki tür ödemeyi de kabul ettiğinde, {{appName}} bunları tek bir QR kodda kodlar. Sessiz ödemeleri destekleyen cüzdanlar gizli olarak öder; diğer herkes açık adrese öder. Hiçbir bağışçı dışlanmaz ve hiçbir aktivist erişim ile gizlilik arasında seçim yapmaya zorlanmaz."
+          "Bir kampanya her iki tür ödemeyi de kabul ettiğinde, {{appName}} bunları tek bir QR kodda kodlar. Sessiz ödemeleri destekleyen cüzdanlar gizli olarak öder; diğer herkes açık adrese öder. Hiçbir bağışçı dışlanmaz ve hiçbir alıcı erişim ile gizlilik arasında seçim yapmaya zorlanmaz."
         ]
       },
       "why-not-lightning": {
@@ -2411,15 +2411,15 @@
       "why-not-rotating-addresses": {
         "question": "{{appName}} neden her bağış için yeni bir adres oluşturmuyor?",
         "answer": [
-          "Bunu yapmak {{appName}}'nın para değiştiren bir aracı olarak hareket etmesini gerektirirdi — önce Bitcoin'in saklayıcısı olup sonra aktiviste iletmek.",
+          "Bunu yapmak {{appName}}'nın para değiştiren bir aracı olarak hareket etmesini gerektirirdi — önce Bitcoin'in saklayıcısı olup sonra alıcıya iletmek.",
           "Bu bizi bir para transfer kuruluşu yapardı, bunun getireceği düzenlemelere tabi olurduk ve tek bir başarısızlık noktası olurduk: {{appName}}'nın sunucusunu kapatın, içinden akan her bağışı kapatmış olursunuz.",
-          "Bunun yerine, her kullanıcının bağış adresi Nostr gizli anahtarından (nsec) — yani giriş yapmak için kullandığınız aynı anahtardan — türetilir. Bağışçılar doğrudan aktiviste gönderir, {{appName}} fonlara hiç dokunmaz ve platformun kendisi kimseyi sansürlemek için kapatılamaz. Bağış başına gizlilik isteyen aktivistler sessiz ödemeleri kabul edebilir; bu da arada para tutan biri olmadan aynı izlenemezliği sağlar."
+          "Bunun yerine, her kullanıcının bağış adresi Nostr gizli anahtarından (nsec) — yani giriş yapmak için kullandığınız aynı anahtardan — türetilir. Bağışçılar doğrudan alıcıya gönderir, {{appName}} fonlara hiç dokunmaz ve platformun kendisi kimseyi sansürlemek için kapatılamaz. Bağış başına gizlilik isteyen alıcılar sessiz ödemeleri kabul edebilir; bu da arada para tutan biri olmadan aynı izlenemezliği sağlar."
         ]
       },
       "why-not-other-crypto": {
         "question": "Neden Monero veya başka bir kripto para değil?",
         "answer": [
-          "Bitcoin, en yaygın benimsenmiş kripto paradır. Bu, bağışçıların satın alıp göndermesini ve aktivistlerin almasını, tutmasını ve harcamasını en kolay olan demektir.",
+          "Bitcoin, en yaygın benimsenmiş kripto paradır. Bu, bağışçıların satın alıp göndermesini ve alıcıların almasını, tutmasını ve harcamasını en kolay olan demektir.",
           "Monero gibi gizlilik odaklı paralar Bitcoin'den farklı gizlilik takasları sunar, ancak tüketici uygulamalarının çoğunluğunca desteklenmezler ve yerel para birimine geri dönüştürmek daha zordur. Bir bağışın iki tarafından birine önce niş bir kripto parayı edinmesini istemek, {{appName}}'nın koymayacağı bir engeldir. Bitcoin bağışlarının kendisi için, sessiz ödemeler Bitcoin ekosistemini terk etmeden izlenemezlik kullanım durumunu karşılar."
         ]
       },
@@ -2511,7 +2511,7 @@
       },
       "paymentComparison": {
         "donorHeader": "Bağış yaparken",
-        "activistHeader": "Oluştururken",
+        "recipientHeader": "Oluştururken",
         "donorRows": {
           "whatYouSee": {
             "label": "Gördüğünüz",
@@ -2531,10 +2531,10 @@
           "settlement": {
             "label": "Uzlaşma",
             "public": "Normal Bitcoin onayları.",
-            "silent": "Aynı zincir üstü onaylar, ancak aktivist bulmak için cüzdanını taramak zorundadır."
+            "silent": "Aynı zincir üstü onaylar, ancak alıcı bulmak için cüzdanını taramak zorundadır."
           }
         },
-        "activistRows": {
+        "recipientRows": {
           "whatDonorsSee": {
             "label": "Bağışçıların gördüğü",
             "public": "Normal bir Bitcoin adresi. Dünyadaki her cüzdanla çalışır.",
@@ -2563,12 +2563,12 @@
           "bestFor": {
             "label": "Şunun için en iyisi",
             "public": "Sosyal kanıt ve görünürlüğün yardımcı olduğu açıkça yürütülen fon toplama.",
-            "silent": "Bağışçı veya aktivist gizliliğinin, görünür toplamdan daha önemli olduğu kampanyalar."
+            "silent": "Bağışçı veya alıcı gizliliğinin, görünür toplamdan daha önemli olduğu kampanyalar."
           },
           "watchOutFor": {
             "label": "Dikkat",
             "public": "Her bağışçının kalıcı, herkese açık kaydı.",
-            "silent": "Bugün sarsıntılı kullanıcı deneyimi. Bazı bağışlar aktivist tarama yapana kadar görünmez."
+            "silent": "Bugün sarsıntılı kullanıcı deneyimi. Bazı bağışlar alıcı tarama yapana kadar görünmez."
           }
         }
       }
@@ -2595,7 +2595,7 @@
           },
           "arrivesDirectly": {
             "title": "Doğrudan ulaşır",
-            "body": "Fonlar doğrudan aktiviste uzlaşır. {{appName}} bunları tutmaz veya yönlendirmez ve adres aktivistin Nostr gizli anahtarından türetilir."
+            "body": "Fonlar doğrudan alıcıya uzlaşır. {{appName}} bunları tutmaz veya yönlendirmez ve adres alıcının Nostr gizli anahtarından türetilir."
           }
         }
       },
@@ -2636,11 +2636,11 @@
         "heading": "Bugünkü sessiz ödemeler hakkında bir not",
         "paragraphs": [
           "Sessiz ödemeler zincir üstünde Bitcoin almanın en gizli yoludur, ancak ekosistem gençtir. Popüler cüzdanların çoğu henüz bir sessiz ödeme uç noktasına gönderemez, bu yüzden bir cüzdan gönderemediğinde bağış kampanyanın açık adresine normal bir Bitcoin işlemine geri döner (kampanya her ikisini de kabul ediyorsa).",
-          "Aktivistler için de sessiz ödeme bağışları anlık bildirimsiz ulaşır ve yalnızca aktivist cüzdanını taradıktan sonra görünür; bu da dakikalardan saatlere kadar sürebilir. Bunların hiçbiri fonlarınızın güvenliğini etkilemez; yalnızca deneyimi şekillendirir."
+          "Alıcılar için de sessiz ödeme bağışları anlık bildirimsiz ulaşır ve yalnızca alıcı cüzdanını taradıktan sonra görünür; bu da dakikalardan saatlere kadar sürebilir. Bunların hiçbiri fonlarınızın güvenliğini etkilemez; yalnızca deneyimi şekillendirir."
         ]
       }
     },
-    "activist": {
+    "recipient": {
       "tldr": {
         "lede": "Kampanyanızı oluştururken neyi kabul edeceğinizi seçin: Açık, Sessiz ya da her ikisi. Her iki seçenek de saklayıcı değildir. {{appName}} hiçbir zaman fonlarınızı tutmaz.",
         "nextActions": [

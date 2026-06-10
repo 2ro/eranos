@@ -41,7 +41,7 @@ const HashtagPage = lazy(() => import("./pages/HashtagPage").then(m => ({ defaul
 const MyDashboardPage = lazy(() => import("./pages/MyDashboardPage").then(m => ({ default: m.MyDashboardPage })));
 const AboutPage = lazy(() => import("./pages/AboutPage").then(m => ({ default: m.AboutPage })));
 const DonorGuidePage = lazy(() => import("./pages/DonorGuidePage").then(m => ({ default: m.DonorGuidePage })));
-const ActivistGuidePage = lazy(() => import("./pages/ActivistGuidePage").then(m => ({ default: m.ActivistGuidePage })));
+const RecipientGuidePage = lazy(() => import("./pages/RecipientGuidePage").then(m => ({ default: m.RecipientGuidePage })));
 const LanguageSettingsPage = lazy(() => import("./pages/LanguageSettingsPage").then(m => ({ default: m.LanguageSettingsPage })));
 const NetworkSettingsPage = lazy(() => import("./pages/NetworkSettingsPage").then(m => ({ default: m.NetworkSettingsPage })));
 const NIP19Page = lazy(() => import("./pages/NIP19Page").then(m => ({ default: m.NIP19Page })));
@@ -178,7 +178,8 @@ export function AppRouter() {
               under the wide layout below. */}
           <Route path="/help" element={<Navigate to="/about" replace />} />
           <Route path="/help/donors" element={<Navigate to="/about/donors" replace />} />
-          <Route path="/help/activists" element={<Navigate to="/about/activists" replace />} />
+          <Route path="/help/activists" element={<Navigate to="/about/recipients" replace />} />
+          <Route path="/help/recipients" element={<Navigate to="/about/recipients" replace />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/safety" element={<CSAEPolicyPage />} />
           <Route path="/changelog" element={<ChangelogPage />} />
@@ -206,11 +207,15 @@ export function AppRouter() {
           <Route path="/pledges/new" element={<CreateActionPage />} />
           <Route path="/dashboard" element={<EventDashboardPage />} />
           <Route path="/i/*" element={<ExternalContentPage />} />
-          {/* About page + Donor / Activist guides. Full-bleed landing-style
+          {/* About page + Donor / Recipient guides. Full-bleed landing-style
               layouts that render their own internal max-widths. */}
           <Route path="/about" element={<AboutPage />} />
           <Route path="/about/donors" element={<DonorGuidePage />} />
-          <Route path="/about/activists" element={<ActivistGuidePage />} />
+          <Route path="/about/recipients" element={<RecipientGuidePage />} />
+          {/* Legacy URL: the recipient guide lived at `/about/activists`
+              before the "activist" → "recipient" copy change. Redirect so
+              external links and bookmarks still resolve. */}
+          <Route path="/about/activists" element={<Navigate to="/about/recipients" replace />} />
           {/* NIP-19 route for npub1, note1, naddr1, nevent1, nprofile1.
               Goes through the wide layout because the dispatch may resolve to
               a profile, campaign, action, or community page — all of which

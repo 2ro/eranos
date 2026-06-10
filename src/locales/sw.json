@@ -453,10 +453,10 @@
       "title": "Mwongozo wa Mfadhili",
       "subtitle": "Bitcoin halisi, inayotumwa moja kwa moja. Mtiririko mzima katika ukurasa mmoja mfupi."
     },
-    "activistGuide": {
-      "seoTitle": "Mwongozo wa Mwanaharakati",
+    "recipientGuide": {
+      "seoTitle": "Mwongozo wa Mpokeaji",
       "seoDescription": "Jinsi ya kupokea michango kwenye {{appName}} na kutoa pesa kwa faragha.",
-      "title": "Mwongozo wa Mwanaharakati",
+      "title": "Mwongozo wa Mpokeaji",
       "subtitle": "Chagua cha kukubali, pokea michango, toa pesa."
     },
     "changelog": {
@@ -483,7 +483,7 @@
   },
   "about": {
     "seoTitle": "Kuhusu",
-    "seoDescription": "Jinsi {{appName}} inavyofanya kazi: kuwaunganisha wanaharakati na ufadhili usiozuilika kupitia Bitcoin na Nostr.",
+    "seoDescription": "Jinsi {{appName}} inavyofanya kazi: kuwaunganisha wapokeaji na ufadhili usiozuilika kupitia Bitcoin na Nostr.",
     "hero": {
       "eyebrow": "Kuhusu {{appName}}",
       "headlinePart1": "Jinsi",
@@ -496,11 +496,11 @@
         "censorshipResistant": "Inastahimili udhibiti"
       },
       "ctaDonor": "Soma Mwongozo wa Mfadhili",
-      "ctaActivist": "Soma Mwongozo wa Mwanaharakati",
+      "ctaRecipient": "Soma Mwongozo wa Mpokeaji",
       "sampleCard": {
         "countryName": "Venezuela",
         "public": "Hadharani",
-        "imageAlt": "Wanaharakati wa Venezuela katika mkesha wa mishumaa wakishikilia bango lisemalo 'Liberen a todos los presos políticos · ¡Cese la represión!'",
+        "imageAlt": "Wananchi wa Venezuela katika mkesha wa mishumaa wakishikilia bango lisemalo 'Liberen a todos los presos políticos · ¡Cese la represión!'",
         "orgName": "Venezolanos Libres",
         "title": "Kuwakomboa Wafungwa wa Kisiasa wa Venezuela",
         "description": "Utetezi wa kisheria na msaada wa familia kwa zaidi ya wafungwa 800 wa kisiasa waliokamatwa na utawala wa Maduro.",
@@ -516,34 +516,34 @@
       "lede": "Hakuna benki, hakuna mipaka, hakuna ruhusa.",
       "step1": {
         "imageAlt": "Funguo ya kriptografia ya rangi ya machungwa inayong'aa ikielea kwenye nafasi ya giza, ikiashiria utambulisho wa kujitegemea",
-        "title": "Wanaharakati hujisajili kwa sekunde.",
-        "body": "Hakuna benki. Hakuna karatasi. Hakuna idhini. Wakati mwanaharakati anaunda akaunti kwenye {{appName}}, anakuwa na anwani ya Bitcoin tayari kupokea msaada, popote duniani."
+        "title": "Wapokeaji hujisajili kwa sekunde.",
+        "body": "Hakuna benki. Hakuna karatasi. Hakuna idhini. Wakati mwapokeaji anaunda akaunti kwenye {{appName}}, anakuwa na anwani ya Bitcoin tayari kupokea msaada, popote duniani."
       },
       "step2": {
         "imageAlt": "Sarafu ya Bitcoin inayong'aa ikiruka angani juu ya ramani ya dunia yenye giza, ikiashiria malipo ya papo hapo ya mipaka",
         "title": "Wafadhili hutuma Bitcoin moja kwa moja.",
-        "body": "Wafadhili hutuma Bitcoin kutoka kwa pochi yoyote wanayotumia tayari (Cash App, Coinbase, Strike, pochi ya kifaa) moja kwa moja kwa mwanaharakati. {{appName}} kamwe haigusi pesa. Hakuna seva katikati, hakuna mhifadhi."
+        "body": "Wafadhili hutuma Bitcoin kutoka kwa pochi yoyote wanayotumia tayari (Cash App, Coinbase, Strike, pochi ya kifaa) moja kwa moja kwa mwapokeaji. {{appName}} kamwe haigusi pesa. Hakuna seva katikati, hakuna mhifadhi."
       },
       "step3": {
         "imageAlt": "Mkono wazi wenye mwanga wa rangi ya machungwa unaong'aa kutoka kiganjani, ukiashiria kupokea na uwezo",
         "title": "Msaada hufika pale unapohitajika.",
-        "body": "Fedha hufika kwa mwanaharakati moja kwa moja. Wanabaki na umiliki, wanabaki na udhibiti. Hamisha, badilisha, au tumia; miongozo iliyo hapa chini inaeleza jinsi ya kufanya hivyo kwa faragha na usalama."
+        "body": "Fedha hufika kwa mwapokeaji moja kwa moja. Wanabaki na umiliki, wanabaki na udhibiti. Hamisha, badilisha, au tumia; miongozo iliyo hapa chini inaeleza jinsi ya kufanya hivyo kwa faragha na usalama."
       }
     },
     "twoWays": {
       "eyebrow": "Bitcoin · QR moja, chaguzi mbili",
       "title": "Njia mbili za kulipwa.",
-      "lede": "Chaguzi zote mbili ni Bitcoin. Tofauti ni unachokitoa kwa ajili ya faragha. Wakati mwanaharakati anaunda kampeni, anachagua chaguzi za kukubali. Ikiwa zote mbili, ukurasa wa mchango unaonyesha msimbo mmoja wa QR unaofanya kazi kwa pochi yoyote.",
+      "lede": "Chaguzi zote mbili ni Bitcoin. Tofauti ni unachokitoa kwa ajili ya faragha. Wakati mwapokeaji anaunda kampeni, anachagua chaguzi za kukubali. Ikiwa zote mbili, ukurasa wa mchango unaonyesha msimbo mmoja wa QR unaofanya kazi kwa pochi yoyote.",
       "public": {
         "kicker": "Malipo ya Umma ya Bitcoin",
         "tagline": "Ya ulimwengu wote · Haraka · Wazi",
         "title": "Inafanya kazi na kila pochi duniani.",
-        "description": "Michango huingia kwenye anwani ya kawaida ya Bitcoin ambayo mwanaharakati anaimiliki. Yeyote mwenye pochi yoyote ya Bitcoin anaweza kutuma. Hakuna programu mpya, hakuna akaunti mpya, hakuna mafunzo mapya.",
+        "description": "Michango huingia kwenye anwani ya kawaida ya Bitcoin ambayo mwapokeaji anaimiliki. Yeyote mwenye pochi yoyote ya Bitcoin anaweza kutuma. Hakuna programu mpya, hakuna akaunti mpya, hakuna mafunzo mapya.",
         "bullet1": "Inafanya kazi katika kila pochi ya Bitcoin: Cash App, Coinbase, Strike, vifaa",
         "bullet2": "Utuaji wa haraka zaidi: uthibitisho wa Bitcoin pekee",
-        "bullet3": "Inayoweza kuthibitishwa katika mnyororo: yeyote anaweza kuona mwanaharakati amepokea nini",
+        "bullet3": "Inayoweza kuthibitishwa katika mnyororo: yeyote anaweza kuona mwapokeaji amepokea nini",
         "tradeoffTitle": "Athari: Umma katika mnyororo.",
-        "tradeoffIntro": "Kila mchango ni wa umma kwenye mnyororo wa Bitcoin na kwenye Nostr. {{appName}} inapendekezwa tu kwa harakati za wazi. Ikiwa wewe au wafadhili wako mnahitaji faragha kali, ikiwa ni pamoja na kutoka kwa watendaji wa serikali, soma <0>Mwongozo wa Mfadhili</0> na <1>Mwongozo wa Mwanaharakati</1> kabla ya kushiriki."
+        "tradeoffIntro": "Kila mchango ni wa umma kwenye mnyororo wa Bitcoin na kwenye Nostr. {{appName}} inapendekezwa tu kwa kampeni za wazi. Ikiwa wewe au wafadhili wako mnahitaji faragha kali, ikiwa ni pamoja na kutoka kwa watendaji wa serikali, soma <0>Mwongozo wa Mfadhili</0> na <1>Mwongozo wa Mpokeaji</1> kabla ya kushiriki."
       },
       "silent": {
         "kicker": "Malipo ya Kimya ya Bitcoin",
@@ -551,7 +551,7 @@
         "title": "Yasiyounganika, katika mnyororo, moja kwa moja.",
         "description": "Michango hutumwa kama malipo ya kimya ya BIP-352. Kila moja huingia kwenye matokeo mapya ya Bitcoin yasiyounganika ambayo mtazamaji anayechunguza mnyororo hawezi kuyaunganisha tena na kampeni.",
         "bullet1": "Njia ya mchango haiwezi kujengwa upya katika mnyororo",
-        "bullet2": "Inalinda wanaharakati wanaokabili maadui makubwa",
+        "bullet2": "Inalinda wapokeaji wanaokabili maadui makubwa",
         "bullet3": "Huhifadhiwa katika salio la faragha lililo tofauti, kamwe halichanganywi na fedha za umma",
         "tradeoffTitle": "Athari: Malipo ya kimya bado ni mapya.",
         "tradeoffIntro": "Njia ya faragha zaidi ya kupokea Bitcoin katika mnyororo, lakini mfumo bado ni mchanga na mbaya leo:",
@@ -563,7 +563,7 @@
       },
       "noCustody": {
         "title": "Hakuna ulinzi. Hakuna mpatanishi.",
-        "body": "{{appName}} kamwe haishiki fedha. Michango huhama kati ya pochi kwenye Bitcoin. Hakuna seva inayosimama kati ya mfadhili na mwanaharakati katika chaguo lolote. Ikiwa {{appName}} ingetoweka kesho, kila kampeni ingeendelea kufanya kazi.",
+        "body": "{{appName}} kamwe haishiki fedha. Michango huhama kati ya pochi kwenye Bitcoin. Hakuna seva inayosimama kati ya mfadhili na mwapokeaji katika chaguo lolote. Ikiwa {{appName}} ingetoweka kesho, kila kampeni ingeendelea kufanya kazi.",
         "gofundme": {
           "heading": "Tofauti na GoFundMe",
           "body": "Hakuna jukwaa linaloweza kufunga michango yako, kudai marejesho, au kumaliza kampeni yako kwa sababu ya kutokubaliana kwa sera."
@@ -602,21 +602,21 @@
         "imageAlt": "Waandamanaji waliovaa kofia wakipita barabarani katika mji wa Ulaya jioni, wakishikilia tochi nyekundu zinazowaka na mabango ya 'FREEDOM' na 'LIBERTAD'",
         "role": "Kwa Wafadhili",
         "title": "Unga mkono malengo ambayo benki hawawezi.",
-        "description": "Tuma Bitcoin moja kwa moja kwa wanaharakati na harakati popote duniani, bila kuomba ruhusa kwa mchakataji wa malipo.",
+        "description": "Tuma Bitcoin moja kwa moja kwa wapokeaji na harakati popote duniani, bila kuomba ruhusa kwa mchakataji wa malipo.",
         "bullet1": "Tumia pochi yoyote ya Bitcoin ulionayo tayari.",
-        "bullet2": "Michango huingia moja kwa moja kwa mwanaharakati. Hakuna mhifadhi, hakuna mpatanishi.",
+        "bullet2": "Michango huingia moja kwa moja kwa mwapokeaji. Hakuna mhifadhi, hakuna mpatanishi.",
         "bullet3": "Kwa faragha, tumia pochi inayoauni malipo ya kimya.",
         "cta": "Soma Mwongozo wa Mfadhili"
       },
-      "activist": {
+      "recipient": {
         "imageAlt": "Mtazamo wa angani wa maelfu ya waandamanaji waliokusanyika usiku kwenye uwanja wa jiji na tochi nyekundu zinazowaka, chini ya bango la 'UNITY IN DARKNESS' lililoonyeshwa kwenye majengo ya jirani",
-        "role": "Kwa Wanaharakati",
+        "role": "Kwa Wapokeaji",
         "title": "Pata ufadhili bila ruhusa.",
         "description": "Pokea msaada moja kwa moja kutoka kwa watu wanaoamini lengo lako. Hakuna akaunti ya benki, hakuna fomu ya maombi, hakuna kampuni katikati.",
         "bullet1": "Anza kupokea michango mara tu unapojisajili.",
         "bullet2": "Chagua aina za malipo za kukubali: za umma, malipo ya kimya, au zote mbili.",
         "bullet3": "Kwa utoaji wa pesa kwa faragha, tuma kwanza kwa pochi ya malipo ya kimya, kisha tuma popote.",
-        "cta": "Soma Mwongozo wa Mwanaharakati"
+        "cta": "Soma Mwongozo wa Mpokeaji"
       },
       "stillStuck": "Bado umekwama?",
       "followTeam": "Fuata Team Soapbox kwenye Nostr",
@@ -1201,8 +1201,8 @@
   "campaigns": {
     "home": {
       "seoTitle": "Wakusanyaji wa fedha",
-      "seoDescription": "Kuwaunganisha wanaharakati na ufadhili usiozuilika.",
-      "heroTagline": "Kuwaunganisha wanaharakati na<1></1><0>ufadhili usiozuilika.</0>",
+      "seoDescription": "Kuunganisha dunia na ufadhili usiozuilika.",
+      "heroTagline": "Kuunganisha dunia na<1></1><0>ufadhili usiozuilika.</0>",
       "heroBody": "Kusanya Bitcoin moja kwa moja kutoka kwa wafuasi kote duniani. Kila mchango huingia moja kwa moja kwenye pochi yako, bila wapatanishi, bila marejesho, na bila jukwaa kushikilia fedha zako.",
       "startCampaign": "Anza kampeni",
       "howItWorks": "Jinsi inavyofanya kazi",
@@ -1226,7 +1226,7 @@
       "whyDifferent": {
         "eyebrow": "Kwa nini {{appName}}",
         "title": "Imejengwa tofauti.",
-        "lede": "Bitcoin moja kwa moja kutoka kwa mfadhili hadi mwanaharakati. Hakuna jukwaa katikati, hakuna mtunzaji anayeshikilia fedha, hakuna ruhusa inayohitajika.",
+        "lede": "Bitcoin moja kwa moja kutoka kwa mfadhili hadi mwapokeaji. Hakuna jukwaa katikati, hakuna mtunzaji anayeshikilia fedha, hakuna ruhusa inayohitajika.",
         "block1": {
           "heading": "Tofauti na GoFundMe",
           "body": "Hakuna jukwaa linaloweza kufungia michango yako, kudai marejesho, au kusitisha kampeni yako kwa sababu ya tofauti za sera. Hakuna Stripe, Visa, au benki iliyo katikati inayoweza kukukata wakati kampeni inaendelea.",
@@ -1243,7 +1243,7 @@
         },
         "block3": {
           "heading": "Hadharani au kwa faragha. Chaguo ni lako.",
-          "body": "Wanaharakati huchagua njia ya kupokea inayolingana na hatari wanazokabiliana nazo. Wafadhili huona QR moja; pochi huchagua itifaki sahihi.",
+          "body": "Wapokeaji huchagua njia ya kupokea inayolingana na hatari wanazokabiliana nazo. Wafadhili huona QR moja; pochi huchagua itifaki sahihi.",
           "publicLabel": "Hadharani",
           "publicSummary": "Hufanya kazi kwenye kila pochi ya Bitcoin. Haraka na inaweza kuthibitishwa on-chain.",
           "privateLabel": "Faragha",
@@ -2274,7 +2274,7 @@
       "what-is-ditto": {
         "question": "{{appName}} ni nini?",
         "answer": [
-          "{{appName}} ni jukwaa la kutuma michango ya Bitcoin — ya umma au ya faragha — moja kwa moja kwa wanaharakati. Hakuna mpatanishi, hakuna mchakataji wa malipo, na hakuna akaunti inayoweza kufungwa.",
+          "{{appName}} ni jukwaa la kutuma michango ya Bitcoin — ya umma au ya faragha — moja kwa moja kwa wapokeaji. Hakuna mpatanishi, hakuna mchakataji wa malipo, na hakuna akaunti inayoweza kufungwa.",
           "{{appName}} imejengwa kwenye Nostr, kwa hivyo utambulisho wako haujafungwa kwenye tovuti hii — wewe ndiye unayemiliki."
         ]
       },
@@ -2293,18 +2293,18 @@
       "send-bitcoin-onchain": {
         "question": "Je, kutuma Bitcoin kunafanyaje kazi?",
         "answer": [
-          "Mwanaharakati anapounda kampeni, anachagua aina za malipo za kukubali: **ya umma**, **ya faragha**, au **zote mbili**.",
+          "Mwapokeaji anapounda kampeni, anachagua aina za malipo za kukubali: **ya umma**, **ya faragha**, au **zote mbili**.",
           "Michango ya **umma** ni Bitcoin halisi katika mnyororo. Inaingia kwenye blockchain ya umma, inafanya kazi katika kila pochi ya Bitcoin, na inaonekana kwa yeyote.",
-          "Michango ya **faragha** hutumia **malipo ya kimya** (BIP-352). Inaingia pia katika mnyororo, lakini muamala hauwezi kuunganishwa na msimbo wa mchango wa mwanaharakati — kwa hivyo wanabaki nje ya orodha za wafadhili za umma na jumla. Mfadhili anahitaji pochi inayoauni malipo ya kimya — tunapendekeza [Ditto Wallet](https://ditto.pub) au [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
+          "Michango ya **faragha** hutumia **malipo ya kimya** (BIP-352). Inaingia pia katika mnyororo, lakini muamala hauwezi kuunganishwa na msimbo wa mchango wa mwapokeaji — kwa hivyo wanabaki nje ya orodha za wafadhili za umma na jumla. Mfadhili anahitaji pochi inayoauni malipo ya kimya — tunapendekeza [Ditto Wallet](https://ditto.pub) au [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
           "Kampeni inapokubali **zote mbili**, {{appName}} inaonyesha msimbo mmoja wa QR unaosimba ncha zote mbili. Pochi za malipo ya kimya huusoma kama wa faragha; pochi nyingine zinarudi kwa anwani ya umma. Wafadhili hawana haja ya kuchagua — pochi yao huchagua njia sahihi kiotomatiki.",
-          "Vyovyote, malipo yanaenda moja kwa moja kwa mwanaharakati. {{appName}} kamwe haigusi fedha."
+          "Vyovyote, malipo yanaenda moja kwa moja kwa mwapokeaji. {{appName}} kamwe haigusi fedha."
         ]
       },
       "connect-wallet": {
         "question": "Pochi ya {{appName}} ni nini?",
         "answer": [
           "Pochi yako ya {{appName}} ni pochi ya Bitcoin ya **kujihifadhi**, iliyojengwa kutoka kwa funguo yako ya Nostr. {{appName}} kamwe haishiki fedha zako — pochi inaendesha katika kivinjari chako na kusaini miamala ndani ya nchi kwa funguo unayoidhibiti wewe tu. Inaweza kupokea Bitcoin njia zote mbili — kama anwani ya umma ambayo pochi yoyote ya Bitcoin inaweza kulipa, na kama msimbo wa malipo ya kimya ambao pochi zenye uwezo zinaweza kulipa kwa faragha. Hakuna cha kujisajilia; ipo wakati una akaunti.",
-          "Pochi ina vichupo viwili: **Umma** (anwani yako ya kawaida ya Bitcoin) na **Faragha** (malipo ya kimya). Masalio hayo mawili huwekwa tofauti kabisa na kamwe hayawezi kutumika pamoja — utengano huo ndio unaofanya michango ya faragha isiunganike katika mnyororo. Unapounda kampeni, unachagua kama utakubali malipo ya umma, malipo ya faragha, au zote mbili. Kutumia unachopokea, ona **Mwongozo wa Mwanaharakati**.",
+          "Pochi ina vichupo viwili: **Umma** (anwani yako ya kawaida ya Bitcoin) na **Faragha** (malipo ya kimya). Masalio hayo mawili huwekwa tofauti kabisa na kamwe hayawezi kutumika pamoja — utengano huo ndio unaofanya michango ya faragha isiunganike katika mnyororo. Unapounda kampeni, unachagua kama utakubali malipo ya umma, malipo ya faragha, au zote mbili. Kutumia unachopokea, ona **Mwongozo wa Mpokeaji**.",
           "Unaweza pia kuhamisha kifungu cha maneno 24 cha mbegu ya pochi yako na kukileta katika pochi yoyote ya kawaida ya Bitcoin — ona \"Je, naweza kuhamisha pochi yangu ya {{appName}} kwa pochi nyingine ya Bitcoin?\" hapa chini."
         ]
       },
@@ -2321,10 +2321,10 @@
       "donations-are-public-general": {
         "question": "Je, michango kwenye {{appName}} ni ya umma?",
         "answer": [
-          "Inategemea aina gani ya malipo mwanaharakati anakubali.",
+          "Inategemea aina gani ya malipo mwapokeaji anakubali.",
           "**Michango ya umma** imerekodiwa kwenye blockchain ya Bitcoin na kwenye Nostr. Yeyote anaweza kuona kiasi, wakati, na anwani.",
-          "**Michango ya faragha** hutumia malipo ya kimya. Hayaunganiki hadharani na msimbo wa mchango wa mwanaharakati, hayaonekani kwenye orodha za wafadhili, na hayahesabiwi katika jumla ya umma.",
-          "Kampeni inapokubali zote mbili, pochi ya mfadhili huamua njia ya kutumia — pochi zenye uwezo wa malipo ya kimya hulipa kwa faragha, nyingine hulipa anwani ya umma. Soma **Mwongozo wa Mfadhili** na **Mwongozo wa Mwanaharakati** kwa picha kamili."
+          "**Michango ya faragha** hutumia malipo ya kimya. Hayaunganiki hadharani na msimbo wa mchango wa mwapokeaji, hayaonekani kwenye orodha za wafadhili, na hayahesabiwi katika jumla ya umma.",
+          "Kampeni inapokubali zote mbili, pochi ya mfadhili huamua njia ya kutumia — pochi zenye uwezo wa malipo ya kimya hulipa kwa faragha, nyingine hulipa anwani ya umma. Soma **Mwongozo wa Mfadhili** na **Mwongozo wa Mpokeaji** kwa picha kamili."
         ]
       },
       "why-donations-pending": {
@@ -2332,13 +2332,13 @@
         "answer": [
           "Mchango **unaosubiri** ni Bitcoin halisi ambayo tayari imetumwa — inangoja tu kuthibitishwa na mtandao. Pochi ya mfadhili imeshatangaza muamala, lakini bado haujajumuishwa katika kizuizi.",
           "Bitcoin huzalisha kizuizi kipya takriban kila dakika 10, na wachimbaji huchagua miamala kulingana na ada aliyolipa mfadhili. Michango mingi huthibitishwa ndani ya saa moja; ile yenye ada ya chini inaweza kuchukua muda mrefu wakati mtandao una shughuli nyingi. {{appName}} hukagua tena hali ya uthibitisho kiotomatiki, hivyo lebo ya **inasubiri** hutoweka yenyewe mara kizuizi kinapotua.",
-          "Fedha ziko njiani — mwanaharakati ataona mchango ukihesabiwa katika jumla ya kampeni mara tu unapothibitishwa. Hakuna jambo mwanaharakati au {{appName}} wanaloweza kufanya kuharakisha; pochi ya mfadhili pekee ndiyo inayoweza kuongeza ada."
+          "Fedha ziko njiani — mwapokeaji ataona mchango ukihesabiwa katika jumla ya kampeni mara tu unapothibitishwa. Hakuna jambo mwapokeaji au {{appName}} wanaloweza kufanya kuharakisha; pochi ya mfadhili pekee ndiyo inayoweza kuongeza ada."
         ]
       },
       "censorship-resistance": {
         "question": "\"Inastahimili udhibiti\" inamaanisha nini hapa?",
         "answer": [
-          "Hakuna kampuni inayoketi kati ya mfadhili na mwanaharakati. {{appName}} haishiki fedha na haiwezi kufunga anwani.",
+          "Hakuna kampuni inayoketi kati ya mfadhili na mwapokeaji. {{appName}} haishiki fedha na haiwezi kufunga anwani.",
           "Mradi mtandao wa Bitcoin unaendesha, michango inaweza kutumwa na kupokelewa. {{appName}} yenyewe kutokuwepo mtandaoni hakutaizuia."
         ]
       },
@@ -2346,17 +2346,17 @@
         "question": "Kwa nini Bitcoin?",
         "answer": [
           "Bitcoin ni reli ya malipo iliyo na uungwaji mkono mkubwa zaidi na inayostahimili udhibiti zaidi duniani. Kila pochi ya Bitcoin inaweza kuituma.",
-          "Kwenye {{appName}}, wanaharakati huchagua jinsi ya kupokea: **ya umma** (anwani ya kawaida ya Bitcoin) kwa ufikiaji wa juu, **ya faragha** (malipo ya kimya) kwa michango isiyounganika, au **zote mbili** ili pochi ya kila mfadhili ichague njia sahihi kiotomatiki. Wafadhili ambao wana programu tu ya watumiaji wa Bitcoin bado wanaweza kuchangia; wafadhili wenye pochi ya malipo ya kimya wanapata faragha kwa chaguo-msingi.",
-          "Athari ni kwamba miamala ya umma ya Bitcoin inaonekana kwenye blockchain na hulipa ada ya mchimba. Miongozo ya Mfadhili na Mwanaharakati inaeleza jinsi ya kushughulikia zote mbili."
+          "Kwenye {{appName}}, wapokeaji huchagua jinsi ya kupokea: **ya umma** (anwani ya kawaida ya Bitcoin) kwa ufikiaji wa juu, **ya faragha** (malipo ya kimya) kwa michango isiyounganika, au **zote mbili** ili pochi ya kila mfadhili ichague njia sahihi kiotomatiki. Wafadhili ambao wana programu tu ya watumiaji wa Bitcoin bado wanaweza kuchangia; wafadhili wenye pochi ya malipo ya kimya wanapata faragha kwa chaguo-msingi.",
+          "Athari ni kwamba miamala ya umma ya Bitcoin inaonekana kwenye blockchain na hulipa ada ya mchimba. Miongozo ya Mfadhili na Mwapokeaji inaeleza jinsi ya kushughulikia zote mbili."
         ]
       },
       "why-not-silent-payments": {
         "question": "Je, {{appName}} inaauni malipo ya kimya?",
         "answer": [
-          "Ndiyo — pande zote mbili. Pochi ya Bitcoin iliyojengwa ndani ya {{appName}} inaauni BIP-352, kwa hivyo unapotuma Bitcoin kutoka kwa pochi yako ya {{appName}} unaweza kulipa anwani yoyote ya malipo ya kimya (`sp1…`) moja kwa moja. Na mwanaharakati anapounda kampeni, anaweza kukubali malipo ya kimya pamoja na, au badala ya, malipo ya umma ya Bitcoin.",
-          "Michango ya malipo ya kimya bado inaingia katika mnyororo, lakini muamala hauwezi kuunganishwa na msimbo wa mchango wa mwanaharakati — kwa hivyo haionekani katika orodha za wafadhili au jumla za umma.",
+          "Ndiyo — pande zote mbili. Pochi ya Bitcoin iliyojengwa ndani ya {{appName}} inaauni BIP-352, kwa hivyo unapotuma Bitcoin kutoka kwa pochi yako ya {{appName}} unaweza kulipa anwani yoyote ya malipo ya kimya (`sp1…`) moja kwa moja. Na mwapokeaji anapounda kampeni, anaweza kukubali malipo ya kimya pamoja na, au badala ya, malipo ya umma ya Bitcoin.",
+          "Michango ya malipo ya kimya bado inaingia katika mnyororo, lakini muamala hauwezi kuunganishwa na msimbo wa mchango wa mwapokeaji — kwa hivyo haionekani katika orodha za wafadhili au jumla za umma.",
           "Kutuma malipo ya kimya kutoka nje ya {{appName}} kunahitaji pochi inayoauni BIP-352. Programu nyingi za watumiaji bado hazifanyi hivyo, lakini [Ditto Wallet](https://ditto.pub) na [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) zinaweza.",
-          "Kampeni inapokubali aina zote mbili za malipo, {{appName}} inaisimba kwenye msimbo mmoja wa QR. Pochi zenye uwezo wa malipo ya kimya hulipa kwa faragha; wengine wote hulipa anwani ya umma. Hakuna mfadhili anayefungiwa nje, na hakuna mwanaharakati analazimishwa kuchagua kati ya ufikiaji na faragha."
+          "Kampeni inapokubali aina zote mbili za malipo, {{appName}} inaisimba kwenye msimbo mmoja wa QR. Pochi zenye uwezo wa malipo ya kimya hulipa kwa faragha; wengine wote hulipa anwani ya umma. Hakuna mfadhili anayefungiwa nje, na hakuna mwapokeaji analazimishwa kuchagua kati ya ufikiaji na faragha."
         ]
       },
       "why-not-lightning": {
@@ -2369,15 +2369,15 @@
       "why-not-rotating-addresses": {
         "question": "Kwa nini {{appName}} haizalishi anwani mpya kwa kila mchango?",
         "answer": [
-          "Kufanya hivi kungehitaji {{appName}} kufanya kama mpatanishi wa kubadilisha pesa — kuchukua ulinzi wa Bitcoin kwanza na kisha kuipeleka kwa mwanaharakati.",
+          "Kufanya hivi kungehitaji {{appName}} kufanya kama mpatanishi wa kubadilisha pesa — kuchukua ulinzi wa Bitcoin kwanza na kisha kuipeleka kwa mwapokeaji.",
           "Hilo lingetufanya kuwa mtumaji wa pesa, chini ya kanuni zinazokuja na hilo, na hatua moja ya kushindwa: funga seva ya {{appName}} na umefunga kila mchango unaopita kupitia.",
-          "Badala yake, anwani ya mchango ya kila mtumiaji inatokana na funguo yake ya siri ya Nostr (nsec) — funguo ile ile unayoingia nayo. Wafadhili hutuma moja kwa moja kwa mwanaharakati, {{appName}} kamwe haigusi fedha, na jukwaa lenyewe haliwezi kuzimwa kudhibiti yeyote. Wanaharakati wanaotaka faragha kwa kila mchango wanaweza kukubali malipo ya kimya, ambayo hutoa kutounganika kuleile bila yeyote kushikilia pesa katikati."
+          "Badala yake, anwani ya mchango ya kila mtumiaji inatokana na funguo yake ya siri ya Nostr (nsec) — funguo ile ile unayoingia nayo. Wafadhili hutuma moja kwa moja kwa mwapokeaji, {{appName}} kamwe haigusi fedha, na jukwaa lenyewe haliwezi kuzimwa kudhibiti yeyote. Wapokeaji wanaotaka faragha kwa kila mchango wanaweza kukubali malipo ya kimya, ambayo hutoa kutounganika kuleile bila yeyote kushikilia pesa katikati."
         ]
       },
       "why-not-other-crypto": {
         "question": "Kwa nini si Monero au cryptocurrency nyingine?",
         "answer": [
-          "Bitcoin ni cryptocurrency iliyo na matumizi makubwa zaidi. Hiyo inamaanisha ni rahisi zaidi kwa wafadhili kununua na kutuma, na rahisi zaidi kwa wanaharakati kupokea, kuhifadhi, na kutumia.",
+          "Bitcoin ni cryptocurrency iliyo na matumizi makubwa zaidi. Hiyo inamaanisha ni rahisi zaidi kwa wafadhili kununua na kutuma, na rahisi zaidi kwa wapokeaji kupokea, kuhifadhi, na kutumia.",
           "Sarafu zinazojikita kwenye faragha kama Monero zinatoa athari tofauti za faragha kuliko Bitcoin, lakini hazitumiwi na programu nyingi za watumiaji na ni ngumu zaidi kubadilisha kurudi kwa sarafu ya ndani. Kuomba pande zote mbili za mchango kwanza kupata cryptocurrency ya kiwango kidogo ni kizuizi ambacho {{appName}} haitaweka njiani. Kwa michango ya Bitcoin yenyewe, malipo ya kimya yanafunika kesi ya matumizi ya kutounganika bila kuondoka kwenye mfumo wa Bitcoin."
         ]
       },
@@ -2469,7 +2469,7 @@
       },
       "paymentComparison": {
         "donorHeader": "Unapochangia",
-        "activistHeader": "Unapounda",
+        "recipientHeader": "Unapounda",
         "donorRows": {
           "whatYouSee": {
             "label": "Unachokiona",
@@ -2489,10 +2489,10 @@
           "settlement": {
             "label": "Utuaji",
             "public": "Uthibitisho wa kawaida wa Bitcoin.",
-            "silent": "Uthibitisho ule ule wa katika-mnyororo, lakini mwanaharakati lazima achanganue pochi yake kuipata."
+            "silent": "Uthibitisho ule ule wa katika-mnyororo, lakini mwapokeaji lazima achanganue pochi yake kuipata."
           }
         },
-        "activistRows": {
+        "recipientRows": {
           "whatDonorsSee": {
             "label": "Wafadhili wanaona nini",
             "public": "Anwani ya kawaida ya Bitcoin. Inafanya kazi na kila pochi duniani.",
@@ -2521,12 +2521,12 @@
           "bestFor": {
             "label": "Bora kwa",
             "public": "Kampeni za wazi ambapo uthibitisho wa kijamii na uonekano husaidia.",
-            "silent": "Kampeni ambapo faragha ya mfadhili au mwanaharakati ni muhimu zaidi kuliko jumla inayoonekana."
+            "silent": "Kampeni ambapo faragha ya mfadhili au mwapokeaji ni muhimu zaidi kuliko jumla inayoonekana."
           },
           "watchOutFor": {
             "label": "Jiangalie",
             "public": "Rekodi ya umma ya kudumu ya kila mfadhili.",
-            "silent": "UX yenye matuta leo. Michango mingine haitaonekana hadi mwanaharakati achanganue."
+            "silent": "UX yenye matuta leo. Michango mingine haitaonekana hadi mwapokeaji achanganue."
           }
         }
       }
@@ -2553,7 +2553,7 @@
           },
           "arrivesDirectly": {
             "title": "Inafika moja kwa moja",
-            "body": "Fedha huingia moja kwa moja kwa mwanaharakati. {{appName}} haishiki au kuelekeza, na anwani inatokana na funguo ya siri ya Nostr ya mwanaharakati."
+            "body": "Fedha huingia moja kwa moja kwa mwapokeaji. {{appName}} haishiki au kuelekeza, na anwani inatokana na funguo ya siri ya Nostr ya mwapokeaji."
           }
         }
       },
@@ -2594,11 +2594,11 @@
         "heading": "Maelezo kuhusu malipo ya kimya leo",
         "paragraphs": [
           "Malipo ya kimya ni njia ya faragha zaidi ya kupokea Bitcoin katika mnyororo, lakini mfumo bado ni mchanga. Pochi nyingi maarufu haziwezi kutuma kwa ncha ya malipo ya kimya bado, kwa hivyo pochi inaposhindwa, mchango hurudi kwa muamala wa kawaida wa Bitcoin kwa anwani ya umma ya kampeni (ikiwa kampeni inakubali zote mbili).",
-          "Kwa wanaharakati, michango ya malipo ya kimya pia hufika bila arifa za kusukuma na huonekana tu baada ya mwanaharakati kuchanganua pochi yake, ambayo inaweza kuchukua dakika hadi saa. Hakuna kati ya hii inayoathiri usalama wa fedha zako; inaunda tu uzoefu."
+          "Kwa wapokeaji, michango ya malipo ya kimya pia hufika bila arifa za kusukuma na huonekana tu baada ya mwapokeaji kuchanganua pochi yake, ambayo inaweza kuchukua dakika hadi saa. Hakuna kati ya hii inayoathiri usalama wa fedha zako; inaunda tu uzoefu."
         ]
       }
     },
-    "activist": {
+    "recipient": {
       "tldr": {
         "lede": "Chagua cha kukubali unapounda kampeni: Umma, Kimya, au zote mbili. Chaguo lolote si la uhifadhi. {{appName}} kamwe haishiki fedha zako.",
         "nextActions": [

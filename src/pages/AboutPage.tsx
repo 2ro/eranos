@@ -30,7 +30,7 @@ import { cn } from '@/lib/utils';
  *   2. How it works, in three steps (cream)
  *   3. Two ways to get paid: compare cards (dark)
  *   4. Need help? FAQ in three chapters (cream)
- *   5. Pick the side you're on: Donor / Activist guides (white)
+ *   5. Pick the side you're on: Donor / Recipient guides (white)
  *
  * Typography follows the CampaignsPage hero recipe exactly: Bebas Neue
  * (`font-display`) is reserved for the hero H1 (italic, normal weight,
@@ -148,11 +148,11 @@ export function AboutPage() {
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180" />
                 </Link>
                 <Link
-                  to="/about/activists"
+                  to="/about/recipients"
                   className="group inline-flex items-center justify-center gap-2 rounded-md border border-white/30 bg-white/5 text-white hover:bg-white/10 font-medium h-12 px-6 text-base transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
                 >
                   <Megaphone className="size-5" />
-                  {t('about.hero.ctaActivist')}
+                  {t('about.hero.ctaRecipient')}
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180" />
                 </Link>
               </div>
@@ -334,14 +334,14 @@ export function AboutPage() {
                   <Trans
                     i18nKey="about.twoWays.public.tradeoffIntro"
                     values={{ appName }}
-                    defaults="Every donation is public on the Bitcoin blockchain and on Nostr. {{appName}} is recommended only for above-ground activism. If you or your donors require extreme privacy, including from state actors, read the <0>Donor Guide</0> and <1>Activist Guide</1> before participating."
+                    defaults="Every donation is public on the Bitcoin blockchain and on Nostr. {{appName}} is recommended only for above-ground campaigns. If you or your donors require extreme privacy, including from state actors, read the <0>Donor Guide</0> and <1>Recipient Guide</1> before participating."
                     components={[
                       <Link
                         to="/about/donors"
                         className="font-semibold text-primary hover:underline"
                       />,
                       <Link
-                        to="/about/activists"
+                        to="/about/recipients"
                         className="font-semibold text-primary hover:underline"
                       />,
                     ]}
@@ -472,20 +472,20 @@ export function AboutPage() {
               cta={t('about.guides.donor.cta')}
             />
             <GuideCard
-              to="/about/activists"
+              to="/about/recipients"
               image="/about/activist-guide-unity.png"
-              imageAlt={t('about.guides.activist.imageAlt')}
-              role={t('about.guides.activist.role')}
+              imageAlt={t('about.guides.recipient.imageAlt')}
+              role={t('about.guides.recipient.role')}
               icon={<Megaphone className="size-5" />}
               accent="orange"
-              title={t('about.guides.activist.title')}
-              description={t('about.guides.activist.description')}
+              title={t('about.guides.recipient.title')}
+              description={t('about.guides.recipient.description')}
               bullets={[
-                t('about.guides.activist.bullet1'),
-                t('about.guides.activist.bullet2'),
-                t('about.guides.activist.bullet3'),
+                t('about.guides.recipient.bullet1'),
+                t('about.guides.recipient.bullet2'),
+                t('about.guides.recipient.bullet3'),
               ]}
-              cta={t('about.guides.activist.cta')}
+              cta={t('about.guides.recipient.cta')}
             />
           </div>
 

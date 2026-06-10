@@ -454,10 +454,10 @@
       "title": "Panduan Donatur",
       "subtitle": "Bitcoin asli, dikirim langsung. Seluruh alur dalam satu halaman singkat."
     },
-    "activistGuide": {
-      "seoTitle": "Panduan Aktivis",
+    "recipientGuide": {
+      "seoTitle": "Panduan Penerima",
       "seoDescription": "Cara menerima donasi di {{appName}} dan mencairkannya secara privat.",
-      "title": "Panduan Aktivis",
+      "title": "Panduan Penerima",
       "subtitle": "Pilih apa yang diterima, terima donasi, cairkan."
     },
     "changelog": {
@@ -484,7 +484,7 @@
   },
   "about": {
     "seoTitle": "Tentang",
-    "seoDescription": "Cara kerja {{appName}}: menghubungkan aktivis dengan pendanaan tak terbendung melalui Bitcoin dan Nostr.",
+    "seoDescription": "Cara kerja {{appName}}: menghubungkan penerima dengan pendanaan tak terbendung melalui Bitcoin dan Nostr.",
     "hero": {
       "eyebrow": "Tentang {{appName}}",
       "headlinePart1": "Cara",
@@ -497,11 +497,11 @@
         "censorshipResistant": "Anti-sensor"
       },
       "ctaDonor": "Baca Panduan Donatur",
-      "ctaActivist": "Baca Panduan Aktivis",
+      "ctaRecipient": "Baca Panduan Penerima",
       "sampleCard": {
         "countryName": "Venezuela",
         "public": "Publik",
-        "imageAlt": "Aktivis Venezuela dalam aksi nyala lilin sambil memegang spanduk bertuliskan 'Liberen a todos los presos políticos · ¡Cese la represión!'",
+        "imageAlt": "Warga Venezuela dalam aksi nyala lilin sambil memegang spanduk bertuliskan 'Liberen a todos los presos políticos · ¡Cese la represión!'",
         "orgName": "Venezolanos Libres",
         "title": "Bebaskan Tahanan Politik Venezuela",
         "description": "Pembelaan hukum dan dukungan keluarga untuk 800+ tahanan politik yang ditahan rezim Maduro.",
@@ -517,34 +517,34 @@
       "lede": "Tanpa bank, tanpa batas negara, tanpa izin.",
       "step1": {
         "imageAlt": "Kunci kriptografis oranye bercahaya melayang di angkasa gelap, melambangkan identitas yang berdaulat sendiri",
-        "title": "Aktivis mendaftar dalam hitungan detik.",
-        "body": "Tanpa bank. Tanpa berkas. Tanpa persetujuan. Saat seorang aktivis membuat akun di {{appName}}, mereka sudah punya alamat Bitcoin siap menerima dukungan, di mana pun di dunia."
+        "title": "Penerima mendaftar dalam hitungan detik.",
+        "body": "Tanpa bank. Tanpa berkas. Tanpa persetujuan. Saat seorang penerima membuat akun di {{appName}}, mereka sudah punya alamat Bitcoin siap menerima dukungan, di mana pun di dunia."
       },
       "step2": {
         "imageAlt": "Koin Bitcoin bercahaya melayang di udara melintasi peta dunia gelap, melambangkan pembayaran lintas batas seketika",
         "title": "Donatur mengirim Bitcoin langsung.",
-        "body": "Donatur mengirim Bitcoin dari dompet apa pun yang sudah mereka pakai (Cash App, Coinbase, Strike, dompet perangkat keras) langsung ke aktivis. {{appName}} tidak pernah menyentuh uangnya. Tidak ada server di tengah, tidak ada kustodian."
+        "body": "Donatur mengirim Bitcoin dari dompet apa pun yang sudah mereka pakai (Cash App, Coinbase, Strike, dompet perangkat keras) langsung ke penerima. {{appName}} tidak pernah menyentuh uangnya. Tidak ada server di tengah, tidak ada kustodian."
       },
       "step3": {
         "imageAlt": "Telapak tangan terbuka dengan cahaya oranye hangat memancar dari telapaknya, melambangkan penerimaan dan agensi",
         "title": "Dukungan sampai ke tempat yang tepat.",
-        "body": "Dana sampai ke aktivis langsung. Mereka tetap memegang kendali, mereka tetap memegang kontrol. Pindahkan, tukarkan, atau belanjakan; panduan di bawah menjelaskan cara melakukannya secara privat dan aman."
+        "body": "Dana sampai ke penerima langsung. Mereka tetap memegang kendali, mereka tetap memegang kontrol. Pindahkan, tukarkan, atau belanjakan; panduan di bawah menjelaskan cara melakukannya secara privat dan aman."
       }
     },
     "twoWays": {
       "eyebrow": "Bitcoin · Satu QR, dua opsi",
       "title": "Dua cara untuk dibayar.",
-      "lede": "Kedua opsi adalah Bitcoin. Perbedaannya adalah apa yang Anda korbankan demi privasi. Saat seorang aktivis membuat kampanye, mereka memilih opsi mana yang diterima. Jika keduanya, halaman donasi menampilkan satu kode QR yang berfungsi untuk dompet apa pun.",
+      "lede": "Kedua opsi adalah Bitcoin. Perbedaannya adalah apa yang Anda korbankan demi privasi. Saat seorang penerima membuat kampanye, mereka memilih opsi mana yang diterima. Jika keduanya, halaman donasi menampilkan satu kode QR yang berfungsi untuk dompet apa pun.",
       "public": {
         "kicker": "Pembayaran Bitcoin Publik",
         "tagline": "Universal · Cepat · Transparan",
         "title": "Berfungsi dengan setiap dompet di bumi.",
-        "description": "Donasi mendarat di alamat Bitcoin biasa yang dikendalikan aktivis. Siapa pun dengan dompet Bitcoin apa pun bisa mengirim. Tanpa aplikasi baru, tanpa akun baru, tanpa kurva belajar.",
+        "description": "Donasi mendarat di alamat Bitcoin biasa yang dikendalikan penerima. Siapa pun dengan dompet Bitcoin apa pun bisa mengirim. Tanpa aplikasi baru, tanpa akun baru, tanpa kurva belajar.",
         "bullet1": "Berfungsi di setiap dompet Bitcoin: Cash App, Coinbase, Strike, perangkat keras",
         "bullet2": "Penyelesaian tercepat: hanya konfirmasi Bitcoin",
-        "bullet3": "Dapat diverifikasi on-chain: siapa pun bisa melihat apa yang diterima aktivis",
+        "bullet3": "Dapat diverifikasi on-chain: siapa pun bisa melihat apa yang diterima penerima",
         "tradeoffTitle": "Konsekuensi: Publik di on-chain.",
-        "tradeoffIntro": "Setiap donasi bersifat publik di blockchain Bitcoin dan di Nostr. {{appName}} direkomendasikan hanya untuk aktivisme yang terbuka. Jika Anda atau donatur Anda membutuhkan privasi ekstrem, termasuk dari aktor negara, baca <0>Panduan Donatur</0> dan <1>Panduan Aktivis</1> sebelum berpartisipasi."
+        "tradeoffIntro": "Setiap donasi bersifat publik di blockchain Bitcoin dan di Nostr. {{appName}} direkomendasikan hanya untuk kampanye terbuka. Jika Anda atau donatur Anda membutuhkan privasi ekstrem, termasuk dari aktor negara, baca <0>Panduan Donatur</0> dan <1>Panduan Penerima</1> sebelum berpartisipasi."
       },
       "silent": {
         "kicker": "Pembayaran Bitcoin Silent",
@@ -552,7 +552,7 @@
         "title": "Tak terhubungkan, on-chain, langsung.",
         "description": "Donasi dikirim sebagai silent payments BIP-352. Setiap donasi mendarat di output Bitcoin yang baru dan tak terhubungkan, yang tidak bisa dikaitkan kembali ke kampanye oleh pengamat yang menatap blockchain.",
         "bullet1": "Jejak donasi tidak bisa direkonstruksi di on-chain",
-        "bullet2": "Melindungi aktivis yang menghadapi musuh serius",
+        "bullet2": "Melindungi penerima yang menghadapi musuh serius",
         "bullet3": "Disimpan dalam saldo privat terpisah, tidak pernah dicampur dengan dana publik",
         "tradeoffTitle": "Konsekuensi: Silent payments masih dini.",
         "tradeoffIntro": "Cara paling privat untuk menerima Bitcoin secara on-chain, namun ekosistemnya masih muda dan kasar saat ini:",
@@ -564,7 +564,7 @@
       },
       "noCustody": {
         "title": "Tanpa kustodi. Tanpa perantara.",
-        "body": "{{appName}} tidak pernah menyimpan dana. Donasi berpindah dari dompet ke dompet di Bitcoin. Tidak ada server yang berdiri di antara donatur dan aktivis di kedua opsi. Jika {{appName}} hilang besok, setiap kampanye akan tetap berjalan.",
+        "body": "{{appName}} tidak pernah menyimpan dana. Donasi berpindah dari dompet ke dompet di Bitcoin. Tidak ada server yang berdiri di antara donatur dan penerima di kedua opsi. Jika {{appName}} hilang besok, setiap kampanye akan tetap berjalan.",
         "gofundme": {
           "heading": "Tidak seperti GoFundMe",
           "body": "Tidak ada platform yang bisa membekukan donasi Anda, menuntut pengembalian dana, atau menutup kampanye Anda karena perbedaan kebijakan."
@@ -603,21 +603,21 @@
         "imageAlt": "Pengunjuk rasa berkerudung berbaris di jalan kota Eropa saat senja, memegang flare merah menyala dan spanduk 'FREEDOM' dan 'LIBERTAD'",
         "role": "Untuk Donatur",
         "title": "Dukung perjuangan yang tidak didukung bank.",
-        "description": "Kirim Bitcoin langsung ke aktivis dan gerakan di mana pun di dunia, tanpa meminta izin kepada prosesor pembayaran.",
+        "description": "Kirim Bitcoin langsung ke penerima dan gerakan di mana pun di dunia, tanpa meminta izin kepada prosesor pembayaran.",
         "bullet1": "Gunakan dompet Bitcoin apa pun yang sudah Anda miliki.",
-        "bullet2": "Donasi mendarat langsung ke aktivis. Tanpa kustodian, tanpa perantara.",
+        "bullet2": "Donasi mendarat langsung ke penerima. Tanpa kustodian, tanpa perantara.",
         "bullet3": "Untuk privasi, gunakan dompet yang mendukung silent payments.",
         "cta": "Baca Panduan Donatur"
       },
-      "activist": {
+      "recipient": {
         "imageAlt": "Pemandangan dari udara ribuan pengunjuk rasa berkumpul di malam hari di alun-alun kota dengan flare merah menyala, di bawah spanduk 'UNITY IN DARKNESS' yang diproyeksikan ke bangunan sekitar",
-        "role": "Untuk Aktivis",
+        "role": "Untuk Penerima",
         "title": "Dapatkan pendanaan tanpa izin.",
         "description": "Terima dukungan langsung dari orang-orang yang percaya pada perjuangan Anda. Tanpa rekening bank, tanpa formulir aplikasi, tanpa perusahaan di tengah.",
         "bullet1": "Mulai menerima donasi segera setelah Anda mendaftar.",
         "bullet2": "Pilih jenis pembayaran yang diterima: publik, silent payments, atau keduanya.",
         "bullet3": "Untuk pencairan privat, kirim ke dompet silent-payments dulu, lalu teruskan ke mana saja.",
-        "cta": "Baca Panduan Aktivis"
+        "cta": "Baca Panduan Penerima"
       },
       "stillStuck": "Masih bingung?",
       "followTeam": "Ikuti Team Soapbox di Nostr",
@@ -1202,8 +1202,8 @@
   "campaigns": {
     "home": {
       "seoTitle": "Penggalangan Dana",
-      "seoDescription": "Menghubungkan aktivis dengan pendanaan tak terbendung.",
-      "heroTagline": "Menghubungkan aktivis dengan<1></1>pendanaan <0>tak terbendung.</0>",
+      "seoDescription": "Menghubungkan dunia dengan pendanaan tak terbendung.",
+      "heroTagline": "Menghubungkan dunia dengan<1></1>pendanaan <0>tak terbendung.</0>",
       "heroBody": "Galang Bitcoin langsung dari pendukung di seluruh dunia. Setiap donasi langsung masuk ke dompet Anda, tanpa perantara, tanpa chargeback, dan tanpa platform yang menahan dana Anda.",
       "startCampaign": "Mulai kampanye",
       "howItWorks": "Cara kerjanya",
@@ -1227,7 +1227,7 @@
       "whyDifferent": {
         "eyebrow": "Mengapa {{appName}}",
         "title": "Dibangun berbeda.",
-        "lede": "Bitcoin langsung dari donor ke aktivis. Tanpa platform di tengah, tanpa kustodian yang menahan dana, tanpa perlu izin.",
+        "lede": "Bitcoin langsung dari donor ke penerima. Tanpa platform di tengah, tanpa kustodian yang menahan dana, tanpa perlu izin.",
         "block1": {
           "heading": "Berbeda dari GoFundMe",
           "body": "Tidak ada platform yang bisa membekukan donasi Anda, menuntut pengembalian dana, atau menghentikan kampanye karena perbedaan kebijakan. Tidak ada Stripe, Visa, atau bank di tengah yang bisa memutus akses Anda saat kampanye berjalan.",
@@ -1244,7 +1244,7 @@
         },
         "block3": {
           "heading": "Publik atau privat. Pilihan Anda.",
-          "body": "Aktivis memilih opsi penerimaan yang sesuai dengan model ancaman mereka. Donor melihat satu QR; dompet memilih protokol yang tepat.",
+          "body": "Penerima memilih opsi penerimaan yang sesuai dengan model ancaman mereka. Donor melihat satu QR; dompet memilih protokol yang tepat.",
           "publicLabel": "Publik",
           "publicSummary": "Berfungsi di setiap dompet Bitcoin. Cepat dan dapat diverifikasi on-chain.",
           "privateLabel": "Privat",
@@ -2315,7 +2315,7 @@
       "what-is-ditto": {
         "question": "Apa itu {{appName}}?",
         "answer": [
-          "{{appName}} adalah platform untuk mengirim donasi Bitcoin — publik atau privat — langsung ke aktivis. Tidak ada perantara, tidak ada prosesor pembayaran, dan tidak ada akun yang bisa dibekukan.",
+          "{{appName}} adalah platform untuk mengirim donasi Bitcoin — publik atau privat — langsung ke penerima. Tidak ada perantara, tidak ada prosesor pembayaran, dan tidak ada akun yang bisa dibekukan.",
           "{{appName}} dibangun di atas Nostr, sehingga identitas Anda tidak terkunci ke situs ini — Andalah yang memilikinya."
         ]
       },
@@ -2334,18 +2334,18 @@
       "send-bitcoin-onchain": {
         "question": "Bagaimana cara kerja pengiriman Bitcoin?",
         "answer": [
-          "Saat seorang aktivis membuat kampanye, mereka memilih jenis pembayaran apa yang diterima: **publik**, **privat**, atau **keduanya**.",
+          "Saat seorang penerima membuat kampanye, mereka memilih jenis pembayaran apa yang diterima: **publik**, **privat**, atau **keduanya**.",
           "Donasi **publik** adalah Bitcoin asli di on-chain. Mereka diselesaikan di blockchain publik, berfungsi di setiap dompet Bitcoin, dan terlihat oleh siapa pun.",
-          "Donasi **privat** menggunakan **silent payments** (BIP-352). Mereka juga diselesaikan on-chain, tetapi transaksinya tidak bisa dihubungkan kembali ke kode donasi aktivis — sehingga tetap di luar daftar donatur publik dan jumlah total. Donatur perlu dompet yang mendukung silent payments — kami merekomendasikan [Ditto Wallet](https://ditto.pub) atau [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
+          "Donasi **privat** menggunakan **silent payments** (BIP-352). Mereka juga diselesaikan on-chain, tetapi transaksinya tidak bisa dihubungkan kembali ke kode donasi penerima — sehingga tetap di luar daftar donatur publik dan jumlah total. Donatur perlu dompet yang mendukung silent payments — kami merekomendasikan [Ditto Wallet](https://ditto.pub) atau [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
           "Saat kampanye menerima **keduanya**, {{appName}} menampilkan satu kode QR yang mengencode kedua titik. Dompet silent-payment membacanya sebagai privat; dompet lain kembali ke alamat publik. Donatur tidak perlu memilih — dompet mereka memilih jalur yang tepat secara otomatis.",
-          "Dengan cara apa pun, pembayaran langsung ke aktivis. {{appName}} tidak pernah menyentuh dananya."
+          "Dengan cara apa pun, pembayaran langsung ke penerima. {{appName}} tidak pernah menyentuh dananya."
         ]
       },
       "connect-wallet": {
         "question": "Apa itu dompet di {{appName}}?",
         "answer": [
           "Dompet {{appName}} Anda adalah dompet Bitcoin **self-custodial**, dibangun dari kunci Nostr Anda. {{appName}} tidak pernah menahan dana Anda — dompet berjalan di peramban Anda dan menandatangani transaksi secara lokal dengan kunci yang hanya Anda kendalikan. Ia dapat menerima Bitcoin dengan kedua cara — sebagai alamat publik yang bisa dibayar dompet Bitcoin apa pun, dan sebagai kode silent-payments yang bisa dibayar oleh dompet yang mendukung secara privat. Tidak ada yang perlu didaftarkan; dompet ada sejak Anda memiliki akun.",
-          "Dompet memiliki dua tab: **Publik** (alamat Bitcoin biasa Anda) dan **Privat** (silent payments). Kedua saldo dipisahkan secara ketat dan tidak pernah bisa dibelanjakan bersama — isolasi itulah yang menjaga donasi privat tetap tak terhubungkan di on-chain. Saat Anda membuat kampanye, Anda memilih apakah menerima pembayaran publik, pembayaran privat, atau keduanya. Untuk membelanjakan apa yang Anda terima, lihat **Panduan Aktivis**.",
+          "Dompet memiliki dua tab: **Publik** (alamat Bitcoin biasa Anda) dan **Privat** (silent payments). Kedua saldo dipisahkan secara ketat dan tidak pernah bisa dibelanjakan bersama — isolasi itulah yang menjaga donasi privat tetap tak terhubungkan di on-chain. Saat Anda membuat kampanye, Anda memilih apakah menerima pembayaran publik, pembayaran privat, atau keduanya. Untuk membelanjakan apa yang Anda terima, lihat **Panduan Penerima**.",
           "Anda juga bisa mengekspor frasa seed 24 kata dari dompet Anda dan mengimpornya ke dompet Bitcoin standar apa pun — lihat \"Bisakah saya mengekspor dompet {{appName}} saya ke dompet Bitcoin lain?\" di bawah."
         ]
       },
@@ -2362,10 +2362,10 @@
       "donations-are-public-general": {
         "question": "Apakah donasi di {{appName}} publik?",
         "answer": [
-          "Itu tergantung jenis pembayaran apa yang diterima aktivis.",
+          "Itu tergantung jenis pembayaran apa yang diterima penerima.",
           "**Donasi publik** dicatat di blockchain Bitcoin dan di Nostr. Siapa pun bisa melihat jumlah, waktu, dan alamatnya.",
-          "**Donasi privat** menggunakan silent payments. Mereka tidak bisa dihubungkan secara publik ke kode donasi aktivis, tidak muncul dalam daftar donatur, dan tidak dihitung dalam jumlah total publik.",
-          "Saat kampanye menerima keduanya, dompet donatur memutuskan jalur mana yang digunakan — dompet yang mendukung silent payments membayar secara privat, yang lain membayar alamat publik. Baca **Panduan Donatur** dan **Panduan Aktivis** untuk gambaran lengkap."
+          "**Donasi privat** menggunakan silent payments. Mereka tidak bisa dihubungkan secara publik ke kode donasi penerima, tidak muncul dalam daftar donatur, dan tidak dihitung dalam jumlah total publik.",
+          "Saat kampanye menerima keduanya, dompet donatur memutuskan jalur mana yang digunakan — dompet yang mendukung silent payments membayar secara privat, yang lain membayar alamat publik. Baca **Panduan Donatur** dan **Panduan Penerima** untuk gambaran lengkap."
         ]
       },
       "why-donations-pending": {
@@ -2373,13 +2373,13 @@
         "answer": [
           "Donasi **pending** adalah Bitcoin asli yang sudah dikirim — ia hanya menunggu untuk dikonfirmasi oleh jaringan. Dompet donatur telah menyiarkan transaksinya, tetapi belum dimasukkan ke dalam blok.",
           "Bitcoin menghasilkan blok baru kira-kira setiap 10 menit, dan penambang memilih transaksi berdasarkan biaya yang dibayar donatur. Sebagian besar donasi terkonfirmasi dalam satu jam; donasi dengan biaya lebih rendah bisa memakan waktu lebih lama saat jaringan sedang sibuk. {{appName}} memeriksa ulang status konfirmasi secara otomatis, sehingga label **pending** hilang dengan sendirinya begitu blok masuk.",
-          "Dananya sedang dalam perjalanan — aktivis akan melihat donasi tersebut dihitung ke dalam total kampanye segera setelah terkonfirmasi. Tidak ada yang bisa dilakukan aktivis atau {{appName}} untuk mempercepatnya; hanya dompet donatur yang bisa menaikkan fee."
+          "Dananya sedang dalam perjalanan — penerima akan melihat donasi tersebut dihitung ke dalam total kampanye segera setelah terkonfirmasi. Tidak ada yang bisa dilakukan penerima atau {{appName}} untuk mempercepatnya; hanya dompet donatur yang bisa menaikkan fee."
         ]
       },
       "censorship-resistance": {
         "question": "Apa yang dimaksud dengan \"anti-sensor\" di sini?",
         "answer": [
-          "Tidak ada perusahaan yang berada di antara donatur dan aktivis. {{appName}} tidak menahan dana dan tidak bisa membekukan alamat.",
+          "Tidak ada perusahaan yang berada di antara donatur dan penerima. {{appName}} tidak menahan dana dan tidak bisa membekukan alamat.",
           "Selama jaringan Bitcoin berjalan, donasi bisa dikirim dan diterima. {{appName}} sendiri offline pun tidak akan menghentikannya."
         ]
       },
@@ -2387,17 +2387,17 @@
         "question": "Mengapa Bitcoin?",
         "answer": [
           "Bitcoin adalah jalur pembayaran yang paling didukung secara luas dan paling anti-sensor di dunia. Setiap dompet Bitcoin bisa mengirimnya.",
-          "Di {{appName}}, aktivis memilih cara menerima: **publik** (alamat Bitcoin biasa) untuk jangkauan maksimum, **privat** (silent payments) untuk donasi tak terhubungkan, atau **keduanya** sehingga dompet setiap donatur memilih jalur yang tepat secara otomatis. Donatur yang hanya memiliki aplikasi Bitcoin konsumen masih bisa berkontribusi; donatur dengan dompet silent-payments mendapat privasi secara default.",
-          "Konsekuensinya adalah transaksi Bitcoin publik terlihat di blockchain dan membayar biaya penambang. Panduan Donatur dan Aktivis menjelaskan cara menangani keduanya."
+          "Di {{appName}}, penerima memilih cara menerima: **publik** (alamat Bitcoin biasa) untuk jangkauan maksimum, **privat** (silent payments) untuk donasi tak terhubungkan, atau **keduanya** sehingga dompet setiap donatur memilih jalur yang tepat secara otomatis. Donatur yang hanya memiliki aplikasi Bitcoin konsumen masih bisa berkontribusi; donatur dengan dompet silent-payments mendapat privasi secara default.",
+          "Konsekuensinya adalah transaksi Bitcoin publik terlihat di blockchain dan membayar biaya penambang. Panduan Donatur dan Penerima menjelaskan cara menangani keduanya."
         ]
       },
       "why-not-silent-payments": {
         "question": "Apakah {{appName}} mendukung silent payments?",
         "answer": [
-          "Ya — di kedua sisi. Dompet Bitcoin bawaan {{appName}} mendukung BIP-352, jadi saat Anda mengirim Bitcoin dari dompet {{appName}} Anda bisa membayar alamat silent-payment apa pun (`sp1…`) secara langsung. Dan saat seorang aktivis membuat kampanye, mereka bisa menerima silent payments bersama dengan, atau sebagai pengganti, pembayaran Bitcoin publik.",
-          "Donasi silent-payment tetap diselesaikan on-chain, tetapi transaksinya tidak bisa dihubungkan kembali ke kode donasi aktivis — jadi mereka tidak muncul di daftar donatur publik atau jumlah total.",
+          "Ya — di kedua sisi. Dompet Bitcoin bawaan {{appName}} mendukung BIP-352, jadi saat Anda mengirim Bitcoin dari dompet {{appName}} Anda bisa membayar alamat silent-payment apa pun (`sp1…`) secara langsung. Dan saat seorang penerima membuat kampanye, mereka bisa menerima silent payments bersama dengan, atau sebagai pengganti, pembayaran Bitcoin publik.",
+          "Donasi silent-payment tetap diselesaikan on-chain, tetapi transaksinya tidak bisa dihubungkan kembali ke kode donasi penerima — jadi mereka tidak muncul di daftar donatur publik atau jumlah total.",
           "Mengirim silent payment dari luar {{appName}} membutuhkan dompet yang mendukung BIP-352. Sebagian besar aplikasi konsumen belum mendukung, tetapi [Ditto Wallet](https://ditto.pub) dan [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) mendukung.",
-          "Saat kampanye menerima kedua jenis pembayaran, {{appName}} mengencode keduanya dalam satu kode QR. Dompet yang mendukung silent-payment membayar secara privat; yang lain membayar alamat publik. Tidak ada donatur yang tertutup, dan tidak ada aktivis yang dipaksa memilih antara jangkauan dan privasi."
+          "Saat kampanye menerima kedua jenis pembayaran, {{appName}} mengencode keduanya dalam satu kode QR. Dompet yang mendukung silent-payment membayar secara privat; yang lain membayar alamat publik. Tidak ada donatur yang tertutup, dan tidak ada penerima yang dipaksa memilih antara jangkauan dan privasi."
         ]
       },
       "why-not-lightning": {
@@ -2410,15 +2410,15 @@
       "why-not-rotating-addresses": {
         "question": "Mengapa {{appName}} tidak membuat alamat baru untuk setiap donasi?",
         "answer": [
-          "Melakukan ini akan mengharuskan {{appName}} bertindak sebagai perantara penukar uang — pertama-tama mengambil kustodi atas Bitcoin dan kemudian meneruskannya ke aktivis.",
+          "Melakukan ini akan mengharuskan {{appName}} bertindak sebagai perantara penukar uang — pertama-tama mengambil kustodi atas Bitcoin dan kemudian meneruskannya ke penerima.",
           "Itu akan menjadikan kami pemindah uang, tunduk pada regulasi yang menyertainya, dan titik kegagalan tunggal: matikan server {{appName}} maka Anda mematikan setiap donasi yang mengalir melaluinya.",
-          "Sebaliknya, alamat donasi setiap pengguna diturunkan dari kunci rahasia Nostr (nsec) mereka — kunci yang sama yang Anda gunakan untuk masuk. Donatur mengirim langsung ke aktivis, {{appName}} tidak pernah menyentuh dana, dan platform itu sendiri tidak bisa dimatikan untuk menyensor siapa pun. Aktivis yang ingin privasi per donasi bisa menerima silent payments, yang memberikan ketakterhubungan yang sama tanpa siapa pun memegang uang di tengah."
+          "Sebaliknya, alamat donasi setiap pengguna diturunkan dari kunci rahasia Nostr (nsec) mereka — kunci yang sama yang Anda gunakan untuk masuk. Donatur mengirim langsung ke penerima, {{appName}} tidak pernah menyentuh dana, dan platform itu sendiri tidak bisa dimatikan untuk menyensor siapa pun. Penerima yang ingin privasi per donasi bisa menerima silent payments, yang memberikan ketakterhubungan yang sama tanpa siapa pun memegang uang di tengah."
         ]
       },
       "why-not-other-crypto": {
         "question": "Mengapa bukan Monero atau kripto lain?",
         "answer": [
-          "Bitcoin sejauh ini adalah kripto yang paling banyak diadopsi. Itu berarti paling mudah bagi donatur untuk dibeli dan dikirim, dan paling mudah bagi aktivis untuk diterima, dipegang, dan dibelanjakan.",
+          "Bitcoin sejauh ini adalah kripto yang paling banyak diadopsi. Itu berarti paling mudah bagi donatur untuk dibeli dan dikirim, dan paling mudah bagi penerima untuk diterima, dipegang, dan dibelanjakan.",
           "Koin berfokus privasi seperti Monero menawarkan konsekuensi privasi berbeda dari Bitcoin, tetapi tidak didukung oleh sebagian besar aplikasi konsumen dan lebih sulit dikonversi kembali ke mata uang lokal. Meminta salah satu sisi donasi untuk pertama-tama memperoleh kripto khusus adalah hambatan yang tidak akan diletakkan {{appName}}. Untuk donasi Bitcoin sendiri, silent payments mencakup kasus penggunaan ketakterhubungan tanpa meninggalkan ekosistem Bitcoin."
         ]
       },
@@ -2510,7 +2510,7 @@
       },
       "paymentComparison": {
         "donorHeader": "Saat Anda berdonasi",
-        "activistHeader": "Saat Anda membuat",
+        "recipientHeader": "Saat Anda membuat",
         "donorRows": {
           "whatYouSee": {
             "label": "Apa yang Anda lihat",
@@ -2530,10 +2530,10 @@
           "settlement": {
             "label": "Penyelesaian",
             "public": "Konfirmasi Bitcoin biasa.",
-            "silent": "Konfirmasi on-chain yang sama, tetapi aktivis harus memindai dompet mereka untuk menemukannya."
+            "silent": "Konfirmasi on-chain yang sama, tetapi penerima harus memindai dompet mereka untuk menemukannya."
           }
         },
-        "activistRows": {
+        "recipientRows": {
           "whatDonorsSee": {
             "label": "Apa yang donatur lihat",
             "public": "Alamat Bitcoin biasa. Berfungsi dengan setiap dompet di bumi.",
@@ -2562,12 +2562,12 @@
           "bestFor": {
             "label": "Terbaik untuk",
             "public": "Penggalangan dana terbuka di mana bukti sosial dan visibilitas membantu.",
-            "silent": "Kampanye di mana privasi donatur atau aktivis lebih penting daripada total yang terlihat."
+            "silent": "Kampanye di mana privasi donatur atau penerima lebih penting daripada total yang terlihat."
           },
           "watchOutFor": {
             "label": "Perhatikan",
             "public": "Rekaman publik permanen dari setiap donatur.",
-            "silent": "UX yang masih kasar saat ini. Beberapa donasi tidak akan muncul sampai aktivis memindai."
+            "silent": "UX yang masih kasar saat ini. Beberapa donasi tidak akan muncul sampai penerima memindai."
           }
         }
       }
@@ -2594,7 +2594,7 @@
           },
           "arrivesDirectly": {
             "title": "Tiba langsung",
-            "body": "Dana langsung diselesaikan ke aktivis. {{appName}} tidak menahan atau merutekannya, dan alamatnya diturunkan dari kunci rahasia Nostr aktivis."
+            "body": "Dana langsung diselesaikan ke penerima. {{appName}} tidak menahan atau merutekannya, dan alamatnya diturunkan dari kunci rahasia Nostr penerima."
           }
         }
       },
@@ -2635,11 +2635,11 @@
         "heading": "Catatan tentang silent payments saat ini",
         "paragraphs": [
           "Silent payments adalah cara paling privat untuk menerima Bitcoin secara on-chain, tetapi ekosistemnya masih muda. Sebagian besar dompet populer belum bisa mengirim ke titik silent-payment, jadi saat dompet tidak bisa, donasi kembali ke transaksi Bitcoin biasa ke alamat publik kampanye (jika kampanye menerima keduanya).",
-          "Untuk aktivis, donasi silent-payment juga tiba tanpa notifikasi push dan hanya muncul setelah aktivis memindai dompet mereka, yang bisa memakan menit hingga jam. Semua ini tidak memengaruhi keamanan dana Anda; ini hanya membentuk pengalaman."
+          "Untuk penerima, donasi silent-payment juga tiba tanpa notifikasi push dan hanya muncul setelah penerima memindai dompet mereka, yang bisa memakan menit hingga jam. Semua ini tidak memengaruhi keamanan dana Anda; ini hanya membentuk pengalaman."
         ]
       }
     },
-    "activist": {
+    "recipient": {
       "tldr": {
         "lede": "Pilih apa yang diterima saat Anda membuat kampanye: Publik, Silent, atau keduanya. Kedua opsi bersifat non-kustodial. {{appName}} tidak pernah menahan dana Anda.",
         "nextActions": [

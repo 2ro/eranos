@@ -22,7 +22,7 @@ interface GuideHeroProps {
 }
 
 /**
- * Compact photo hero shared by the Donor Guide and Activist Guide pages.
+ * Compact photo hero shared by the Donor Guide and Recipient Guide pages.
  *
  * Same structural recipe as the Organize / Actions homepage heroes
  * ({@link HeroBanner} + {@link HeroAtmosphere} + scrims + overlay copy),
