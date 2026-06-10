@@ -1199,8 +1199,8 @@
   "campaigns": {
     "home": {
       "seoTitle": "Collectes de fonds",
-      "seoDescription": "Connecter les activistes à un financement inarrêtable.",
-      "heroTagline": "Connecter les activistes à un financement<1></1><0>inarrêtable</0>.",
+      "seoDescription": "Connecter le monde à un financement inarrêtable.",
+      "heroTagline": "Connecter le monde à un financement<1></1><0>inarrêtable</0>.",
       "heroBody": "Récoltez du Bitcoin directement auprès de soutiens partout dans le monde. Chaque don est réglé directement vers votre portefeuille, sans intermédiaire, sans rétrofacturation, et sans plateforme qui détient vos fonds.",
       "startCampaign": "Démarrer une campagne",
       "howItWorks": "Comment ça marche",

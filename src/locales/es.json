@@ -761,8 +761,8 @@
   "campaigns": {
     "home": {
       "seoTitle": "Recaudaciones",
-      "seoDescription": "Conectamos a activistas con financiación imparable.",
-      "heroTagline": "Activistas con financiación <0>imparable</0>.",
+      "seoDescription": "Conectamos al mundo con financiación imparable.",
+      "heroTagline": "El mundo con financiación <0>imparable</0>.",
       "heroBody": "Recauda Bitcoin directamente de simpatizantes de todo el mundo. Cada donación va a tu cartera sin intermediarios, sin contracargos y sin que ninguna plataforma retenga tus fondos.",
       "startCampaign": "Iniciar una campaña",
       "howItWorks": "Cómo funciona",
