@@ -62,9 +62,9 @@ interface AudioPlayerActions {
   stop: () => void;
 }
 
-type AudioPlayerContextType = AudioPlayerState & AudioPlayerActions;
+export type AudioPlayerContextType = AudioPlayerState & AudioPlayerActions;
 
-const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(undefined);
+export const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(undefined);
 
 export function useAudioPlayer(): AudioPlayerContextType {
   const ctx = useContext(AudioPlayerContext);

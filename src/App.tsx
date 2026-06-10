@@ -17,6 +17,7 @@ import { SentryProvider } from "@/components/SentryProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useNsecPasteGuard } from "@/hooks/useNsecPasteGuard";
 import type { AppConfig } from "@/contexts/AppContext";
+import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
 import { NWCProvider } from "@/contexts/NWCContext";
 import { OnboardingProvider } from "@/contexts/OnboardingProvider";
 import { HdWalletSpProvider } from "@/contexts/HdWalletSpProvider";
@@ -213,7 +214,9 @@ export function App() {
                       <OnboardingProvider>
                         <TooltipProvider>
                           <HdWalletSpProvider>
-                            <AppRouter />
+                            <AudioPlayerProvider>
+                              <AppRouter />
+                            </AudioPlayerProvider>
                           </HdWalletSpProvider>
                         </TooltipProvider>
                       </OnboardingProvider>

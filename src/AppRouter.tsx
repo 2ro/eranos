@@ -7,6 +7,8 @@ import { TopNav } from "./components/TopNav";
 import { OnboardingGate } from "./components/OnboardingGate";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { VersionCheck } from "./components/VersionCheck";
+import { MinimizedAudioBar } from "./components/MinimizedAudioBar";
+import { AudioNavigationGuard } from "./components/AudioNavigationGuard";
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useProfileUrl } from "./hooks/useProfileUrl";
 import { cn } from "@/lib/utils";
@@ -133,6 +135,8 @@ export function AppRouter() {
       <Toaster />
       <VersionCheck />
       <ScrollToTop />
+      <AudioNavigationGuard />
+      <MinimizedAudioBar />
       <OnboardingGate>
         <Routes>
         {/* Narrow layout — `max-w-3xl` center column. The default for
