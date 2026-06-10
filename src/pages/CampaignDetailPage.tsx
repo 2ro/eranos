@@ -28,6 +28,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ModerationMenu } from '@/components/moderation';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -350,6 +351,8 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         cover={cover}
         isCreator={isCreator}
         naddr={naddr}
+        coord={campaign.aTag}
+        entityTitle={campaign.title}
         deleteDisabled={deleteMutation.isPending}
         onBack={() => navigate(-1)}
         onDelete={() => setDeleteConfirmOpen(true)}
@@ -757,6 +760,10 @@ interface CampaignHeroProps {
   cover: string | undefined;
   isCreator: boolean;
   naddr: string;
+  /** Addressable coordinate (`kind:pubkey:d`) used by the moderation menu. */
+  coord: string;
+  /** Campaign title used by the moderation menu for toast feedback. */
+  entityTitle: string;
   deleteDisabled: boolean;
   onBack: () => void;
   onDelete: () => void;
@@ -769,6 +776,8 @@ function CampaignHero({
   cover,
   isCreator,
   naddr,
+  coord,
+  entityTitle,
   deleteDisabled,
   onBack,
   onDelete,
@@ -796,26 +805,35 @@ function CampaignHero({
             <ChevronLeft className="size-5 rtl:rotate-180" />
           </button>
 
-          {isCreator && (
-            <div className="flex items-center gap-1.5">
-              <Button asChild size="sm" variant="ghost" className="h-10 rounded-full text-white hover:bg-white/10 hover:text-white">
-                <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`} aria-label={t('campaignsDetail.edit')}>
-                  <Pencil className="size-4" />
-                </Link>
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                onClick={onDelete}
-                disabled={deleteDisabled}
-                aria-label={t('campaignsDetail.delete')}
-                className="h-10 rounded-full text-white hover:bg-destructive/30 hover:text-white"
-              >
-                <Trash2 className="size-4" />
-              </Button>
-            </div>
-          )}
+          <div className="flex items-center gap-1.5">
+            <ModerationMenu
+              coord={coord}
+              entityTitle={entityTitle}
+              surface="campaign"
+              axes={['hide']}
+              className="size-10 rounded-full text-white hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+            />
+            {isCreator && (
+              <>
+                <Button asChild size="sm" variant="ghost" className="h-10 rounded-full text-white hover:bg-white/10 hover:text-white">
+                  <Link to={`/campaigns/new?edit=${encodeURIComponent(naddr)}`} aria-label={t('campaignsDetail.edit')}>
+                    <Pencil className="size-4" />
+                  </Link>
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={onDelete}
+                  disabled={deleteDisabled}
+                  aria-label={t('campaignsDetail.delete')}
+                  className="h-10 rounded-full text-white hover:bg-destructive/30 hover:text-white"
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -921,6 +939,13 @@ function CampaignHero({
                 </Button>
               </div>
             )}
+            <ModerationMenu
+              coord={coord}
+              entityTitle={entityTitle}
+              surface="campaign"
+              axes={['hide']}
+              className="size-10 rounded-full bg-black/30 text-white backdrop-blur-md hover:bg-black/45 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+            />
           </div>
         </div>
       </header>
