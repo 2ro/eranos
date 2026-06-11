@@ -73,3 +73,8 @@ export const CAMPAIGN_CATEGORIES: readonly CampaignCategory[] = [
 export const CAMPAIGN_CATEGORY_SLUGS = new Set<string>(
   CAMPAIGN_CATEGORIES.map((c) => c.slug),
 );
+
+/** Translation keys keyed by campaign category slug. */
+export const CAMPAIGN_CATEGORY_LABEL_KEYS_BY_SLUG = new Map<string, string>(
+  CAMPAIGN_CATEGORIES.map((c) => [c.slug, c.labelKey]),
+);
