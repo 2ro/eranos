@@ -620,6 +620,25 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
       let matchesFound = 0;
       let highestContiguousScanned = fromHeight - 1;
 
+      // A scan may only advance the persisted `scanHeight` cursor when its
+      // range is contiguous with the already-scanned prefix — i.e. it starts
+      // at or below the block after the effective cursor. Otherwise a
+      // forward-jumping range (e.g. "Scan recent" on a wallet whose cursor is
+      // far behind) would record the skipped gap as scanned, and payments
+      // received in that gap would silently never be found: the auto-scanner
+      // resumes from `scanHeight + 1` and trusts that everything below it was
+      // covered. UTXOs discovered by a non-contiguous scan are still merged —
+      // only the cursor is held back, so the auto-scanner later walks the gap.
+      //
+      // A never-scanned wallet (effective cursor 0) is exempt: its documented
+      // bootstrap deliberately jumps to a recent window instead of walking
+      // from genesis (see AUTO_SCAN_INITIAL_WINDOW_BLOCKS).
+      const cursorAtStart = Math.max(
+        storage.scanHeight,
+        readLocalCheckpoint(pubkey, indexerUrl),
+      );
+      const mayAdvanceCursor = cursorAtStart === 0 || fromHeight <= cursorAtStart + 1;
+
       // ── ECDH scan worker ─────────────────────────────────────
       //
       // Offload the secp256k1 ECDH + per-output `Pₖ` derivation to a worker
@@ -757,8 +776,10 @@ export function useHdWalletSpInternal(): UseHdWalletSpResult {
           }
 
           // Forward the scan cursor as long as we advance contiguously from
-          // the start of this range.
-          if (h === highestContiguousScanned + 1) {
+          // the start of this range — and only when the range itself is
+          // contiguous with the previously persisted cursor (see
+          // `mayAdvanceCursor` above).
+          if (mayAdvanceCursor && h === highestContiguousScanned + 1) {
             highestContiguousScanned = h;
             const opt = optimisticRef.current!;
             optimisticRef.current = {
