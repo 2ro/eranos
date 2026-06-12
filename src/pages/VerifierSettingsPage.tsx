@@ -49,12 +49,7 @@ export function VerifierSettingsPage() {
           backTo="/settings"
           alwaysShowBack
           contentClassName="max-w-2xl mx-auto w-full sm:px-6"
-          titleContent={
-            <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-bold">{t('verifier.title')}</h1>
-              <p className="text-sm text-muted-foreground mt-0.5">{t('verifier.subtitle')}</p>
-            </div>
-          }
+          title={t('verifier.title')}
         />
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
           <Card>
@@ -115,12 +110,7 @@ export function VerifierSettingsPage() {
         backTo="/settings"
         alwaysShowBack
         contentClassName="max-w-2xl mx-auto w-full sm:px-6"
-        titleContent={
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold">{t('verifier.title')}</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">{t('verifier.subtitle')}</p>
-          </div>
-        }
+        title={t('verifier.title')}
       />
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-6">
