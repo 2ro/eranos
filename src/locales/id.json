@@ -1456,9 +1456,59 @@
     "profileSectionTitle": "Verifikator"
   },
   "organizations": {
-    "title": "Untuk organisasi",
-    "subtitle": "Daftarkan organisasi Anda ke Agora dan beri tahu para donatur cara Anda memeriksa kampanye.",
-    "intro": "Agora dibangun di atas Nostr, sehingga organisasi Anda membawa identitasnya sendiri. Masuk dengan profil Nostr organisasi Anda — atau buat satu — lalu terbitkan pernyataan yang menjelaskan cara Anda memverifikasi kampanye yang Anda dukung. Para donatur melihat pernyataan ini di profil Anda dan menggunakannya untuk memutuskan apakah mereka dapat memercayai penilaian Anda.",
+    "seoTitle": "Untuk organisasi",
+    "seoDescription": "Daftarkan organisasi Anda ke {{appName}}, terbitkan pernyataan verifikasi publik, dan raih kepercayaan para donatur.",
+    "hero": {
+      "eyebrow": "Untuk organisasi & verifikator",
+      "headlinePart1": "Bantu donatur untuk",
+      "headlineHighlight": "memercayai",
+      "body": "Bawa organisasi Anda ke {{appName}} dan terbitkan pernyataan publik yang menjelaskan cara Anda memeriksa kampanye yang Anda dukung. Tanpa pendaftaran, tanpa penjaga gerbang — reputasi Anda yang bekerja.",
+      "trustChips": {
+        "noPermission": "Tidak perlu izin",
+        "ownIdentity": "Identitas Anda sendiri",
+        "public": "Publik & dapat diverifikasi"
+      },
+      "cta": "Mulai sekarang"
+    },
+    "steps": {
+      "eyebrow": "Cara kerjanya",
+      "title": "Bergabung dalam tiga langkah",
+      "lede": "{{appName}} dibangun di atas Nostr, sehingga organisasi Anda membawa identitasnya sendiri. Penyiapan hanya butuh beberapa menit.",
+      "step1": {
+        "title": "Bawa profil Anda",
+        "body": "Masuk dengan profil Nostr organisasi Anda — atau buat satu dalam hitungan detik. Identitas Anda adalah milik Anda, dapat dibawa ke setiap aplikasi Nostr, dan tidak dikendalikan oleh {{appName}}."
+      },
+      "step2": {
+        "title": "Jelaskan proses Anda",
+        "body": "Tulis pernyataan publik yang menjelaskan cara Anda memverifikasi kampanye: pemeriksaan yang Anda lakukan, bukti yang Anda minta, dan cara Anda memastikan identitas seorang penyelenggara."
+      },
+      "step3": {
+        "title": "Terbitkan & raih kepercayaan",
+        "body": "Pernyataan Anda muncul di profil Anda dan memberi sinyal kepada para donatur bahwa Anda mendukung kampanye yang Anda verifikasi. Perbarui atau tarik kembali kapan saja."
+      }
+    },
+    "why": {
+      "eyebrow": "Mengapa ini penting",
+      "title": "Mengapa menerbitkan pernyataan verifikasi",
+      "lede": "Para donatur memberi dengan lebih percaya diri ketika mereka tahu siapa yang menjamin sebuah kampanye dan bagaimana caranya.",
+      "trust": {
+        "title": "Bangun kepercayaan donatur",
+        "body": "Proses yang jelas dan publik memberi tahu para donatur bahwa uang mereka pergi ke tempat yang seharusnya — dan bahwa seseorang yang kredibel telah memeriksanya."
+      },
+      "transparency": {
+        "title": "Transparansi radikal",
+        "body": "Pernyataan Anda diterbitkan secara terbuka ke Nostr. Siapa pun dapat membaca persis bagaimana Anda bekerja, tanpa kotak hitam."
+      },
+      "visibility": {
+        "title": "Menonjol",
+        "body": "Pernyataan verifikator ditampilkan secara menonjol di profil Anda, membantu organisasi yang serius untuk membedakan diri."
+      }
+    },
+    "getStarted": {
+      "eyebrow": "Mulai sekarang",
+      "title": "Terbitkan pernyataan Anda",
+      "lede": "Masuk dengan profil organisasi Anda untuk menerbitkan, memperbarui, atau menarik kembali pernyataan verifikasi Anda."
+    },
     "loginGateTitle": "Masuk dengan profil organisasi Anda",
     "loginGateBody": "Masuk dengan profil Nostr organisasi Anda, atau buat satu, untuk memulai. Setelah masuk, Anda dapat menerbitkan pernyataan verifikasi Anda di sini."
   },

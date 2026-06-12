@@ -1467,9 +1467,59 @@
     "profileSectionTitle": "Verifier"
   },
   "organizations": {
-    "title": "For organizations",
-    "subtitle": "Onboard your organization onto Agora and tell donors how you vet campaigns.",
-    "intro": "Agora is built on Nostr, so your organization brings its own identity. Sign in with your organization's Nostr profile — or create one — then publish a statement describing how you verify the campaigns you stand behind. Donors see this statement on your profile and use it to decide whether to trust your judgement.",
+    "seoTitle": "For organizations",
+    "seoDescription": "Onboard your organization onto {{appName}}, publish a public verification statement, and earn donor trust.",
+    "hero": {
+      "eyebrow": "For organizations & verifiers",
+      "headlinePart1": "Help donors",
+      "headlineHighlight": "trust",
+      "body": "Bring your organization onto {{appName}} and publish a public statement describing how you vet the campaigns you stand behind. No application, no gatekeepers — your reputation does the work.",
+      "trustChips": {
+        "noPermission": "No permission needed",
+        "ownIdentity": "Your own identity",
+        "public": "Public & verifiable"
+      },
+      "cta": "Get started"
+    },
+    "steps": {
+      "eyebrow": "How it works",
+      "title": "Onboard in three steps",
+      "lede": "{{appName}} is built on Nostr, so your organization brings its own identity. Getting set up takes minutes.",
+      "step1": {
+        "title": "Bring your profile",
+        "body": "Sign in with your organization's Nostr profile — or create one in seconds. Your identity is yours, portable across every Nostr app, and not controlled by {{appName}}."
+      },
+      "step2": {
+        "title": "Describe your process",
+        "body": "Write a public statement explaining how you verify campaigns: the checks you run, the evidence you require, and how you confirm an organizer's identity."
+      },
+      "step3": {
+        "title": "Publish & earn trust",
+        "body": "Your statement appears on your profile and signals to donors that you stand behind the campaigns you verify. Update or withdraw it any time."
+      }
+    },
+    "why": {
+      "eyebrow": "Why it matters",
+      "title": "Why publish a verification statement",
+      "lede": "Donors give more confidently when they know who is vouching for a campaign and how.",
+      "trust": {
+        "title": "Build donor trust",
+        "body": "A clear, public process tells donors their money is going where it should — and that someone credible has checked."
+      },
+      "transparency": {
+        "title": "Radical transparency",
+        "body": "Your statement is published openly to Nostr. Anyone can read exactly how you work, with no black boxes."
+      },
+      "visibility": {
+        "title": "Stand out",
+        "body": "Verifier statements are shown prominently on your profile, helping serious organizations distinguish themselves."
+      }
+    },
+    "getStarted": {
+      "eyebrow": "Get started",
+      "title": "Publish your statement",
+      "lede": "Sign in with your organization's profile to publish, update, or withdraw your verification statement."
+    },
     "loginGateTitle": "Sign in with your organization's profile",
     "loginGateBody": "Log in with your organization's Nostr profile, or create one, to get started. Once you're signed in, you can publish your verification statement here."
   },

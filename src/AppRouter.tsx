@@ -186,7 +186,6 @@ export function AppRouter() {
           <Route path="/safety" element={<CSAEPolicyPage />} />
           <Route path="/changelog" element={<ChangelogPage />} />
           <Route path="/organizers" element={<OrganizersPage />} />
-          <Route path="/organizations" element={<OrganizationsPage />} />
           {/* `/settings/verifier` moved to the public `/organizations` onboarding
               page. Keep the old path as a redirect so existing links resolve. */}
           <Route path="/settings/verifier" element={<Navigate to="/organizations" replace />} />
@@ -218,6 +217,9 @@ export function AppRouter() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/about/donors" element={<DonorGuidePage />} />
           <Route path="/about/recipients" element={<RecipientGuidePage />} />
+          {/* Organizations onboarding / marketing page. Wide layout so the
+              hero and section backgrounds can span the viewport like /about. */}
+          <Route path="/organizations" element={<OrganizationsPage />} />
           {/* Legacy URL: the recipient guide lived at `/about/activists`
               before the "activist" → "recipient" copy change. Redirect so
               external links and bookmarks still resolve. */}

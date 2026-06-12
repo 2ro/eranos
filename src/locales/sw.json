@@ -1455,9 +1455,59 @@
     "profileSectionTitle": "Mthibitishaji"
   },
   "organizations": {
-    "title": "Kwa mashirika",
-    "subtitle": "Sajili shirika lako kwenye Agora na uwaeleze wafadhili jinsi unavyochunguza kampeni.",
-    "intro": "Agora imejengwa juu ya Nostr, hivyo shirika lako huleta utambulisho wake lenyewe. Ingia kwa wasifu wa Nostr wa shirika lako — au tengeneza mmoja — kisha chapisha taarifa inayoeleza jinsi unavyothibitisha kampeni unazoziunga mkono. Wafadhili huona taarifa hii kwenye wasifu wako na huitumia kuamua kama waamini uamuzi wako.",
+    "seoTitle": "Kwa mashirika",
+    "seoDescription": "Sajili shirika lako kwenye {{appName}}, chapisha taarifa ya uthibitishaji ya umma, na upate imani ya wafadhili.",
+    "hero": {
+      "eyebrow": "Kwa mashirika na wathibitishaji",
+      "headlinePart1": "Wasaidie wafadhili",
+      "headlineHighlight": "kuamini",
+      "body": "Lete shirika lako kwenye {{appName}} na uchapishe taarifa ya umma inayoeleza jinsi unavyochunguza kampeni unazoziunga mkono. Hakuna maombi, hakuna walinzi wa lango — sifa yako ndiyo inayofanya kazi.",
+      "trustChips": {
+        "noPermission": "Hakuna ruhusa inayohitajika",
+        "ownIdentity": "Utambulisho wako mwenyewe",
+        "public": "Ya umma na inayothibitishika"
+      },
+      "cta": "Anza"
+    },
+    "steps": {
+      "eyebrow": "Jinsi inavyofanya kazi",
+      "title": "Sajili kwa hatua tatu",
+      "lede": "{{appName}} imejengwa juu ya Nostr, hivyo shirika lako huleta utambulisho wake lenyewe. Kujiandaa huchukua dakika chache.",
+      "step1": {
+        "title": "Lete wasifu wako",
+        "body": "Ingia kwa wasifu wa Nostr wa shirika lako — au tengeneza mmoja kwa sekunde. Utambulisho wako ni wako, unaobebeka katika kila programu ya Nostr, na haudhibitiwi na {{appName}}."
+      },
+      "step2": {
+        "title": "Eleza mchakato wako",
+        "body": "Andika taarifa ya umma inayoeleza jinsi unavyothibitisha kampeni: ukaguzi unaofanya, ushahidi unaohitaji, na jinsi unavyothibitisha utambulisho wa mratibu."
+      },
+      "step3": {
+        "title": "Chapisha na upate imani",
+        "body": "Taarifa yako huonekana kwenye wasifu wako na huwaashiria wafadhili kuwa unaziunga mkono kampeni unazozithibitisha. Isasishe au iondoe wakati wowote."
+      }
+    },
+    "why": {
+      "eyebrow": "Kwa nini ni muhimu",
+      "title": "Kwa nini uchapishe taarifa ya uthibitishaji",
+      "lede": "Wafadhili hutoa kwa uhakika zaidi wanapojua nani anayedhamini kampeni na jinsi gani.",
+      "trust": {
+        "title": "Jenga imani ya wafadhili",
+        "body": "Mchakato wazi wa umma huwaambia wafadhili kuwa pesa zao zinaenda zinakopaswa kuenda — na kwamba mtu anayeaminika amekagua."
+      },
+      "transparency": {
+        "title": "Uwazi wa hali ya juu",
+        "body": "Taarifa yako huchapishwa wazi kwa Nostr. Yeyote anaweza kusoma hasa jinsi unavyofanya kazi, bila masanduku ya siri."
+      },
+      "visibility": {
+        "title": "Jitokeze",
+        "body": "Taarifa za wathibitishaji huonyeshwa kwa uwazi kwenye wasifu wako, zikisaidia mashirika makini kujitofautisha."
+      }
+    },
+    "getStarted": {
+      "eyebrow": "Anza",
+      "title": "Chapisha taarifa yako",
+      "lede": "Ingia kwa wasifu wa shirika lako ili kuchapisha, kusasisha, au kuondoa taarifa yako ya uthibitishaji."
+    },
     "loginGateTitle": "Ingia kwa wasifu wa shirika lako",
     "loginGateBody": "Ingia kwa wasifu wa Nostr wa shirika lako, au tengeneza mmoja, ili kuanza. Mara tu unapoingia, unaweza kuchapisha taarifa yako ya uthibitishaji hapa."
   },

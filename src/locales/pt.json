@@ -1458,9 +1458,59 @@
     "profileSectionTitle": "Verificador"
   },
   "organizations": {
-    "title": "Para organizações",
-    "subtitle": "Integre sua organização ao Agora e diga aos doadores como você avalia campanhas.",
-    "intro": "O Agora é construído sobre o Nostr, então sua organização traz sua própria identidade. Entre com o perfil Nostr da sua organização — ou crie um — e depois publique uma declaração descrevendo como você verifica as campanhas que apoia. Os doadores veem essa declaração no seu perfil e a usam para decidir se confiam no seu julgamento.",
+    "seoTitle": "Para organizações",
+    "seoDescription": "Integre sua organização ao {{appName}}, publique uma declaração de verificação pública e conquiste a confiança dos doadores.",
+    "hero": {
+      "eyebrow": "Para organizações e verificadores",
+      "headlinePart1": "Ajude os doadores a",
+      "headlineHighlight": "confiar",
+      "body": "Traga sua organização para o {{appName}} e publique uma declaração pública descrevendo como você avalia as campanhas que apoia. Sem inscrição, sem porteiros — sua reputação faz o trabalho.",
+      "trustChips": {
+        "noPermission": "Sem necessidade de permissão",
+        "ownIdentity": "Sua própria identidade",
+        "public": "Pública e verificável"
+      },
+      "cta": "Começar"
+    },
+    "steps": {
+      "eyebrow": "Como funciona",
+      "title": "Integre em três passos",
+      "lede": "O {{appName}} é construído sobre o Nostr, então sua organização traz sua própria identidade. A configuração leva minutos.",
+      "step1": {
+        "title": "Traga seu perfil",
+        "body": "Entre com o perfil Nostr da sua organização — ou crie um em segundos. Sua identidade é sua, portátil em todos os aplicativos Nostr e não controlada pelo {{appName}}."
+      },
+      "step2": {
+        "title": "Descreva seu processo",
+        "body": "Escreva uma declaração pública explicando como você verifica as campanhas: as verificações que realiza, as evidências que exige e como confirma a identidade de um organizador."
+      },
+      "step3": {
+        "title": "Publique e conquiste confiança",
+        "body": "Sua declaração aparece no seu perfil e sinaliza aos doadores que você apoia as campanhas que verifica. Atualize-a ou retire-a a qualquer momento."
+      }
+    },
+    "why": {
+      "eyebrow": "Por que importa",
+      "title": "Por que publicar uma declaração de verificação",
+      "lede": "Os doadores doam com mais confiança quando sabem quem está respaldando uma campanha e como.",
+      "trust": {
+        "title": "Construa a confiança dos doadores",
+        "body": "Um processo claro e público diz aos doadores que o dinheiro deles está indo para onde deveria — e que alguém confiável verificou."
+      },
+      "transparency": {
+        "title": "Transparência radical",
+        "body": "Sua declaração é publicada abertamente no Nostr. Qualquer um pode ler exatamente como você trabalha, sem caixas-pretas."
+      },
+      "visibility": {
+        "title": "Destaque-se",
+        "body": "As declarações dos verificadores são exibidas com destaque no seu perfil, ajudando organizações sérias a se diferenciarem."
+      }
+    },
+    "getStarted": {
+      "eyebrow": "Começar",
+      "title": "Publique sua declaração",
+      "lede": "Entre com o perfil da sua organização para publicar, atualizar ou retirar sua declaração de verificação."
+    },
     "loginGateTitle": "Entre com o perfil da sua organização",
     "loginGateBody": "Entre com o perfil Nostr da sua organização, ou crie um, para começar. Depois de entrar, você pode publicar sua declaração de verificação aqui."
   },

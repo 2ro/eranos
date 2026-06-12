@@ -1016,9 +1016,59 @@
     "profileSectionTitle": "Musimbisi"
   },
   "organizations": {
-    "title": "Kune masangano",
-    "subtitle": "Pinza sangano rako muAgora ugoudza vanopa kuti unoongorora sei mishandirapamwe.",
-    "intro": "Agora yakavakwa paNostr, saka sangano rako rinouya nehunhu hwaro pacharo. Pinda nepurofairi yeNostr yesangano rako — kana kuti gadzira imwe — wozoburitsa chirevo chinotsanangura mautariro aunoita mishandirapamwe yaunotsigira. Vanopa vanoona chirevo ichi papurofairi yako uye vanochishandisa kuti vasarudze kana vachivimba nemaonero ako.",
+    "seoTitle": "Kune masangano",
+    "seoDescription": "Pinza sangano rako mu{{appName}}, uburitse chirevo cheruzhinji chekusimbisa, uye uwane kuvimbwa nevanopa.",
+    "hero": {
+      "eyebrow": "Kune masangano nevanosimbisa",
+      "headlinePart1": "Batsira vanopa kuti",
+      "headlineHighlight": "vavimbe",
+      "body": "Unza sangano rako mu{{appName}} uye uburitse chirevo cheruzhinji chinotsanangura mautariro aunoita mishandirapamwe yaunotsigira. Hapana chikumbiro, hapana vavhure-musuwo — mukurumbira wako ndiwo unoita basa.",
+      "trustChips": {
+        "noPermission": "Hapana mvumo inodiwa",
+        "ownIdentity": "Hunhu hwako pachako",
+        "public": "Cheruzhinji uye chinogona kusimbiswa"
+      },
+      "cta": "Tanga"
+    },
+    "steps": {
+      "eyebrow": "Mashandiro azvo",
+      "title": "Pinda mumatanho matatu",
+      "lede": "{{appName}} yakavakwa paNostr, saka sangano rako rinouya nehunhu hwaro pacharo. Kugadzirira kunotora maminitsi.",
+      "step1": {
+        "title": "Unza purofairi yako",
+        "body": "Pinda nepurofairi yeNostr yesangano rako — kana kuti gadzira imwe musekondi. Hunhu hwako ndehwako, hunotakurika pamapurogiramu ese eNostr, uye hahutongwi ne{{appName}}."
+      },
+      "step2": {
+        "title": "Tsanangura maitiro ako",
+        "body": "Nyora chirevo cheruzhinji chinotsanangura mautariro aunoongorora mishandirapamwe: kuongorora kwaunoita, humbowo hwaunoda, uye maitiro aunosimbisa hunhu hwemuronga."
+      },
+      "step3": {
+        "title": "Buritsa uye uwane kuvimbwa",
+        "body": "Chirevo chako chinoonekwa papurofairi yako uye chinoratidza vanopa kuti unotsigira mishandirapamwe yaunosimbisa. Gadziridza kana kubvisa chero nguva."
+      }
+    },
+    "why": {
+      "eyebrow": "Kukosha kwazvo",
+      "title": "Sei uchifanira kuburitsa chirevo chekusimbisa",
+      "lede": "Vanopa vanopa nechivimbo zvakanyanya kana vachiziva kuti ndiani ari kumiririra mushandirapamwe uye sei.",
+      "trust": {
+        "title": "Vaka kuvimbwa nevanopa",
+        "body": "Maitiro akajeka, eruzhinji anoudza vanopa kuti mari yavo iri kuenda kwainofanira kuenda — uye kuti munhu anovimbika aongorora."
+      },
+      "transparency": {
+        "title": "Kuonekwa pachena kwakanyanya",
+        "body": "Chirevo chako chinoburitswa pachena kuNostr. Chero munhu anogona kuverenga chaizvo kuti unoshanda sei, pasina mabhokisi matema."
+      },
+      "visibility": {
+        "title": "Ratidzika",
+        "body": "Zvirevo zvevanosimbisa zvinoratidzwa zvakanyanya papurofairi yako, zvichibatsira masangano akakomba kuti azvisiyanise."
+      }
+    },
+    "getStarted": {
+      "eyebrow": "Tanga",
+      "title": "Buritsa chirevo chako",
+      "lede": "Pinda nepurofairi yesangano rako kuti uburitse, ugadziridze, kana kubvisa chirevo chako chekusimbisa."
+    },
     "loginGateTitle": "Pinda nepurofairi yesangano rako",
     "loginGateBody": "Pinda nepurofairi yeNostr yesangano rako, kana kuti gadzira imwe, kuti utange. Kana wapinda, unogona kuburitsa chirevo chako chekusimbisa pano."
   },
