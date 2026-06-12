@@ -1365,6 +1365,11 @@
     "title": "सेटिंग्स",
     "description": "अपनी {{appName}} सेटिंग्स प्रबंधित करें",
     "deleteAccount": "अकाउंट डिलीट करें",
+    "groups": {
+      "account": "खाता",
+      "app": "ऐप",
+      "system": "सिस्टम"
+    },
     "sections": {
       "profile": "प्रोफ़ाइल",
       "profileDesc": "डिस्प्ले नाम, बायो, अवतार, और सत्यापन।",

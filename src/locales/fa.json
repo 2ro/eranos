@@ -923,6 +923,11 @@
     "title": "تنظیمات",
     "description": "مدیریت تنظیمات {{appName}} شما",
     "deleteAccount": "حذف حساب",
+    "groups": {
+      "account": "حساب",
+      "app": "برنامه",
+      "system": "سیستم"
+    },
     "sections": {
       "profile": "نمایه",
       "profileDesc": "نام نمایشی، بیوگرافی، آواتار و تأیید هویت.",

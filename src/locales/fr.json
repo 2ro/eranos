@@ -1362,6 +1362,11 @@
     "title": "Paramètres",
     "description": "Gérez vos paramètres {{appName}}",
     "deleteAccount": "Supprimer le compte",
+    "groups": {
+      "account": "Compte",
+      "app": "Application",
+      "system": "Système"
+    },
     "sections": {
       "profile": "Profil",
       "profileDesc": "Nom d'affichage, biographie, avatar et vérification.",

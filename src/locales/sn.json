@@ -925,6 +925,11 @@
     "title": "Marongero",
     "description": "Tarisira marongero ako e{{appName}}",
     "deleteAccount": "Bvisa akaunti",
+    "groups": {
+      "account": "Akaundi",
+      "app": "Puroguramu",
+      "system": "Sisitimu"
+    },
     "sections": {
       "profile": "Profile",
       "profileDesc": "Zita rinoratidzwa, nhoroondo, mufananidzo, nokutsigirwa.",

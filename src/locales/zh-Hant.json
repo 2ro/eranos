@@ -925,6 +925,11 @@
     "title": "設定",
     "description": "管理你的 {{appName}} 設定",
     "deleteAccount": "刪除賬戶",
+    "groups": {
+      "account": "帳戶",
+      "app": "應用程式",
+      "system": "系統"
+    },
     "sections": {
       "profile": "個人資料",
       "profileDesc": "顯示名稱、簡介、頭像和驗證。",

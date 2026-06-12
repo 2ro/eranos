@@ -1366,6 +1366,11 @@
     "title": "Ayarlar",
     "description": "{{appName}} ayarlarınızı yönetin",
     "deleteAccount": "Hesabı sil",
+    "groups": {
+      "account": "Hesap",
+      "app": "Uygulama",
+      "system": "Sistem"
+    },
     "sections": {
       "profile": "Profil",
       "profileDesc": "Görünen ad, biyografi, avatar ve doğrulama.",

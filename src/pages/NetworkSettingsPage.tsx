@@ -50,28 +50,25 @@ export function NetworkSettingsPage() {
         }
       />
 
-      <div className="p-4">
+      <div className="p-4 max-w-2xl mx-auto w-full space-y-7">
         {/* Intro */}
-        <div className="px-3 pt-2 pb-4">
-          <h2 className="text-sm font-semibold">{t('settings.network.connectionsHeading')}</h2>
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+        <div className="px-1 pt-1">
+          <h2 className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground/80">{t('settings.network.connectionsHeading')}</h2>
+          <p className="text-[13px] text-muted-foreground mt-1.5 leading-relaxed">
             {t('settings.network.connectionsIntro')}
           </p>
         </div>
 
         {/* Low-Bandwidth Mode */}
-        <div>
-          <div className="relative px-3 py-3.5">
-            <h2 className="text-base font-semibold">{t('settings.network.lowBandwidthHeading')}</h2>
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
-          </div>
-          <div className="pt-4 pb-4 px-3 space-y-4">
+        <section>
+          <h2 className="px-1 pb-1.5 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground/80">{t('settings.network.lowBandwidthHeading')}</h2>
+          <div className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-4">
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1 min-w-0">
-                <Label htmlFor="low-bandwidth" className="text-sm font-medium">
+                <Label htmlFor="low-bandwidth" className="text-[15px] font-medium">
                   {t('settings.network.reduceDataUsage')}
                 </Label>
-                <p className="text-xs text-muted-foreground leading-relaxed">
+                <p className="text-[13px] text-muted-foreground leading-relaxed">
                   {t('settings.network.reduceDataUsageDesc')}
                 </p>
               </div>
@@ -86,13 +83,13 @@ export function NetworkSettingsPage() {
 
             {/* Image Proxy — independent of Low-Bandwidth. Controls whether
                 images are fetched from a downsizing proxy. */}
-            <div className="space-y-3">
+            <div className="space-y-3 pt-4 border-t border-border/50">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1 min-w-0">
-                  <Label htmlFor="image-proxy" className="text-sm font-medium">
+                  <Label htmlFor="image-proxy" className="text-[15px] font-medium">
                     {t('settings.network.useImageProxy')}
                   </Label>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
+                  <p className="text-[13px] text-muted-foreground leading-relaxed">
                     {t('settings.network.useImageProxyDesc')}
                   </p>
                 </div>
@@ -156,40 +153,27 @@ export function NetworkSettingsPage() {
               )}
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Relays */}
-        <div>
-          <div className="relative px-3 py-3.5">
-            <h2 className="text-base font-semibold flex items-center gap-1.5">{t('settings.network.relays')} <HelpTip faqId="what-are-relays" /></h2>
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
-          </div>
-          <div className="pt-2 pb-4">
-            <RelayListManager />
-          </div>
-        </div>
+        <section>
+          <h2 className="px-1 pb-1.5 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground/80 flex items-center gap-1.5">{t('settings.network.relays')} <HelpTip faqId="what-are-relays" /></h2>
+          <RelayListManager />
+        </section>
 
         {/* Blossom Servers */}
-        <div>
-          <div className="relative px-3 py-3.5">
-            <h2 className="text-base font-semibold flex items-center gap-1.5">{t('settings.network.blossomServers')} <HelpTip faqId="what-are-blossom" /></h2>
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
-          </div>
-          <div className="pt-2 pb-4">
-            <BlossomSettings />
-          </div>
-        </div>
+        <section>
+          <h2 className="px-1 pb-1.5 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground/80 flex items-center gap-1.5">{t('settings.network.blossomServers')} <HelpTip faqId="what-are-blossom" /></h2>
+          <BlossomSettings />
+        </section>
 
         {/* Image Upload Quality */}
-        <div>
-          <div className="relative px-3 py-3.5">
-            <h2 className="text-base font-semibold">{t('settings.network.imageUploads')}</h2>
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
-          </div>
-          <div className="pt-4 pb-4 px-3 space-y-3">
+        <section>
+          <h2 className="px-1 pb-1.5 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground/80">{t('settings.network.imageUploads')}</h2>
+          <div className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium">{t('settings.network.uploadQuality')}</Label>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <Label className="text-[15px] font-medium">{t('settings.network.uploadQuality')}</Label>
+              <p className="text-[13px] text-muted-foreground leading-relaxed">
                 {t('settings.network.uploadQualityDesc')}
               </p>
             </div>
@@ -210,7 +194,7 @@ export function NetworkSettingsPage() {
               ))}
             </div>
           </div>
-        </div>
+        </section>
       </div>
     </main>
   );

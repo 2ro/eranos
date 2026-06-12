@@ -925,6 +925,11 @@
     "title": "تنظیمات",
     "description": "د {{appName}} تنظیماتو اداره کول",
     "deleteAccount": "حساب ړنګول",
+    "groups": {
+      "account": "حساب",
+      "app": "اپلیکیشن",
+      "system": "سیسټم"
+    },
     "sections": {
       "profile": "پروفایل",
       "profileDesc": "د ښودنې نوم، بیوګرافي، اواتار، او تصدیق.",

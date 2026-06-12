@@ -1376,6 +1376,11 @@
     "title": "Settings",
     "description": "Manage your {{appName}} settings",
     "deleteAccount": "Delete account",
+    "groups": {
+      "account": "Account",
+      "app": "App",
+      "system": "System"
+    },
     "sections": {
       "profile": "Profile",
       "profileDesc": "Display name, bio, avatar, and verification.",

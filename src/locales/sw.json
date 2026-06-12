@@ -1364,6 +1364,11 @@
     "title": "Mipangilio",
     "description": "Simamia mipangilio yako ya {{appName}}",
     "deleteAccount": "Futa akaunti",
+    "groups": {
+      "account": "Akaunti",
+      "app": "Programu",
+      "system": "Mfumo"
+    },
     "sections": {
       "profile": "Wasifu",
       "profileDesc": "Jina la kuonyesha, wasifu, picha, na uthibitisho.",

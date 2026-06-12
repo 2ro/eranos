@@ -923,6 +923,11 @@
     "title": "Ajustes",
     "description": "Administra tus ajustes de {{appName}}",
     "deleteAccount": "Eliminar cuenta",
+    "groups": {
+      "account": "Cuenta",
+      "app": "Aplicación",
+      "system": "Sistema"
+    },
     "sections": {
       "profile": "Perfil",
       "profileDesc": "Nombre, biografía, avatar y verificación.",

@@ -37,11 +37,11 @@ export function AdvancedSettingsPage() {
         }
       />
 
-      <div className="p-4">
+      <div className="p-4 max-w-2xl mx-auto w-full">
         {/* Intro */}
-        <div className="px-3 pt-2 pb-4">
-          <h2 className="text-sm font-semibold">{t('settings.advanced.powerUserHeading')}</h2>
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+        <div className="px-1 pt-1 pb-4">
+          <h2 className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground/80">{t('settings.advanced.powerUserHeading')}</h2>
+          <p className="text-[13px] text-muted-foreground mt-1.5 leading-relaxed">
             {t('settings.advanced.intro')}
           </p>
         </div>

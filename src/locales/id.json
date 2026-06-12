@@ -1365,6 +1365,11 @@
     "title": "Pengaturan",
     "description": "Kelola pengaturan {{appName}} Anda",
     "deleteAccount": "Hapus akun",
+    "groups": {
+      "account": "Akun",
+      "app": "Aplikasi",
+      "system": "Sistem"
+    },
     "sections": {
       "profile": "Profil",
       "profileDesc": "Nama tampilan, bio, avatar, dan verifikasi.",

@@ -1367,6 +1367,11 @@
     "title": "Configurações",
     "description": "Gerencie suas configurações do {{appName}}",
     "deleteAccount": "Excluir conta",
+    "groups": {
+      "account": "Conta",
+      "app": "Aplicativo",
+      "system": "Sistema"
+    },
     "sections": {
       "profile": "Perfil",
       "profileDesc": "Nome de exibição, biografia, avatar e verificação.",

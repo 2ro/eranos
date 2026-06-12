@@ -925,6 +925,11 @@
     "title": "设置",
     "description": "管理你的 {{appName}} 设置",
     "deleteAccount": "删除账户",
+    "groups": {
+      "account": "账户",
+      "app": "应用",
+      "system": "系统"
+    },
     "sections": {
       "profile": "个人资料",
       "profileDesc": "显示名称、简介、头像和验证。",

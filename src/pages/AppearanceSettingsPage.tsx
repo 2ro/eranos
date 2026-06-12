@@ -1,5 +1,5 @@
 import { useSeoMeta } from '@unhead/react';
-import { Monitor, Moon, Sun } from 'lucide-react';
+import { Check, Monitor, Moon, Sun } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -60,52 +60,47 @@ export function AppearanceSettingsPage() {
         }
       />
 
-      <div className="p-4">
+      <div className="p-4 max-w-2xl mx-auto w-full">
         {/* Intro */}
-        <div className="px-3 pt-2 pb-6">
-          <h2 className="text-sm font-semibold">{t('settings.appearance.colorMode')}</h2>
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+        <div className="px-1 pt-1 pb-4">
+          <h2 className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground/80">{t('settings.appearance.colorMode')}</h2>
+          <p className="text-[13px] text-muted-foreground mt-1.5 leading-relaxed">
             {t('settings.appearance.intro')}
           </p>
         </div>
 
         {/* Theme options */}
-        <div className="space-y-2">
+        <div className="overflow-hidden rounded-2xl bg-card border border-border/60 shadow-sm divide-y divide-border/50">
           {themeOptions.map((option) => (
             <button
               key={option.value}
               onClick={() => setTheme(option.value)}
               className={cn(
-                'w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border-2 transition-all duration-200',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                theme === option.value
-                  ? 'border-primary bg-primary/5 shadow-sm'
-                  : 'border-border/50 hover:border-primary/40 hover:bg-muted/30',
+                'w-full flex items-center gap-3.5 px-3.5 py-3 transition-colors',
+                'hover:bg-muted/50 active:bg-muted/70',
+                'focus-visible:outline-none focus-visible:bg-muted/50',
               )}
             >
               <div
                 className={cn(
-                  'flex items-center justify-center size-10 rounded-lg transition-colors',
+                  'flex items-center justify-center size-9 rounded-[10px] transition-colors',
                   theme === option.value
-                    ? 'bg-primary text-primary-foreground'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
                     : 'bg-muted text-muted-foreground',
                 )}
               >
                 {option.icon}
               </div>
               <div className="flex-1 text-left min-w-0">
-                <p className={cn(
-                  'text-sm font-semibold',
-                  theme === option.value ? 'text-foreground' : 'text-foreground',
-                )}>
+                <p className="text-[15px] font-medium leading-tight text-foreground">
                   {t(option.labelKey)}
                 </p>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="text-[13px] text-muted-foreground mt-0.5 leading-snug">
                   {t(option.descriptionKey)}
                 </p>
               </div>
               {theme === option.value && (
-                <div className="size-2.5 rounded-full bg-primary shrink-0 animate-in fade-in zoom-in duration-200" />
+                <Check className="size-[18px] text-primary shrink-0 animate-in fade-in zoom-in duration-200" aria-hidden="true" />
               )}
             </button>
           ))}
