@@ -60,6 +60,7 @@
     "profile": "Profil",
     "settings": "Ayarlar",
     "about": "Hakkında",
+    "organizations": "Organizasyonlar",
     "privacy": "Gizlilik",
     "safety": "Güvenlik",
     "changelog": "Sürüm notları",
@@ -1374,8 +1375,6 @@
     "sections": {
       "profile": "Profil",
       "profileDesc": "Görünen ad, biyografi, avatar ve doğrulama.",
-      "verifier": "Doğrulayıcı",
-      "verifierDesc": "Kampanyaları nasıl denetlediğinizi anlatarak doğrulayıcı olun.",
       "appearance": "Görünüm",
       "appearanceDesc": "Sistem, aydınlık veya karanlık mod.",
       "language": "Dil",
@@ -1456,6 +1455,13 @@
     "loginGateTitle": "Doğrulayıcı olmak için giriş yapın",
     "loginGateBody": "Doğrulayıcı beyanı yayımlamak için giriş yapmış olmanız gerekir.",
     "profileSectionTitle": "Doğrulayıcı"
+  },
+  "organizations": {
+    "title": "Organizasyonlar için",
+    "subtitle": "Organizasyonunuzu Agora'ya katın ve kampanyaları nasıl denetlediğinizi bağışçılara anlatın.",
+    "intro": "Agora, Nostr üzerine kuruludur; bu yüzden organizasyonunuz kendi kimliğini beraberinde getirir. Organizasyonunuzun Nostr profiliyle giriş yapın — ya da bir tane oluşturun — ardından desteklediğiniz kampanyaları nasıl doğruladığınızı açıklayan bir beyan yayımlayın. Bağışçılar bu beyanı profilinizde görür ve yargınıza güvenip güvenmeyeceklerine karar vermek için kullanır.",
+    "loginGateTitle": "Organizasyonunuzun profiliyle giriş yapın",
+    "loginGateBody": "Başlamak için organizasyonunuzun Nostr profiliyle giriş yapın ya da bir tane oluşturun. Giriş yaptıktan sonra doğrulama beyanınızı buradan yayımlayabilirsiniz."
   },
   "organizers": {
     "appoint": "Organizatör Ata",

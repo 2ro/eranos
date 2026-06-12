@@ -60,6 +60,7 @@
     "profile": "Profil",
     "settings": "Paramètres",
     "about": "À propos",
+    "organizations": "Organisations",
     "privacy": "Confidentialité",
     "safety": "Sécurité",
     "changelog": "Journal des modifications",
@@ -1370,8 +1371,6 @@
     "sections": {
       "profile": "Profil",
       "profileDesc": "Nom d'affichage, biographie, avatar et vérification.",
-      "verifier": "Vérificateur",
-      "verifierDesc": "Devenez vérificateur en décrivant comment vous examinez les campagnes.",
       "appearance": "Apparence",
       "appearanceDesc": "Mode système, clair ou sombre.",
       "language": "Langue",
@@ -1452,6 +1451,13 @@
     "loginGateTitle": "Connectez-vous pour devenir vérificateur",
     "loginGateBody": "Vous devez être connecté pour publier une déclaration de vérificateur.",
     "profileSectionTitle": "Vérificateur"
+  },
+  "organizations": {
+    "title": "Pour les organisations",
+    "subtitle": "Intégrez votre organisation à Agora et expliquez aux donateurs comment vous vérifiez les campagnes.",
+    "intro": "Agora est bâti sur Nostr, votre organisation apporte donc sa propre identité. Connectez-vous avec le profil Nostr de votre organisation — ou créez-en un — puis publiez une déclaration décrivant comment vous vérifiez les campagnes que vous soutenez. Les donateurs voient cette déclaration sur votre profil et s'en servent pour décider s'ils peuvent faire confiance à votre jugement.",
+    "loginGateTitle": "Connectez-vous avec le profil de votre organisation",
+    "loginGateBody": "Connectez-vous avec le profil Nostr de votre organisation, ou créez-en un, pour commencer. Une fois connecté, vous pourrez publier votre déclaration de vérification ici."
   },
   "organizers": {
     "appoint": "Désigner un organisateur",

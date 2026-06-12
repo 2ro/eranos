@@ -61,6 +61,7 @@
     "profile": "Perfil",
     "settings": "Configurações",
     "about": "Sobre",
+    "organizations": "Organizações",
     "privacy": "Privacidade",
     "safety": "Segurança",
     "changelog": "Notas de versão",
@@ -1375,8 +1376,6 @@
     "sections": {
       "profile": "Perfil",
       "profileDesc": "Nome de exibição, biografia, avatar e verificação.",
-      "verifier": "Verificador",
-      "verifierDesc": "Torne-se um verificador descrevendo como você avalia campanhas.",
       "appearance": "Aparência",
       "appearanceDesc": "Modo sistema, claro ou escuro.",
       "language": "Idioma",
@@ -1457,6 +1456,13 @@
     "loginGateTitle": "Entre para se tornar um verificador",
     "loginGateBody": "Você precisa estar conectado para publicar uma declaração de verificador.",
     "profileSectionTitle": "Verificador"
+  },
+  "organizations": {
+    "title": "Para organizações",
+    "subtitle": "Integre sua organização ao Agora e diga aos doadores como você avalia campanhas.",
+    "intro": "O Agora é construído sobre o Nostr, então sua organização traz sua própria identidade. Entre com o perfil Nostr da sua organização — ou crie um — e depois publique uma declaração descrevendo como você verifica as campanhas que apoia. Os doadores veem essa declaração no seu perfil e a usam para decidir se confiam no seu julgamento.",
+    "loginGateTitle": "Entre com o perfil da sua organização",
+    "loginGateBody": "Entre com o perfil Nostr da sua organização, ou crie um, para começar. Depois de entrar, você pode publicar sua declaração de verificação aqui."
   },
   "organizers": {
     "appoint": "Nomear organizador",

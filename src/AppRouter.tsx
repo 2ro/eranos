@@ -47,13 +47,13 @@ const NetworkSettingsPage = lazy(() => import("./pages/NetworkSettingsPage").the
 const NIP19Page = lazy(() => import("./pages/NIP19Page").then(m => ({ default: m.NIP19Page })));
 const NotificationSettings = lazy(() => import("./pages/NotificationSettings").then(m => ({ default: m.NotificationSettings })));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage").then(m => ({ default: m.NotificationsPage })));
+const OrganizationsPage = lazy(() => import("./pages/OrganizationsPage").then(m => ({ default: m.OrganizationsPage })));
 const OrganizersPage = lazy(() => import("./pages/OrganizersPage").then(m => ({ default: m.OrganizersPage })));
 const EventDashboardPage = lazy(() => import("./pages/EventDashboardPage").then(m => ({ default: m.EventDashboardPage })));
 const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage").then(m => ({ default: m.PrivacyPolicyPage })));
 const ProfileSettings = lazy(() => import("./pages/ProfileSettings").then(m => ({ default: m.ProfileSettings })));
 const SearchPage = lazy(() => import("./pages/SearchPage").then(m => ({ default: m.SearchPage })));
 const SettingsPage = lazy(() => import("./pages/SettingsPage").then(m => ({ default: m.SettingsPage })));
-const VerifierSettingsPage = lazy(() => import("./pages/VerifierSettingsPage").then(m => ({ default: m.VerifierSettingsPage })));
 const WalletPage = lazy(() => import("./pages/WalletPage").then(m => ({ default: m.WalletPage })));
 const WalletMigrateV1Page = lazy(() => import("./pages/WalletMigrateV1Page").then(m => ({ default: m.WalletMigrateV1Page })));
 const WalletDoubleTweakFixPage = lazy(() => import("./pages/WalletDoubleTweakFixPage").then(m => ({ default: m.WalletDoubleTweakFixPage })));
@@ -98,6 +98,7 @@ function SiteFooter() {
         </button>
         <nav className="flex items-center gap-5">
           <Link to="/about" className="hover:text-foreground motion-safe:transition-colors">{t('nav.about')}</Link>
+          <Link to="/organizations" className="hover:text-foreground motion-safe:transition-colors">{t('nav.organizations')}</Link>
           <Link to="/privacy" className="hover:text-foreground motion-safe:transition-colors">{t('nav.privacy')}</Link>
           <Link to="/safety" className="hover:text-foreground motion-safe:transition-colors">{t('nav.safety')}</Link>
           <Link to="/changelog" className="hover:text-foreground motion-safe:transition-colors">{t('nav.changelog')}</Link>
@@ -154,7 +155,6 @@ export function AppRouter() {
           <Route path="/settings/appearance" element={<AppearanceSettingsPage />} />
           <Route path="/settings/language" element={<LanguageSettingsPage />} />
           <Route path="/settings/profile" element={<ProfileSettings />} />
-          <Route path="/settings/verifier" element={<VerifierSettingsPage />} />
           <Route path="/settings/wallet" element={<WalletSettingsPage />} />
           <Route path="/settings/notifications" element={<NotificationSettings />} />
           <Route path="/settings/advanced" element={<AdvancedSettingsPage />} />
@@ -186,6 +186,10 @@ export function AppRouter() {
           <Route path="/safety" element={<CSAEPolicyPage />} />
           <Route path="/changelog" element={<ChangelogPage />} />
           <Route path="/organizers" element={<OrganizersPage />} />
+          <Route path="/organizations" element={<OrganizationsPage />} />
+          {/* `/settings/verifier` moved to the public `/organizations` onboarding
+              page. Keep the old path as a redirect so existing links resolve. */}
+          <Route path="/settings/verifier" element={<Navigate to="/organizations" replace />} />
           {/* Callback target for remote signers (e.g. Amber, Primal) after NIP-46 approval */}
           <Route path="/remoteloginsuccess" element={<RemoteLoginSuccessPage />} />
         </Route>

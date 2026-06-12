@@ -61,6 +61,7 @@
     "profile": "Profile",
     "settings": "Settings",
     "about": "About",
+    "organizations": "Organizations",
     "privacy": "Privacy",
     "safety": "Safety",
     "changelog": "Changelog",
@@ -1384,8 +1385,6 @@
     "sections": {
       "profile": "Profile",
       "profileDesc": "Display name, bio, avatar, and verification.",
-      "verifier": "Verifier",
-      "verifierDesc": "Become a verifier by describing how you vet campaigns.",
       "appearance": "Appearance",
       "appearanceDesc": "System, light, or dark mode.",
       "language": "Language",
@@ -1466,6 +1465,13 @@
     "loginGateTitle": "Sign in to become a verifier",
     "loginGateBody": "You need to be signed in to publish a verifier statement.",
     "profileSectionTitle": "Verifier"
+  },
+  "organizations": {
+    "title": "For organizations",
+    "subtitle": "Onboard your organization onto Agora and tell donors how you vet campaigns.",
+    "intro": "Agora is built on Nostr, so your organization brings its own identity. Sign in with your organization's Nostr profile — or create one — then publish a statement describing how you verify the campaigns you stand behind. Donors see this statement on your profile and use it to decide whether to trust your judgement.",
+    "loginGateTitle": "Sign in with your organization's profile",
+    "loginGateBody": "Log in with your organization's Nostr profile, or create one, to get started. Once you're signed in, you can publish your verification statement here."
   },
   "organizers": {
     "appoint": "Appoint Organizer",

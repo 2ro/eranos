@@ -61,6 +61,7 @@
     "profile": "Profil",
     "settings": "Pengaturan",
     "about": "Tentang",
+    "organizations": "Organisasi",
     "privacy": "Privasi",
     "safety": "Keamanan",
     "changelog": "Catatan Versi",
@@ -1373,8 +1374,6 @@
     "sections": {
       "profile": "Profil",
       "profileDesc": "Nama tampilan, bio, avatar, dan verifikasi.",
-      "verifier": "Verifikator",
-      "verifierDesc": "Jadilah verifikator dengan menjelaskan cara Anda memeriksa kampanye.",
       "appearance": "Tampilan",
       "appearanceDesc": "Mode sistem, terang, atau gelap.",
       "language": "Bahasa",
@@ -1455,6 +1454,13 @@
     "loginGateTitle": "Masuk untuk menjadi verifikator",
     "loginGateBody": "Anda harus masuk untuk memublikasikan pernyataan verifikator.",
     "profileSectionTitle": "Verifikator"
+  },
+  "organizations": {
+    "title": "Untuk organisasi",
+    "subtitle": "Daftarkan organisasi Anda ke Agora dan beri tahu para donatur cara Anda memeriksa kampanye.",
+    "intro": "Agora dibangun di atas Nostr, sehingga organisasi Anda membawa identitasnya sendiri. Masuk dengan profil Nostr organisasi Anda — atau buat satu — lalu terbitkan pernyataan yang menjelaskan cara Anda memverifikasi kampanye yang Anda dukung. Para donatur melihat pernyataan ini di profil Anda dan menggunakannya untuk memutuskan apakah mereka dapat memercayai penilaian Anda.",
+    "loginGateTitle": "Masuk dengan profil organisasi Anda",
+    "loginGateBody": "Masuk dengan profil Nostr organisasi Anda, atau buat satu, untuk memulai. Setelah masuk, Anda dapat menerbitkan pernyataan verifikasi Anda di sini."
   },
   "organizers": {
     "appoint": "Tunjuk Organizer",

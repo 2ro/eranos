@@ -61,6 +61,7 @@
     "profile": "Profile",
     "settings": "Marongero",
     "about": "Nezve",
+    "organizations": "Masangano",
     "privacy": "Akavanzika",
     "safety": "Kuchengetedzeka",
     "changelog": "Rondedzero yeshanduko",
@@ -933,8 +934,6 @@
     "sections": {
       "profile": "Profile",
       "profileDesc": "Zita rinoratidzwa, nhoroondo, mufananidzo, nokutsigirwa.",
-      "verifier": "Musimbisi",
-      "verifierDesc": "Iva musimbisi nokutsanangura mautariro aunoita mishandirapamwe.",
       "appearance": "Maonero",
       "appearanceDesc": "System, chiedza, kana rima.",
       "language": "Mutauro",
@@ -1015,6 +1014,13 @@
     "loginGateTitle": "Pinda kuti uve musimbisi",
     "loginGateBody": "Unofanira kunge wakapinda kuti uburitse chirevo chemusimbisi.",
     "profileSectionTitle": "Musimbisi"
+  },
+  "organizations": {
+    "title": "Kune masangano",
+    "subtitle": "Pinza sangano rako muAgora ugoudza vanopa kuti unoongorora sei mishandirapamwe.",
+    "intro": "Agora yakavakwa paNostr, saka sangano rako rinouya nehunhu hwaro pacharo. Pinda nepurofairi yeNostr yesangano rako — kana kuti gadzira imwe — wozoburitsa chirevo chinotsanangura mautariro aunoita mishandirapamwe yaunotsigira. Vanopa vanoona chirevo ichi papurofairi yako uye vanochishandisa kuti vasarudze kana vachivimba nemaonero ako.",
+    "loginGateTitle": "Pinda nepurofairi yesangano rako",
+    "loginGateBody": "Pinda nepurofairi yeNostr yesangano rako, kana kuti gadzira imwe, kuti utange. Kana wapinda, unogona kuburitsa chirevo chako chekusimbisa pano."
   },
   "organizers": {
     "appoint": "Sarudza Mugadziri",

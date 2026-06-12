@@ -1,7 +1,7 @@
 import { useSeoMeta } from '@unhead/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2, ShieldCheck } from 'lucide-react';
+import { Building2, Loader2 } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
 import { PolicyMarkdown } from '@/components/PolicyMarkdown';
@@ -17,7 +17,7 @@ import {
   useVerifierStatement,
 } from '@/hooks/useVerifierStatement';
 
-export function VerifierSettingsPage() {
+export function OrganizationsPage() {
   const { t } = useTranslation();
   const { config } = useAppContext();
   const { user } = useCurrentUser();
@@ -30,8 +30,8 @@ export function VerifierSettingsPage() {
   const [hydrated, setHydrated] = useState(false);
 
   useSeoMeta({
-    title: `${t('verifier.title')} | ${t('settings.title')} | ${config.appName}`,
-    description: t('verifier.subtitle'),
+    title: `${t('organizations.title')} | ${config.appName}`,
+    description: t('organizations.subtitle'),
   });
 
   // Seed the textarea from the published statement once it loads.
@@ -42,24 +42,33 @@ export function VerifierSettingsPage() {
     }
   }, [hydrated, isLoading, statement]);
 
+  // Logged-out: onboarding help. Instruct the visitor to log in with — or
+  // create — their organization's Nostr profile before they can publish a
+  // verification statement.
   if (!user) {
     return (
-      <main>
+      <main className="min-h-screen pb-16">
         <PageHeader
-          backTo="/settings"
+          backTo="/"
           alwaysShowBack
           contentClassName="max-w-2xl mx-auto w-full sm:px-6"
-          title={t('verifier.title')}
+          title={t('organizations.title')}
         />
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+          <div className="space-y-3">
+            <p className="text-base text-muted-foreground leading-relaxed">
+              {t('organizations.intro')}
+            </p>
+          </div>
+
           <Card>
             <CardContent className="py-12 px-8 flex flex-col items-center gap-6 text-center">
               <div className="p-4 rounded-full bg-primary/10">
-                <ShieldCheck className="size-8 text-primary" />
+                <Building2 className="size-8 text-primary" />
               </div>
               <div className="space-y-2 max-w-sm">
-                <h2 className="text-xl font-semibold">{t('verifier.loginGateTitle')}</h2>
-                <p className="text-muted-foreground text-sm">{t('verifier.loginGateBody')}</p>
+                <h2 className="text-xl font-semibold">{t('organizations.loginGateTitle')}</h2>
+                <p className="text-muted-foreground text-sm">{t('organizations.loginGateBody')}</p>
               </div>
               <LoginArea className="max-w-60" />
             </CardContent>
@@ -107,13 +116,18 @@ export function VerifierSettingsPage() {
   return (
     <main className="min-h-screen pb-16">
       <PageHeader
-        backTo="/settings"
+        backTo="/"
         alwaysShowBack
         contentClassName="max-w-2xl mx-auto w-full sm:px-6"
-        title={t('verifier.title')}
+        title={t('organizations.title')}
       />
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+        {/* Onboarding intro */}
+        <p className="text-base text-muted-foreground leading-relaxed">
+          {t('organizations.intro')}
+        </p>
+
         {/* Prompt */}
         <div className="space-y-2">
           <label htmlFor="verifier-statement" className="text-sm font-semibold">
@@ -185,4 +199,4 @@ export function VerifierSettingsPage() {
   );
 }
 
-export default VerifierSettingsPage;
+export default OrganizationsPage;

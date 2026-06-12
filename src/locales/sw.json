@@ -60,6 +60,7 @@
     "profile": "Wasifu",
     "settings": "Mipangilio",
     "about": "Kuhusu",
+    "organizations": "Mashirika",
     "privacy": "Faragha",
     "safety": "Usalama",
     "changelog": "Kumbukumbu ya mabadiliko",
@@ -1372,8 +1373,6 @@
     "sections": {
       "profile": "Wasifu",
       "profileDesc": "Jina la kuonyesha, wasifu, picha, na uthibitisho.",
-      "verifier": "Mthibitishaji",
-      "verifierDesc": "Kuwa mthibitishaji kwa kueleza jinsi unavyochunguza kampeni.",
       "appearance": "Mwonekano",
       "appearanceDesc": "Hali ya mfumo, mwanga, au giza.",
       "language": "Lugha",
@@ -1454,6 +1453,13 @@
     "loginGateTitle": "Ingia ili kuwa mthibitishaji",
     "loginGateBody": "Unahitaji kuwa umeingia ili kuchapisha taarifa ya mthibitishaji.",
     "profileSectionTitle": "Mthibitishaji"
+  },
+  "organizations": {
+    "title": "Kwa mashirika",
+    "subtitle": "Sajili shirika lako kwenye Agora na uwaeleze wafadhili jinsi unavyochunguza kampeni.",
+    "intro": "Agora imejengwa juu ya Nostr, hivyo shirika lako huleta utambulisho wake lenyewe. Ingia kwa wasifu wa Nostr wa shirika lako — au tengeneza mmoja — kisha chapisha taarifa inayoeleza jinsi unavyothibitisha kampeni unazoziunga mkono. Wafadhili huona taarifa hii kwenye wasifu wako na huitumia kuamua kama waamini uamuzi wako.",
+    "loginGateTitle": "Ingia kwa wasifu wa shirika lako",
+    "loginGateBody": "Ingia kwa wasifu wa Nostr wa shirika lako, au tengeneza mmoja, ili kuanza. Mara tu unapoingia, unaweza kuchapisha taarifa yako ya uthibitishaji hapa."
   },
   "organizers": {
     "appoint": "Teua Mratibu",

@@ -61,6 +61,7 @@
     "profile": "個人資料",
     "settings": "設定",
     "about": "關於",
+    "organizations": "組織",
     "privacy": "隱私",
     "safety": "安全",
     "changelog": "更新日誌",
@@ -933,8 +934,6 @@
     "sections": {
       "profile": "個人資料",
       "profileDesc": "顯示名稱、簡介、頭像和驗證。",
-      "verifier": "驗證者",
-      "verifierDesc": "透過描述你如何審核活動來成為驗證者。",
       "appearance": "外觀",
       "appearanceDesc": "系統、淺色或深色模式。",
       "language": "語言",
@@ -1015,6 +1014,13 @@
     "loginGateTitle": "登入以成為驗證者",
     "loginGateBody": "你需要登入才能發布驗證者聲明。",
     "profileSectionTitle": "驗證者"
+  },
+  "organizations": {
+    "title": "面向組織",
+    "subtitle": "將你的組織接入 Agora,並告訴捐贈者你如何審核活動。",
+    "intro": "Agora 建構於 Nostr 之上,因此你的組織擁有自己的身分。使用組織的 Nostr 個人資料登入——或建立一個——然後發布一份聲明,描述你如何驗證你所支持的活動。捐贈者會在你的個人資料上看到這份聲明,並據此決定是否信任你的判斷。",
+    "loginGateTitle": "使用你組織的個人資料登入",
+    "loginGateBody": "使用你組織的 Nostr 個人資料登入,或建立一個,即可開始。登入後,你可以在這裡發布你的驗證聲明。"
   },
   "organizers": {
     "appoint": "任命組織者",
