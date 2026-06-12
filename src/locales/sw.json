@@ -1521,23 +1521,6 @@
         "body": "Taarifa yako huonekana kwenye wasifu wako na huwaashiria wafadhili kuwa unaziunga mkono kampeni unazozithibitisha. Isasishe au iondoe wakati wowote."
       }
     },
-    "why": {
-      "eyebrow": "Kwa nini ni muhimu",
-      "title": "Kwa nini uchapishe taarifa ya uthibitishaji",
-      "lede": "Wafadhili hutoa kwa uhakika zaidi wanapojua nani anayedhamini kampeni na jinsi gani.",
-      "trust": {
-        "title": "Jenga imani ya wafadhili",
-        "body": "Mchakato wazi wa umma huwaambia wafadhili kuwa pesa zao zinaenda zinakopaswa kuenda — na kwamba mtu anayeaminika amekagua."
-      },
-      "transparency": {
-        "title": "Uwazi wa hali ya juu",
-        "body": "Taarifa yako huchapishwa wazi kwa Nostr. Yeyote anaweza kusoma hasa jinsi unavyofanya kazi, bila masanduku ya siri."
-      },
-      "visibility": {
-        "title": "Jitokeze",
-        "body": "Taarifa za wathibitishaji huonyeshwa kwa uwazi kwenye wasifu wako, zikisaidia mashirika makini kujitofautisha."
-      }
-    },
     "getStarted": {
       "eyebrow": "Anza",
       "title": "Chapisha taarifa yako",

@@ -1522,23 +1522,6 @@
         "body": "Pernyataan Anda muncul di profil Anda dan memberi sinyal kepada para donatur bahwa Anda mendukung kampanye yang Anda verifikasi. Perbarui atau tarik kembali kapan saja."
       }
     },
-    "why": {
-      "eyebrow": "Mengapa ini penting",
-      "title": "Mengapa menerbitkan pernyataan verifikasi",
-      "lede": "Para donatur memberi dengan lebih percaya diri ketika mereka tahu siapa yang menjamin sebuah kampanye dan bagaimana caranya.",
-      "trust": {
-        "title": "Bangun kepercayaan donatur",
-        "body": "Proses yang jelas dan publik memberi tahu para donatur bahwa uang mereka pergi ke tempat yang seharusnya — dan bahwa seseorang yang kredibel telah memeriksanya."
-      },
-      "transparency": {
-        "title": "Transparansi radikal",
-        "body": "Pernyataan Anda diterbitkan secara terbuka ke Nostr. Siapa pun dapat membaca persis bagaimana Anda bekerja, tanpa kotak hitam."
-      },
-      "visibility": {
-        "title": "Menonjol",
-        "body": "Pernyataan verifikator ditampilkan secara menonjol di profil Anda, membantu organisasi yang serius untuk membedakan diri."
-      }
-    },
     "getStarted": {
       "eyebrow": "Mulai sekarang",
       "title": "Terbitkan pernyataan Anda",

@@ -1524,23 +1524,6 @@
         "body": "Sua declaração aparece no seu perfil e sinaliza aos doadores que você apoia as campanhas que verifica. Atualize-a ou retire-a a qualquer momento."
       }
     },
-    "why": {
-      "eyebrow": "Por que importa",
-      "title": "Por que publicar uma declaração de verificação",
-      "lede": "Os doadores doam com mais confiança quando sabem quem está respaldando uma campanha e como.",
-      "trust": {
-        "title": "Construa a confiança dos doadores",
-        "body": "Um processo claro e público diz aos doadores que o dinheiro deles está indo para onde deveria — e que alguém confiável verificou."
-      },
-      "transparency": {
-        "title": "Transparência radical",
-        "body": "Sua declaração é publicada abertamente no Nostr. Qualquer um pode ler exatamente como você trabalha, sem caixas-pretas."
-      },
-      "visibility": {
-        "title": "Destaque-se",
-        "body": "As declarações dos verificadores são exibidas com destaque no seu perfil, ajudando organizações sérias a se diferenciarem."
-      }
-    },
     "getStarted": {
       "eyebrow": "Começar",
       "title": "Publique sua declaração",

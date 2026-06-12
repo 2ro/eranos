@@ -1082,23 +1082,6 @@
         "body": "Chirevo chako chinoonekwa papurofairi yako uye chinoratidza vanopa kuti unotsigira mishandirapamwe yaunosimbisa. Gadziridza kana kubvisa chero nguva."
       }
     },
-    "why": {
-      "eyebrow": "Kukosha kwazvo",
-      "title": "Sei uchifanira kuburitsa chirevo chekusimbisa",
-      "lede": "Vanopa vanopa nechivimbo zvakanyanya kana vachiziva kuti ndiani ari kumiririra mushandirapamwe uye sei.",
-      "trust": {
-        "title": "Vaka kuvimbwa nevanopa",
-        "body": "Maitiro akajeka, eruzhinji anoudza vanopa kuti mari yavo iri kuenda kwainofanira kuenda — uye kuti munhu anovimbika aongorora."
-      },
-      "transparency": {
-        "title": "Kuonekwa pachena kwakanyanya",
-        "body": "Chirevo chako chinoburitswa pachena kuNostr. Chero munhu anogona kuverenga chaizvo kuti unoshanda sei, pasina mabhokisi matema."
-      },
-      "visibility": {
-        "title": "Ratidzika",
-        "body": "Zvirevo zvevanosimbisa zvinoratidzwa zvakanyanya papurofairi yako, zvichibatsira masangano akakomba kuti azvisiyanise."
-      }
-    },
     "getStarted": {
       "eyebrow": "Tanga",
       "title": "Buritsa chirevo chako",

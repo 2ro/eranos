@@ -1523,23 +1523,6 @@
         "body": "Beyanınız profilinizde görünür ve bağışçılara doğruladığınız kampanyaların arkasında durduğunuzu gösterir. İstediğiniz zaman güncelleyin veya geri çekin."
       }
     },
-    "why": {
-      "eyebrow": "Neden önemli",
-      "title": "Neden bir doğrulama beyanı yayımlamalısınız",
-      "lede": "Bir kampanyaya kimin ve nasıl kefil olduğunu bildiklerinde bağışçılar daha güvenle bağış yapar.",
-      "trust": {
-        "title": "Bağışçı güveni oluşturun",
-        "body": "Açık ve herkese açık bir süreç, bağışçılara paralarının gitmesi gereken yere gittiğini ve güvenilir birinin kontrol ettiğini gösterir."
-      },
-      "transparency": {
-        "title": "Radikal şeffaflık",
-        "body": "Beyanınız Nostr'a açıkça yayımlanır. Herkes, hiçbir kara kutu olmadan, tam olarak nasıl çalıştığınızı okuyabilir."
-      },
-      "visibility": {
-        "title": "Öne çıkın",
-        "body": "Doğrulayıcı beyanları profilinizde belirgin biçimde gösterilir; bu da ciddi organizasyonların kendilerini ayırt etmelerine yardımcı olur."
-      }
-    },
     "getStarted": {
       "eyebrow": "Başlayın",
       "title": "Beyanınızı yayımlayın",

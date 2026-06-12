@@ -6,10 +6,8 @@ import {
   BadgeCheck,
   Building2,
   CircleCheck,
-  Eye,
   Loader2,
   ShieldCheck,
-  Users,
 } from 'lucide-react';
 
 import { MilkdownEditor } from '@/components/markdown/MilkdownEditor';
@@ -23,7 +21,6 @@ import {
   useSetVerifierStatement,
   useVerifierStatement,
 } from '@/hooks/useVerifierStatement';
-import { cn } from '@/lib/utils';
 
 /**
  * The /organizations page. A landing-style document modeled on the
@@ -31,8 +28,7 @@ import { cn } from '@/lib/utils';
  *
  *   1. Hero (dark) — pitch + CTA that scrolls to the form
  *   2. How it works, in three steps (cream)
- *   3. Why publish a verification statement — benefit cards (white)
- *   4. Get started (cream) — the functional verifier-statement editor.
+ *   3. Get started (cream) — the functional verifier-statement editor.
  *      Logged out: prompt to log in with / create the org's Nostr profile.
  *      Logged in: the full publish / update / withdraw editor.
  *
@@ -161,36 +157,7 @@ export function OrganizationsPage() {
         </div>
       </section>
 
-      {/* ── 3. Why publish a statement (white / navy) ───────────────────── */}
-      <section className="relative bg-white dark:bg-[#13181f] py-20 md:py-28">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeader
-            eyebrow={t('organizations.why.eyebrow')}
-            title={t('organizations.why.title')}
-            lede={t('organizations.why.lede')}
-          />
-
-          <div className="grid sm:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
-            <BenefitCard
-              icon={<Users className="size-6" />}
-              title={t('organizations.why.trust.title')}
-              body={t('organizations.why.trust.body')}
-            />
-            <BenefitCard
-              icon={<Eye className="size-6" />}
-              title={t('organizations.why.transparency.title')}
-              body={t('organizations.why.transparency.body')}
-            />
-            <BenefitCard
-              icon={<BadgeCheck className="size-6" />}
-              title={t('organizations.why.visibility.title')}
-              body={t('organizations.why.visibility.body')}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* ── 4. Get started — the functional editor ──────────────────────── */}
+      {/* ── 3. Get started — the functional editor ──────────────────────── */}
       <section
         id="get-started"
         className="bg-[#f5f1eb] dark:bg-[#0a0c14] py-20 md:py-28 scroll-mt-16"
@@ -409,34 +376,6 @@ function StepCard({ number, icon, title, body }: StepCardProps) {
         {title}
       </h3>
       <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-[15px]">
-        {body}
-      </p>
-    </div>
-  );
-}
-
-interface BenefitCardProps {
-  icon: React.ReactNode;
-  title: string;
-  body: string;
-  className?: string;
-}
-
-function BenefitCard({ icon, title, body, className }: BenefitCardProps) {
-  return (
-    <div
-      className={cn(
-        'rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1c2230] shadow-sm p-6 sm:p-7',
-        className,
-      )}
-    >
-      <span className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary mb-5">
-        {icon}
-      </span>
-      <h3 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white mb-2 leading-snug">
-        {title}
-      </h3>
-      <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">
         {body}
       </p>
     </div>

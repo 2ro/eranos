@@ -1519,23 +1519,6 @@
         "body": "Votre déclaration apparaît sur votre profil et indique aux donateurs que vous soutenez les campagnes que vous vérifiez. Mettez-la à jour ou retirez-la à tout moment."
       }
     },
-    "why": {
-      "eyebrow": "Pourquoi c'est important",
-      "title": "Pourquoi publier une déclaration de vérification",
-      "lede": "Les donateurs donnent plus volontiers lorsqu'ils savent qui se porte garant d'une campagne et comment.",
-      "trust": {
-        "title": "Bâtir la confiance des donateurs",
-        "body": "Un processus clair et public indique aux donateurs que leur argent va là où il doit aller — et qu'une personne crédible a effectué les vérifications."
-      },
-      "transparency": {
-        "title": "Transparence radicale",
-        "body": "Votre déclaration est publiée ouvertement sur Nostr. Tout le monde peut lire exactement comment vous travaillez, sans aucune boîte noire."
-      },
-      "visibility": {
-        "title": "Démarquez-vous",
-        "body": "Les déclarations des vérificateurs sont affichées en évidence sur votre profil, ce qui aide les organisations sérieuses à se distinguer."
-      }
-    },
     "getStarted": {
       "eyebrow": "Commencer",
       "title": "Publiez votre déclaration",
