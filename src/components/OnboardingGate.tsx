@@ -29,6 +29,7 @@ import {
   type OrgProfileDraft,
 } from '@/components/onboarding/VerifierIdentityStep';
 import { VerifierBioStep } from '@/components/onboarding/VerifierBioStep';
+import { usePublishOrgProfile } from '@/hooks/usePublishOrgProfile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -165,6 +166,24 @@ function CaptiveOverlay() {
     [],
   );
 
+  // Pubkey of the key generated in this captive flow, if any. Used as the
+  // `expectedPubkey` guard when publishing the org profile so a failed
+  // auto-login can't overwrite a different account's kind-0. Empty when the
+  // user was already authenticated on entry (no guard needed then).
+  const signupPubkey = useMemo(() => {
+    if (!nsec) return undefined;
+    try {
+      const decoded = nip19.decode(nsec);
+      if (decoded.type !== 'nsec') return undefined;
+      return getPublicKey(decoded.data);
+    } catch {
+      return undefined;
+    }
+  }, [nsec]);
+
+  const { mutateAsync: publishOrgProfile, isPending: isPublishingOrg } =
+    usePublishOrgProfile();
+
   // Linear progress bar position. Once the user has chosen the verifier
   // role, the bar tracks the extended verifier step list so the four
   // sub-flow screens are reflected; otherwise the base three-step list is
@@ -239,6 +258,23 @@ function CaptiveOverlay() {
     cancel();
     navigate('/campaigns');
   }, [cancel, navigate]);
+
+  // Leaving the bio step: publish the assembled kind-0 org profile, then
+  // advance to the statement step. Publishing is best-effort — a failure
+  // surfaces a non-fatal toast and the user still proceeds (they can fix the
+  // profile later from settings), mirroring the InitialSyncGate behavior.
+  const handleBioContinue = useCallback(async () => {
+    try {
+      await publishOrgProfile({ draft: orgDraft, expectedPubkey: signupPubkey });
+    } catch {
+      toast({
+        title: t('onboarding.verifier.publishFailedTitle'),
+        description: t('onboarding.verifier.publishFailedDescription'),
+        variant: 'destructive',
+      });
+    }
+    goNextVerifierStep();
+  }, [publishOrgProfile, orgDraft, signupPubkey, toast, t, goNextVerifierStep]);
 
   // Key generation ----------------------------------------------------------
   const handleGenerateKey = useCallback(() => {
@@ -322,7 +358,8 @@ function CaptiveOverlay() {
             draft={orgDraft}
             pubkey={user?.pubkey}
             onChange={patchOrgDraft}
-            onContinue={goNextVerifierStep}
+            onContinue={handleBioContinue}
+            isPublishing={isPublishingOrg}
           />
         );
       case 'orgStatement':
