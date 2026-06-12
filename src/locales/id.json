@@ -1453,7 +1453,7 @@
     "disclaimer": "Siapa pun dapat menjadi verifikator. Pernyataan Anda dipublikasikan secara publik ke Nostr dan ditampilkan secara menonjol di profil Anda. Pernyataan ini tidak memberikan izin khusus apa pun — pernyataan ini hanya memberi tahu donatur cara Anda memeriksa kampanye.",
     "loginGateTitle": "Masuk untuk menjadi verifikator",
     "loginGateBody": "Anda harus masuk untuk memublikasikan pernyataan verifikator.",
-    "profileSectionTitle": "Verifikator"
+    "howWeVerifyTitle": "Cara kami memverifikasi"
   },
   "mdEditor": {
     "toolbar": {

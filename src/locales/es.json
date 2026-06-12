@@ -1011,7 +1011,7 @@
     "disclaimer": "Cualquiera puede convertirse en verificador. Tu declaración se publica públicamente en Nostr y se muestra de forma destacada en tu perfil. No otorga ningún permiso especial: simplemente indica a los donantes cómo evalúas las campañas.",
     "loginGateTitle": "Inicia sesión para convertirte en verificador",
     "loginGateBody": "Debes haber iniciado sesión para publicar una declaración de verificador.",
-    "profileSectionTitle": "Verificador"
+    "howWeVerifyTitle": "Cómo verificamos"
   },
   "mdEditor": {
     "toolbar": {

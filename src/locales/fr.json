@@ -1450,7 +1450,7 @@
     "disclaimer": "Tout le monde peut devenir vérificateur. Votre déclaration est publiée publiquement sur Nostr et affichée bien en évidence sur votre profil. Elle n'accorde aucune permission particulière — elle indique simplement aux donateurs comment vous examinez les campagnes.",
     "loginGateTitle": "Connectez-vous pour devenir vérificateur",
     "loginGateBody": "Vous devez être connecté pour publier une déclaration de vérificateur.",
-    "profileSectionTitle": "Vérificateur"
+    "howWeVerifyTitle": "Comment nous vérifions"
   },
   "mdEditor": {
     "toolbar": {

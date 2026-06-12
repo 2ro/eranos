@@ -1013,7 +1013,7 @@
     "disclaimer": "任何人都可以成為驗證者。你的聲明會公開發布到 Nostr 並在你的個人資料上醒目顯示。它不會授予任何特殊權限——只是告訴捐贈者你如何審核活動。",
     "loginGateTitle": "登入以成為驗證者",
     "loginGateBody": "你需要登入才能發布驗證者聲明。",
-    "profileSectionTitle": "驗證者"
+    "howWeVerifyTitle": "我們如何驗證"
   },
   "mdEditor": {
     "toolbar": {

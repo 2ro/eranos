@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { ShieldCheck } from 'lucide-react';
 
 import { PolicyMarkdown } from '@/components/PolicyMarkdown';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,9 +12,13 @@ interface ProfileVerifierSectionProps {
 
 /**
  * Renders a profile's kind 14672 verifier statement — a self-published
- * explanation of how the account verifies campaigns. Surfaced prominently
- * in the profile overview so donors can judge whether to trust the
- * account's verifications.
+ * explanation of how the account verifies campaigns. Surfaced full-width
+ * above the profile tabs so donors can read, in the account's own words,
+ * how it vets campaigns.
+ *
+ * Note: this is a self-authored claim, not a platform endorsement — the
+ * heading is deliberately neutral ("How We Verify") and carries no
+ * trust-implying badge, since Agora makes no guarantees about the account.
  *
  * Renders nothing when the profile has no statement (or has withdrawn it).
  */
@@ -36,9 +39,8 @@ export function ProfileVerifierSection({ pubkey, className }: ProfileVerifierSec
 
   return (
     <section className={cn('space-y-3', className)}>
-      <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-primary">
-        <ShieldCheck className="size-4" aria-hidden="true" />
-        <span>{t('verifier.profileSectionTitle')}</span>
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-primary">
+        {t('verifier.howWeVerifyTitle')}
       </h2>
       <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
         <PolicyMarkdown source={statement} />

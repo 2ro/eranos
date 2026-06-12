@@ -1454,7 +1454,7 @@
     "disclaimer": "Herkes doğrulayıcı olabilir. Beyanınız Nostr'a herkese açık olarak yayımlanır ve profilinizde belirgin biçimde gösterilir. Herhangi bir özel izin vermez — yalnızca kampanyaları nasıl denetlediğinizi bağışçılara anlatır.",
     "loginGateTitle": "Doğrulayıcı olmak için giriş yapın",
     "loginGateBody": "Doğrulayıcı beyanı yayımlamak için giriş yapmış olmanız gerekir.",
-    "profileSectionTitle": "Doğrulayıcı"
+    "howWeVerifyTitle": "Nasıl doğrularız"
   },
   "mdEditor": {
     "toolbar": {
