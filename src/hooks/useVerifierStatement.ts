@@ -7,16 +7,16 @@ import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
 
 /**
- * Kind 15063 — Verifier Statement (see NIP.md).
+ * Kind 14672 — Verifier Statement (see NIP.md).
  *
  * A replaceable event (one per user) whose `content` is a freeform Markdown
  * statement describing how the author verifies campaigns. Anyone can publish
  * one to "become a verifier"; empty content means the author has withdrawn.
  */
-export const VERIFIER_STATEMENT_KIND = 15063;
+export const VERIFIER_STATEMENT_KIND = 14672;
 
 /**
- * Query a user's verifier statement (kind 15063).
+ * Query a user's verifier statement (kind 14672).
  *
  * Returns the trimmed Markdown statement, or `null` when the user has no
  * statement or has withdrawn it (empty content).

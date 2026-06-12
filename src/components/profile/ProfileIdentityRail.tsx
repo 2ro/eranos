@@ -390,7 +390,7 @@ export function ProfileOverviewSections({
   const { t } = useTranslation();
   return (
     <div className={cn('flex flex-col gap-5', className)}>
-      {/* Verifier statement (kind 15063) — surfaced first so donors can
+      {/* Verifier statement (kind 14672) — surfaced first so donors can
           immediately see how this account verifies campaigns. Renders
           nothing when the profile has not published a statement. */}
       <ProfileVerifierSection pubkey={pubkey} />

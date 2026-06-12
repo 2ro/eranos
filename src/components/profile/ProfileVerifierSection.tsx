@@ -12,7 +12,7 @@ interface ProfileVerifierSectionProps {
 }
 
 /**
- * Renders a profile's kind 15063 verifier statement — a self-published
+ * Renders a profile's kind 14672 verifier statement — a self-published
  * explanation of how the account verifies campaigns. Surfaced prominently
  * in the profile overview so donors can judge whether to trust the
  * account's verifications.
