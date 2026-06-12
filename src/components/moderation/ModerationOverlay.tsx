@@ -1,5 +1,6 @@
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
+import { useCampaignVerifications } from '@/hooks/useCampaignVerifications';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useOrganizationModeration } from '@/hooks/useOrganizationModeration';
 import { usePledgeModeration } from '@/hooks/usePledgeModeration';
@@ -47,18 +48,29 @@ function OverlayBody({
   axes,
   badgeSize,
   showMenu = true,
+  showHiddenBadge = true,
   className,
-}: Omit<ModerationOverlayProps, never> & { isHidden: boolean }) {
+}: Omit<ModerationOverlayProps, never> & {
+  isHidden: boolean;
+  /**
+   * Whether to render the "Hidden" badge. The badge is a moderator-only
+   * concept — a verifier who isn't a moderator gets the kebab (verify
+   * row) but not the hidden-state chip. Defaults to true.
+   */
+  showHiddenBadge?: boolean;
+}) {
   const wrapperClass = className ?? 'absolute top-2 right-2 z-10 flex items-center gap-1.5';
 
-  // When the menu is suppressed AND nothing is hidden, the overlay
-  // would render an empty positioned div. Skip render entirely so the
-  // banner stays clean.
-  if (!showMenu && !isHidden) return null;
+  const renderBadge = isHidden && showHiddenBadge;
+
+  // When the menu is suppressed AND nothing is rendered for the badge,
+  // the overlay would render an empty positioned div. Skip render
+  // entirely so the banner stays clean.
+  if (!showMenu && !renderBadge) return null;
 
   return (
     <div className={wrapperClass}>
-      {isHidden && <HiddenBadge size={badgeSize ?? 'compact'} />}
+      {renderBadge && <HiddenBadge size={badgeSize ?? 'compact'} />}
       {showMenu && (
         <ModerationMenu
           coord={coord}
@@ -78,9 +90,16 @@ function OverlayBody({
 // dedicated components keeps the rules of hooks happy.
 // ─────────────────────────────────────────────────────────────────────
 
-function CampaignOverlay(props: ModerationOverlayProps) {
+function CampaignOverlay(props: ModerationOverlayProps & { isMod: boolean }) {
   const { data } = useCampaignModeration();
-  return <OverlayBody {...props} isHidden={data.hiddenCoords.has(props.coord)} />;
+  const { isMod, ...rest } = props;
+  return (
+    <OverlayBody
+      {...rest}
+      isHidden={data.hiddenCoords.has(props.coord)}
+      showHiddenBadge={isMod}
+    />
+  );
 }
 
 function PledgeOverlay(props: ModerationOverlayProps) {
@@ -96,16 +115,48 @@ function GroupOverlay(props: ModerationOverlayProps) {
 /**
  * Absolutely-positioned overlay for cards: bundles the Hidden badge
  * (when the entity is hidden) and the moderator kebab in a single
- * top-right corner. Returns `null` for non-moderators so non-mod grids
- * never subscribe to the moderation label query at all.
+ * top-right corner. Returns `null` for users with nothing to do so
+ * non-mod grids never subscribe to the moderation label query at all.
+ *
+ * The campaign surface additionally surfaces the kebab to **verifiers**
+ * (accounts with a kind 14672 verifier statement) so they can reach the
+ * "Verify this campaign" action — see {@link CampaignModerationOverlay}.
+ * Pledges and groups stay strictly moderator-gated.
  *
  * Consistent across campaigns, pledges, and groups — same chip, same
- * kebab placement, same moderator gating, same visual order.
+ * kebab placement, same visual order.
  *
  * Card containers must be `relative` for the absolute positioning to
  * anchor correctly.
  */
 export function ModerationOverlay(props: ModerationOverlayProps) {
+  if (props.surface === 'campaign') {
+    return <CampaignModerationOverlay {...props} />;
+  }
+  return <NonCampaignModerationOverlay {...props} />;
+}
+
+/**
+ * Campaign overlay gate: visible to moderators (full kebab + hidden
+ * badge) and to verifiers (kebab carrying only the verify row). Mounts
+ * the verification query so a verifier's eligibility is resolved.
+ */
+function CampaignModerationOverlay(props: ModerationOverlayProps) {
+  const { user } = useCurrentUser();
+  const { data: moderators } = useCampaignModerators();
+  const { canVerify } = useCampaignVerifications();
+  const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
+
+  if (!isMod && !canVerify) return null;
+
+  return <CampaignOverlay {...props} isMod={isMod} />;
+}
+
+/**
+ * Pledge / group overlay gate: strictly moderator-gated so non-mod grids
+ * never subscribe to the moderation label query.
+ */
+function NonCampaignModerationOverlay(props: ModerationOverlayProps) {
   const { user } = useCurrentUser();
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
@@ -113,8 +164,10 @@ export function ModerationOverlay(props: ModerationOverlayProps) {
   if (!isMod) return null;
 
   switch (props.surface) {
-    case 'campaign': return <CampaignOverlay {...props} />;
     case 'pledge': return <PledgeOverlay {...props} />;
     case 'group': return <GroupOverlay {...props} />;
+    case 'campaign':
+      // Handled by ModerationOverlay before reaching here.
+      return null;
   }
 }

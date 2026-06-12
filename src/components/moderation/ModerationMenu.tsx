@@ -252,7 +252,7 @@ function CampaignItemsInner(props: {
    */
   onAddToList?: () => void;
   /**
-   * Called when the moderator clicks "Verify this campaign". The host
+   * Called when the user clicks "Verify this campaign". The host
    * owns the confirmation dialog (same reason as `onAddToList`). When
    * absent, the verify row is omitted — only hosts that render the
    * dialog ({@link ModerationMenu}) opt in.
@@ -269,11 +269,25 @@ function CampaignItemsInner(props: {
   // the shared shell because the shell drives the "Add to list…" row
   // plus Hide / Unhide.
   //
-  // Verification is a moderator action like the rest, gated by the same
-  // pack — so the verify row is rendered as the first row INSIDE the
-  // moderator section (the `leadingExtra` slot), under the "Moderator
-  // actions" label.
-  if (!isMod) return null;
+  // Verification is available to a broader set than the moderator pack:
+  // moderators AND self-declared verifiers (kind 14672). The verify row
+  // ({@link CampaignVerifyItem}) gates itself on `canVerify`, so for a
+  // verifier who isn't a moderator we render ONLY the verify row — the
+  // moderator-only shell (Hide / Add to list…) is skipped.
+  const verifyRow = props.onRequestVerify ? (
+    <CampaignVerifyItem
+      coord={props.coord}
+      entityTitle={props.entityTitle}
+      onRequestVerify={props.onRequestVerify}
+    />
+  ) : null;
+
+  if (!isMod) {
+    // Non-moderators see nothing but the verify row (itself gated on
+    // `canVerify`). No "Moderator actions" label, no Hide / Add to list.
+    return <>{verifyRow}</>;
+  }
+
   return (
     <ModerationItemsShell
       coord={props.coord}
@@ -282,22 +296,15 @@ function CampaignItemsInner(props: {
       moderation={data}
       moderate={moderate}
       onAddToList={props.onAddToList}
-      leadingExtra={
-        props.onRequestVerify ? (
-          <CampaignVerifyItem
-            coord={props.coord}
-            entityTitle={props.entityTitle}
-            onRequestVerify={props.onRequestVerify}
-          />
-        ) : undefined
-      }
+      leadingExtra={verifyRow ?? undefined}
     />
   );
 }
 
 /**
  * Verify / remove-verification row for the campaign moderation menu.
- * Gated by the moderator pack — renders `null` for non-moderators.
+ * Gated by {@link useCampaignVerifications}'s `canVerify` — renders for
+ * moderators AND self-declared verifiers (kind 14672), `null` otherwise.
  *
  * Verifying opens a confirmation dialog (owned by {@link ModerationMenu}),
  * so this row only signals intent via `onRequestVerify`. Removing a
@@ -316,9 +323,9 @@ function CampaignVerifyItem({
   const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useCurrentUser();
-  const { data, isModerator, verify, unverify } = useCampaignVerifications();
+  const { data, canVerify, verify, unverify } = useCampaignVerifications();
 
-  if (!isModerator) return null;
+  if (!canVerify) return null;
 
   const mine = user
     ? (data.byCoord.get(coord) ?? []).find((v) => v.pubkey === user.pubkey)
@@ -410,6 +417,32 @@ function GroupItemsInner(props: {
 export function ModerationMenuItems(
   props: ModerationItemsProps & { onAddToList?: () => void; onRequestVerify?: () => void },
 ) {
+  // The campaign surface has its own visibility rule (moderators OR
+  // verifiers), computed inside its branch so non-campaign surfaces never
+  // subscribe to the verification query. CampaignItemsInner returns the
+  // verify row for verifiers and the full shell for moderators, and `null`
+  // for everyone else.
+  if (props.surface === 'campaign') {
+    return (
+      <CampaignItemsInner
+        coord={props.coord}
+        entityTitle={props.entityTitle}
+        axes={props.axes}
+        onAddToList={props.onAddToList}
+        onRequestVerify={props.onRequestVerify}
+      />
+    );
+  }
+
+  return <NonCampaignModerationItems {...props} />;
+}
+
+/**
+ * Pledge / group moderator rows. These surfaces are strictly
+ * moderator-gated (no verifier path), so we keep the early `!isMod`
+ * bail-out that skips the moderation query for non-moderators.
+ */
+function NonCampaignModerationItems(props: ModerationItemsProps) {
   const { user } = useCurrentUser();
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
@@ -417,16 +450,6 @@ export function ModerationMenuItems(
   if (!isMod) return null;
 
   switch (props.surface) {
-    case 'campaign':
-      return (
-        <CampaignItemsInner
-          coord={props.coord}
-          entityTitle={props.entityTitle}
-          axes={props.axes}
-          onAddToList={props.onAddToList}
-          onRequestVerify={props.onRequestVerify}
-        />
-      );
     case 'pledge':
       return (
         <PledgeItemsInner
@@ -443,6 +466,9 @@ export function ModerationMenuItems(
           axes={props.axes}
         />
       );
+    case 'campaign':
+      // Handled by ModerationMenuItems before reaching here.
+      return null;
   }
 }
 
@@ -475,9 +501,12 @@ export function ModerationMenu({ className, ...rest }: ModerationMenuProps) {
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
   const [membershipOpen, setMembershipOpen] = useState(false);
   const [verifyOpen, setVerifyOpen] = useState(false);
-  const { verify } = useCampaignVerifications();
+  const { canVerify, verify } = useCampaignVerifications();
 
-  if (!isMod) return null;
+  // Campaign kebab is visible to moderators AND verifiers (verifiers see
+  // only the verify row inside it). Other surfaces stay moderator-only.
+  const visible = rest.surface === 'campaign' ? isMod || canVerify : isMod;
+  if (!visible) return null;
 
   const onConfirmVerify = async () => {
     try {

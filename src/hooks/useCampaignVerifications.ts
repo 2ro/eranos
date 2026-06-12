@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNostrPublish } from './useNostrPublish';
 import { useCurrentUser } from './useCurrentUser';
 import { useCampaignModerators } from './useCampaignModerators';
+import { useVerifierStatement } from './useVerifierStatement';
 import { CAMPAIGN_KIND } from '@/lib/campaign';
 import { LABEL_KIND } from '@/lib/agoraModeration';
 import {
@@ -43,13 +44,22 @@ export function useCampaignVerifications() {
   const { user } = useCurrentUser();
   const { mutateAsync: publishEvent } = useNostrPublish();
   const { data: moderators } = useCampaignModerators();
+  const { isVerifier } = useVerifierStatement(user?.pubkey);
 
   // Stable key so the query refetches when the moderator set changes.
   const moderatorsKey = moderators ? [...moderators].sort().join(',') : '';
 
-  // True when the logged-in user is a moderator. Gates the verify /
-  // unverify controls in the UI.
+  // True when the logged-in user is a moderator. Moderators sign the
+  // verification labels that feed the stacked-avatar badge (the read path
+  // filters by `authors: moderators`).
   const isModerator = !!user && !!moderators && moderators.includes(user.pubkey);
+
+  // True when the logged-in user may verify campaigns: either a moderator
+  // or a self-declared verifier (someone who published a kind 14672
+  // verifier statement). Verifiers' verifications surface on their own
+  // profile's "Verified" tab (`useVerifiedCampaigns`, scoped by author);
+  // moderators' additionally power the on-card verification badge.
+  const canVerify = isModerator || isVerifier;
 
   const verificationQuery = useQuery({
     queryKey: ['campaign-verifications', moderatorsKey],
@@ -80,8 +90,8 @@ export function useCampaignVerifications() {
   const verify = useMutation({
     mutationFn: async ({ coord }: { coord: string }) => {
       if (!user) throw new Error('You must be logged in to verify a campaign.');
-      if (!moderators?.includes(user.pubkey)) {
-        throw new Error('Only moderators can verify campaigns.');
+      if (!moderators?.includes(user.pubkey) && !isVerifier) {
+        throw new Error('Only moderators and verifiers can verify campaigns.');
       }
       if (!coord.startsWith(`${CAMPAIGN_KIND}:`)) {
         throw new Error(`Coordinate must start with ${CAMPAIGN_KIND}:`);
@@ -130,8 +140,13 @@ export function useCampaignVerifications() {
     data: verificationQuery.data ?? EMPTY_VERIFICATION_DATA,
     isLoading: verificationQuery.isLoading,
     isReady: verificationQuery.isSuccess,
-    /** Whether the logged-in user may verify / unverify campaigns. */
+    /** Whether the logged-in user is a campaign moderator. */
     isModerator,
+    /**
+     * Whether the logged-in user may verify / unverify campaigns — true for
+     * moderators and for self-declared verifiers (kind 14672 statement).
+     */
+    canVerify,
     verify,
     unverify,
   };
