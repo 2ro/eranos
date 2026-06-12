@@ -30,16 +30,8 @@ import { useUploadFile } from '@/hooks/useUploadFile';
 import { useToast } from '@/hooks/useToast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
 
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from '@/components/ui/form';
+import { Form } from '@/components/ui/form';
 import {
   Collapsible,
   CollapsibleContent,
@@ -366,22 +358,6 @@ export function ProfileSettings() {
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-3 space-y-4">
-              <FormField
-                control={form.control}
-                name="bot"
-                render={({ field }) => (
-                  <FormItem className="flex items-center justify-between rounded-lg border p-3">
-                    <div>
-                      <FormLabel className="text-sm">{t('profileSettings.advanced.botLabel')}</FormLabel>
-                      <FormDescription className="text-xs">{t('profileSettings.advanced.botDescription')}</FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
               {/* Your Key — private-key backup. Rendered inside Advanced but is not part of the form. */}
               <div className="pt-2">
                 <BackupKeySection />
