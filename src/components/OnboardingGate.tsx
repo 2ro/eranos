@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -29,7 +30,9 @@ import {
   type OrgProfileDraft,
 } from '@/components/onboarding/VerifierIdentityStep';
 import { VerifierBioStep } from '@/components/onboarding/VerifierBioStep';
+import { VerifierStatementEditor } from '@/components/organizations/VerifierStatementEditor';
 import { usePublishOrgProfile } from '@/hooks/usePublishOrgProfile';
+import { useVerifierStatement } from '@/hooks/useVerifierStatement';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -183,6 +186,15 @@ function CaptiveOverlay() {
 
   const { mutateAsync: publishOrgProfile, isPending: isPublishingOrg } =
     usePublishOrgProfile();
+
+  // Tracks whether the verifier statement (kind 14672) has been published,
+  // gating the statement step's Next button. Seeded from any existing
+  // statement so a returning verifier isn't blocked.
+  const { isVerifier } = useVerifierStatement(user?.pubkey);
+  const [statementPublished, setStatementPublished] = useState(false);
+  useEffect(() => {
+    if (isVerifier) setStatementPublished(true);
+  }, [isVerifier]);
 
   // Linear progress bar position. Once the user has chosen the verifier
   // role, the bar tracks the extended verifier step list so the four
@@ -364,8 +376,14 @@ function CaptiveOverlay() {
         );
       case 'orgStatement':
         // Verifier sub-flow step 3 — publish the verifier statement
-        // (kind 14672). Filled in by a later commit.
-        return <VerifierStepShell onContinue={goNextVerifierStep} />;
+        // (kind 14672), reusing the shared editor.
+        return (
+          <VerifierStatementStep
+            published={statementPublished}
+            onPublishedChange={setStatementPublished}
+            onContinue={goNextVerifierStep}
+          />
+        );
       case 'orgVerifyHowto':
         // Verifier sub-flow step 4 — teach the verify gesture, then finish.
         // Filled in by a later commit.
@@ -481,16 +499,56 @@ function RoleStep({ role, onPick }: RoleStepProps) {
 }
 
 /**
- * Placeholder shell for the four verifier sub-flow steps. Each real step
- * (organization identity, bio, statement, how-to-verify) replaces this in a
- * later commit; for now it just renders a Continue button so the state
- * machine and navigation can be exercised end-to-end.
+ * Placeholder shell for verifier sub-flow steps not yet built out. Renders a
+ * single Continue button so the state machine can be exercised end-to-end.
  */
 function VerifierStepShell({ onContinue }: { onContinue: () => void }) {
   return (
     <div className="space-y-6">
       <Button onClick={onContinue} className="w-full h-12 text-base rounded-full">
         Continue
+      </Button>
+    </div>
+  );
+}
+
+interface VerifierStatementStepProps {
+  published: boolean;
+  onPublishedChange: (published: boolean) => void;
+  onContinue: () => void;
+}
+
+/**
+ * Verifier sub-flow step 3 — publish the verifier statement (kind 14672).
+ * Wraps the shared {@link VerifierStatementEditor} with the captive-flow
+ * heading and a Continue button that unlocks once a statement is live.
+ */
+function VerifierStatementStep({
+  published,
+  onPublishedChange,
+  onContinue,
+}: VerifierStatementStepProps) {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-6">
+      <div className="space-y-2 text-center">
+        <h2 className="text-2xl font-bold tracking-tight">
+          {t('onboarding.verifier.statement.title')}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {t('onboarding.verifier.statement.subtitle')}
+        </p>
+      </div>
+
+      <VerifierStatementEditor onPublishedChange={onPublishedChange} />
+
+      <Button
+        onClick={onContinue}
+        disabled={!published}
+        className="w-full h-12 text-base rounded-full"
+      >
+        {t('common.continue')}
+        <ArrowRight className="ml-2 h-4 w-4 rtl:rotate-180" />
       </Button>
     </div>
   );

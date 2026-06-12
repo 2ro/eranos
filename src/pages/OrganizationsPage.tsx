@@ -1,27 +1,21 @@
 import { useSeoMeta } from '@unhead/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowRight,
   BadgeCheck,
   Building2,
   CircleCheck,
-  Loader2,
   ShieldCheck,
 } from 'lucide-react';
 
-import { MilkdownEditor } from '@/components/markdown/MilkdownEditor';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { VerifyTutorial } from '@/components/organizations/VerifyTutorial';
-import { Button } from '@/components/ui/button';
+import { VerifierStatementEditor } from '@/components/organizations/VerifierStatementEditor';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useToast } from '@/hooks/useToast';
-import {
-  useSetVerifierStatement,
-  useVerifierStatement,
-} from '@/hooks/useVerifierStatement';
+import { useVerifierStatement } from '@/hooks/useVerifierStatement';
 
 /**
  * The /organizations page. A landing-style document modeled on the
@@ -189,20 +183,11 @@ export function OrganizationsPage() {
 function VerifierEditor() {
   const { t } = useTranslation();
   const { user } = useCurrentUser();
-  const { toast } = useToast();
 
-  const { statement, isLoading } = useVerifierStatement(user?.pubkey);
-  const { mutateAsync: setStatement, isPending } = useSetVerifierStatement();
-
-  const [value, setValue] = useState('');
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    if (!hydrated && !isLoading) {
-      setValue(statement ?? '');
-      setHydrated(true);
-    }
-  }, [hydrated, isLoading, statement]);
+  const { isVerifier } = useVerifierStatement(user?.pubkey);
+  // Track publish state locally so the tutorial appears/disappears
+  // immediately on publish / withdraw, seeded from the queried state.
+  const [isPublished, setIsPublished] = useState(isVerifier);
 
   // Logged out: instruct the visitor to log in with — or create — their
   // organization's Nostr profile before they can publish a statement.
@@ -227,106 +212,13 @@ function VerifierEditor() {
     );
   }
 
-  const trimmed = value.trim();
-  const isPublished = !!statement;
-  const unchanged = trimmed === (statement ?? '');
-
-  const handlePublish = async () => {
-    try {
-      await setStatement(trimmed);
-      toast({
-        title: trimmed
-          ? t('verifier.publishedToast')
-          : t('verifier.withdrawnToast'),
-      });
-    } catch (error) {
-      toast({
-        title: t('verifier.errorToast'),
-        description: error instanceof Error ? error.message : String(error),
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleWithdraw = async () => {
-    try {
-      await setStatement('');
-      setValue('');
-      toast({ title: t('verifier.withdrawnToast') });
-    } catch (error) {
-      toast({
-        title: t('verifier.errorToast'),
-        description: error instanceof Error ? error.message : String(error),
-        variant: 'destructive',
-      });
-    }
-  };
-
   return (
     <div className="space-y-8">
-      <Card className="border-border/60 shadow-sm">
-        <CardContent className="p-6 sm:p-8 space-y-6">
-        {/* Prompt */}
-        <div className="space-y-2">
-          <p className="text-sm font-semibold">
-            {t('verifier.promptLabel')}
-          </p>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {t('verifier.prompt')}
-          </p>
-        </div>
-
-        {isLoading && !hydrated ? (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" />
-            {t('verifier.loading')}
-          </div>
-        ) : (
-          <>
-            {/* WYSIWYG markdown editor: formatting toolbar + rich-text
-                editing surface, value flows back out as markdown. */}
-            <div className="rounded-lg border border-input bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring">
-              <MilkdownEditor
-                value={value}
-                onChange={setValue}
-                placeholder={t('verifier.placeholder')}
-              />
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <Button
-                type="button"
-                onClick={handlePublish}
-                disabled={isPending || !trimmed || unchanged}
-              >
-                {isPending && <Loader2 className="size-4 animate-spin mr-2" />}
-                {isPublished ? t('verifier.update') : t('verifier.publish')}
-              </Button>
-
-              {isPublished && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={handleWithdraw}
-                  disabled={isPending}
-                  className="text-destructive hover:text-destructive"
-                >
-                  {t('verifier.withdraw')}
-                </Button>
-              )}
-            </div>
-
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {t('verifier.disclaimer')}
-            </p>
-          </>
-        )}
-      </CardContent>
-    </Card>
+      <VerifierStatementEditor onPublishedChange={setIsPublished} />
 
       {/* Once the org's statement is live, teach them the actual
           verify gesture: the three-dots menu on any campaign card. */}
-      {isPublished && <VerifyTutorial />}
+      {(isPublished || isVerifier) && <VerifyTutorial />}
     </div>
   );
 }
