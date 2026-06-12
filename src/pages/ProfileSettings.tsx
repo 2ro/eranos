@@ -678,99 +678,6 @@ export function ProfileSettings() {
             </div>
           )}
 
-          {/* Profile fields */}
-          <div>
-            <h2 className="text-sm font-medium py-2 flex items-center gap-1">
-              {t('profileSettings.fields.heading')}
-              <HelpTip faqId="profile-fields" iconSize="size-3.5" />
-            </h2>
-
-            <div className="space-y-3 pt-1">
-              {/* Website — always first */}
-              <FormField
-                control={form.control}
-                name="website"
-                render={({ field }) => (
-                  <div className="grid grid-cols-[auto,1fr,2fr,auto] gap-2 items-center">
-                    <div className="w-6" />
-                    <div className="flex items-center h-9 px-3 text-sm text-muted-foreground">
-                      <span>{t('profileSettings.fields.website')}</span>
-                    </div>
-                    <Input placeholder={t('profileSettings.fields.websitePlaceholder')} {...field} className="h-9" />
-                    <div className="size-9" />
-                  </div>
-                )}
-              />
-
-              {/* Lightning address */}
-              <FormField
-                control={form.control}
-                name="lud16"
-                render={({ field }) => (
-                  <div className="grid grid-cols-[auto,1fr,2fr,auto] gap-2 items-center">
-                    <div className="w-6" />
-                    <div className="flex items-center h-9 px-3 text-sm text-muted-foreground gap-1">
-                      <span>{t('profileSettings.fields.lightning')}</span>
-                      <HelpTip faqId="what-are-zaps" iconSize="size-3.5" />
-                    </div>
-                    <Input placeholder={t('profileSettings.fields.lightningPlaceholder')} {...field} className="h-9" />
-                    <div className="size-9" />
-                  </div>
-                )}
-              />
-
-              <SortableList
-                items={fields}
-                getItemId={(field) => field.id}
-                onReorder={handleFieldReorder}
-                className="space-y-3"
-                renderItem={(field, index) => (
-                  <SortableFieldRow
-                    key={field.id}
-                    id={field.id}
-                    index={index}
-                    type={form.watch(`fields.${index}.type`) ?? 'text'}
-                    accept={form.watch(`fields.${index}.accept`)}
-                    valuePlaceholder={form.watch(`fields.${index}.placeholder`)}
-                    isUploading={uploadingFieldIndex === index}
-                    control={form.control}
-                    onRemove={() => remove(index)}
-                    onMediaPick={() => handleMediaPick(index)}
-                    onTickerChange={(ticker) => form.setValue(`fields.${index}.label`, ticker, { shouldDirty: true })}
-                  />
-                )}
-              />
-
-              {/* Add field — visible pill buttons */}
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {[...presets, customPreset].map((preset) => {
-                  const Icon = preset.icon;
-                  return (
-                    <Tooltip key={preset.id}>
-                      <TooltipTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="h-7 rounded-full px-3 text-xs gap-1.5"
-                          onClick={() => handleAddPreset(preset)}
-                        >
-                          <Plus className="size-3 text-muted-foreground" />
-                          <Icon className="size-3.5 text-muted-foreground" />
-                          {preset.label}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom" className="text-xs">
-                        {preset.description}
-                      </TooltipContent>
-                    </Tooltip>
-                  );
-                })}
-              </div>
-
-            </div>
-          </div>
-
           {/* Mobile sidebar preview — visible only below widgets where the real sidebar is hidden */}
           <div className="lg:hidden">
             <Collapsible open={showMobilePreview} onOpenChange={setShowMobilePreview}>
@@ -803,6 +710,99 @@ export function ProfileSettings() {
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-3 space-y-4">
+              {/* Profile fields */}
+              <div>
+                <h2 className="text-sm font-medium py-2 flex items-center gap-1">
+                  {t('profileSettings.fields.heading')}
+                  <HelpTip faqId="profile-fields" iconSize="size-3.5" />
+                </h2>
+
+                <div className="space-y-3 pt-1">
+                  {/* Website — always first */}
+                  <FormField
+                    control={form.control}
+                    name="website"
+                    render={({ field }) => (
+                      <div className="grid grid-cols-[auto,1fr,2fr,auto] gap-2 items-center">
+                        <div className="w-6" />
+                        <div className="flex items-center h-9 px-3 text-sm text-muted-foreground">
+                          <span>{t('profileSettings.fields.website')}</span>
+                        </div>
+                        <Input placeholder={t('profileSettings.fields.websitePlaceholder')} {...field} className="h-9" />
+                        <div className="size-9" />
+                      </div>
+                    )}
+                  />
+
+                  {/* Lightning address */}
+                  <FormField
+                    control={form.control}
+                    name="lud16"
+                    render={({ field }) => (
+                      <div className="grid grid-cols-[auto,1fr,2fr,auto] gap-2 items-center">
+                        <div className="w-6" />
+                        <div className="flex items-center h-9 px-3 text-sm text-muted-foreground gap-1">
+                          <span>{t('profileSettings.fields.lightning')}</span>
+                          <HelpTip faqId="what-are-zaps" iconSize="size-3.5" />
+                        </div>
+                        <Input placeholder={t('profileSettings.fields.lightningPlaceholder')} {...field} className="h-9" />
+                        <div className="size-9" />
+                      </div>
+                    )}
+                  />
+
+                  <SortableList
+                    items={fields}
+                    getItemId={(field) => field.id}
+                    onReorder={handleFieldReorder}
+                    className="space-y-3"
+                    renderItem={(field, index) => (
+                      <SortableFieldRow
+                        key={field.id}
+                        id={field.id}
+                        index={index}
+                        type={form.watch(`fields.${index}.type`) ?? 'text'}
+                        accept={form.watch(`fields.${index}.accept`)}
+                        valuePlaceholder={form.watch(`fields.${index}.placeholder`)}
+                        isUploading={uploadingFieldIndex === index}
+                        control={form.control}
+                        onRemove={() => remove(index)}
+                        onMediaPick={() => handleMediaPick(index)}
+                        onTickerChange={(ticker) => form.setValue(`fields.${index}.label`, ticker, { shouldDirty: true })}
+                      />
+                    )}
+                  />
+
+                  {/* Add field — visible pill buttons */}
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {[...presets, customPreset].map((preset) => {
+                      const Icon = preset.icon;
+                      return (
+                        <Tooltip key={preset.id}>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-7 rounded-full px-3 text-xs gap-1.5"
+                              onClick={() => handleAddPreset(preset)}
+                            >
+                              <Plus className="size-3 text-muted-foreground" />
+                              <Icon className="size-3.5 text-muted-foreground" />
+                              {preset.label}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="text-xs">
+                            {preset.description}
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
+                  </div>
+
+                </div>
+              </div>
+
               <FormField
                 control={form.control}
                 name="bot"
