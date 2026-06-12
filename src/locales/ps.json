@@ -1015,6 +1015,41 @@
     "loginGateBody": "د تصدیق کوونکي بیان د خپرولو لپاره باید ننوتلي اوسئ.",
     "profileSectionTitle": "تصدیق کوونکی"
   },
+  "mdEditor": {
+    "toolbar": {
+      "bold": "بولډ",
+      "italic": "کږ",
+      "strikethrough": "کرښه‌لرونکی",
+      "inlineCode": "کرښه‌ییز کوډ",
+      "heading1": "سرليک ۱",
+      "heading2": "سرليک ۲",
+      "heading3": "سرليک ۳",
+      "bulletList": "ټکیزه لړليک",
+      "numberedList": "شمیریزه لړليک",
+      "blockquote": "نقل قول",
+      "insertLink": "لينک دننه کول",
+      "insertImage": "انځور دننه کول",
+      "horizontalRule": "افقي کرښه"
+    },
+    "help": {
+      "title": "د مارک‌ډاون چټک ماخذ",
+      "bold": "بولډ",
+      "italic": "کږ",
+      "bulletList": "ټکی",
+      "numberedList": "شمیریز",
+      "link": "لينک",
+      "quote": "نقل قول",
+      "code": "کوډ"
+    },
+    "link": {
+      "title": "لينک دننه کول",
+      "textLabel": "د لينک متن",
+      "textPlaceholder": "د لينک متن دننه کړئ…",
+      "urlLabel": "URL",
+      "cancel": "لغوه کول",
+      "insert": "لينک دننه کول"
+    }
+  },
   "organizations": {
     "seoTitle": "د سازمانونو لپاره",
     "seoDescription": "خپل سازمان په {{appName}} کې راجستر کړئ، یو عمومي تصدیق بیان خپور کړئ، او د بسپنه ورکوونکو باور ترلاسه کړئ.",

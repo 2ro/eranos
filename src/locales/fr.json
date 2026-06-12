@@ -1452,6 +1452,41 @@
     "loginGateBody": "Vous devez être connecté pour publier une déclaration de vérificateur.",
     "profileSectionTitle": "Vérificateur"
   },
+  "mdEditor": {
+    "toolbar": {
+      "bold": "Gras",
+      "italic": "Italique",
+      "strikethrough": "Barré",
+      "inlineCode": "Code en ligne",
+      "heading1": "Titre 1",
+      "heading2": "Titre 2",
+      "heading3": "Titre 3",
+      "bulletList": "Liste à puces",
+      "numberedList": "Liste numérotée",
+      "blockquote": "Citation",
+      "insertLink": "Insérer un lien",
+      "insertImage": "Insérer une image",
+      "horizontalRule": "Ligne horizontale"
+    },
+    "help": {
+      "title": "Aide-mémoire Markdown",
+      "bold": "gras",
+      "italic": "italique",
+      "bulletList": "puce",
+      "numberedList": "numéroté",
+      "link": "lien",
+      "quote": "citation",
+      "code": "code"
+    },
+    "link": {
+      "title": "Insérer un lien",
+      "textLabel": "Texte du lien",
+      "textPlaceholder": "Saisissez le texte du lien…",
+      "urlLabel": "URL",
+      "cancel": "Annuler",
+      "insert": "Insérer un lien"
+    }
+  },
   "organizations": {
     "seoTitle": "Pour les organisations",
     "seoDescription": "Intégrez votre organisation à {{appName}}, publiez une déclaration de vérification publique et gagnez la confiance des donateurs.",

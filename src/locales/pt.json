@@ -1457,6 +1457,41 @@
     "loginGateBody": "Você precisa estar conectado para publicar uma declaração de verificador.",
     "profileSectionTitle": "Verificador"
   },
+  "mdEditor": {
+    "toolbar": {
+      "bold": "Negrito",
+      "italic": "Itálico",
+      "strikethrough": "Tachado",
+      "inlineCode": "Código em linha",
+      "heading1": "Título 1",
+      "heading2": "Título 2",
+      "heading3": "Título 3",
+      "bulletList": "Lista com marcadores",
+      "numberedList": "Lista numerada",
+      "blockquote": "Citação",
+      "insertLink": "Inserir link",
+      "insertImage": "Inserir imagem",
+      "horizontalRule": "Linha horizontal"
+    },
+    "help": {
+      "title": "Referência rápida de Markdown",
+      "bold": "negrito",
+      "italic": "itálico",
+      "bulletList": "marcador",
+      "numberedList": "numerada",
+      "link": "link",
+      "quote": "citação",
+      "code": "código"
+    },
+    "link": {
+      "title": "Inserir link",
+      "textLabel": "Texto do link",
+      "textPlaceholder": "Digite o texto do link…",
+      "urlLabel": "URL",
+      "cancel": "Cancelar",
+      "insert": "Inserir link"
+    }
+  },
   "organizations": {
     "seoTitle": "Para organizações",
     "seoDescription": "Integre sua organização ao {{appName}}, publique uma declaração de verificação pública e conquiste a confiança dos doadores.",

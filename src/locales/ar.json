@@ -1003,6 +1003,41 @@
     "loginGateBody": "يجب أن تكون مسجلاً للدخول لنشر بيان تحقق.",
     "profileSectionTitle": "مُحقِّق"
   },
+  "mdEditor": {
+    "toolbar": {
+      "bold": "عريض",
+      "italic": "مائل",
+      "strikethrough": "يتوسطه خط",
+      "inlineCode": "كود مضمّن",
+      "heading1": "عنوان 1",
+      "heading2": "عنوان 2",
+      "heading3": "عنوان 3",
+      "bulletList": "قائمة نقطية",
+      "numberedList": "قائمة مرقمة",
+      "blockquote": "اقتباس",
+      "insertLink": "إدراج رابط",
+      "insertImage": "إدراج صورة",
+      "horizontalRule": "خط أفقي"
+    },
+    "help": {
+      "title": "مرجع سريع لـ Markdown",
+      "bold": "عريض",
+      "italic": "مائل",
+      "bulletList": "نقطي",
+      "numberedList": "مرقم",
+      "link": "رابط",
+      "quote": "اقتباس",
+      "code": "كود"
+    },
+    "link": {
+      "title": "إدراج رابط",
+      "textLabel": "نص الرابط",
+      "textPlaceholder": "أدخل نص الرابط…",
+      "urlLabel": "URL",
+      "cancel": "إلغاء",
+      "insert": "إدراج رابط"
+    }
+  },
   "organizations": {
     "seoTitle": "للمنظّمات",
     "seoDescription": "أدرِج منظّمتك على {{appName}}، وانشر بيان تحقّق علنياً، واكسب ثقة المتبرعين.",

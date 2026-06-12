@@ -12,11 +12,10 @@ import {
   Users,
 } from 'lucide-react';
 
-import { PolicyMarkdown } from '@/components/PolicyMarkdown';
+import { MilkdownEditor } from '@/components/markdown/MilkdownEditor';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useToast } from '@/hooks/useToast';
@@ -300,9 +299,9 @@ function VerifierEditor() {
       <CardContent className="p-6 sm:p-8 space-y-6">
         {/* Prompt */}
         <div className="space-y-2">
-          <label htmlFor="verifier-statement" className="text-sm font-semibold">
+          <p className="text-sm font-semibold">
             {t('verifier.promptLabel')}
-          </label>
+          </p>
           <p className="text-sm text-muted-foreground leading-relaxed">
             {t('verifier.prompt')}
           </p>
@@ -315,26 +314,15 @@ function VerifierEditor() {
           </div>
         ) : (
           <>
-            <Textarea
-              id="verifier-statement"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder={t('verifier.placeholder')}
-              rows={10}
-              className="resize-y text-base"
-            />
-
-            {/* Live preview */}
-            {trimmed && (
-              <Card className="bg-muted/30">
-                <CardContent className="py-4 px-5 space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    {t('verifier.previewLabel')}
-                  </p>
-                  <PolicyMarkdown source={trimmed} />
-                </CardContent>
-              </Card>
-            )}
+            {/* WYSIWYG markdown editor: formatting toolbar + rich-text
+                editing surface, value flows back out as markdown. */}
+            <div className="rounded-lg border border-input bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring">
+              <MilkdownEditor
+                value={value}
+                onChange={setValue}
+                placeholder={t('verifier.placeholder')}
+              />
+            </div>
 
             <div className="flex flex-wrap items-center gap-3">
               <Button

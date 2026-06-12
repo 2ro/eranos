@@ -1015,6 +1015,41 @@
     "loginGateBody": "Unofanira kunge wakapinda kuti uburitse chirevo chemusimbisi.",
     "profileSectionTitle": "Musimbisi"
   },
+  "mdEditor": {
+    "toolbar": {
+      "bold": "Yakakora",
+      "italic": "Yakarereka",
+      "strikethrough": "Yakadhindwa napakati",
+      "inlineCode": "Kodhi iri mumutsara",
+      "heading1": "Musoro 1",
+      "heading2": "Musoro 2",
+      "heading3": "Musoro 3",
+      "bulletList": "Rondedzero yemadhoti",
+      "numberedList": "Rondedzero yenhamba",
+      "blockquote": "Chinotorwa",
+      "insertLink": "Isa chinongedzo",
+      "insertImage": "Isa mufananidzo",
+      "horizontalRule": "Mutsara wakatsetseka"
+    },
+    "help": {
+      "title": "Rubatsiro rwekukurumidza rweMarkdown",
+      "bold": "yakakora",
+      "italic": "yakarereka",
+      "bulletList": "dhoti",
+      "numberedList": "nhamba",
+      "link": "chinongedzo",
+      "quote": "chinotorwa",
+      "code": "kodhi"
+    },
+    "link": {
+      "title": "Isa chinongedzo",
+      "textLabel": "Mavara echinongedzo",
+      "textPlaceholder": "Nyora mavara echinongedzo…",
+      "urlLabel": "URL",
+      "cancel": "Kanzura",
+      "insert": "Isa chinongedzo"
+    }
+  },
   "organizations": {
     "seoTitle": "Kune masangano",
     "seoDescription": "Pinza sangano rako mu{{appName}}, uburitse chirevo cheruzhinji chekusimbisa, uye uwane kuvimbwa nevanopa.",

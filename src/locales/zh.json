@@ -1015,6 +1015,41 @@
     "loginGateBody": "你需要登录才能发布验证者声明。",
     "profileSectionTitle": "验证者"
   },
+  "mdEditor": {
+    "toolbar": {
+      "bold": "粗体",
+      "italic": "斜体",
+      "strikethrough": "删除线",
+      "inlineCode": "行内代码",
+      "heading1": "一级标题",
+      "heading2": "二级标题",
+      "heading3": "三级标题",
+      "bulletList": "无序列表",
+      "numberedList": "有序列表",
+      "blockquote": "引用",
+      "insertLink": "插入链接",
+      "insertImage": "插入图片",
+      "horizontalRule": "分隔线"
+    },
+    "help": {
+      "title": "Markdown 快速参考",
+      "bold": "粗体",
+      "italic": "斜体",
+      "bulletList": "项目符号",
+      "numberedList": "编号",
+      "link": "链接",
+      "quote": "引用",
+      "code": "代码"
+    },
+    "link": {
+      "title": "插入链接",
+      "textLabel": "链接文字",
+      "textPlaceholder": "输入链接文字…",
+      "urlLabel": "URL",
+      "cancel": "取消",
+      "insert": "插入链接"
+    }
+  },
   "organizations": {
     "seoTitle": "面向组织",
     "seoDescription": "将你的组织接入 {{appName}},发布一份公开的验证声明,赢得捐赠者的信任。",

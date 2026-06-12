@@ -1457,6 +1457,41 @@
     "loginGateBody": "Вы должны войти, чтобы опубликовать заявление верификатора.",
     "profileSectionTitle": "Верификатор"
   },
+  "mdEditor": {
+    "toolbar": {
+      "bold": "Полужирный",
+      "italic": "Курсив",
+      "strikethrough": "Зачёркнутый",
+      "inlineCode": "Строчный код",
+      "heading1": "Заголовок 1",
+      "heading2": "Заголовок 2",
+      "heading3": "Заголовок 3",
+      "bulletList": "Маркированный список",
+      "numberedList": "Нумерованный список",
+      "blockquote": "Цитата",
+      "insertLink": "Вставить ссылку",
+      "insertImage": "Вставить изображение",
+      "horizontalRule": "Горизонтальная линия"
+    },
+    "help": {
+      "title": "Краткий справочник Markdown",
+      "bold": "полужирный",
+      "italic": "курсив",
+      "bulletList": "маркер",
+      "numberedList": "нумерованный",
+      "link": "ссылка",
+      "quote": "цитата",
+      "code": "код"
+    },
+    "link": {
+      "title": "Вставить ссылку",
+      "textLabel": "Текст ссылки",
+      "textPlaceholder": "Введите текст ссылки…",
+      "urlLabel": "URL",
+      "cancel": "Отмена",
+      "insert": "Вставить ссылку"
+    }
+  },
   "organizations": {
     "seoTitle": "Для организаций",
     "seoDescription": "Подключите свою организацию к {{appName}}, опубликуйте публичное заявление о верификации и заслужите доверие доноров.",

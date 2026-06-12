@@ -1013,6 +1013,41 @@
     "loginGateBody": "برای انتشار بیانیهٔ تأییدکننده باید وارد شده باشید.",
     "profileSectionTitle": "تأییدکننده"
   },
+  "mdEditor": {
+    "toolbar": {
+      "bold": "پررنگ",
+      "italic": "مورب",
+      "strikethrough": "خط‌خورده",
+      "inlineCode": "کد درون‌خطی",
+      "heading1": "سرتیتر ۱",
+      "heading2": "سرتیتر ۲",
+      "heading3": "سرتیتر ۳",
+      "bulletList": "فهرست گلوله‌ای",
+      "numberedList": "فهرست شماره‌دار",
+      "blockquote": "نقل‌قول",
+      "insertLink": "درج پیوند",
+      "insertImage": "درج تصویر",
+      "horizontalRule": "خط افقی"
+    },
+    "help": {
+      "title": "مرجع سریع Markdown",
+      "bold": "پررنگ",
+      "italic": "مورب",
+      "bulletList": "گلوله‌ای",
+      "numberedList": "شماره‌دار",
+      "link": "پیوند",
+      "quote": "نقل‌قول",
+      "code": "کد"
+    },
+    "link": {
+      "title": "درج پیوند",
+      "textLabel": "متن پیوند",
+      "textPlaceholder": "متن پیوند را وارد کنید…",
+      "urlLabel": "URL",
+      "cancel": "لغو",
+      "insert": "درج پیوند"
+    }
+  },
   "organizations": {
     "seoTitle": "برای سازمان‌ها",
     "seoDescription": "سازمان خود را به {{appName}} بیاورید، یک بیانیهٔ تأیید عمومی منتشر کنید و اعتماد اهداکنندگان را به دست آورید.",

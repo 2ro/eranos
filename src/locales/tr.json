@@ -1456,6 +1456,41 @@
     "loginGateBody": "Doğrulayıcı beyanı yayımlamak için giriş yapmış olmanız gerekir.",
     "profileSectionTitle": "Doğrulayıcı"
   },
+  "mdEditor": {
+    "toolbar": {
+      "bold": "Kalın",
+      "italic": "İtalik",
+      "strikethrough": "Üstü çizili",
+      "inlineCode": "Satır içi kod",
+      "heading1": "Başlık 1",
+      "heading2": "Başlık 2",
+      "heading3": "Başlık 3",
+      "bulletList": "Madde işaretli liste",
+      "numberedList": "Numaralı liste",
+      "blockquote": "Alıntı",
+      "insertLink": "Bağlantı ekle",
+      "insertImage": "Görsel ekle",
+      "horizontalRule": "Yatay çizgi"
+    },
+    "help": {
+      "title": "Markdown hızlı başvuru",
+      "bold": "kalın",
+      "italic": "italik",
+      "bulletList": "madde",
+      "numberedList": "numaralı",
+      "link": "bağlantı",
+      "quote": "alıntı",
+      "code": "kod"
+    },
+    "link": {
+      "title": "Bağlantı ekle",
+      "textLabel": "Bağlantı metni",
+      "textPlaceholder": "Bağlantı metnini girin…",
+      "urlLabel": "URL",
+      "cancel": "İptal",
+      "insert": "Bağlantı ekle"
+    }
+  },
   "organizations": {
     "seoTitle": "Organizasyonlar için",
     "seoDescription": "Organizasyonunuzu {{appName}} platformuna katın, herkese açık bir doğrulama beyanı yayımlayın ve bağışçıların güvenini kazanın.",

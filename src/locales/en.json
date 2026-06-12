@@ -1466,6 +1466,41 @@
     "loginGateBody": "You need to be signed in to publish a verifier statement.",
     "profileSectionTitle": "Verifier"
   },
+  "mdEditor": {
+    "toolbar": {
+      "bold": "Bold",
+      "italic": "Italic",
+      "strikethrough": "Strikethrough",
+      "inlineCode": "Inline code",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "bulletList": "Bullet list",
+      "numberedList": "Numbered list",
+      "blockquote": "Blockquote",
+      "insertLink": "Insert link",
+      "insertImage": "Insert image",
+      "horizontalRule": "Horizontal rule"
+    },
+    "help": {
+      "title": "Markdown quick reference",
+      "bold": "bold",
+      "italic": "italic",
+      "bulletList": "bullet",
+      "numberedList": "numbered",
+      "link": "link",
+      "quote": "quote",
+      "code": "code"
+    },
+    "link": {
+      "title": "Insert link",
+      "textLabel": "Link text",
+      "textPlaceholder": "Enter link text…",
+      "urlLabel": "URL",
+      "cancel": "Cancel",
+      "insert": "Insert link"
+    }
+  },
   "organizations": {
     "seoTitle": "For organizations",
     "seoDescription": "Onboard your organization onto {{appName}}, publish a public verification statement, and earn donor trust.",

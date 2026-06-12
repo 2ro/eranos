@@ -1454,6 +1454,41 @@
     "loginGateBody": "Unahitaji kuwa umeingia ili kuchapisha taarifa ya mthibitishaji.",
     "profileSectionTitle": "Mthibitishaji"
   },
+  "mdEditor": {
+    "toolbar": {
+      "bold": "Mzito",
+      "italic": "Italiki",
+      "strikethrough": "Mstari wa kufuta",
+      "inlineCode": "Msimbo wa mstarini",
+      "heading1": "Kichwa 1",
+      "heading2": "Kichwa 2",
+      "heading3": "Kichwa 3",
+      "bulletList": "Orodha ya vitone",
+      "numberedList": "Orodha ya nambari",
+      "blockquote": "Nukuu",
+      "insertLink": "Ingiza kiungo",
+      "insertImage": "Ingiza picha",
+      "horizontalRule": "Mstari mlalo"
+    },
+    "help": {
+      "title": "Rejea ya haraka ya Markdown",
+      "bold": "mzito",
+      "italic": "italiki",
+      "bulletList": "kitone",
+      "numberedList": "nambari",
+      "link": "kiungo",
+      "quote": "nukuu",
+      "code": "msimbo"
+    },
+    "link": {
+      "title": "Ingiza kiungo",
+      "textLabel": "Maandishi ya kiungo",
+      "textPlaceholder": "Weka maandishi ya kiungo…",
+      "urlLabel": "URL",
+      "cancel": "Ghairi",
+      "insert": "Ingiza kiungo"
+    }
+  },
   "organizations": {
     "seoTitle": "Kwa mashirika",
     "seoDescription": "Sajili shirika lako kwenye {{appName}}, chapisha taarifa ya uthibitishaji ya umma, na upate imani ya wafadhili.",

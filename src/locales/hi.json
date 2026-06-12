@@ -1455,6 +1455,41 @@
     "loginGateBody": "सत्यापनकर्ता वक्तव्य प्रकाशित करने के लिए आपको साइन इन होना आवश्यक है।",
     "profileSectionTitle": "सत्यापनकर्ता"
   },
+  "mdEditor": {
+    "toolbar": {
+      "bold": "बोल्ड",
+      "italic": "इटैलिक",
+      "strikethrough": "स्ट्राइकथ्रू",
+      "inlineCode": "इनलाइन कोड",
+      "heading1": "शीर्षक 1",
+      "heading2": "शीर्षक 2",
+      "heading3": "शीर्षक 3",
+      "bulletList": "बुलेट सूची",
+      "numberedList": "क्रमांकित सूची",
+      "blockquote": "उद्धरण",
+      "insertLink": "लिंक डालें",
+      "insertImage": "छवि डालें",
+      "horizontalRule": "क्षैतिज रेखा"
+    },
+    "help": {
+      "title": "मार्कडाउन त्वरित संदर्भ",
+      "bold": "बोल्ड",
+      "italic": "इटैलिक",
+      "bulletList": "बुलेट",
+      "numberedList": "क्रमांकित",
+      "link": "लिंक",
+      "quote": "उद्धरण",
+      "code": "कोड"
+    },
+    "link": {
+      "title": "लिंक डालें",
+      "textLabel": "लिंक टेक्स्ट",
+      "textPlaceholder": "लिंक टेक्स्ट दर्ज करें…",
+      "urlLabel": "URL",
+      "cancel": "रद्द करें",
+      "insert": "लिंक डालें"
+    }
+  },
   "organizations": {
     "seoTitle": "संगठनों के लिए",
     "seoDescription": "अपने संगठन को {{appName}} पर लाएँ, एक सार्वजनिक सत्यापन वक्तव्य प्रकाशित करें और दानदाताओं का भरोसा अर्जित करें।",

@@ -1455,6 +1455,41 @@
     "loginGateBody": "Anda harus masuk untuk memublikasikan pernyataan verifikator.",
     "profileSectionTitle": "Verifikator"
   },
+  "mdEditor": {
+    "toolbar": {
+      "bold": "Tebal",
+      "italic": "Miring",
+      "strikethrough": "Coret",
+      "inlineCode": "Kode sebaris",
+      "heading1": "Judul 1",
+      "heading2": "Judul 2",
+      "heading3": "Judul 3",
+      "bulletList": "Daftar berbutir",
+      "numberedList": "Daftar bernomor",
+      "blockquote": "Kutipan",
+      "insertLink": "Sisipkan tautan",
+      "insertImage": "Sisipkan gambar",
+      "horizontalRule": "Garis horizontal"
+    },
+    "help": {
+      "title": "Referensi cepat Markdown",
+      "bold": "tebal",
+      "italic": "miring",
+      "bulletList": "butir",
+      "numberedList": "bernomor",
+      "link": "tautan",
+      "quote": "kutipan",
+      "code": "kode"
+    },
+    "link": {
+      "title": "Sisipkan tautan",
+      "textLabel": "Teks tautan",
+      "textPlaceholder": "Masukkan teks tautan…",
+      "urlLabel": "URL",
+      "cancel": "Batal",
+      "insert": "Sisipkan tautan"
+    }
+  },
   "organizations": {
     "seoTitle": "Untuk organisasi",
     "seoDescription": "Daftarkan organisasi Anda ke {{appName}}, terbitkan pernyataan verifikasi publik, dan raih kepercayaan para donatur.",
