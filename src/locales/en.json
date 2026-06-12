@@ -23,6 +23,7 @@
     "close": "Close",
     "back": "Back",
     "next": "Next",
+    "continue": "Continue",
     "refresh": "Refresh",
     "search": "Search",
     "filter": "Filter",
@@ -148,6 +149,35 @@
       "uploadFailed": "Upload failed.",
       "publishFailedTitle": "Profile setup failed",
       "publishFailedDescription": "Your account was created but the profile could not be saved. You can update it later."
+    },
+    "verifier": {
+      "identity": {
+        "title": "Set up your organization",
+        "subtitle": "Add your organization's name, website, logo, and a banner. Donors will see these on every campaign you verify.",
+        "websiteLabel": "Website",
+        "websiteInvalid": "Enter a valid website starting with https://",
+        "cropAvatar": "Crop logo",
+        "cropBanner": "Crop banner",
+        "uploading": "Uploading image…"
+      },
+      "bio": {
+        "title": "Tell us about your organization",
+        "subtitle": "A short description of who you are and what you do. This appears on your profile.",
+        "label": "About your organization",
+        "placeholder": "We're a nonprofit that…",
+        "publishing": "Saving your profile…"
+      },
+      "publishFailedTitle": "Profile not saved",
+      "publishFailedDescription": "Your account is ready, but the organization profile couldn't be published. You can finish it later from settings.",
+      "statement": {
+        "title": "Publish your verifier statement",
+        "subtitle": "Explain how your organization checks out campaigns before vouching for them. This is public and helps donors trust your badge."
+      },
+      "howto": {
+        "title": "How to verify a campaign",
+        "subtitle": "You're all set. Here's how to vouch for a campaign once you've checked it out.",
+        "finish": "View campaigns"
+      }
     }
   },
   "feed": {

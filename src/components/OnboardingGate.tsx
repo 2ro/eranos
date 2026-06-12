@@ -24,6 +24,10 @@ import {
 import { generateSecretKey, getPublicKey, nip19 } from 'nostr-tools';
 
 import { AgoraBoltIcon } from '@/components/icons/AgoraBoltIcon';
+import {
+  VerifierIdentityStep,
+  type OrgProfileDraft,
+} from '@/components/onboarding/VerifierIdentityStep';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -143,6 +147,22 @@ function CaptiveOverlay() {
   const [nsec, setNsec] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [showKey, setShowKey] = useState(false);
+
+  // Verifier sub-flow: the organization's kind-0 profile draft, accumulated
+  // across the identity + bio steps and published once at the end. Held here
+  // so back-navigation between sub-flow steps preserves what's entered.
+  const [orgDraft, setOrgDraft] = useState<OrgProfileDraft>({
+    name: '',
+    website: '',
+    picture: '',
+    banner: '',
+    about: '',
+  });
+  const patchOrgDraft = useCallback(
+    (patch: Partial<OrgProfileDraft>) =>
+      setOrgDraft((prev) => ({ ...prev, ...patch })),
+    [],
+  );
 
   // Linear progress bar position. Once the user has chosen the verifier
   // role, the bar tracks the extended verifier step list so the four
@@ -287,8 +307,13 @@ function CaptiveOverlay() {
         );
       case 'orgIdentity':
         // Verifier sub-flow step 1 — organization identity (kind-0).
-        // Filled in by a later commit.
-        return <VerifierStepShell onContinue={goNextVerifierStep} />;
+        return (
+          <VerifierIdentityStep
+            draft={orgDraft}
+            onChange={patchOrgDraft}
+            onContinue={goNextVerifierStep}
+          />
+        );
       case 'orgBio':
         // Verifier sub-flow step 2 — organization bio (kind-0 about).
         // Filled in by a later commit.
