@@ -38,11 +38,11 @@ export function ProfileVerifierSection({ pubkey, className }: ProfileVerifierSec
   if (!statement) return null;
 
   return (
-    <section className={cn('space-y-3', className)}>
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-primary">
-        {t('verifier.howWeVerifyTitle')}
-      </h2>
-      <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
+    <section className={className}>
+      <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 space-y-2">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-primary">
+          {t('verifier.howWeVerifyTitle')}
+        </h2>
         <PolicyMarkdown source={statement} />
       </div>
     </section>
