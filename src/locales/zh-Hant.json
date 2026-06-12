@@ -928,6 +928,8 @@
     "sections": {
       "profile": "個人資料",
       "profileDesc": "顯示名稱、簡介、頭像和驗證。",
+      "verifier": "驗證者",
+      "verifierDesc": "透過描述你如何審核活動來成為驗證者。",
       "appearance": "外觀",
       "appearanceDesc": "系統、淺色或深色模式。",
       "language": "語言",
@@ -994,6 +996,25 @@
     "subtitle": "選擇整個應用使用的語言。",
     "intro": "選擇你的首選語言。應用將立即切換並在此裝置上記住你的選擇。",
     "translationNote": "翻譯仍在進行中。未翻譯的文本將以英文顯示。"
+  },
+  "verifier": {
+    "title": "驗證者",
+    "subtitle": "透過描述你如何審核活動來成為驗證者。",
+    "promptLabel": "你的驗證流程",
+    "prompt": "告訴我們你為驗證活動所採取的步驟。請盡可能詳細，讓捐贈者知道他們可以信任你的判斷。",
+    "placeholder": "描述你如何驗證活動——你執行的檢查、你要求的證據、你如何確認組織者的身分，以及任何有助於捐贈者信任你判斷的內容。",
+    "previewLabel": "預覽",
+    "publish": "成為驗證者",
+    "update": "更新聲明",
+    "withdraw": "撤回",
+    "loading": "正在載入你的聲明…",
+    "publishedToast": "你的驗證者聲明已上線。",
+    "withdrawnToast": "你的驗證者聲明已撤回。",
+    "errorToast": "無法儲存你的驗證者聲明。",
+    "disclaimer": "任何人都可以成為驗證者。你的聲明會公開發布到 Nostr 並在你的個人資料上醒目顯示。它不會授予任何特殊權限——只是告訴捐贈者你如何審核活動。",
+    "loginGateTitle": "登入以成為驗證者",
+    "loginGateBody": "你需要登入才能發布驗證者聲明。",
+    "profileSectionTitle": "驗證者"
   },
   "organizers": {
     "appoint": "任命組織者",

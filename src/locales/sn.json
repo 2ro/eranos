@@ -928,6 +928,8 @@
     "sections": {
       "profile": "Profile",
       "profileDesc": "Zita rinoratidzwa, nhoroondo, mufananidzo, nokutsigirwa.",
+      "verifier": "Musimbisi",
+      "verifierDesc": "Iva musimbisi nokutsanangura mautariro aunoita mishandirapamwe.",
       "appearance": "Maonero",
       "appearanceDesc": "System, chiedza, kana rima.",
       "language": "Mutauro",
@@ -994,6 +996,25 @@
     "subtitle": "Sarudza mutauro unoshandiswa muapp yose.",
     "intro": "Sarudza mutauro waunoda. App ichachinja ipapo ipapo uye icharangarira sarudzo yako pamudziyo uyu.",
     "translationNote": "Shanduro dzichiri kuitwa. Mavara asina kushandurwa anozoonekwa muChirungu."
+  },
+  "verifier": {
+    "title": "Musimbisi",
+    "subtitle": "Iva musimbisi nokutsanangura mautariro aunoita mishandirapamwe.",
+    "promptLabel": "Maitiro ako ekusimbisa",
+    "prompt": "Tiudze matanho aunotora kusimbisa mishandirapamwe. Sanganisa ruzivo rwakawanda sezvinobvira kuti vapi vazive kuti vanogona kuvimba nokutonga kwako.",
+    "placeholder": "Tsanangura mautariro aunoita mishandirapamwe — kuongorora kwaunoita, humbowo hwaunoda, mautariro aunoita kusimbisa chizvarwa chemurongi, nezvimwe zvose zvinobatsira vapi kuvimba nokutonga kwako.",
+    "previewLabel": "Tarisa",
+    "publish": "Iva musimbisi",
+    "update": "Vandudza chirevo",
+    "withdraw": "Bvisa",
+    "loading": "Kuverenga chirevo chako…",
+    "publishedToast": "Chirevo chako chemusimbisi chave pachena.",
+    "withdrawnToast": "Chirevo chako chemusimbisi chabviswa.",
+    "errorToast": "Hatina kukwanisa kuchengeta chirevo chako chemusimbisi.",
+    "disclaimer": "Munhu wese anogona kuva musimbisi. Chirevo chako chinoburitswa pachena kuNostr uye chinoratidzwa pachena pa profile yako. Hachipi mvumo dzakasiyana — chinongoudza vapi mautariro aunoita mishandirapamwe.",
+    "loginGateTitle": "Pinda kuti uve musimbisi",
+    "loginGateBody": "Unofanira kunge wakapinda kuti uburitse chirevo chemusimbisi.",
+    "profileSectionTitle": "Musimbisi"
   },
   "organizers": {
     "appoint": "Sarudza Mugadziri",

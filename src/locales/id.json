@@ -1368,6 +1368,8 @@
     "sections": {
       "profile": "Profil",
       "profileDesc": "Nama tampilan, bio, avatar, dan verifikasi.",
+      "verifier": "Verifikator",
+      "verifierDesc": "Jadilah verifikator dengan menjelaskan cara Anda memeriksa kampanye.",
       "appearance": "Tampilan",
       "appearanceDesc": "Mode sistem, terang, atau gelap.",
       "language": "Bahasa",
@@ -1434,6 +1436,25 @@
     "subtitle": "Pilih bahasa yang digunakan di seluruh aplikasi.",
     "intro": "Pilih bahasa yang Anda inginkan. Aplikasi akan beralih segera dan mengingat pilihan Anda di perangkat ini.",
     "translationNote": "Terjemahan masih dalam pengerjaan. Teks yang belum diterjemahkan akan kembali ke bahasa Inggris."
+  },
+  "verifier": {
+    "title": "Verifikator",
+    "subtitle": "Jadilah verifikator dengan menjelaskan cara Anda memeriksa kampanye.",
+    "promptLabel": "Proses verifikasi Anda",
+    "prompt": "Beri tahu kami langkah-langkah yang Anda lakukan untuk memverifikasi kampanye. Sertakan sedetail mungkin agar para donatur tahu bahwa mereka dapat memercayai penilaian Anda.",
+    "placeholder": "Jelaskan cara Anda memverifikasi kampanye — pemeriksaan yang Anda lakukan, bukti yang Anda minta, cara Anda mengonfirmasi identitas organizer, dan hal lain yang membantu donatur memercayai penilaian Anda.",
+    "previewLabel": "Pratinjau",
+    "publish": "Jadi verifikator",
+    "update": "Perbarui pernyataan",
+    "withdraw": "Tarik",
+    "loading": "Memuat pernyataan Anda…",
+    "publishedToast": "Pernyataan verifikator Anda sudah aktif.",
+    "withdrawnToast": "Pernyataan verifikator Anda telah ditarik.",
+    "errorToast": "Tidak dapat menyimpan pernyataan verifikator Anda.",
+    "disclaimer": "Siapa pun dapat menjadi verifikator. Pernyataan Anda dipublikasikan secara publik ke Nostr dan ditampilkan secara menonjol di profil Anda. Pernyataan ini tidak memberikan izin khusus apa pun — pernyataan ini hanya memberi tahu donatur cara Anda memeriksa kampanye.",
+    "loginGateTitle": "Masuk untuk menjadi verifikator",
+    "loginGateBody": "Anda harus masuk untuk memublikasikan pernyataan verifikator.",
+    "profileSectionTitle": "Verifikator"
   },
   "organizers": {
     "appoint": "Tunjuk Organizer",

@@ -15,6 +15,7 @@
 | 33863 | Campaign                   | Self-authored fundraising campaign with a single Bitcoin wallet endpoint (`bc1...` or `sp1...`) |
 | 30385 | Community Stats Snapshot   | Pre-computed per-country / global community leaderboards       |
 | 36639 | Pledge                     | Donor pledge for concrete submissions, stored as sats           |
+| 15063 | Verifier Statement         | Self-authored statement describing how the author verifies campaigns (one per user) |
 
 ### Agora Protocols
 
@@ -737,6 +738,62 @@ Fold by `(coord, moderator)`, keeping the newest label per pair. A campaign is "
 - Verification is a moderator action: clients SHOULD render the verify / remove-verification control inside the campaign moderator menu (alongside hide / add-to-list), gated on moderator membership.
 - Verification is purely additive — it never hides or promotes a campaign on its own. It is a trust hint layered over whatever moderation/discovery state already applies.
 - The label kind 1985 read is routed to Agora's search relays (`relay.ditto.pub`, `relay.dreamith.to`) where these labels are published.
+
+---
+
+## Kind 15063: Verifier Statement
+
+### Summary
+
+Replaceable event kind for a **self-authored statement describing how the author verifies campaigns**. Anyone can "become a verifier" simply by publishing one of these events — there is no gatekeeper. The statement is a public, freeform explanation of the diligence process the author applies before vouching for a campaign, so donors can judge whether to trust that author's judgement.
+
+Exactly one statement per user (replaceable, no `d` tag): publishing a new event replaces the previous one. Clients surface the statement prominently on the author's profile page.
+
+This kind is **distinct from** the `agora.verified` campaign-verification labels (kind 1985, see Kind 33863 above). Those are moderator-signed, gated by the Team Soapbox follow pack, and vouch for one specific campaign. A kind 15063 statement is an open, self-published description of an author's *general* verification methodology and confers no special authority — it is a reputation signal donors read, not an access-control mechanism.
+
+### Event Structure
+
+```json
+{
+  "kind": 15063,
+  "pubkey": "<author-pubkey>",
+  "content": "I personally visit each campaign organizer over video call, confirm their identity against a government ID, and cross-check the cause with at least two independent local sources before I vouch for it. ...",
+  "tags": [
+    ["alt", "Verifier statement: how this account verifies campaigns"],
+    ["t", "agora"]
+  ]
+}
+```
+
+### Content
+
+The `content` field is the verifier statement, formatted as **Markdown**. Clients SHOULD render it with the same Markdown renderer they use for other long-form Agora content (campaign stories, policy pages). Empty or whitespace-only content means the author has **withdrawn** their verifier statement — clients MUST treat an empty-content event the same as no event (the author is no longer a verifier) and MUST NOT render a verifier section for it.
+
+### Tags
+
+| Tag   | Required    | Description                                                                 |
+|-------|-------------|-----------------------------------------------------------------------------|
+| `alt` | Recommended | NIP-31 human-readable fallback describing the event's purpose.              |
+| `t`   | Optional    | Agora content marker (`t:agora`). Added at publish time via `withAgoraTag`. |
+
+The statement carries no queryable fields beyond the author and kind — it is identified entirely by `(15063, pubkey)`.
+
+### Querying
+
+**Fetch a user's verifier statement:**
+
+```json
+{ "kinds": [15063], "authors": ["<pubkey>"], "limit": 1 }
+```
+
+Clients MUST filter by `authors` — a verifier statement only describes the diligence of the pubkey that signed it, so an unfiltered query would be meaningless (and would let anyone's statement be attributed to anyone).
+
+### Client Behavior
+
+- **Becoming a verifier:** a user publishes a kind 15063 event with their statement in `content`. No approval, allowlist, or moderation gate applies.
+- **Withdrawing:** a user republishes the event with empty `content`, or publishes a NIP-09 kind 5 deletion referencing the event. Either way clients stop rendering the verifier section.
+- **Rendering:** clients SHOULD surface the statement prominently on the author's profile (e.g. a dedicated "Verifier" section in the profile overview), rendering the Markdown content sanitized.
+- **Editing:** because the kind is replaceable, the latest event per `(15063, pubkey)` wins. Clients performing an edit SHOULD pass the previous event as `prev` so `published_at` is preserved (NIP-23 convention).
 
 ---
 

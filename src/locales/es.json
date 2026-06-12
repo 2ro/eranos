@@ -926,6 +926,8 @@
     "sections": {
       "profile": "Perfil",
       "profileDesc": "Nombre, biografía, avatar y verificación.",
+      "verifier": "Verificador",
+      "verifierDesc": "Conviértete en verificador describiendo cómo evalúas las campañas.",
       "appearance": "Apariencia",
       "appearanceDesc": "Modo sistema, claro u oscuro.",
       "language": "Idioma",
@@ -992,6 +994,25 @@
     "subtitle": "Elige el idioma usado en toda la aplicación.",
     "intro": "Selecciona tu idioma preferido. La aplicación cambiará al instante y recordará tu elección en este dispositivo.",
     "translationNote": "Las traducciones están en curso. El texto sin traducir aparecerá en inglés."
+  },
+  "verifier": {
+    "title": "Verificador",
+    "subtitle": "Conviértete en verificador describiendo cómo evalúas las campañas.",
+    "promptLabel": "Tu proceso de verificación",
+    "prompt": "Cuéntanos qué pasos sigues para verificar las campañas. Incluye todos los detalles posibles para que los donantes sepan que pueden confiar en tu criterio.",
+    "placeholder": "Describe cómo verificas las campañas: las comprobaciones que realizas, las pruebas que exiges, cómo confirmas la identidad de un organizador y cualquier otra cosa que ayude a los donantes a confiar en tu criterio.",
+    "previewLabel": "Vista previa",
+    "publish": "Convertirme en verificador",
+    "update": "Actualizar declaración",
+    "withdraw": "Retirar",
+    "loading": "Cargando tu declaración…",
+    "publishedToast": "Tu declaración de verificador está activa.",
+    "withdrawnToast": "Tu declaración de verificador ha sido retirada.",
+    "errorToast": "No se pudo guardar tu declaración de verificador.",
+    "disclaimer": "Cualquiera puede convertirse en verificador. Tu declaración se publica públicamente en Nostr y se muestra de forma destacada en tu perfil. No otorga ningún permiso especial: simplemente indica a los donantes cómo evalúas las campañas.",
+    "loginGateTitle": "Inicia sesión para convertirte en verificador",
+    "loginGateBody": "Debes haber iniciado sesión para publicar una declaración de verificador.",
+    "profileSectionTitle": "Verificador"
   },
   "organizers": {
     "appoint": "Designar Organizador",

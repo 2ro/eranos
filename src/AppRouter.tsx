@@ -53,6 +53,7 @@ const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage").then(m 
 const ProfileSettings = lazy(() => import("./pages/ProfileSettings").then(m => ({ default: m.ProfileSettings })));
 const SearchPage = lazy(() => import("./pages/SearchPage").then(m => ({ default: m.SearchPage })));
 const SettingsPage = lazy(() => import("./pages/SettingsPage").then(m => ({ default: m.SettingsPage })));
+const VerifierSettingsPage = lazy(() => import("./pages/VerifierSettingsPage").then(m => ({ default: m.VerifierSettingsPage })));
 const WalletPage = lazy(() => import("./pages/WalletPage").then(m => ({ default: m.WalletPage })));
 const WalletMigrateV1Page = lazy(() => import("./pages/WalletMigrateV1Page").then(m => ({ default: m.WalletMigrateV1Page })));
 const WalletDoubleTweakFixPage = lazy(() => import("./pages/WalletDoubleTweakFixPage").then(m => ({ default: m.WalletDoubleTweakFixPage })));
@@ -153,6 +154,7 @@ export function AppRouter() {
           <Route path="/settings/appearance" element={<AppearanceSettingsPage />} />
           <Route path="/settings/language" element={<LanguageSettingsPage />} />
           <Route path="/settings/profile" element={<ProfileSettings />} />
+          <Route path="/settings/verifier" element={<VerifierSettingsPage />} />
           <Route path="/settings/wallet" element={<WalletSettingsPage />} />
           <Route path="/settings/notifications" element={<NotificationSettings />} />
           <Route path="/settings/advanced" element={<AdvancedSettingsPage />} />

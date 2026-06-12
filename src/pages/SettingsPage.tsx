@@ -31,6 +31,13 @@ const settingsSections: SettingsSection[] = [
     requiresAuth: true,
   },
   {
+    id: 'verifier',
+    labelKey: 'settings.sections.verifier',
+    descriptionKey: 'settings.sections.verifierDesc',
+    path: '/settings/verifier',
+    requiresAuth: true,
+  },
+  {
     id: 'appearance',
     labelKey: 'settings.sections.appearance',
     descriptionKey: 'settings.sections.appearanceDesc',

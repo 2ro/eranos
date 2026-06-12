@@ -1365,6 +1365,8 @@
     "sections": {
       "profile": "Profil",
       "profileDesc": "Nom d'affichage, biographie, avatar et vérification.",
+      "verifier": "Vérificateur",
+      "verifierDesc": "Devenez vérificateur en décrivant comment vous examinez les campagnes.",
       "appearance": "Apparence",
       "appearanceDesc": "Mode système, clair ou sombre.",
       "language": "Langue",
@@ -1431,6 +1433,25 @@
     "subtitle": "Choisissez la langue utilisée dans toute l'application.",
     "intro": "Sélectionnez votre langue préférée. L'application changera immédiatement et se souviendra de votre choix sur cet appareil.",
     "translationNote": "Les traductions sont en cours. Le texte non traduit revient à l'anglais."
+  },
+  "verifier": {
+    "title": "Vérificateur",
+    "subtitle": "Devenez vérificateur en décrivant comment vous examinez les campagnes.",
+    "promptLabel": "Votre processus de vérification",
+    "prompt": "Dites-nous quelles étapes vous suivez pour vérifier les campagnes. Donnez le plus de détails possible afin que les donateurs sachent qu'ils peuvent faire confiance à votre jugement.",
+    "placeholder": "Décrivez comment vous vérifiez les campagnes — les contrôles que vous effectuez, les preuves que vous exigez, comment vous confirmez l'identité d'un organisateur, et tout ce qui aide les donateurs à faire confiance à votre jugement.",
+    "previewLabel": "Aperçu",
+    "publish": "Devenir vérificateur",
+    "update": "Mettre à jour la déclaration",
+    "withdraw": "Retirer",
+    "loading": "Chargement de votre déclaration…",
+    "publishedToast": "Votre déclaration de vérificateur est en ligne.",
+    "withdrawnToast": "Votre déclaration de vérificateur a été retirée.",
+    "errorToast": "Impossible d'enregistrer votre déclaration de vérificateur.",
+    "disclaimer": "Tout le monde peut devenir vérificateur. Votre déclaration est publiée publiquement sur Nostr et affichée bien en évidence sur votre profil. Elle n'accorde aucune permission particulière — elle indique simplement aux donateurs comment vous examinez les campagnes.",
+    "loginGateTitle": "Connectez-vous pour devenir vérificateur",
+    "loginGateBody": "Vous devez être connecté pour publier une déclaration de vérificateur.",
+    "profileSectionTitle": "Vérificateur"
   },
   "organizers": {
     "appoint": "Désigner un organisateur",

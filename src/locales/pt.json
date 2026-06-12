@@ -1370,6 +1370,8 @@
     "sections": {
       "profile": "Perfil",
       "profileDesc": "Nome de exibição, biografia, avatar e verificação.",
+      "verifier": "Verificador",
+      "verifierDesc": "Torne-se um verificador descrevendo como você avalia campanhas.",
       "appearance": "Aparência",
       "appearanceDesc": "Modo sistema, claro ou escuro.",
       "language": "Idioma",
@@ -1436,6 +1438,25 @@
     "subtitle": "Escolha o idioma usado em todo o aplicativo.",
     "intro": "Selecione seu idioma preferido. O aplicativo mudará imediatamente e lembrará da sua escolha neste dispositivo.",
     "translationNote": "As traduções estão em andamento. Texto não traduzido recai para o inglês."
+  },
+  "verifier": {
+    "title": "Verificador",
+    "subtitle": "Torne-se um verificador descrevendo como você avalia campanhas.",
+    "promptLabel": "Seu processo de verificação",
+    "prompt": "Conte-nos quais passos você toma para verificar campanhas. Inclua o máximo de detalhes possível para que os doadores saibam que podem confiar no seu julgamento.",
+    "placeholder": "Descreva como você verifica campanhas — as checagens que você faz, as evidências que você exige, como você confirma a identidade de um organizador e qualquer outra coisa que ajude os doadores a confiar no seu julgamento.",
+    "previewLabel": "Pré-visualizar",
+    "publish": "Tornar-se um verificador",
+    "update": "Atualizar declaração",
+    "withdraw": "Retirar",
+    "loading": "Carregando sua declaração…",
+    "publishedToast": "Sua declaração de verificador está no ar.",
+    "withdrawnToast": "Sua declaração de verificador foi retirada.",
+    "errorToast": "Não foi possível salvar sua declaração de verificador.",
+    "disclaimer": "Qualquer pessoa pode se tornar um verificador. Sua declaração é publicada publicamente no Nostr e exibida com destaque no seu perfil. Ela não concede nenhuma permissão especial — apenas informa aos doadores como você avalia campanhas.",
+    "loginGateTitle": "Entre para se tornar um verificador",
+    "loginGateBody": "Você precisa estar conectado para publicar uma declaração de verificador.",
+    "profileSectionTitle": "Verificador"
   },
   "organizers": {
     "appoint": "Nomear organizador",

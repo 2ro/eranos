@@ -1369,6 +1369,8 @@
     "sections": {
       "profile": "Profil",
       "profileDesc": "Görünen ad, biyografi, avatar ve doğrulama.",
+      "verifier": "Doğrulayıcı",
+      "verifierDesc": "Kampanyaları nasıl denetlediğinizi anlatarak doğrulayıcı olun.",
       "appearance": "Görünüm",
       "appearanceDesc": "Sistem, aydınlık veya karanlık mod.",
       "language": "Dil",
@@ -1435,6 +1437,25 @@
     "subtitle": "Uygulama genelinde kullanılan dili seçin.",
     "intro": "Tercih ettiğiniz dili seçin. Uygulama hemen değişir ve seçiminiz bu cihazda hatırlanır.",
     "translationNote": "Çeviriler hâlâ devam ediyor. Çevrilmemiş metinler İngilizceye geri döner."
+  },
+  "verifier": {
+    "title": "Doğrulayıcı",
+    "subtitle": "Kampanyaları nasıl denetlediğinizi anlatarak doğrulayıcı olun.",
+    "promptLabel": "Doğrulama süreciniz",
+    "prompt": "Kampanyaları doğrulamak için hangi adımları attığınızı bize anlatın. Bağışçıların yargınıza güvenebilmesi için olabildiğince ayrıntı verin.",
+    "placeholder": "Kampanyaları nasıl doğruladığınızı açıklayın — yaptığınız kontrolleri, talep ettiğiniz kanıtları, bir organizatörün kimliğini nasıl teyit ettiğinizi ve bağışçıların yargınıza güvenmesine yardımcı olacak diğer her şeyi.",
+    "previewLabel": "Önizleme",
+    "publish": "Doğrulayıcı ol",
+    "update": "Beyanı güncelle",
+    "withdraw": "Geri çek",
+    "loading": "Beyanınız yükleniyor…",
+    "publishedToast": "Doğrulayıcı beyanınız yayında.",
+    "withdrawnToast": "Doğrulayıcı beyanınız geri çekildi.",
+    "errorToast": "Doğrulayıcı beyanınız kaydedilemedi.",
+    "disclaimer": "Herkes doğrulayıcı olabilir. Beyanınız Nostr'a herkese açık olarak yayımlanır ve profilinizde belirgin biçimde gösterilir. Herhangi bir özel izin vermez — yalnızca kampanyaları nasıl denetlediğinizi bağışçılara anlatır.",
+    "loginGateTitle": "Doğrulayıcı olmak için giriş yapın",
+    "loginGateBody": "Doğrulayıcı beyanı yayımlamak için giriş yapmış olmanız gerekir.",
+    "profileSectionTitle": "Doğrulayıcı"
   },
   "organizers": {
     "appoint": "Organizatör Ata",

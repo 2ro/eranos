@@ -1379,6 +1379,8 @@
     "sections": {
       "profile": "Profile",
       "profileDesc": "Display name, bio, avatar, and verification.",
+      "verifier": "Verifier",
+      "verifierDesc": "Become a verifier by describing how you vet campaigns.",
       "appearance": "Appearance",
       "appearanceDesc": "System, light, or dark mode.",
       "language": "Language",
@@ -1445,6 +1447,25 @@
     "subtitle": "Choose the language used throughout the app.",
     "intro": "Select your preferred language. The app will switch immediately and remember your choice on this device.",
     "translationNote": "Translations are a work in progress. Untranslated text falls back to English."
+  },
+  "verifier": {
+    "title": "Verifier",
+    "subtitle": "Become a verifier by describing how you vet campaigns.",
+    "promptLabel": "Your verification process",
+    "prompt": "Tell us what steps you take to verify campaigns. Include as much detail as possible so donors know they can trust your judgement.",
+    "placeholder": "Describe how you verify campaigns — the checks you run, the evidence you require, how you confirm an organizer's identity, and anything else that helps donors trust your judgement.",
+    "previewLabel": "Preview",
+    "publish": "Become a verifier",
+    "update": "Update statement",
+    "withdraw": "Withdraw",
+    "loading": "Loading your statement…",
+    "publishedToast": "Your verifier statement is live.",
+    "withdrawnToast": "Your verifier statement has been withdrawn.",
+    "errorToast": "Couldn't save your verifier statement.",
+    "disclaimer": "Anyone can become a verifier. Your statement is published publicly to Nostr and shown prominently on your profile. It does not grant any special permissions — it simply tells donors how you vet campaigns.",
+    "loginGateTitle": "Sign in to become a verifier",
+    "loginGateBody": "You need to be signed in to publish a verifier statement.",
+    "profileSectionTitle": "Verifier"
   },
   "organizers": {
     "appoint": "Appoint Organizer",

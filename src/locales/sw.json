@@ -1367,6 +1367,8 @@
     "sections": {
       "profile": "Wasifu",
       "profileDesc": "Jina la kuonyesha, wasifu, picha, na uthibitisho.",
+      "verifier": "Mthibitishaji",
+      "verifierDesc": "Kuwa mthibitishaji kwa kueleza jinsi unavyochunguza kampeni.",
       "appearance": "Mwonekano",
       "appearanceDesc": "Hali ya mfumo, mwanga, au giza.",
       "language": "Lugha",
@@ -1433,6 +1435,25 @@
     "subtitle": "Chagua lugha inayotumiwa katika programu yote.",
     "intro": "Chagua lugha unayopendelea. Programu itabadilika mara moja na itakumbuka chaguo lako kwenye kifaa hiki.",
     "translationNote": "Tafsiri ziko katika hatua ya kazi. Maandishi yasiyotafsiriwa hurudi kwa Kiingereza."
+  },
+  "verifier": {
+    "title": "Mthibitishaji",
+    "subtitle": "Kuwa mthibitishaji kwa kueleza jinsi unavyochunguza kampeni.",
+    "promptLabel": "Mchakato wako wa uthibitishaji",
+    "prompt": "Tuambie hatua unazochukua kuthibitisha kampeni. Jumuisha maelezo mengi iwezekanavyo ili wafadhili wajue wanaweza kuamini uamuzi wako.",
+    "placeholder": "Eleza jinsi unavyothibitisha kampeni — ukaguzi unaofanya, ushahidi unaohitaji, jinsi unavyothibitisha utambulisho wa mratibu, na chochote kingine kinachosaidia wafadhili kuamini uamuzi wako.",
+    "previewLabel": "Hakiki",
+    "publish": "Kuwa mthibitishaji",
+    "update": "Sasisha taarifa",
+    "withdraw": "Ondoa",
+    "loading": "Inapakia taarifa yako…",
+    "publishedToast": "Taarifa yako ya mthibitishaji iko mtandaoni.",
+    "withdrawnToast": "Taarifa yako ya mthibitishaji imeondolewa.",
+    "errorToast": "Imeshindikana kuhifadhi taarifa yako ya mthibitishaji.",
+    "disclaimer": "Yeyote anaweza kuwa mthibitishaji. Taarifa yako huchapishwa hadharani kwenye Nostr na huonyeshwa kwa uwazi kwenye wasifu wako. Haitoi ruhusa zozote maalum — inawaambia tu wafadhili jinsi unavyochunguza kampeni.",
+    "loginGateTitle": "Ingia ili kuwa mthibitishaji",
+    "loginGateBody": "Unahitaji kuwa umeingia ili kuchapisha taarifa ya mthibitishaji.",
+    "profileSectionTitle": "Mthibitishaji"
   },
   "organizers": {
     "appoint": "Teua Mratibu",
