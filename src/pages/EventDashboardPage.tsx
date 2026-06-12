@@ -51,13 +51,13 @@ export function EventDashboardPage() {
     </div>
   );
 
-  const headerClassName = 'max-w-5xl mx-auto sm:px-6';
+  const headerContentClassName = 'max-w-5xl mx-auto w-full sm:px-6';
 
   // Error state
   if (error && kpis.totalPosts === 0) {
     return (
       <main className="min-h-screen pb-16 sidebar:pb-0">
-        <PageHeader title="Dashboard" icon={<Activity className="size-5" />} className={headerClassName}>
+        <PageHeader title="Dashboard" icon={<Activity className="size-5" />} contentClassName={headerContentClassName}>
           {headerActions}
         </PageHeader>
         <div className="px-4 sm:px-6 py-6 max-w-5xl mx-auto">
@@ -80,7 +80,7 @@ export function EventDashboardPage() {
 
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
-      <PageHeader title="Dashboard" icon={<Activity className="size-5" />} className={headerClassName}>
+      <PageHeader title="Dashboard" icon={<Activity className="size-5" />} contentClassName={headerContentClassName}>
         {headerActions}
       </PageHeader>
 

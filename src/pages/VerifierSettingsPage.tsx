@@ -48,8 +48,7 @@ export function VerifierSettingsPage() {
         <PageHeader
           backTo="/settings"
           alwaysShowBack
-          className="sm:px-6"
-          contentClassName="max-w-2xl mx-auto w-full"
+          contentClassName="max-w-2xl mx-auto w-full sm:px-6"
           titleContent={
             <div className="flex-1 min-w-0">
               <h1 className="text-xl font-bold">{t('verifier.title')}</h1>
@@ -115,8 +114,7 @@ export function VerifierSettingsPage() {
       <PageHeader
         backTo="/settings"
         alwaysShowBack
-        className="sm:px-6"
-        contentClassName="max-w-2xl mx-auto w-full"
+        contentClassName="max-w-2xl mx-auto w-full sm:px-6"
         titleContent={
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-bold">{t('verifier.title')}</h1>

@@ -35,11 +35,11 @@ interface PageHeaderProps {
  * to provide a consistent header layout.
  */
 export function PageHeader({ title, icon, titleContent, backTo = '/', onBack, alwaysShowBack, children, className, contentClassName }: PageHeaderProps) {
-  const backButtonClass = cn('p-2 -ml-2 rounded-full hover:bg-secondary transition-colors', !alwaysShowBack && 'sidebar:hidden');
+  const backButtonClass = cn('p-2 -ml-2 rounded-full hover:bg-secondary transition-colors shrink-0', !alwaysShowBack && 'sidebar:hidden');
 
   return (
-    <div className={cn('px-4 py-4 bg-background/85', className)}>
-      <div className={cn('flex items-center gap-4', contentClassName)}>
+    <div className={cn('py-4 bg-background/85', className)}>
+      <div className={cn('flex items-center gap-1.5 px-4', contentClassName)}>
         {onBack ? (
           <button onClick={onBack} className={backButtonClass} aria-label="Go back">
             <ArrowLeft className="size-5" />
