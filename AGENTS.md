@@ -1,6 +1,10 @@
 # Project Overview
 
-Agora is a Nostr client built with React 19.x, TailwindCSS 3.x, Vite, shadcn/ui, and Nostrify, wrapped as a native iOS/Android app via Capacitor.
+Agora is a peer-to-peer crowdfunding Nostr client built with React 19.x, TailwindCSS 3.x, Vite, shadcn/ui, and Nostrify, wrapped as a native iOS/Android app via Capacitor.
+
+Donations are **on-chain Bitcoin** — donors pay a campaign's Bitcoin address directly. Agora ships an integrated **non-custodial HD Bitcoin wallet** (deterministically derived from the user's Nostr key) with BIP-86 Taproot and **BIP-352 silent-payment** support. The app never custodies or converts funds; it is a non-custodial UI that connects donors and campaigns peer-to-peer.
+
+**This is not a Lightning project.** Lightning (`useZaps`, `useWallet`, `useNWC`, LNURL/NWC/WebLN) survives only as a secondary *tipping* path for notes/profiles and a deprecated Breez/Spark wallet in recovery-only mode — never for campaign donations. The crowdfunding core is strictly on-chain.
 
 ## Technology Stack
 
@@ -17,7 +21,7 @@ Agora is a Nostr client built with React 19.x, TailwindCSS 3.x, Vite, shadcn/ui,
 ## Project Structure
 
 - `/src/components/` — UI components. `ui/` holds shadcn primitives; `auth/` holds login components.
-- `/src/hooks/` — custom hooks. Discover the full set with `ls src/hooks/`. Key ones: `useNostr`, `useAuthor`, `useCurrentUser`, `useNostrPublish`, `useUploadFile`, `useAppContext`, `useTheme`, `useToast`, `useLoggedInAccounts`, `useLoginActions`, `useIsMobile`, `useZaps`, `useWallet`, `useNWC`, `useShakespeare`.
+- `/src/hooks/` — custom hooks. Discover the full set with `ls src/hooks/`. Core Nostr: `useNostr`, `useAuthor`, `useCurrentUser`, `useNostrPublish`, `useUploadFile`, `useAppContext`, `useTheme`, `useToast`, `useLoggedInAccounts`, `useLoginActions`, `useIsMobile`. **On-chain wallet & crowdfunding (the headline feature):** `useHdWallet`, `useHdWalletSp` (BIP-352 silent payments), `useBitcoinSigner`, `useDonateCampaign`, `useCampaign`/`useCampaigns`, `useCampaignDonations`, `useOnchainZap`. **Lightning (secondary tipping only, not campaigns):** `useZaps`, `useWallet` (NWC/WebLN status — *not* the on-chain wallet), `useNWC`.
 - `/src/pages/` — page components wired into `AppRouter.tsx`. The catch-all `/:nip19` route is handled by `NIP19Page.tsx` (see the `nip19-routing` skill).
 - `/src/lib/` — utility functions and shared logic.
 - `/src/contexts/` — React context providers (`AppContext`, `NWCContext`).
