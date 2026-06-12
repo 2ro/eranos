@@ -31,6 +31,7 @@ import {
 } from '@/components/onboarding/VerifierIdentityStep';
 import { VerifierBioStep } from '@/components/onboarding/VerifierBioStep';
 import { VerifierStatementEditor } from '@/components/organizations/VerifierStatementEditor';
+import { VerifyTutorial } from '@/components/organizations/VerifyTutorial';
 import { usePublishOrgProfile } from '@/hooks/usePublishOrgProfile';
 import { useVerifierStatement } from '@/hooks/useVerifierStatement';
 import { Button } from '@/components/ui/button';
@@ -386,8 +387,9 @@ function CaptiveOverlay() {
         );
       case 'orgVerifyHowto':
         // Verifier sub-flow step 4 — teach the verify gesture, then finish.
-        // Filled in by a later commit.
-        return <VerifierStepShell onContinue={handleVerifierFinish} />;
+        return (
+          <VerifierHowtoStep onFinish={handleVerifierFinish} />
+        );
     }
   })();
 
@@ -432,7 +434,14 @@ function CaptiveOverlay() {
       <div className="flex-1 flex items-start sm:items-center justify-center px-6 pt-16 pb-12">
         <div
           key={step}
-          className="w-full max-w-md mx-auto animate-in fade-in slide-in-from-bottom-2 duration-300"
+          className={cn(
+            'w-full mx-auto animate-in fade-in slide-in-from-bottom-2 duration-300',
+            // Statement & how-to steps host a markdown editor / two-column
+            // tutorial and need more room than the narrow base screens.
+            step === 'orgStatement' || step === 'orgVerifyHowto'
+              ? 'max-w-3xl'
+              : 'max-w-md',
+          )}
         >
           {stepBody}
         </div>
@@ -499,14 +508,27 @@ function RoleStep({ role, onPick }: RoleStepProps) {
 }
 
 /**
- * Placeholder shell for verifier sub-flow steps not yet built out. Renders a
- * single Continue button so the state machine can be exercised end-to-end.
+ * Verifier sub-flow step 4 — teach the verify gesture with the shared
+ * {@link VerifyTutorial}, then offer the terminal "View campaigns" CTA.
  */
-function VerifierStepShell({ onContinue }: { onContinue: () => void }) {
+function VerifierHowtoStep({ onFinish }: { onFinish: () => void }) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
-      <Button onClick={onContinue} className="w-full h-12 text-base rounded-full">
-        Continue
+      <div className="space-y-2 text-center">
+        <h2 className="text-2xl font-bold tracking-tight">
+          {t('onboarding.verifier.howto.title')}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {t('onboarding.verifier.howto.subtitle')}
+        </p>
+      </div>
+
+      <VerifyTutorial />
+
+      <Button onClick={onFinish} className="w-full h-12 text-base rounded-full">
+        {t('onboarding.verifier.howto.finish')}
+        <ArrowRight className="ml-2 h-4 w-4 rtl:rotate-180" />
       </Button>
     </div>
   );
