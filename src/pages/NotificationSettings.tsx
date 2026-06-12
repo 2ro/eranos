@@ -254,17 +254,11 @@ export function NotificationSettings() {
       <PageHeader
         backTo="/settings"
         alwaysShowBack
-        titleContent={
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold">{t('notifSettings.title')}</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {t('notifSettings.subtitle')}
-            </p>
-          </div>
-        }
+        contentClassName="max-w-2xl mx-auto w-full"
+        title={t('notifSettings.title')}
       />
 
-      <div className="p-4">
+      <div className="p-4 max-w-2xl mx-auto w-full">
         {/* Push Notifications */}
         <SectionHeader title={t('notifSettings.pushHeading')} />
         <div className="pb-4">

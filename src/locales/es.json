@@ -952,7 +952,6 @@
     "appearance": {
       "title": "Apariencia",
       "subtitle": "Elige cómo se ve la aplicación.",
-      "intro": "Elige tu modo de color preferido. «Sistema» seguirá automáticamente la configuración clara u oscura de tu dispositivo.",
       "colorMode": "Modo de color",
       "system": "Sistema",
       "systemDesc": "Sigue la configuración de tu dispositivo",
@@ -964,8 +963,6 @@
     "network": {
       "title": "Red",
       "subtitle": "Gestiona el uso de datos, los relés y los servidores de subida de archivos.",
-      "connectionsHeading": "Conexiones de red",
-      "connectionsIntro": "Administra tus conexiones de relé. Los relés son servidores que almacenan y distribuyen eventos de Nostr a través de la red.",
       "lowBandwidthHeading": "Modo de bajo ancho de banda",
       "reduceDataUsage": "Reducir el uso de datos",
       "reduceDataUsageDesc": "Para conexiones medidas o lentas. Los videos no se reproducen automáticamente, se omiten las previsualizaciones de video en segundo plano y las imágenes esperan a un toque antes de cargarse.",
@@ -986,7 +983,6 @@
       "title": "Avanzado",
       "subtitle": "Conexiones de cartera, configuración del sistema y otras opciones para usuarios avanzados.",
       "intro": "Conexiones de cartera, configuración del sistema y otras opciones avanzadas.",
-      "powerUserHeading": "Ajustes avanzados",
       "wallet": "Cartera"
     },
     "wallet": {
@@ -997,7 +993,6 @@
   "language": {
     "title": "Idioma",
     "subtitle": "Elige el idioma usado en toda la aplicación.",
-    "intro": "Selecciona tu idioma preferido. La aplicación cambiará al instante y recordará tu elección en este dispositivo.",
     "translationNote": "Las traducciones están en curso. El texto sin traducir aparecerá en inglés."
   },
   "verifier": {
@@ -1560,7 +1555,6 @@
     "seoTitle": "Notificaciones",
     "seoDescription": "Configura tus preferencias de notificaciones",
     "title": "Notificaciones",
-    "subtitle": "Personaliza qué notificaciones recibes.",
     "pushHeading": "Notificaciones push",
     "enablePush": {
       "label": "Activar notificaciones push",
@@ -1842,12 +1836,7 @@
     "seoDescription": "Edita tu perfil de {{appName}}",
     "header": {
       "title": "Perfil",
-      "subtitle": "Tu identidad en Nostr es portátil — va contigo a donde vayas.",
       "save": "Guardar"
-    },
-    "intro": {
-      "heading": "Tu identidad",
-      "body": "Toca cualquier campo de la tarjeta para editarlo. Haz clic en tu avatar o portada para subir y recortar una nueva imagen."
     },
     "uploading": "Subiendo…",
     "fields": {

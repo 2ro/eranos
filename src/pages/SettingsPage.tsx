@@ -2,7 +2,6 @@ import { useSeoMeta } from '@unhead/react';
 import { lazy, Suspense, useState } from 'react';
 import {
   ChevronRight,
-  Settings,
   User,
   BadgeCheck,
   Palette,
@@ -14,7 +13,6 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { PageHeader } from '@/components/PageHeader';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
 import { isAdmin } from '@/lib/admins';
@@ -147,10 +145,8 @@ export function SettingsPage() {
 
   return (
     <main className="min-h-screen pb-16 sidebar:pb-0">
-      <PageHeader title={t('settings.title')} icon={<Settings className="size-5" />} backTo="/" />
-
       {/* Grouped settings list */}
-      <nav aria-label={t('settings.title')} className="px-4 sm:px-6 pt-2 space-y-7 max-w-2xl mx-auto w-full">
+      <nav aria-label={t('settings.title')} className="px-4 sm:px-6 pt-6 space-y-7 max-w-2xl mx-auto w-full">
         {groups.map(({ group, items }) => (
           <section key={group}>
             <h2 className="px-3.5 pb-1.5 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground/80">

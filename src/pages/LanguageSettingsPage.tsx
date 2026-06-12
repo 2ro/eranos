@@ -50,26 +50,16 @@ export function LanguageSettingsPage() {
       <PageHeader
         backTo="/settings"
         alwaysShowBack
+        contentClassName="max-w-2xl mx-auto w-full"
         titleContent={
-          <div className="flex-1 min-w-0 flex items-center gap-3">
+          <div className="flex-1 min-w-0 flex items-center gap-2">
             <Languages className="size-5 shrink-0" aria-hidden="true" />
-            <div className="min-w-0">
-              <h1 className="text-xl font-bold truncate">{t('language.title')}</h1>
-              <p className="text-sm text-muted-foreground mt-0.5 truncate">
-                {t('language.subtitle')}
-              </p>
-            </div>
+            <h1 className="text-xl font-bold truncate">{t('language.title')}</h1>
           </div>
         }
       />
 
       <div className="p-4 max-w-2xl mx-auto w-full">
-        <div className="px-1 pt-1 pb-4">
-          <p className="text-[13px] text-muted-foreground leading-relaxed">
-            {t('language.intro')}
-          </p>
-        </div>
-
         <ul
           className="overflow-hidden rounded-2xl bg-card border border-border/60 shadow-sm divide-y divide-border/50"
           role="radiogroup"

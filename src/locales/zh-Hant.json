@@ -954,7 +954,6 @@
     "appearance": {
       "title": "外觀",
       "subtitle": "選擇應用的外觀。",
-      "intro": "選擇你喜歡的顏色模式。「跟隨系統」將自動匹配你裝置的淺色或深色設定。",
       "colorMode": "顏色模式",
       "system": "跟隨系統",
       "systemDesc": "跟隨你的裝置設定",
@@ -966,8 +965,6 @@
     "network": {
       "title": "網路",
       "subtitle": "管理資料使用、中繼和檔案上傳伺服器。",
-      "connectionsHeading": "網路連線",
-      "connectionsIntro": "管理你的中繼連線。中繼是在整個網路上儲存和分發 Nostr 事件的伺服器。",
       "lowBandwidthHeading": "低頻寬模式",
       "reduceDataUsage": "減少資料使用",
       "reduceDataUsageDesc": "適用於計量或緩慢的網路連線。影片不會自動播放，跳過後臺影片預覽，圖片需要點選後才載入。",
@@ -988,7 +985,6 @@
       "title": "高階",
       "subtitle": "錢包連線、系統配置和其他面向高階使用者的選項。",
       "intro": "錢包連線、系統配置和其他高階選項。",
-      "powerUserHeading": "高階使用者設定",
       "wallet": "錢包"
     },
     "wallet": {
@@ -999,7 +995,6 @@
   "language": {
     "title": "語言",
     "subtitle": "選擇整個應用使用的語言。",
-    "intro": "選擇你的首選語言。應用將立即切換並在此裝置上記住你的選擇。",
     "translationNote": "翻譯仍在進行中。未翻譯的文本將以英文顯示。"
   },
   "verifier": {
@@ -1486,7 +1481,6 @@
     "seoTitle": "通知",
     "seoDescription": "配置你的通知偏好",
     "title": "通知",
-    "subtitle": "自定義你接收哪些通知。",
     "pushHeading": "推送通知",
     "enablePush": {
       "label": "啟用推送通知",
@@ -1768,12 +1762,7 @@
     "seoDescription": "編輯你的 {{appName}} 資料",
     "header": {
       "title": "資料",
-      "subtitle": "你的 Nostr 身份是可移植的——它會跟隨你到任何地方。",
       "save": "儲存"
-    },
-    "intro": {
-      "heading": "你的身份",
-      "body": "點選卡片上的任意欄位進行編輯。點選頭像或橫幅可上傳並裁剪新圖片。"
     },
     "uploading": "上傳中…",
     "fields": {

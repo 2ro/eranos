@@ -1395,7 +1395,6 @@
     "appearance": {
       "title": "Görünüm",
       "subtitle": "Uygulamanın nasıl görüneceğini seçin.",
-      "intro": "Tercih ettiğiniz renk modunu seçin. Sistem, cihazınızın aydınlık ya da karanlık ayarına otomatik olarak uyacaktır.",
       "colorMode": "Renk Modu",
       "system": "Sistem",
       "systemDesc": "Cihaz ayarınızı izler",
@@ -1407,8 +1406,6 @@
     "network": {
       "title": "Ağ",
       "subtitle": "Veri kullanımını, röleleri ve dosya yükleme sunucularını yönetin.",
-      "connectionsHeading": "Ağ Bağlantıları",
-      "connectionsIntro": "Röle bağlantılarınızı yönetin. Röleler, Nostr event'lerini ağ üzerinde depolayan ve dağıtan sunuculardır.",
       "lowBandwidthHeading": "Düşük Bant Genişliği Modu",
       "reduceDataUsage": "Veri kullanımını azalt",
       "reduceDataUsageDesc": "Ölçülü veya yavaş bağlantılar için. Videolar otomatik oynatılmaz, arka plan video önizlemeleri atlanır ve resimler dokunmadan önce yüklenmez.",
@@ -1429,7 +1426,6 @@
       "title": "Gelişmiş",
       "subtitle": "Cüzdan bağlantıları, sistem yapılandırması ve ileri kullanıcılar için diğer gelişmiş seçenekler.",
       "intro": "Cüzdan bağlantıları, sistem yapılandırması ve diğer gelişmiş seçenekler.",
-      "powerUserHeading": "İleri Kullanıcı Ayarları",
       "wallet": "Cüzdan"
     },
     "wallet": {
@@ -1440,7 +1436,6 @@
   "language": {
     "title": "Dil",
     "subtitle": "Uygulama genelinde kullanılan dili seçin.",
-    "intro": "Tercih ettiğiniz dili seçin. Uygulama hemen değişir ve seçiminiz bu cihazda hatırlanır.",
     "translationNote": "Çeviriler hâlâ devam ediyor. Çevrilmemiş metinler İngilizceye geri döner."
   },
   "verifier": {
@@ -1927,7 +1922,6 @@
     "seoTitle": "Bildirimler",
     "seoDescription": "Bildirim tercihlerinizi yapılandırın",
     "title": "Bildirimler",
-    "subtitle": "Hangi bildirimleri alacağınızı özelleştirin.",
     "pushHeading": "Anlık Bildirimler",
     "enablePush": {
       "label": "Anlık Bildirimleri Etkinleştir",
@@ -2209,12 +2203,7 @@
     "seoDescription": "{{appName}} profilinizi düzenleyin",
     "header": {
       "title": "Profil",
-      "subtitle": "Nostr kimliğiniz taşınabilir — nereye giderseniz sizinle gider.",
       "save": "Kaydet"
-    },
-    "intro": {
-      "heading": "Kimliğiniz",
-      "body": "Düzenlemek için karttaki herhangi bir alana dokunun. Yeni bir resim yüklemek ve kırpmak için avatarınıza veya pankartınıza tıklayın."
     },
     "uploading": "Yükleniyor…",
     "fields": {

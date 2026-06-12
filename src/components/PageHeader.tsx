@@ -19,6 +19,13 @@ interface PageHeaderProps {
   children?: React.ReactNode;
   /** Override the outer wrapper classes. */
   className?: string;
+  /**
+   * Classes applied to the inner flex row that holds the back button, title,
+   * and children. Use to constrain the header to the same centered column as
+   * the page content (e.g. `max-w-2xl mx-auto w-full`) so the title lines up
+   * with the body instead of floating against the viewport edge.
+   */
+  contentClassName?: string;
 }
 
 /**
@@ -27,27 +34,29 @@ interface PageHeaderProps {
  * Used by kind-feed pages, bookmarks, help, trends, and other sub-pages
  * to provide a consistent header layout.
  */
-export function PageHeader({ title, icon, titleContent, backTo = '/', onBack, alwaysShowBack, children, className }: PageHeaderProps) {
+export function PageHeader({ title, icon, titleContent, backTo = '/', onBack, alwaysShowBack, children, className, contentClassName }: PageHeaderProps) {
   const backButtonClass = cn('p-2 -ml-2 rounded-full hover:bg-secondary transition-colors', !alwaysShowBack && 'sidebar:hidden');
 
   return (
-    <div className={cn('flex items-center gap-4 px-4 py-4 bg-background/85', className)}>
-      {onBack ? (
-        <button onClick={onBack} className={backButtonClass} aria-label="Go back">
-          <ArrowLeft className="size-5" />
-        </button>
-      ) : (
-        <Link to={backTo} className={backButtonClass}>
-          <ArrowLeft className="size-5" />
-        </Link>
-      )}
-      {titleContent ?? (
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          {icon}
-          <h1 className="text-xl font-bold truncate">{title}</h1>
-        </div>
-      )}
-      {children}
+    <div className={cn('px-4 py-4 bg-background/85', className)}>
+      <div className={cn('flex items-center gap-4', contentClassName)}>
+        {onBack ? (
+          <button onClick={onBack} className={backButtonClass} aria-label="Go back">
+            <ArrowLeft className="size-5" />
+          </button>
+        ) : (
+          <Link to={backTo} className={backButtonClass}>
+            <ArrowLeft className="size-5" />
+          </Link>
+        )}
+        {titleContent ?? (
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {icon}
+            <h1 className="text-xl font-bold truncate">{title}</h1>
+          </div>
+        )}
+        {children}
+      </div>
     </div>
   );
 }

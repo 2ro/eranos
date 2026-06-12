@@ -1396,7 +1396,6 @@
     "appearance": {
       "title": "Aparência",
       "subtitle": "Escolha como o aplicativo se parece.",
-      "intro": "Escolha seu modo de cor preferido. Sistema corresponderá automaticamente à configuração clara ou escura do seu dispositivo.",
       "colorMode": "Modo de cor",
       "system": "Sistema",
       "systemDesc": "Segue a configuração do seu dispositivo",
@@ -1408,8 +1407,6 @@
     "network": {
       "title": "Rede",
       "subtitle": "Gerencie uso de dados, relays e servidores de upload de arquivos.",
-      "connectionsHeading": "Conexões de rede",
-      "connectionsIntro": "Gerencie suas conexões de relay. Relays são servidores que armazenam e distribuem eventos Nostr pela rede.",
       "lowBandwidthHeading": "Modo de baixa largura de banda",
       "reduceDataUsage": "Reduzir uso de dados",
       "reduceDataUsageDesc": "Para conexões medidas ou lentas. Vídeos não tocarão automaticamente, previews de vídeo em segundo plano são ignorados e imagens aguardam um toque antes de carregar.",
@@ -1430,7 +1427,6 @@
       "title": "Avançado",
       "subtitle": "Conexões de carteira, configuração de sistema e outras opções avançadas para usuários experientes.",
       "intro": "Conexões de carteira, configuração de sistema e outras opções avançadas.",
-      "powerUserHeading": "Configurações de usuário avançado",
       "wallet": "Carteira"
     },
     "wallet": {
@@ -1441,7 +1437,6 @@
   "language": {
     "title": "Idioma",
     "subtitle": "Escolha o idioma usado em todo o aplicativo.",
-    "intro": "Selecione seu idioma preferido. O aplicativo mudará imediatamente e lembrará da sua escolha neste dispositivo.",
     "translationNote": "As traduções estão em andamento. Texto não traduzido recai para o inglês."
   },
   "verifier": {
@@ -2004,7 +1999,6 @@
     "seoTitle": "Notificações",
     "seoDescription": "Configure suas preferências de notificação",
     "title": "Notificações",
-    "subtitle": "Personalize quais notificações você recebe.",
     "pushHeading": "Notificações push",
     "enablePush": {
       "label": "Ativar notificações push",
@@ -2286,12 +2280,7 @@
     "seoDescription": "Edite seu perfil {{appName}}",
     "header": {
       "title": "Perfil",
-      "subtitle": "Sua identidade Nostr é portátil — vai para onde você for.",
       "save": "Salvar"
-    },
-    "intro": {
-      "heading": "Sua identidade",
-      "body": "Toque em qualquer campo do cartão para editar. Clique no seu avatar ou banner para enviar e recortar uma nova imagem."
     },
     "uploading": "Enviando…",
     "fields": {

@@ -1393,7 +1393,6 @@
     "appearance": {
       "title": "Mwonekano",
       "subtitle": "Chagua jinsi programu inavyoonekana.",
-      "intro": "Chagua hali yako ya rangi unayopendelea. Mfumo utalingana kiotomatiki na mpangilio wa mwanga au giza wa kifaa chako.",
       "colorMode": "Hali ya Rangi",
       "system": "Mfumo",
       "systemDesc": "Inafuata mpangilio wa kifaa chako",
@@ -1405,8 +1404,6 @@
     "network": {
       "title": "Mtandao",
       "subtitle": "Simamia matumizi ya data, relei, na seva za upakiaji faili.",
-      "connectionsHeading": "Muunganisho wa Mtandao",
-      "connectionsIntro": "Simamia muunganisho wako wa relei. Relei ni seva zinazohifadhi na kusambaza matukio ya Nostr katika mtandao.",
       "lowBandwidthHeading": "Hali ya Mtandao wa Chini",
       "reduceDataUsage": "Punguza matumizi ya data",
       "reduceDataUsageDesc": "Kwa muunganisho wenye kupimwa au polepole. Video hazitachezwa kiotomatiki, hakikisho la video nyuma hupitwa, na picha husubiri bonyezo kabla ya kupakiwa.",
@@ -1427,7 +1424,6 @@
       "title": "Ya kina",
       "subtitle": "Muunganisho wa pochi, usanidi wa mfumo, na chaguzi zingine za kina kwa watumiaji wenye uwezo.",
       "intro": "Muunganisho wa pochi, usanidi wa mfumo, na chaguzi zingine za kina.",
-      "powerUserHeading": "Mipangilio ya Mtumiaji Mwenye Uwezo",
       "wallet": "Pochi"
     },
     "wallet": {
@@ -1438,7 +1434,6 @@
   "language": {
     "title": "Lugha",
     "subtitle": "Chagua lugha inayotumiwa katika programu yote.",
-    "intro": "Chagua lugha unayopendelea. Programu itabadilika mara moja na itakumbuka chaguo lako kwenye kifaa hiki.",
     "translationNote": "Tafsiri ziko katika hatua ya kazi. Maandishi yasiyotafsiriwa hurudi kwa Kiingereza."
   },
   "verifier": {
@@ -1885,7 +1880,6 @@
     "seoTitle": "Arifa",
     "seoDescription": "Sanidi mapendeleo yako ya arifa",
     "title": "Arifa",
-    "subtitle": "Badilisha arifa unazopokea.",
     "pushHeading": "Arifa za Kusukuma",
     "enablePush": {
       "label": "Wezesha Arifa za Kusukuma",
@@ -2167,12 +2161,7 @@
     "seoDescription": "Hariri wasifu wako wa {{appName}}",
     "header": {
       "title": "Wasifu",
-      "subtitle": "Utambulisho wako wa Nostr unabebeka — unaenda popote unapokwenda.",
       "save": "Hifadhi"
-    },
-    "intro": {
-      "heading": "Utambulisho Wako",
-      "body": "Gusa uwanja wowote kwenye kadi kuhariri. Bonyeza picha yako au bango kupakia na kukata picha mpya."
     },
     "uploading": "Inapakia…",
     "fields": {

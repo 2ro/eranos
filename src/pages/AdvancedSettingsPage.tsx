@@ -27,24 +27,15 @@ export function AdvancedSettingsPage() {
       <PageHeader
         backTo="/settings"
         alwaysShowBack
-        titleContent={
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold">{t('settings.advanced.title')}</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {t('settings.advanced.subtitle')}
-            </p>
-          </div>
-        }
+        contentClassName="max-w-2xl mx-auto w-full"
+        title={t('settings.advanced.title')}
       />
 
       <div className="p-4 max-w-2xl mx-auto w-full">
         {/* Intro */}
-        <div className="px-1 pt-1 pb-4">
-          <h2 className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground/80">{t('settings.advanced.powerUserHeading')}</h2>
-          <p className="text-[13px] text-muted-foreground mt-1.5 leading-relaxed">
-            {t('settings.advanced.intro')}
-          </p>
-        </div>
+        <p className="px-1 pt-1 pb-4 text-[13px] text-muted-foreground leading-relaxed">
+          {t('settings.advanced.intro')}
+        </p>
 
         {/* Wallet collapsible — only when logged in */}
         {user && (

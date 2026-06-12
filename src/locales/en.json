@@ -1405,7 +1405,6 @@
     "appearance": {
       "title": "Appearance",
       "subtitle": "Choose how the app looks.",
-      "intro": "Pick your preferred color mode. System will automatically match your device's light or dark setting.",
       "colorMode": "Color Mode",
       "system": "System",
       "systemDesc": "Follows your device setting",
@@ -1417,8 +1416,6 @@
     "network": {
       "title": "Network",
       "subtitle": "Manage data usage, relays, and file upload servers.",
-      "connectionsHeading": "Network Connections",
-      "connectionsIntro": "Manage your relay connections. Relays are servers that store and distribute Nostr events across the network.",
       "lowBandwidthHeading": "Low-Bandwidth Mode",
       "reduceDataUsage": "Reduce data usage",
       "reduceDataUsageDesc": "For metered or slow connections. Videos won't autoplay, background video previews are skipped, and images wait for a tap before loading.",
@@ -1439,7 +1436,6 @@
       "title": "Advanced",
       "subtitle": "Wallet connections, system configuration, and other advanced options for power users.",
       "intro": "Wallet connections, system configuration, and other advanced options.",
-      "powerUserHeading": "Power User Settings",
       "wallet": "Wallet"
     },
     "wallet": {
@@ -1450,7 +1446,6 @@
   "language": {
     "title": "Language",
     "subtitle": "Choose the language used throughout the app.",
-    "intro": "Select your preferred language. The app will switch immediately and remember your choice on this device.",
     "translationNote": "Translations are a work in progress. Untranslated text falls back to English."
   },
   "verifier": {
@@ -2080,7 +2075,6 @@
     "seoTitle": "Notifications",
     "seoDescription": "Configure your notification preferences",
     "title": "Notifications",
-    "subtitle": "Customize which notifications you receive.",
     "pushHeading": "Push Notifications",
     "enablePush": {
       "label": "Enable Push Notifications",
@@ -2362,12 +2356,7 @@
     "seoDescription": "Edit your {{appName}} profile",
     "header": {
       "title": "Profile",
-      "subtitle": "Your Nostr identity is portable — it goes wherever you go.",
       "save": "Save"
-    },
-    "intro": {
-      "heading": "Your Identity",
-      "body": "Tap any field on the card to edit. Click your avatar or banner to upload and crop a new image."
     },
     "uploading": "Uploading…",
     "fields": {

@@ -27,17 +27,15 @@ export function WalletSettingsPage() {
       <PageHeader
         backTo="/settings"
         alwaysShowBack
+        contentClassName="max-w-2xl mx-auto w-full"
         titleContent={
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-bold flex items-center gap-1.5">{t('settings.wallet.title')} <HelpTip faqId="connect-wallet" /></h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {t('settings.wallet.subtitle')}
-            </p>
           </div>
         }
       />
 
-      <div className="p-4">
+      <div className="p-4 max-w-2xl mx-auto w-full">
         <WalletSettings />
       </div>
     </main>

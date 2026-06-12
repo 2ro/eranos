@@ -954,7 +954,6 @@
     "appearance": {
       "title": "Maonero",
       "subtitle": "Sarudza kuti app inoonekwa sei.",
-      "intro": "Sarudza mode yeruvara waunoda. «System» ichaenderana zvakazvimirira nemamiriro echiedza kana erima emudziyo wako.",
       "colorMode": "Mode yeruvara",
       "system": "System",
       "systemDesc": "Inotevera marongero emudziyo wako",
@@ -966,8 +965,6 @@
     "network": {
       "title": "Network",
       "subtitle": "Tarisira kushandiswa kwedata, marelays, nemaserver ekuiswa kwemafaira.",
-      "connectionsHeading": "Mibatanidzwa yeNetwork",
-      "connectionsIntro": "Tarisira mibatanidzwa yako yemarelays. Marelays maserver anochengeta nokuparadzira zviitiko zveNostr panetwork yose.",
       "lowBandwidthHeading": "Modhi yeBandwidth Diki",
       "reduceDataUsage": "Deredza kushandiswa kwedata",
       "reduceDataUsageDesc": "YeKubatana kunoyerwa kana kwakanonoka. Mavhidhiyo haaite kutamba ega, zviratidziro zvemavhidhiyo zviri shure zvinosiyiwa, uye mifananidzo inomirira kubatwa pamberi pekutakurwa.",
@@ -988,7 +985,6 @@
       "title": "Zvepamusoro",
       "subtitle": "Mibatanidzwa yechikwama, marongero esystem, nezvimwe zvinotenderwa kuvashandisi venyanzvi.",
       "intro": "Mibatanidzwa yechikwama, marongero esystem, nezvimwe zvepamusoro.",
-      "powerUserHeading": "Marongero evashandisi venyanzvi",
       "wallet": "Chikwama"
     },
     "wallet": {
@@ -999,7 +995,6 @@
   "language": {
     "title": "Mutauro",
     "subtitle": "Sarudza mutauro unoshandiswa muapp yose.",
-    "intro": "Sarudza mutauro waunoda. App ichachinja ipapo ipapo uye icharangarira sarudzo yako pamudziyo uyu.",
     "translationNote": "Shanduro dzichiri kuitwa. Mavara asina kushandurwa anozoonekwa muChirungu."
   },
   "verifier": {
@@ -1562,7 +1557,6 @@
     "seoTitle": "Zviziviso",
     "seoDescription": "Gadzira zvido zvako zvezviziviso",
     "title": "Zviziviso",
-    "subtitle": "Gadzira kuti ndezvipi zviziviso zvauchawana.",
     "pushHeading": "Zviziviso Zvepush",
     "enablePush": {
       "label": "Vhura zviziviso zvepush",
@@ -1844,12 +1838,7 @@
     "seoDescription": "Gadziridza pfungidziro yako ye{{appName}}",
     "header": {
       "title": "Pfungidziro",
-      "subtitle": "Chimiro chako cheNostr chinotakurika — chinoenda newe kwese kwaunoenda.",
       "save": "Chengeta"
-    },
-    "intro": {
-      "heading": "Chimiro chako",
-      "body": "Tinha chero ndima pakadhi kuti ugadziridze. Dzvanya pamufananidzo wako kana banner kuti uise uye uchekerere mufananidzo mutsva."
     },
     "uploading": "Kuisa…",
     "fields": {

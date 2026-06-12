@@ -646,10 +646,10 @@ export function ProfileSettings() {
         title={t('profileSettings.header.title')}
         backTo="/settings"
         alwaysShowBack
+        contentClassName="max-w-xl mx-auto w-full"
         titleContent={
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-bold leading-tight">{t('profileSettings.header.title')}</h1>
-            <p className="text-sm text-muted-foreground">{t('profileSettings.header.subtitle')}</p>
           </div>
         }
       >
@@ -659,15 +659,7 @@ export function ProfileSettings() {
       </PageHeader>
 
       <Form {...form}>
-        <form id="profile-settings-form" onSubmit={form.handleSubmit(onSubmit)} className="max-w-xl mx-auto px-4 pb-10 space-y-6">
-
-          {/* Intro */}
-          <div className="px-3 pt-2 pb-2">
-            <h2 className="text-sm font-semibold">{t('profileSettings.intro.heading')}</h2>
-            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-              {t('profileSettings.intro.body')}
-            </p>
-          </div>
+        <form id="profile-settings-form" onSubmit={form.handleSubmit(onSubmit)} className="max-w-xl mx-auto px-4 pt-4 pb-10 space-y-6">
 
           {/* Interactive profile card */}
           <ProfileCard

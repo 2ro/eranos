@@ -1394,7 +1394,6 @@
     "appearance": {
       "title": "Tampilan",
       "subtitle": "Pilih tampilan aplikasi.",
-      "intro": "Pilih mode warna yang Anda inginkan. Sistem akan secara otomatis menyesuaikan dengan pengaturan terang atau gelap perangkat Anda.",
       "colorMode": "Mode Warna",
       "system": "Sistem",
       "systemDesc": "Mengikuti pengaturan perangkat Anda",
@@ -1406,8 +1405,6 @@
     "network": {
       "title": "Jaringan",
       "subtitle": "Kelola penggunaan data, relay, dan server unggah berkas.",
-      "connectionsHeading": "Koneksi Jaringan",
-      "connectionsIntro": "Kelola koneksi relay Anda. Relay adalah server yang menyimpan dan mendistribusikan event Nostr di seluruh jaringan.",
       "lowBandwidthHeading": "Mode Bandwidth Rendah",
       "reduceDataUsage": "Kurangi penggunaan data",
       "reduceDataUsageDesc": "Untuk koneksi terbatas kuota atau lambat. Video tidak akan diputar otomatis, pratinjau video latar dilewati, dan gambar menunggu ketuk sebelum dimuat.",
@@ -1428,7 +1425,6 @@
       "title": "Lanjutan",
       "subtitle": "Koneksi dompet, konfigurasi sistem, dan opsi lanjutan lainnya untuk pengguna mahir.",
       "intro": "Koneksi dompet, konfigurasi sistem, dan opsi lanjutan lainnya.",
-      "powerUserHeading": "Pengaturan Pengguna Mahir",
       "wallet": "Dompet"
     },
     "wallet": {
@@ -1439,7 +1435,6 @@
   "language": {
     "title": "Bahasa",
     "subtitle": "Pilih bahasa yang digunakan di seluruh aplikasi.",
-    "intro": "Pilih bahasa yang Anda inginkan. Aplikasi akan beralih segera dan mengingat pilihan Anda di perangkat ini.",
     "translationNote": "Terjemahan masih dalam pengerjaan. Teks yang belum diterjemahkan akan kembali ke bahasa Inggris."
   },
   "verifier": {
@@ -1926,7 +1921,6 @@
     "seoTitle": "Notifikasi",
     "seoDescription": "Konfigurasikan preferensi notifikasi Anda",
     "title": "Notifikasi",
-    "subtitle": "Sesuaikan notifikasi mana yang Anda terima.",
     "pushHeading": "Notifikasi Push",
     "enablePush": {
       "label": "Aktifkan Notifikasi Push",
@@ -2208,12 +2202,7 @@
     "seoDescription": "Ubah profil {{appName}} Anda",
     "header": {
       "title": "Profil",
-      "subtitle": "Identitas Nostr Anda portabel — ia ikut ke mana pun Anda pergi.",
       "save": "Simpan"
-    },
-    "intro": {
-      "heading": "Identitas Anda",
-      "body": "Ketuk bidang apa pun pada kartu untuk mengubahnya. Klik avatar atau banner Anda untuk mengunggah dan memotong gambar baru."
     },
     "uploading": "Mengunggah…",
     "fields": {

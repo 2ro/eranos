@@ -40,25 +40,15 @@ export function NetworkSettingsPage() {
       <PageHeader
         backTo="/settings"
         alwaysShowBack
+        contentClassName="max-w-2xl mx-auto w-full"
         titleContent={
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-bold flex items-center gap-1.5">{t('settings.network.title')} <HelpTip faqId="what-is-nostr" /></h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {t('settings.network.subtitle')}
-            </p>
           </div>
         }
       />
 
       <div className="p-4 max-w-2xl mx-auto w-full space-y-7">
-        {/* Intro */}
-        <div className="px-1 pt-1">
-          <h2 className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground/80">{t('settings.network.connectionsHeading')}</h2>
-          <p className="text-[13px] text-muted-foreground mt-1.5 leading-relaxed">
-            {t('settings.network.connectionsIntro')}
-          </p>
-        </div>
-
         {/* Low-Bandwidth Mode */}
         <section>
           <h2 className="px-1 pb-1.5 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground/80">{t('settings.network.lowBandwidthHeading')}</h2>

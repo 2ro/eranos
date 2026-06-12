@@ -50,24 +50,12 @@ export function AppearanceSettingsPage() {
       <PageHeader
         backTo="/settings"
         alwaysShowBack
-        titleContent={
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold">{t('settings.appearance.title')}</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {t('settings.appearance.subtitle')}
-            </p>
-          </div>
-        }
+        contentClassName="max-w-2xl mx-auto w-full"
+        title={t('settings.appearance.title')}
       />
 
       <div className="p-4 max-w-2xl mx-auto w-full">
-        {/* Intro */}
-        <div className="px-1 pt-1 pb-4">
-          <h2 className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground/80">{t('settings.appearance.colorMode')}</h2>
-          <p className="text-[13px] text-muted-foreground mt-1.5 leading-relaxed">
-            {t('settings.appearance.intro')}
-          </p>
-        </div>
+        <h2 className="px-1 pb-1.5 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground/80">{t('settings.appearance.colorMode')}</h2>
 
         {/* Theme options */}
         <div className="overflow-hidden rounded-2xl bg-card border border-border/60 shadow-sm divide-y divide-border/50">

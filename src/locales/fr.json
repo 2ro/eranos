@@ -1391,7 +1391,6 @@
     "appearance": {
       "title": "Apparence",
       "subtitle": "Choisissez l'apparence de l'application.",
-      "intro": "Choisissez votre mode de couleur préféré. Système correspondra automatiquement au réglage clair ou sombre de votre appareil.",
       "colorMode": "Mode de couleur",
       "system": "Système",
       "systemDesc": "Suit le réglage de votre appareil",
@@ -1403,8 +1402,6 @@
     "network": {
       "title": "Réseau",
       "subtitle": "Gérez l'utilisation des données, les relais et les serveurs de téléversement.",
-      "connectionsHeading": "Connexions réseau",
-      "connectionsIntro": "Gérez vos connexions aux relais. Les relais sont des serveurs qui stockent et distribuent les événements Nostr sur le réseau.",
       "lowBandwidthHeading": "Mode faible bande passante",
       "reduceDataUsage": "Réduire l'utilisation des données",
       "reduceDataUsageDesc": "Pour les connexions mesurées ou lentes. Les vidéos ne se lisent pas automatiquement, les aperçus vidéo en arrière-plan sont ignorés, et les images attendent une pression avant de charger.",
@@ -1425,7 +1422,6 @@
       "title": "Avancé",
       "subtitle": "Connexions de portefeuille, configuration système et autres options avancées pour les utilisateurs expérimentés.",
       "intro": "Connexions de portefeuille, configuration système et autres options avancées.",
-      "powerUserHeading": "Paramètres utilisateur avancé",
       "wallet": "Portefeuille"
     },
     "wallet": {
@@ -1436,7 +1432,6 @@
   "language": {
     "title": "Langue",
     "subtitle": "Choisissez la langue utilisée dans toute l'application.",
-    "intro": "Sélectionnez votre langue préférée. L'application changera immédiatement et se souviendra de votre choix sur cet appareil.",
     "translationNote": "Les traductions sont en cours. Le texte non traduit revient à l'anglais."
   },
   "verifier": {
@@ -1999,7 +1994,6 @@
     "seoTitle": "Notifications",
     "seoDescription": "Configurez vos préférences de notification",
     "title": "Notifications",
-    "subtitle": "Personnalisez les notifications que vous recevez.",
     "pushHeading": "Notifications push",
     "enablePush": {
       "label": "Activer les notifications push",
@@ -2281,12 +2275,7 @@
     "seoDescription": "Modifiez votre profil {{appName}}",
     "header": {
       "title": "Profil",
-      "subtitle": "Votre identité Nostr est portable — elle vous suit partout.",
       "save": "Enregistrer"
-    },
-    "intro": {
-      "heading": "Votre identité",
-      "body": "Appuyez sur n'importe quel champ de la carte pour le modifier. Cliquez sur votre avatar ou votre bannière pour téléverser et recadrer une nouvelle image."
     },
     "uploading": "Téléversement…",
     "fields": {
