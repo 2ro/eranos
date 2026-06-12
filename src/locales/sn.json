@@ -1088,7 +1088,23 @@
       "lede": "Pinda nepurofairi yesangano rako kuti uburitse, ugadziridze, kana kubvisa chirevo chako chekusimbisa."
     },
     "loginGateTitle": "Pinda nepurofairi yesangano rako",
-    "loginGateBody": "Pinda nepurofairi yeNostr yesangano rako, kana kuti gadzira imwe, kuti utange. Kana wapinda, unogona kuburitsa chirevo chako chekusimbisa pano."
+    "loginGateBody": "Pinda nepurofairi yeNostr yesangano rako, kana kuti gadzira imwe, kuti utange. Kana wapinda, unogona kuburitsa chirevo chako chekusimbisa pano.",
+    "tutorial": {
+      "eyebrow": "Iwe zvino uri muongorori",
+      "title": "Mashandisirwo ekusimbisa mushandirapamwe",
+      "lede": "Chirevo chako chava pachena. Heano matanho ekutsigira mushandirapamwe waunovimba nawo — zvinotora kubata kaviri chete kubva pakadhi rapi nerapi remushandirapamwe.",
+      "steps": {
+        "open": { "title": "Vhura menyu", "body": "Pakadhi ripi neripi remushandirapamwe, baya bhatani remadhoti matatu kona yekumusoro kurudyi kwebhanga." },
+        "verify": { "title": "Sarudza \"Simbisa mushandirapamwe uyu\"", "body": "Menyu inoratidza chiito chekusimbisa — chinoonekwa chete nevatariri nevaongorori sewe." },
+        "confirm": { "title": "Simbisa uye wapedza", "body": "Pupura kuti mushandirapamwe ndewechokwadi. Bheji rako rinobatana nekadhi kuti vanopa vazive kuti unowutsigira." }
+      },
+      "demo": {
+        "campaignTitle": "Mvura Yakachena yeMwanza",
+        "campaignOrganizer": "naMradi Foundation",
+        "menuVerify": "Simbisa mushandirapamwe uyu",
+        "verifiedBadge": "Yasimbiswa newe"
+      }
+    }
   },
   "organizers": {
     "appoint": "Sarudza Mugadziri",

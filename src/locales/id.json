@@ -1528,7 +1528,23 @@
       "lede": "Masuk dengan profil organisasi Anda untuk menerbitkan, memperbarui, atau menarik kembali pernyataan verifikasi Anda."
     },
     "loginGateTitle": "Masuk dengan profil organisasi Anda",
-    "loginGateBody": "Masuk dengan profil Nostr organisasi Anda, atau buat satu, untuk memulai. Setelah masuk, Anda dapat menerbitkan pernyataan verifikasi Anda di sini."
+    "loginGateBody": "Masuk dengan profil Nostr organisasi Anda, atau buat satu, untuk memulai. Setelah masuk, Anda dapat menerbitkan pernyataan verifikasi Anda di sini.",
+    "tutorial": {
+      "eyebrow": "Anda kini seorang verifikator",
+      "title": "Cara memverifikasi kampanye",
+      "lede": "Pernyataan Anda sudah aktif. Berikut cara menjamin kampanye yang Anda percaya — cukup dua ketukan dari kartu kampanye mana pun.",
+      "steps": {
+        "open": { "title": "Buka menu", "body": "Pada kartu kampanye mana pun, ketuk tombol tiga titik di sudut kanan atas banner." },
+        "verify": { "title": "Pilih \"Verifikasi kampanye ini\"", "body": "Menu menampilkan aksi verifikasi — hanya terlihat oleh moderator dan verifikator seperti Anda." },
+        "confirm": { "title": "Konfirmasi & selesai", "body": "Tegaskan bahwa kampanye ini autentik. Lencana Anda akan muncul di kartu sehingga para donatur tahu Anda mendukungnya." }
+      },
+      "demo": {
+        "campaignTitle": "Air Bersih untuk Mwanza",
+        "campaignOrganizer": "oleh Mradi Foundation",
+        "menuVerify": "Verifikasi kampanye ini",
+        "verifiedBadge": "Diverifikasi oleh Anda"
+      }
+    }
   },
   "organizers": {
     "appoint": "Tunjuk Organizer",

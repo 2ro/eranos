@@ -1525,7 +1525,32 @@
       "lede": "Connectez-vous avec le profil de votre organisation pour publier, mettre à jour ou retirer votre déclaration de vérification."
     },
     "loginGateTitle": "Connectez-vous avec le profil de votre organisation",
-    "loginGateBody": "Connectez-vous avec le profil Nostr de votre organisation, ou créez-en un, pour commencer. Une fois connecté, vous pourrez publier votre déclaration de vérification ici."
+    "loginGateBody": "Connectez-vous avec le profil Nostr de votre organisation, ou créez-en un, pour commencer. Une fois connecté, vous pourrez publier votre déclaration de vérification ici.",
+    "tutorial": {
+      "eyebrow": "Vous êtes désormais vérificateur",
+      "title": "Comment vérifier une campagne",
+      "lede": "Votre déclaration est en ligne. Voici comment vous porter garant d'une campagne en laquelle vous avez confiance — deux clics suffisent depuis n'importe quelle carte de campagne.",
+      "steps": {
+        "open": {
+          "title": "Ouvrez le menu",
+          "body": "Sur n'importe quelle carte de campagne, appuyez sur le bouton à trois points dans le coin supérieur droit de la bannière."
+        },
+        "verify": {
+          "title": "Choisissez \"Vérifier cette campagne\"",
+          "body": "Le menu révèle une action de vérification — visible uniquement par les modérateurs et les vérificateurs comme vous."
+        },
+        "confirm": {
+          "title": "Confirmez, et c'est terminé",
+          "body": "Attestez que la campagne est authentique. Votre badge rejoint la carte afin que les donateurs sachent que vous la soutenez."
+        }
+      },
+      "demo": {
+        "campaignTitle": "De l'eau potable pour Mwanza",
+        "campaignOrganizer": "par la Fondation Mradi",
+        "menuVerify": "Vérifier cette campagne",
+        "verifiedBadge": "Vérifié par vous"
+      }
+    }
   },
   "organizers": {
     "appoint": "Désigner un organisateur",

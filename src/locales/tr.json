@@ -1529,7 +1529,23 @@
       "lede": "Doğrulama beyanınızı yayımlamak, güncellemek veya geri çekmek için organizasyonunuzun profiliyle giriş yapın."
     },
     "loginGateTitle": "Organizasyonunuzun profiliyle giriş yapın",
-    "loginGateBody": "Başlamak için organizasyonunuzun Nostr profiliyle giriş yapın ya da bir tane oluşturun. Giriş yaptıktan sonra doğrulama beyanınızı buradan yayımlayabilirsiniz."
+    "loginGateBody": "Başlamak için organizasyonunuzun Nostr profiliyle giriş yapın ya da bir tane oluşturun. Giriş yaptıktan sonra doğrulama beyanınızı buradan yayımlayabilirsiniz.",
+    "tutorial": {
+      "eyebrow": "Artık bir doğrulayıcısınız",
+      "title": "Bir kampanya nasıl doğrulanır",
+      "lede": "Beyanınız yayında. Güvendiğiniz bir kampanyaya nasıl kefil olacağınız işte burada — herhangi bir kampanya kartından iki dokunuşla yapılır.",
+      "steps": {
+        "open": { "title": "Menüyü açın", "body": "Herhangi bir kampanya kartında, afişin sağ üst köşesindeki üç nokta düğmesine dokunun." },
+        "verify": { "title": "\"Bu kampanyayı doğrula\" seçeneğini seçin", "body": "Menüde bir doğrulama işlemi belirir — yalnızca sizin gibi moderatörler ve doğrulayıcılar tarafından görülebilir." },
+        "confirm": { "title": "Onaylayın ve işlem tamam", "body": "Kampanyanın gerçek olduğunu teyit edin. Rozetiniz kartta yerini alır, böylece bağışçılar arkasında durduğunuzu bilir." }
+      },
+      "demo": {
+        "campaignTitle": "Mwanza için Temiz Su",
+        "campaignOrganizer": "Mradi Vakfı tarafından",
+        "menuVerify": "Bu kampanyayı doğrula",
+        "verifiedBadge": "Sizin tarafınızdan doğrulandı"
+      }
+    }
   },
   "organizers": {
     "appoint": "Organizatör Ata",

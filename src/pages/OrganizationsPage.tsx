@@ -12,6 +12,7 @@ import {
 
 import { MilkdownEditor } from '@/components/markdown/MilkdownEditor';
 import { LoginArea } from '@/components/auth/LoginArea';
+import { VerifyTutorial } from '@/components/organizations/VerifyTutorial';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -262,8 +263,9 @@ function VerifierEditor() {
   };
 
   return (
-    <Card className="border-border/60 shadow-sm">
-      <CardContent className="p-6 sm:p-8 space-y-6">
+    <div className="space-y-8">
+      <Card className="border-border/60 shadow-sm">
+        <CardContent className="p-6 sm:p-8 space-y-6">
         {/* Prompt */}
         <div className="space-y-2">
           <p className="text-sm font-semibold">
@@ -321,6 +323,11 @@ function VerifierEditor() {
         )}
       </CardContent>
     </Card>
+
+      {/* Once the org's statement is live, teach them the actual
+          verify gesture: the three-dots menu on any campaign card. */}
+      {isPublished && <VerifyTutorial />}
+    </div>
   );
 }
 

@@ -1527,7 +1527,23 @@
       "lede": "Ingia kwa wasifu wa shirika lako ili kuchapisha, kusasisha, au kuondoa taarifa yako ya uthibitishaji."
     },
     "loginGateTitle": "Ingia kwa wasifu wa shirika lako",
-    "loginGateBody": "Ingia kwa wasifu wa Nostr wa shirika lako, au tengeneza mmoja, ili kuanza. Mara tu unapoingia, unaweza kuchapisha taarifa yako ya uthibitishaji hapa."
+    "loginGateBody": "Ingia kwa wasifu wa Nostr wa shirika lako, au tengeneza mmoja, ili kuanza. Mara tu unapoingia, unaweza kuchapisha taarifa yako ya uthibitishaji hapa.",
+    "tutorial": {
+      "eyebrow": "Sasa wewe ni mthibitishaji",
+      "title": "Jinsi ya kuthibitisha kampeni",
+      "lede": "Taarifa yako iko hewani. Hivi ndivyo unavyoweza kuiunga mkono kampeni unayoiamini \u2014 inachukua mibofyo miwili kutoka kwa kadi yoyote ya kampeni.",
+      "steps": {
+        "open": { "title": "Fungua menyu", "body": "Kwenye kadi yoyote ya kampeni, gusa kitufe cha nukta tatu kwenye kona ya juu kulia ya bango." },
+        "verify": { "title": "Chagua \"Thibitisha kampeni hii\"", "body": "Menyu hufunua kitendo cha kuthibitisha \u2014 kinachoonekana kwa wasimamizi na wathibitishaji kama wewe pekee." },
+        "confirm": { "title": "Thibitisha na umemaliza", "body": "Shuhudia kuwa kampeni ni halisi. Beji yako huungana na kadi ili wafadhili wajue unaiunga mkono." }
+      },
+      "demo": {
+        "campaignTitle": "Maji Safi kwa Mwanza",
+        "campaignOrganizer": "na Mradi Foundation",
+        "menuVerify": "Thibitisha kampeni hii",
+        "verifiedBadge": "Imethibitishwa na wewe"
+      }
+    }
   },
   "organizers": {
     "appoint": "Teua Mratibu",

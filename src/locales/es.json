@@ -1086,7 +1086,32 @@
       "lede": "Inicia sesión con el perfil de tu organización para publicar, actualizar o retirar tu declaración de verificación."
     },
     "loginGateTitle": "Inicia sesión con el perfil de tu organización",
-    "loginGateBody": "Inicia sesión con el perfil de Nostr de tu organización, o crea uno, para empezar. Una vez que hayas iniciado sesión, podrás publicar aquí tu declaración de verificación."
+    "loginGateBody": "Inicia sesión con el perfil de Nostr de tu organización, o crea uno, para empezar. Una vez que hayas iniciado sesión, podrás publicar aquí tu declaración de verificación.",
+    "tutorial": {
+      "eyebrow": "Ahora eres verificador",
+      "title": "Cómo verificar una campaña",
+      "lede": "Tu declaración ya está publicada. Así puedes respaldar una campaña en la que confías: solo dos toques desde cualquier tarjeta de campaña.",
+      "steps": {
+        "open": {
+          "title": "Abre el menú",
+          "body": "En cualquier tarjeta de campaña, toca el botón de tres puntos en la esquina superior derecha del banner."
+        },
+        "verify": {
+          "title": "Elige \"Verificar esta campaña\"",
+          "body": "El menú muestra una acción de verificación, visible solo para moderadores y verificadores como tú."
+        },
+        "confirm": {
+          "title": "Confirma y listo",
+          "body": "Da fe de que la campaña es auténtica. Tu insignia se une a la tarjeta para que los donantes sepan que la respaldas."
+        }
+      },
+      "demo": {
+        "campaignTitle": "Agua limpia para Mwanza",
+        "campaignOrganizer": "de la Fundación Mradi",
+        "menuVerify": "Verificar esta campaña",
+        "verifiedBadge": "Verificada por ti"
+      }
+    }
   },
   "organizers": {
     "appoint": "Designar Organizador",

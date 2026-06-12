@@ -1539,7 +1539,32 @@
       "lede": "Sign in with your organization's profile to publish, update, or withdraw your verification statement."
     },
     "loginGateTitle": "Sign in with your organization's profile",
-    "loginGateBody": "Log in with your organization's Nostr profile, or create one, to get started. Once you're signed in, you can publish your verification statement here."
+    "loginGateBody": "Log in with your organization's Nostr profile, or create one, to get started. Once you're signed in, you can publish your verification statement here.",
+    "tutorial": {
+      "eyebrow": "You're a verifier now",
+      "title": "How to verify a campaign",
+      "lede": "Your statement is live. Here's how to vouch for a campaign you trust — it takes two taps from any campaign card.",
+      "steps": {
+        "open": {
+          "title": "Open the menu",
+          "body": "On any campaign card, tap the three-dots button in the top-right corner of the banner."
+        },
+        "verify": {
+          "title": "Choose \"Verify this campaign\"",
+          "body": "The menu reveals a verify action — visible only to moderators and verifiers like you."
+        },
+        "confirm": {
+          "title": "Confirm & you're done",
+          "body": "Attest the campaign is authentic. Your badge joins the card so donors know you stand behind it."
+        }
+      },
+      "demo": {
+        "campaignTitle": "Clean Water for Mwanza",
+        "campaignOrganizer": "by Mradi Foundation",
+        "menuVerify": "Verify this campaign",
+        "verifiedBadge": "Verified by you"
+      }
+    }
   },
   "organizers": {
     "appoint": "Appoint Organizer",

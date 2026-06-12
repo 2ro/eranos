@@ -138,6 +138,12 @@ export default {
 				// an organic audio indicator.
 				'0%, 100%': { transform: 'scaleY(0.35)' },
 				'50%': { transform: 'scaleY(1)' }
+			},
+			'tutorial-tap': {
+				// A soft "press" pulse for the demo cursor in the
+				// verifier tutorial — shrinks briefly to read as a tap.
+				'0%, 70%, 100%': { transform: 'scale(1)' },
+				'80%': { transform: 'scale(0.78)' }
 			}
 			},
 			animation: {
@@ -149,7 +155,8 @@ export default {
 				'collapsible-down': 'collapsible-down 0.2s ease-out',
 				'collapsible-up': 'collapsible-up 0.2s ease-out',
 				'accent-glow': 'accent-glow 2s ease-in-out infinite',
-				'equaliser-bar': 'equaliser-bar 0.9s ease-in-out infinite'
+				'equaliser-bar': 'equaliser-bar 0.9s ease-in-out infinite',
+				'tutorial-tap': 'tutorial-tap 2.4s ease-in-out infinite'
 			}
 		}
 	},
