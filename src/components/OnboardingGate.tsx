@@ -36,25 +36,63 @@ import { cn } from '@/lib/utils';
 /**
  * Step state machine for the captive signup flow.
  *
- * Order:
+ * Base order (creator / donor):
  *   keygen → secure → role
  *
- * Three screens total. The old flow had a separate "wallet-coupling explainer"
- * step and a separate "outro" celebration screen; both were folded in. The
- * coupling explainer was redundant with `secure` (both screens are about the
- * key), so the secure step now carries the "this key is your account AND
- * your wallet" framing inline. The outro was a glorified tap-to-continue —
- * the role step's primary button already navigates somewhere meaningful, so
- * the role pick *is* the outro.
+ * Picking the *verifier* role doesn't navigate away — it branches into a
+ * captive sub-flow that continues from the role step:
+ *   role → orgIdentity → orgBio → orgStatement → orgVerifyHowto
+ *
+ * 1. orgIdentity   — banner, avatar, org name, website (kind-0 identity)
+ * 2. orgBio        — the organization's bio (kind-0 about)
+ * 3. orgStatement  — publish the verifier statement (kind 14672)
+ * 4. orgVerifyHowto— teach the verify gesture, then "View Campaigns"
+ *
+ * The old flow had a separate "wallet-coupling explainer" step and a
+ * separate "outro" celebration screen; both were folded in. The coupling
+ * explainer was redundant with `secure` (both screens are about the key), so
+ * the secure step now carries the "this key is your account AND your wallet"
+ * framing inline. For creator/donor the role pick *is* the outro.
  *
  * Login is handled by the existing `AuthDialog` modal — the captive flow is
  * only ever opened by an explicit `startSignup()` call (e.g. from
  * AuthDialog's "Create a new Nostr account" button), so the user has
  * already picked "signup" by the time we mount.
  */
-type Step = 'keygen' | 'secure' | 'role';
+type Step =
+  | 'keygen'
+  | 'secure'
+  | 'role'
+  | 'orgIdentity'
+  | 'orgBio'
+  | 'orgStatement'
+  | 'orgVerifyHowto';
 
+/** Base steps that count toward the progress bar for creator/donor. */
 const SIGNUP_STEPS: Step[] = ['keygen', 'secure', 'role'];
+
+/**
+ * Steps that count toward the progress bar once the user has chosen the
+ * verifier role. The role step is shared with the base flow, then the four
+ * verifier sub-flow steps extend it.
+ */
+const VERIFIER_STEPS: Step[] = [
+  'keygen',
+  'secure',
+  'role',
+  'orgIdentity',
+  'orgBio',
+  'orgStatement',
+  'orgVerifyHowto',
+];
+
+/** Ordered verifier sub-flow steps, used for sequential next/back nav. */
+const VERIFIER_SUBFLOW: Step[] = [
+  'orgIdentity',
+  'orgBio',
+  'orgStatement',
+  'orgVerifyHowto',
+];
 
 /**
  * The captive onboarding gate. Render this as a sibling of `<AppRouter />`;
@@ -106,12 +144,17 @@ function CaptiveOverlay() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showKey, setShowKey] = useState(false);
 
-  // Linear progress bar position. Every step in the machine counts toward
-  // the bar.
-  const currentProgressIndex = SIGNUP_STEPS.indexOf(step);
+  // Linear progress bar position. Once the user has chosen the verifier
+  // role, the bar tracks the extended verifier step list so the four
+  // sub-flow screens are reflected; otherwise the base three-step list is
+  // used (creator/donor progress math is unaffected).
+  const isVerifierFlow =
+    contextRole === 'verifier' || VERIFIER_SUBFLOW.includes(step);
+  const progressSteps = isVerifierFlow ? VERIFIER_STEPS : SIGNUP_STEPS;
+  const currentProgressIndex = progressSteps.indexOf(step);
   const progress = currentProgressIndex < 0
     ? 0
-    : ((currentProgressIndex + 1) / SIGNUP_STEPS.length) * 100;
+    : ((currentProgressIndex + 1) / progressSteps.length) * 100;
 
   // Navigation helpers ------------------------------------------------------
   const goTo = useCallback((target: Step) => {
@@ -124,34 +167,57 @@ function CaptiveOverlay() {
       cancel();
     } else if (step === 'secure') {
       goTo('keygen');
+    } else if (VERIFIER_SUBFLOW.includes(step)) {
+      // Within the verifier sub-flow: step back one screen, or back to the
+      // role picker from the first sub-flow step.
+      const idx = VERIFIER_SUBFLOW.indexOf(step);
+      goTo(idx <= 0 ? 'role' : VERIFIER_SUBFLOW[idx - 1]);
     } else {
+      // role step
       if (user) cancel();
       else goTo('secure');
     }
   }, [step, user, cancel, goTo]);
 
-  // Role pick is the final step for creator/donor. Picking a role both
-  // records the choice (used by the role-pick CTA labels) and navigates to
-  // the matching surface: creator → campaign-creation form, donor → full
-  // campaign grid (`/campaigns`, not `/`, so they land on the
-  // browse-everything view rather than the curated home with its own
-  // marketing hero). The verifier role does not navigate away — it branches
-  // into the captive verifier sub-flow (wired up in a later step); for now
-  // it routes to the public /organizations onboarding tool.
+  // Advance one screen within the verifier sub-flow. The first call (from
+  // the role pick) enters at `orgIdentity`; subsequent calls walk the list.
+  const goNextVerifierStep = useCallback(() => {
+    const idx = VERIFIER_SUBFLOW.indexOf(step);
+    if (idx < 0) {
+      goTo(VERIFIER_SUBFLOW[0]);
+    } else if (idx < VERIFIER_SUBFLOW.length - 1) {
+      goTo(VERIFIER_SUBFLOW[idx + 1]);
+    }
+  }, [step, goTo]);
+
+  // Role pick. For creator/donor this is the final step: it records the
+  // choice and navigates to the matching surface (creator → /campaigns/new,
+  // donor → /campaigns). The verifier role does NOT navigate away — it
+  // records the role and enters the captive verifier sub-flow, which
+  // finishes on its own terms ("View Campaigns").
   const handleRolePick = useCallback(
     (next: 'creator' | 'donor' | 'verifier') => {
       setContextRole(next);
+      if (next === 'verifier') {
+        goTo('orgIdentity');
+        return;
+      }
       cancel();
       if (next === 'creator') {
         navigate('/campaigns/new');
-      } else if (next === 'verifier') {
-        navigate('/organizations');
       } else {
         navigate('/campaigns');
       }
     },
-    [setContextRole, cancel, navigate],
+    [setContextRole, cancel, navigate, goTo],
   );
+
+  // Terminal CTA for the verifier sub-flow — drop the new verifier on the
+  // campaign grid so they can immediately start vouching.
+  const handleVerifierFinish = useCallback(() => {
+    cancel();
+    navigate('/campaigns');
+  }, [cancel, navigate]);
 
   // Key generation ----------------------------------------------------------
   const handleGenerateKey = useCallback(() => {
@@ -219,6 +285,22 @@ function CaptiveOverlay() {
             onPick={handleRolePick}
           />
         );
+      case 'orgIdentity':
+        // Verifier sub-flow step 1 — organization identity (kind-0).
+        // Filled in by a later commit.
+        return <VerifierStepShell onContinue={goNextVerifierStep} />;
+      case 'orgBio':
+        // Verifier sub-flow step 2 — organization bio (kind-0 about).
+        // Filled in by a later commit.
+        return <VerifierStepShell onContinue={goNextVerifierStep} />;
+      case 'orgStatement':
+        // Verifier sub-flow step 3 — publish the verifier statement
+        // (kind 14672). Filled in by a later commit.
+        return <VerifierStepShell onContinue={goNextVerifierStep} />;
+      case 'orgVerifyHowto':
+        // Verifier sub-flow step 4 — teach the verify gesture, then finish.
+        // Filled in by a later commit.
+        return <VerifierStepShell onContinue={handleVerifierFinish} />;
     }
   })();
 
@@ -325,6 +407,22 @@ function RoleStep({ role, onPick }: RoleStepProps) {
         />
       </div>
 
+    </div>
+  );
+}
+
+/**
+ * Placeholder shell for the four verifier sub-flow steps. Each real step
+ * (organization identity, bio, statement, how-to-verify) replaces this in a
+ * later commit; for now it just renders a Continue button so the state
+ * machine and navigation can be exercised end-to-end.
+ */
+function VerifierStepShell({ onContinue }: { onContinue: () => void }) {
+  return (
+    <div className="space-y-6">
+      <Button onClick={onContinue} className="w-full h-12 text-base rounded-full">
+        Continue
+      </Button>
     </div>
   );
 }
