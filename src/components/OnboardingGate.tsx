@@ -28,6 +28,7 @@ import {
   VerifierIdentityStep,
   type OrgProfileDraft,
 } from '@/components/onboarding/VerifierIdentityStep';
+import { VerifierBioStep } from '@/components/onboarding/VerifierBioStep';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -316,8 +317,14 @@ function CaptiveOverlay() {
         );
       case 'orgBio':
         // Verifier sub-flow step 2 — organization bio (kind-0 about).
-        // Filled in by a later commit.
-        return <VerifierStepShell onContinue={goNextVerifierStep} />;
+        return (
+          <VerifierBioStep
+            draft={orgDraft}
+            pubkey={user?.pubkey}
+            onChange={patchOrgDraft}
+            onContinue={goNextVerifierStep}
+          />
+        );
       case 'orgStatement':
         // Verifier sub-flow step 3 — publish the verifier statement
         // (kind 14672). Filled in by a later commit.
