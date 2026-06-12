@@ -31,6 +31,7 @@ import { Nip05Badge } from '@/components/Nip05Badge';
 import { PledgeCard } from '@/components/PledgeCard';
 import { ProfileReactionButton } from '@/components/ProfileReactionButton';
 import { OrganizationsAllDialog } from '@/components/profile/OrganizationsAllDialog';
+import { ProfileVerifierSection } from '@/components/profile/ProfileVerifierSection';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useProfileOrganizations, type ProfileOrganization } from '@/hooks/useProfileOrganizations';
 import type { ProfileCampaignStats } from '@/hooks/useProfileCampaignStats';
@@ -389,6 +390,11 @@ export function ProfileOverviewSections({
   const { t } = useTranslation();
   return (
     <div className={cn('flex flex-col gap-5', className)}>
+      {/* Verifier statement (kind 14672) — surfaced first so donors can
+          immediately see how this account verifies campaigns. Renders
+          nothing when the profile has not published a statement. */}
+      <ProfileVerifierSection pubkey={pubkey} />
+
       {/* Profile fields (rendered upstream) — placed first so the
           profile's own freeform metadata (links, addresses, etc.) is
           the first thing visitors read, ahead of campaigns/orgs. */}

@@ -69,7 +69,6 @@ import { ProfileCampaignsTab } from '@/components/profile/ProfileCampaignsTab';
 import { ProfilePledgesTab } from '@/components/profile/ProfilePledgesTab';
 import { ProfileActivityTab } from '@/components/profile/ProfileActivityTab';
 import { ProfileTabs } from '@/components/profile/ProfileTabs';
-import { ProfileVerifierSection } from '@/components/profile/ProfileVerifierSection';
 import type { ParsedCampaign } from '@/lib/campaign';
 import type { AddrCoords } from '@/hooks/useEvent';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -1427,12 +1426,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                 `min-w-0` is critical inside a grid track so long unbroken
                 text doesn't push the column wider than its fraction. */}
             <section className="min-w-0">
-              {/* Verifier statement (kind 14672) — full-width above the
-                  tabs so donors can read how this account vets campaigns.
-                  Renders nothing when no statement is published. */}
-              {pubkey && (
-                <ProfileVerifierSection pubkey={pubkey} className="mb-5" />
-              )}
               <ProfileTabs
                 tabs={desktopTabs}
                 activeTab={DESKTOP_TAB_IDS.has(activeTab) ? activeTab : 'activity'}
@@ -1520,11 +1513,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                     onTabChange={setActiveTab}
                     authorEvent={authorEvent}
                   />
-
-                  {/* Verifier statement (kind 14672) — full-width above the
-                      tabs, below the identity header. Renders nothing when
-                      no statement is published. */}
-                  <ProfileVerifierSection pubkey={pubkey} className="mt-5" />
 
                   {/* Tab bar — sticky to the top of the page scroll once
                       it leaves the viewport. Sits right below the stats. */}
