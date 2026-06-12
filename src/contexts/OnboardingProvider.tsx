@@ -32,7 +32,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     // animation. We re-seed on the next startSignup().
   }, []);
 
-  const setRole = useCallback((next: 'creator' | 'donor') => {
+  const setRole = useCallback((next: 'creator' | 'donor' | 'verifier') => {
     setRoleState(next);
   }, []);
 

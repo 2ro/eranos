@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
   ArrowRight,
+  BadgeCheck,
   Bitcoin,
   Download,
   Eye,
@@ -129,18 +130,22 @@ function CaptiveOverlay() {
     }
   }, [step, user, cancel, goTo]);
 
-  // Role pick is the final step. Picking a role both records the choice
-  // (used by the role-pick CTA labels) and navigates to the matching
-  // surface: creator → campaign-creation form, donor → full campaign grid
-  // (`/campaigns`, not `/`, so they land on the browse-everything view
-  // rather than the curated home with its own marketing hero). No separate
-  // outro / celebration screen.
+  // Role pick is the final step for creator/donor. Picking a role both
+  // records the choice (used by the role-pick CTA labels) and navigates to
+  // the matching surface: creator → campaign-creation form, donor → full
+  // campaign grid (`/campaigns`, not `/`, so they land on the
+  // browse-everything view rather than the curated home with its own
+  // marketing hero). The verifier role does not navigate away — it branches
+  // into the captive verifier sub-flow (wired up in a later step); for now
+  // it routes to the public /organizations onboarding tool.
   const handleRolePick = useCallback(
-    (next: 'creator' | 'donor') => {
+    (next: 'creator' | 'donor' | 'verifier') => {
       setContextRole(next);
       cancel();
       if (next === 'creator') {
         navigate('/campaigns/new');
+      } else if (next === 'verifier') {
+        navigate('/organizations');
       } else {
         navigate('/campaigns');
       }
@@ -273,7 +278,7 @@ function CaptiveOverlay() {
 
 interface RoleStepProps {
   role: OnboardingRole;
-  onPick: (role: 'creator' | 'donor') => void;
+  onPick: (role: 'creator' | 'donor' | 'verifier') => void;
 }
 
 /**
@@ -309,6 +314,14 @@ function RoleStep({ role, onPick }: RoleStepProps) {
           finderNote={t('onboarding.role.donor.finderNote')}
           selected={role === 'donor'}
           onClick={() => onPick('donor')}
+        />
+        <RoleCard
+          icon={<BadgeCheck className="h-5 w-5 md:h-6 md:w-6 text-primary" />}
+          title={t('onboarding.role.verifier.title')}
+          description={t('onboarding.role.verifier.description')}
+          finderNote={t('onboarding.role.verifier.finderNote')}
+          selected={role === 'verifier'}
+          onClick={() => onPick('verifier')}
         />
       </div>
 

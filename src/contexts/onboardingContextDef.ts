@@ -1,13 +1,17 @@
 import { createContext, useContext } from 'react';
 
 /**
- * The two top-level roles a new user can pick during onboarding. Drives
- * downstream copy (creator vs. donor framing) and the role-pick CTA target
- * (creator → /campaigns/new, donor → /campaigns).
+ * The top-level roles a new user can pick during onboarding. Drives
+ * downstream copy (creator vs. donor vs. verifier framing) and the
+ * role-pick behavior:
+ *   - `creator` → navigate to /campaigns/new
+ *   - `donor`   → navigate to /campaigns
+ *   - `verifier`→ stay captive and branch into the verifier sub-flow
+ *     (org identity → org bio → publish statement → how-to-verify)
  *
  * `null` before the user has answered the role-picker step.
  */
-export type OnboardingRole = 'creator' | 'donor' | null;
+export type OnboardingRole = 'creator' | 'donor' | 'verifier' | null;
 
 /** Options to pre-seed when invoking the captive flow from a specific CTA. */
 export interface StartSignupOptions {
@@ -15,7 +19,7 @@ export interface StartSignupOptions {
    * Pre-fill the role picker. CTAs that semantically already imply a role
    * (e.g. "Start a campaign") can skip the role step by passing this.
    */
-  role?: 'creator' | 'donor';
+  role?: 'creator' | 'donor' | 'verifier';
 }
 
 export interface OnboardingContextValue {
@@ -29,7 +33,7 @@ export interface OnboardingContextValue {
    *  finishes or explicitly bails out. */
   cancel: () => void;
   /** Update the selected role from inside the flow (role-picker step). */
-  setRole: (role: 'creator' | 'donor') => void;
+  setRole: (role: 'creator' | 'donor' | 'verifier') => void;
 }
 
 export const OnboardingContext = createContext<OnboardingContextValue | undefined>(undefined);

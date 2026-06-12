@@ -104,6 +104,11 @@
         "title": "Give to campaigns",
         "description": "Support causes with Bitcoin.",
         "finderNote": "Your donation goes straight to the organizer's wallet."
+      },
+      "verifier": {
+        "title": "Verify campaigns",
+        "description": "Vouch for campaigns you've checked out, as an organization.",
+        "finderNote": "Donors see your badge on campaigns you trust."
       }
     },
     "keygen": {
