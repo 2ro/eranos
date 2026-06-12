@@ -552,7 +552,14 @@ export function ModerationMenu({ className, ...rest }: ModerationMenuProps) {
         </DropdownMenuContent>
       </DropdownMenu>
       {rest.surface === 'campaign' && (
-        <>
+        // The campaign card wraps everything in a <Link>. Radix dialogs portal
+        // their DOM out of the card, but React synthetic events still bubble
+        // through the component tree to the Link — so clicks inside the dialog
+        // would navigate to the campaign page. Stop propagation here.
+        <span
+          onClick={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
           <CampaignListMembershipDialog
             open={membershipOpen}
             onOpenChange={setMembershipOpen}
@@ -566,7 +573,7 @@ export function ModerationMenu({ className, ...rest }: ModerationMenuProps) {
             isPending={verify.isPending}
             onConfirm={onConfirmVerify}
           />
-        </>
+        </span>
       )}
     </>
   );
