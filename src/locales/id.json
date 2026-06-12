@@ -2160,6 +2160,7 @@
     "couldNotResolveNip05": "Tidak dapat menyelesaikan pengenal NIP-05 ini.",
     "tabs": {
       "overview": "Ikhtisar",
+      "verified": "Terverifikasi",
       "activity": "Aktivitas",
       "campaigns": "Kampanye",
       "groups": "Grup",
@@ -2259,6 +2260,11 @@
       "emptySelf": "Anda belum meluncurkan kampanye.",
       "emptyOther": "{{name}} belum meluncurkan kampanye.",
       "startLink": "Mulai kampanye →"
+    },
+    "verified": {
+      "count_one": "{{count}} kampanye terverifikasi",
+      "count_other": "{{count}} kampanye terverifikasi",
+      "empty": "{{name}} belum memverifikasi kampanye apa pun."
     },
     "pledgesTab": {
       "active": "Aktif",

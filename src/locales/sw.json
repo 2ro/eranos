@@ -2119,6 +2119,7 @@
     "couldNotResolveNip05": "Haikuweza kutatua kitambulisho hiki cha NIP-05.",
     "tabs": {
       "overview": "Muhtasari",
+      "verified": "Zilizothibitishwa",
       "activity": "Shughuli",
       "campaigns": "Kampeni",
       "groups": "Vikundi",
@@ -2218,6 +2219,11 @@
       "emptySelf": "Bado hujazindua kampeni yoyote.",
       "emptyOther": "{{name}} bado hajazindua kampeni yoyote.",
       "startLink": "Anza kampeni →"
+    },
+    "verified": {
+      "count_one": "Kampeni {{count}} iliyothibitishwa",
+      "count_other": "Kampeni {{count}} zilizothibitishwa",
+      "empty": "{{name}} bado hajathibitisha kampeni yoyote."
     },
     "pledgesTab": {
       "active": "Zinazoendelea",

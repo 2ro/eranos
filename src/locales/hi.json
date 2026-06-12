@@ -2160,6 +2160,7 @@
     "couldNotResolveNip05": "इस NIP-05 पहचानकर्ता को resolve नहीं कर सके।",
     "tabs": {
       "overview": "ओवरव्यू",
+      "verified": "सत्यापित",
       "activity": "गतिविधि",
       "campaigns": "कैंपेन",
       "groups": "ग्रुप",
@@ -2259,6 +2260,11 @@
       "emptySelf": "आपने अभी कोई कैंपेन लॉन्च नहीं किया है।",
       "emptyOther": "{{name}} ने अभी कोई कैंपेन लॉन्च नहीं किया है।",
       "startLink": "कैंपेन शुरू करें →"
+    },
+    "verified": {
+      "count_one": "{{count}} सत्यापित कैंपेन",
+      "count_other": "{{count}} सत्यापित कैंपेन",
+      "empty": "{{name}} ने अभी तक किसी कैंपेन को सत्यापित नहीं किया है।"
     },
     "pledgesTab": {
       "active": "सक्रिय",

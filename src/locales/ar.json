@@ -1784,6 +1784,7 @@
     "couldNotResolveNip05": "تعذّر تحليل معرّف NIP-05 هذا.",
     "tabs": {
       "overview": "نظرة عامة",
+      "verified": "تم التوثيق",
       "activity": "النشاط",
       "campaigns": "الحملات",
       "groups": "المجموعات",
@@ -1883,6 +1884,11 @@
       "emptySelf": "لم تطلق أي حملة بعد.",
       "emptyOther": "لم يطلق {{name}} أي حملة بعد.",
       "startLink": "ابدأ حملة ←"
+    },
+    "verified": {
+      "count_one": "حملة موثّقة واحدة",
+      "count_other": "{{count}} حملة موثّقة",
+      "empty": "لم يوثّق {{name}} أي حملة بعد."
     },
     "pledgesTab": {
       "active": "نشطة",

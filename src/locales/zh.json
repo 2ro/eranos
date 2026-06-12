@@ -1796,6 +1796,7 @@
     "couldNotResolveNip05": "无法解析此 NIP-05 标识符。",
     "tabs": {
       "overview": "概览",
+      "verified": "已验证",
       "activity": "动态",
       "campaigns": "活动",
       "groups": "群组",
@@ -1895,6 +1896,11 @@
       "emptySelf": "你还没有发起任何活动。",
       "emptyOther": "{{name}} 还没有发起任何活动。",
       "startLink": "发起活动 →"
+    },
+    "verified": {
+      "count_one": "{{count}} 个已验证活动",
+      "count_other": "{{count}} 个已验证活动",
+      "empty": "{{name}} 尚未验证任何活动。"
     },
     "pledgesTab": {
       "active": "进行中",

@@ -2161,6 +2161,7 @@
     "couldNotResolveNip05": "Bu NIP-05 tanımlayıcısı çözülemedi.",
     "tabs": {
       "overview": "Genel bakış",
+      "verified": "Doğrulandı",
       "activity": "Etkinlik",
       "campaigns": "Kampanyalar",
       "groups": "Gruplar",
@@ -2260,6 +2261,11 @@
       "emptySelf": "Henüz bir kampanya başlatmadınız.",
       "emptyOther": "{{name}} henüz bir kampanya başlatmadı.",
       "startLink": "Kampanya başlat →"
+    },
+    "verified": {
+      "count_one": "{{count}} doğrulanmış kampanya",
+      "count_other": "{{count}} doğrulanmış kampanya",
+      "empty": "{{name}} henüz hiçbir kampanyayı doğrulamadı."
     },
     "pledgesTab": {
       "active": "Aktif",

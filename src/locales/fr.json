@@ -2233,6 +2233,7 @@
     "couldNotResolveNip05": "Impossible de résoudre cet identifiant NIP-05.",
     "tabs": {
       "overview": "Aperçu",
+      "verified": "Vérifiées",
       "activity": "Activité",
       "campaigns": "Campagnes",
       "groups": "Groupes",
@@ -2332,6 +2333,11 @@
       "emptySelf": "Vous n'avez pas encore lancé de campagne.",
       "emptyOther": "{{name}} n'a pas encore lancé de campagne.",
       "startLink": "Démarrer une campagne →"
+    },
+    "verified": {
+      "count_one": "{{count}} campagne vérifiée",
+      "count_other": "{{count}} campagnes vérifiées",
+      "empty": "{{name}} n'a encore vérifié aucune campagne."
     },
     "pledgesTab": {
       "active": "Active",

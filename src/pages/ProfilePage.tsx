@@ -54,6 +54,7 @@ import { ProfileRecoveryDialog } from '@/components/ProfileRecoveryDialog';
 import { GiveBadgeDialog } from '@/components/GiveBadgeDialog';
 import { useProfileCampaignStats } from '@/hooks/useProfileCampaignStats';
 import type { ProfileCampaignStats } from '@/hooks/useProfileCampaignStats';
+import { useVerifierStatement } from '@/hooks/useVerifierStatement';
 import { useActions } from '@/hooks/useActions';
 import type { Action } from '@/hooks/useActions';
 import { useBtcPrice } from '@/hooks/useBtcPrice';
@@ -69,6 +70,7 @@ import { ProfileCampaignsTab } from '@/components/profile/ProfileCampaignsTab';
 import { ProfilePledgesTab } from '@/components/profile/ProfilePledgesTab';
 import { ProfileActivityTab } from '@/components/profile/ProfileActivityTab';
 import { ProfileTabs } from '@/components/profile/ProfileTabs';
+import { ProfileVerifiedTab } from '@/components/profile/ProfileVerifiedTab';
 import type { ParsedCampaign } from '@/lib/campaign';
 import type { AddrCoords } from '@/hooks/useEvent';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -911,6 +913,10 @@ function ProfileTabContent({
     );
   }
 
+  if (activeTab === 'verified') {
+    return <ProfileVerifiedTab pubkey={pubkey} displayName={displayName} />;
+  }
+
   if (activeTab === 'campaigns') {
     return (
       <ProfileCampaignsTab
@@ -955,14 +961,15 @@ const MOBILE_TAB_LABEL_KEYS = ['overview', 'activity', 'campaigns', 'groups', 'p
 // Map from label key → internal tab id.
 const CORE_TAB_IDS: Record<string, string> = {
   'overview': 'overview',
+  'verified': 'verified',
   'activity': 'activity',
   'campaigns': 'campaigns',
   'groups': 'community',
   'pledges': 'pledges',
 };
 
-const KNOWN_TAB_IDS = new Set(['overview', 'activity', 'campaigns', 'community', 'pledges']);
-const DESKTOP_TAB_IDS = new Set(['activity', 'campaigns', 'pledges']);
+const KNOWN_TAB_IDS = new Set(['overview', 'verified', 'activity', 'campaigns', 'community', 'pledges']);
+const DESKTOP_TAB_IDS = new Set(['verified', 'activity', 'campaigns', 'pledges']);
 
 /**
  * Read the viewport at first render to pick the initial active tab.
@@ -1172,19 +1179,52 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   );
 }
 
+  // Is the profile being viewed a verifier (has a kind 14672 statement)?
+  // When so, a "Verified" tab is shown and becomes the default on first
+  // load. The flag is async, so the default switch happens in an effect.
+  const { isVerifier } = useVerifierStatement(pubkey);
+
+  // True once the user has explicitly picked a tab, so the verifier
+  // default-switch never overrides a deliberate selection.
+  const tabManuallySelected = useRef(false);
+  const handleTabChange = useCallback((tabId: string) => {
+    tabManuallySelected.current = true;
+    setActiveTab(tabId);
+  }, []);
+
+  // Default verifier profiles to the "Verified" tab on first load.
+  useEffect(() => {
+    if (isVerifier && !tabManuallySelected.current) {
+      setActiveTab('verified');
+    }
+  }, [isVerifier]);
+
+  // Reset the "manually selected" guard when navigating to a new profile
+  // so the verifier default applies fresh on each profile.
+  useEffect(() => {
+    tabManuallySelected.current = false;
+  }, [pubkey]);
+
   // Two tab lists — mobile (Overview + Community visible) and desktop
   // (only the three content tabs; the rail covers Overview / Community
   // visually). Both `ProfileTabs` instances feed the same `activeTab`,
   // so cross-breakpoint navigation (e.g. clicking "See all" in the
   // mobile Overview tab) Just Works.
-  const desktopTabs = useMemo(
-    () => DESKTOP_TAB_LABEL_KEYS.map((key) => ({ id: CORE_TAB_IDS[key], label: t(`profile.tabs.${key}`) })),
-    [t],
-  );
-  const mobileTabs = useMemo(
-    () => MOBILE_TAB_LABEL_KEYS.map((key) => ({ id: CORE_TAB_IDS[key], label: t(`profile.tabs.${key}`) })),
-    [t],
-  );
+  // Verifier profiles get a "Verified" tab, surfaced first (and made the
+  // default in the effect above) so visitors immediately see the campaigns
+  // the organization has vouched for. Non-verifiers never see the tab.
+  const desktopTabs = useMemo(() => {
+    const keys = isVerifier
+      ? (['verified', ...DESKTOP_TAB_LABEL_KEYS] as const)
+      : DESKTOP_TAB_LABEL_KEYS;
+    return keys.map((key) => ({ id: CORE_TAB_IDS[key], label: t(`profile.tabs.${key}`) }));
+  }, [t, isVerifier]);
+  const mobileTabs = useMemo(() => {
+    const keys = isVerifier
+      ? (['verified', ...MOBILE_TAB_LABEL_KEYS] as const)
+      : MOBILE_TAB_LABEL_KEYS;
+    return keys.map((key) => ({ id: CORE_TAB_IDS[key], label: t(`profile.tabs.${key}`) }));
+  }, [t, isVerifier]);
 
   // Keep the active tab in sync if it ever falls out of the recognized
   // set. The desktop case also redirects mobile-only tabs (`overview`,
@@ -1414,7 +1454,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                   onMoreMenuOpen={() => setMoreMenuOpen(true)}
                   onFollowQROpen={() => setFollowQROpen(true)}
                   onToggleFollow={handleToggleFollow}
-                  onTabChange={(id) => setActiveTab(id)}
+                  onTabChange={(id) => handleTabChange(id)}
                   onDonate={openDonateForCampaign}
                   canFollow={!!user}
                   authorEvent={authorEvent}
@@ -1429,7 +1469,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
               <ProfileTabs
                 tabs={desktopTabs}
                 activeTab={DESKTOP_TAB_IDS.has(activeTab) ? activeTab : 'activity'}
-                onChange={setActiveTab}
+                onChange={handleTabChange}
               />
               {pubkey && (
                 <ProfileTabContent
@@ -1444,9 +1484,9 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                   pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
                   fields={fields}
                   fieldsContent={fields.map((field, i) => (
-                    <ProfileFieldInline key={i} field={field} />
+                     <ProfileFieldInline key={i} field={field} />
                   ))}
-                  onTabChange={setActiveTab}
+                  onTabChange={handleTabChange}
                 />
               )}
             </section>
@@ -1510,7 +1550,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                     onDonate={openDonateForCampaign}
                     onFollowersOpen={() => setFollowersModalOpen(true)}
                     onFollowingOpen={() => setFollowingModalOpen(true)}
-                    onTabChange={setActiveTab}
+                    onTabChange={handleTabChange}
                     authorEvent={authorEvent}
                   />
 
@@ -1520,7 +1560,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                     <ProfileTabs
                       tabs={mobileTabs}
                       activeTab={activeTab}
-                      onChange={setActiveTab}
+                      onChange={handleTabChange}
                     />
                     <ProfileTabContent
                       activeTab={activeTab}
@@ -1536,7 +1576,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                       fieldsContent={fields.map((field, i) => (
                         <ProfileFieldInline key={i} field={field} />
                       ))}
-                      onTabChange={setActiveTab}
+                  onTabChange={handleTabChange}
                     />
                   </div>
                 </>

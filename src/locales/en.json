@@ -2314,6 +2314,7 @@
     "couldNotResolveNip05": "Could not resolve this NIP-05 identifier.",
     "tabs": {
       "overview": "Overview",
+      "verified": "Verified",
       "activity": "Activity",
       "campaigns": "Campaigns",
       "groups": "Groups",
@@ -2413,6 +2414,11 @@
       "emptySelf": "You haven't launched a campaign yet.",
       "emptyOther": "{{name}} hasn't launched a campaign yet.",
       "startLink": "Start a campaign →"
+    },
+    "verified": {
+      "count_one": "{{count}} verified campaign",
+      "count_other": "{{count}} verified campaigns",
+      "empty": "{{name}} hasn't verified any campaigns yet."
     },
     "pledgesTab": {
       "active": "Active",

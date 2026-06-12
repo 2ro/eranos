@@ -1796,6 +1796,7 @@
     "couldNotResolveNip05": "Hatina kukwanisa kuziva chiratidzo cheNIP-05 ichi.",
     "tabs": {
       "overview": "Pfupiso",
+      "verified": "Zvasimbiswa",
       "activity": "Zviitiko",
       "campaigns": "Mishando",
       "groups": "Mapoka",
@@ -1895,6 +1896,11 @@
       "emptySelf": "Hauna kutanga mushando.",
       "emptyOther": "{{name}} haana kutanga mushando.",
       "startLink": "Tanga mushando →"
+    },
+    "verified": {
+      "count_one": "Mushando {{count}} wakasimbiswa",
+      "count_other": "Mishando {{count}} yakasimbiswa",
+      "empty": "{{name}} haasati asimbisa chero mushando."
     },
     "pledgesTab": {
       "active": "Zviri kuitika",

@@ -1794,6 +1794,7 @@
     "couldNotResolveNip05": "این شناسه NIP-05 قابل حل نیست.",
     "tabs": {
       "overview": "مرور",
+      "verified": "تأییدشده",
       "activity": "فعالیت",
       "campaigns": "کارزارها",
       "groups": "گروه‌ها",
@@ -1893,6 +1894,11 @@
       "emptySelf": "هنوز کارزاری راه‌اندازی نکرده‌اید.",
       "emptyOther": "{{name}} هنوز کارزاری راه‌اندازی نکرده است.",
       "startLink": "راه‌اندازی کارزار ←"
+    },
+    "verified": {
+      "count_one": "{{count}} کارزار تأییدشده",
+      "count_other": "{{count}} کارزار تأییدشده",
+      "empty": "{{name}} هنوز هیچ کارزاری را تأیید نکرده است."
     },
     "pledgesTab": {
       "active": "فعال",

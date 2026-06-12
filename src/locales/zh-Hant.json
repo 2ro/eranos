@@ -1720,6 +1720,7 @@
     "couldNotResolveNip05": "無法解析此 NIP-05 識別符號。",
     "tabs": {
       "overview": "概覽",
+      "verified": "已驗證",
       "activity": "動態",
       "campaigns": "活動",
       "groups": "群組",
@@ -1819,6 +1820,11 @@
       "emptySelf": "你還沒有發起任何活動。",
       "emptyOther": "{{name}} 還沒有發起任何活動。",
       "startLink": "發起活動 →"
+    },
+    "verified": {
+      "count_one": "{{count}} 個已驗證活動",
+      "count_other": "{{count}} 個已驗證活動",
+      "empty": "{{name}} 尚未驗證任何活動。"
     },
     "pledgesTab": {
       "active": "進行中",

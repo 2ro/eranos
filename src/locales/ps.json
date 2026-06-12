@@ -1796,6 +1796,7 @@
     "couldNotResolveNip05": "د NIP-05 پیژندونکی نه شو حل کیدلی.",
     "tabs": {
       "overview": "بیاکتنه",
+      "verified": "تایید شوي",
       "activity": "فعالیت",
       "campaigns": "کمپاینونه",
       "groups": "ډلې",
@@ -1895,6 +1896,11 @@
       "emptySelf": "تاسو لا تر اوسه کوم کمپاین نه دی پیل کړی.",
       "emptyOther": "{{name}} لا تر اوسه کوم کمپاین نه دی پیل کړی.",
       "startLink": "کمپاین پیل کړئ ←"
+    },
+    "verified": {
+      "count_one": "{{count}} تایید شوی کمپاین",
+      "count_other": "{{count}} تایید شوي کمپاینونه",
+      "empty": "{{name}} لا تر اوسه کوم کمپاین نه دی تایید کړی."
     },
     "pledgesTab": {
       "active": "فعال",
