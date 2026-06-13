@@ -171,7 +171,7 @@
       "publishFailedDescription": "Your account is ready, but the organization profile couldn't be published. You can finish it later from settings.",
       "statement": {
         "title": "Publish your verifier statement",
-        "subtitle": "Explain how your organization checks out campaigns before vouching for them. This is public and helps donors trust your badge."
+        "subtitle": "Explain how your organization checks out campaigns before vouching for them — the checks you run, the evidence you require, how you confirm an organizer's identity. This is published publicly and shown on your profile so donors can trust your badge."
       },
       "howto": {
         "title": "How to verify a campaign",
@@ -1590,8 +1590,13 @@
     },
     "getStarted": {
       "eyebrow": "Get started",
-      "title": "Publish your statement",
-      "lede": "Sign in with your organization's profile to publish, update, or withdraw your verification statement."
+      "title": "Become a verifier",
+      "lede": "Set up your organization and publish your verification statement in a few quick steps."
+    },
+    "getStartedCard": {
+      "title": "Set up your organization",
+      "body": "We'll walk you through creating your organization's profile, publishing your verification statement, and verifying your first campaign.",
+      "cta": "Start verifying"
     },
     "loginGateTitle": "Sign in with your organization's profile",
     "loginGateBody": "Log in with your organization's Nostr profile, or create one, to get started. Once you're signed in, you can publish your verification statement here.",

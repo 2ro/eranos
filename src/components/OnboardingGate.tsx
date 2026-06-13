@@ -1,6 +1,5 @@
 import {
   useCallback,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -33,7 +32,7 @@ import { VerifierBioStep } from '@/components/onboarding/VerifierBioStep';
 import { VerifierStatementEditor } from '@/components/organizations/VerifierStatementEditor';
 import { VerifyTutorial } from '@/components/organizations/VerifyTutorial';
 import { usePublishOrgProfile } from '@/hooks/usePublishOrgProfile';
-import { useVerifierStatement } from '@/hooks/useVerifierStatement';
+import { useSetVerifierStatement } from '@/hooks/useVerifierStatement';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -187,15 +186,6 @@ function CaptiveOverlay() {
 
   const { mutateAsync: publishOrgProfile, isPending: isPublishingOrg } =
     usePublishOrgProfile();
-
-  // Tracks whether the verifier statement (kind 14672) has been published,
-  // gating the statement step's Next button. Seeded from any existing
-  // statement so a returning verifier isn't blocked.
-  const { isVerifier } = useVerifierStatement(user?.pubkey);
-  const [statementPublished, setStatementPublished] = useState(false);
-  useEffect(() => {
-    if (isVerifier) setStatementPublished(true);
-  }, [isVerifier]);
 
   // Linear progress bar position. Once the user has chosen the verifier
   // role, the bar tracks the extended verifier step list so the four
@@ -380,8 +370,6 @@ function CaptiveOverlay() {
         // (kind 14672), reusing the shared editor.
         return (
           <VerifierStatementStep
-            published={statementPublished}
-            onPublishedChange={setStatementPublished}
             onContinue={goNextVerifierStep}
           />
         );
@@ -535,22 +523,58 @@ function VerifierHowtoStep({ onFinish }: { onFinish: () => void }) {
 }
 
 interface VerifierStatementStepProps {
-  published: boolean;
-  onPublishedChange: (published: boolean) => void;
   onContinue: () => void;
 }
 
 /**
  * Verifier sub-flow step 3 — publish the verifier statement (kind 14672).
- * Wraps the shared {@link VerifierStatementEditor} with the captive-flow
- * heading and a Continue button that unlocks once a statement is live.
+ *
+ * One header and one combined subtext sit above a borderless
+ * {@link VerifierStatementEditor}. There's no separate publish button: the
+ * primary button publishes the statement (when there's content) and then
+ * advances. A returning verifier can withdraw inline.
  */
 function VerifierStatementStep({
-  published,
-  onPublishedChange,
   onContinue,
 }: VerifierStatementStepProps) {
   const { t } = useTranslation();
+  const { toast } = useToast();
+  const { mutateAsync: setStatement, isPending } = useSetVerifierStatement();
+
+  const [value, setValue] = useState('');
+  const [alreadyPublished, setAlreadyPublished] = useState(false);
+
+  const trimmed = value.trim();
+
+  const handleContinue = useCallback(async () => {
+    try {
+      await setStatement(trimmed);
+      toast({ title: t('verifier.publishedToast') });
+      onContinue();
+    } catch (error) {
+      toast({
+        title: t('verifier.errorToast'),
+        description: error instanceof Error ? error.message : String(error),
+        variant: 'destructive',
+      });
+    }
+  }, [setStatement, trimmed, toast, t, onContinue]);
+
+  const handleWithdraw = useCallback(async () => {
+    try {
+      await setStatement('');
+      setValue('');
+      setAlreadyPublished(false);
+      toast({ title: t('verifier.withdrawnToast') });
+    } catch (error) {
+      toast({
+        title: t('verifier.errorToast'),
+        description: error instanceof Error ? error.message : String(error),
+        variant: 'destructive',
+      });
+    }
+  }, [setStatement, toast, t]);
+
   return (
     <div className="space-y-6">
       <div className="space-y-2 text-center">
@@ -562,15 +586,25 @@ function VerifierStatementStep({
         </p>
       </div>
 
-      <VerifierStatementEditor onPublishedChange={onPublishedChange} />
+      <VerifierStatementEditor
+        value={value}
+        onChange={setValue}
+        onHydrated={(s) => setAlreadyPublished(!!s)}
+        showWithdraw={alreadyPublished}
+        onWithdraw={handleWithdraw}
+        isWithdrawing={isPending}
+      />
 
       <Button
-        onClick={onContinue}
-        disabled={!published}
+        onClick={handleContinue}
+        disabled={!trimmed || isPending}
         className="w-full h-12 text-base rounded-full"
       >
+        {isPending ? (
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        ) : null}
         {t('common.continue')}
-        <ArrowRight className="ml-2 h-4 w-4 rtl:rotate-180" />
+        {!isPending && <ArrowRight className="ml-2 h-4 w-4 rtl:rotate-180" />}
       </Button>
     </div>
   );

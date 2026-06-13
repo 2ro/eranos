@@ -4,150 +4,87 @@ import { Loader2 } from 'lucide-react';
 
 import { MilkdownEditor } from '@/components/markdown/MilkdownEditor';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useToast } from '@/hooks/useToast';
-import {
-  useSetVerifierStatement,
-  useVerifierStatement,
-} from '@/hooks/useVerifierStatement';
+import { useVerifierStatement } from '@/hooks/useVerifierStatement';
 import { cn } from '@/lib/utils';
 
 interface VerifierStatementEditorProps {
+  /** Current markdown value (controlled). */
+  value: string;
+  onChange: (value: string) => void;
+  /** Hydration callback — fired once with the user's existing statement. */
+  onHydrated?: (statement: string) => void;
+  /** Show a Withdraw control (only when a statement is already published). */
+  showWithdraw?: boolean;
+  onWithdraw?: () => void;
+  isWithdrawing?: boolean;
   className?: string;
-  /**
-   * Called after a non-empty statement has been published or updated, and
-   * with `false` after a withdrawal. Lets hosts (e.g. the captive onboarding
-   * flow) react to publish state — for instance, enabling a "Next" button.
-   */
-  onPublishedChange?: (isPublished: boolean) => void;
 }
 
 /**
- * The functional verifier-statement editor (kind 14672): a WYSIWYG Markdown
- * surface with publish / update / withdraw controls and a live hydrate from
- * the user's existing statement.
+ * The verifier-statement (kind 14672) markdown editing surface.
  *
- * Extracted from OrganizationsPage so both the public /organizations tool
- * and the captive verifier onboarding flow render the exact same editor and
- * stay in sync. Assumes a logged-in user; callers gate on auth.
+ * A controlled, borderless WYSIWYG editor: the host owns the value and the
+ * publish action (publishing is wired to the onboarding step's primary
+ * button). The editor only renders the editing surface, hydrating once from
+ * the user's existing statement, plus an optional inline Withdraw control.
  */
 export function VerifierStatementEditor({
+  value,
+  onChange,
+  onHydrated,
+  showWithdraw = false,
+  onWithdraw,
+  isWithdrawing = false,
   className,
-  onPublishedChange,
 }: VerifierStatementEditorProps) {
   const { t } = useTranslation();
   const { user } = useCurrentUser();
-  const { toast } = useToast();
-
   const { statement, isLoading } = useVerifierStatement(user?.pubkey);
-  const { mutateAsync: setStatement, isPending } = useSetVerifierStatement();
-
-  const [value, setValue] = useState('');
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     if (!hydrated && !isLoading) {
-      setValue(statement ?? '');
+      onChange(statement ?? '');
+      onHydrated?.(statement ?? '');
       setHydrated(true);
     }
-  }, [hydrated, isLoading, statement]);
+  }, [hydrated, isLoading, statement, onChange, onHydrated]);
 
-  const trimmed = value.trim();
-  const isPublished = !!statement;
-  const unchanged = trimmed === (statement ?? '');
-
-  const handlePublish = async () => {
-    try {
-      await setStatement(trimmed);
-      toast({
-        title: trimmed
-          ? t('verifier.publishedToast')
-          : t('verifier.withdrawnToast'),
-      });
-      onPublishedChange?.(!!trimmed);
-    } catch (error) {
-      toast({
-        title: t('verifier.errorToast'),
-        description: error instanceof Error ? error.message : String(error),
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleWithdraw = async () => {
-    try {
-      await setStatement('');
-      setValue('');
-      toast({ title: t('verifier.withdrawnToast') });
-      onPublishedChange?.(false);
-    } catch (error) {
-      toast({
-        title: t('verifier.errorToast'),
-        description: error instanceof Error ? error.message : String(error),
-        variant: 'destructive',
-      });
-    }
-  };
+  if (isLoading && !hydrated) {
+    return (
+      <div className={cn('flex items-center gap-2 text-sm text-muted-foreground', className)}>
+        <Loader2 className="size-4 animate-spin" />
+        {t('verifier.loading')}
+      </div>
+    );
+  }
 
   return (
-    <Card className={cn('border-border/60 shadow-sm', className)}>
-      <CardContent className="p-6 sm:p-8 space-y-6">
-        {/* Prompt */}
-        <div className="space-y-2">
-          <p className="text-sm font-semibold">{t('verifier.promptLabel')}</p>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {t('verifier.prompt')}
-          </p>
-        </div>
+    <div className={cn('space-y-4', className)}>
+      {/* Borderless WYSIWYG markdown editor — no surrounding card/box so it
+          blends into the step. */}
+      <div className="rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-ring">
+        <MilkdownEditor
+          value={value}
+          onChange={onChange}
+          placeholder={t('verifier.placeholder')}
+        />
+      </div>
 
-        {isLoading && !hydrated ? (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" />
-            {t('verifier.loading')}
-          </div>
-        ) : (
-          <>
-            {/* WYSIWYG markdown editor: formatting toolbar + rich-text
-                editing surface, value flows back out as markdown. */}
-            <div className="rounded-lg border border-input bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring">
-              <MilkdownEditor
-                value={value}
-                onChange={setValue}
-                placeholder={t('verifier.placeholder')}
-              />
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <Button
-                type="button"
-                onClick={handlePublish}
-                disabled={isPending || !trimmed || unchanged}
-              >
-                {isPending && <Loader2 className="size-4 animate-spin mr-2" />}
-                {isPublished ? t('verifier.update') : t('verifier.publish')}
-              </Button>
-
-              {isPublished && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={handleWithdraw}
-                  disabled={isPending}
-                  className="text-destructive hover:text-destructive"
-                >
-                  {t('verifier.withdraw')}
-                </Button>
-              )}
-            </div>
-
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {t('verifier.disclaimer')}
-            </p>
-          </>
-        )}
-      </CardContent>
-    </Card>
+      {showWithdraw && onWithdraw && (
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={onWithdraw}
+          disabled={isWithdrawing}
+          className="text-destructive hover:text-destructive px-0"
+        >
+          {isWithdrawing && <Loader2 className="size-4 animate-spin mr-2" />}
+          {t('verifier.withdraw')}
+        </Button>
+      )}
+    </div>
   );
 }
 

@@ -1,5 +1,4 @@
 import { useSeoMeta } from '@unhead/react';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowRight,
@@ -9,12 +8,12 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 
-import { LoginArea } from '@/components/auth/LoginArea';
 import { VerifyTutorial } from '@/components/organizations/VerifyTutorial';
-import { VerifierStatementEditor } from '@/components/organizations/VerifierStatementEditor';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useOnboarding } from '@/contexts/onboardingContextDef';
 import { useVerifierStatement } from '@/hooks/useVerifierStatement';
 
 /**
@@ -183,16 +182,11 @@ export function OrganizationsPage() {
 function VerifierEditor() {
   const { t } = useTranslation();
   const { user } = useCurrentUser();
-
   const { isVerifier } = useVerifierStatement(user?.pubkey);
-  // Track publish state locally so the tutorial appears/disappears
-  // immediately on publish / withdraw, seeded from the queried state.
-  const [isPublished, setIsPublished] = useState(isVerifier);
+  const { startSignup } = useOnboarding();
 
-  // Logged out: instruct the visitor to log in with — or create — their
-  // organization's Nostr profile before they can publish a statement.
-  if (!user) {
-    return (
+  return (
+    <div className="space-y-8">
       <Card className="border-border/60 shadow-sm">
         <CardContent className="py-12 px-8 flex flex-col items-center gap-6 text-center">
           <div className="p-4 rounded-full bg-primary/10">
@@ -200,25 +194,26 @@ function VerifierEditor() {
           </div>
           <div className="space-y-2 max-w-sm">
             <h3 className="text-xl font-bold tracking-tight">
-              {t('organizations.loginGateTitle')}
+              {t('organizations.getStartedCard.title')}
             </h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              {t('organizations.loginGateBody')}
+              {t('organizations.getStartedCard.body')}
             </p>
           </div>
-          <LoginArea className="max-w-60" />
+          <Button
+            size="lg"
+            className="gap-2"
+            onClick={() => startSignup({ role: 'verifier' })}
+          >
+            <BadgeCheck className="size-5" />
+            {t('organizations.getStartedCard.cta')}
+          </Button>
         </CardContent>
       </Card>
-    );
-  }
-
-  return (
-    <div className="space-y-8">
-      <VerifierStatementEditor onPublishedChange={setIsPublished} />
 
       {/* Once the org's statement is live, teach them the actual
           verify gesture: the three-dots menu on any campaign card. */}
-      {(isPublished || isVerifier) && <VerifyTutorial />}
+      {isVerifier && <VerifyTutorial />}
     </div>
   );
 }
