@@ -20,20 +20,23 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
  * The component renders a faithful mock campaign card and drives a small
  * three-step state machine that mimics a cursor opening the kebab menu and
  * clicking the verify item. It auto-advances on a timer and loops forever so
- * users learn the gesture purely by watching. Motion is fully gated behind
- * `motion-safe:` / a `prefers-reduced-motion` check — with reduced motion the
- * cursor and looping are disabled and the final state is shown statically.
+ * users learn the gesture purely by watching. The cursor is gated behind a
+ * `prefers-reduced-motion` check; the UI state replay itself is a simple
+ * visibility sequence so the instruction still works without cursor motion.
  */
 
 type Phase = 'idle' | 'menuOpen' | 'verified';
 
-const PHASE_ORDER: Phase[] = ['idle', 'menuOpen', 'verified'];
+const NEXT_PHASE: Record<Phase, Phase> = {
+  idle: 'menuOpen',
+  menuOpen: 'verified',
+  verified: 'idle',
+};
 
-// How long each phase is held before auto-advancing (ms).
-const PHASE_DURATION: Record<Phase, number> = {
-  idle: 1600,
-  menuOpen: 1800,
-  verified: 2400,
+const PHASE_DELAY: Record<Phase, number> = {
+  idle: 500,
+  menuOpen: 500,
+  verified: 1200,
 };
 
 function usePrefersReducedMotion(): boolean {
@@ -74,23 +77,17 @@ export function VerifyTutorial({
   const { t } = useTranslation();
   const reducedMotion = usePrefersReducedMotion();
 
-  const [phase, setPhase] = useState<Phase>(reducedMotion ? 'verified' : 'idle');
+  const [phase, setPhase] = useState<Phase>('idle');
 
-  // Autoplay loop. Disabled under reduced motion (the static end state is shown
-  // instead). Each phase auto-advances to the next, wrapping around forever so
-  // the gesture replays on a loop with no manual controls.
+  // Simple visibility loop: start with the card, reveal the menu after 0.5s,
+  // reveal the badge after another 0.5s, then pause briefly and reset.
   useEffect(() => {
-    if (reducedMotion) return;
     const id = window.setTimeout(() => {
-      setPhase((prev) => {
-        const idx = PHASE_ORDER.indexOf(prev);
-        return PHASE_ORDER[(idx + 1) % PHASE_ORDER.length];
-      });
-    }, PHASE_DURATION[phase]);
+      setPhase((prev) => NEXT_PHASE[prev]);
+    }, PHASE_DELAY[phase]);
     return () => window.clearTimeout(id);
-  }, [phase, reducedMotion]);
+  }, [phase]);
 
-  const phaseIndex = PHASE_ORDER.indexOf(phase);
   const menuVisible = phase === 'menuOpen';
   const verified = phase === 'verified';
 
@@ -126,7 +123,6 @@ export function VerifyTutorial({
 
       <DemoStage
         phase={phase}
-        phaseIndex={phaseIndex}
         menuVisible={menuVisible}
         verified={verified}
         reducedMotion={reducedMotion}
@@ -161,7 +157,6 @@ const DEMO_CAMPAIGN = {
 
 interface DemoStageProps {
   phase: Phase;
-  phaseIndex: number;
   menuVisible: boolean;
   verified: boolean;
   reducedMotion: boolean;
@@ -174,7 +169,6 @@ interface DemoStageProps {
 
 function DemoStage({
   phase,
-  phaseIndex,
   menuVisible,
   verified,
   reducedMotion,
@@ -246,7 +240,7 @@ function DemoStage({
             <div
               className={cn(
                 'flex size-8 items-center justify-center rounded-md bg-background/80 text-muted-foreground backdrop-blur transition-all duration-300',
-                phaseIndex === 0 &&
+                phase === 'idle' &&
                   !reducedMotion &&
                   'motion-safe:animate-pulse ring-2 ring-primary/60',
                 menuVisible && 'bg-background text-foreground ring-2 ring-primary/50',
@@ -267,7 +261,7 @@ function DemoStage({
               <div
                 className={cn(
                   'flex items-center gap-2 rounded-sm px-2 py-2 text-sm font-medium transition-colors',
-                  phaseIndex >= 1
+                  menuVisible
                     ? 'bg-primary/10 text-primary'
                     : 'text-foreground',
                 )}
@@ -324,7 +318,7 @@ function DemoStage({
           className={cn(
             'pointer-events-none absolute z-30 transition-all duration-700 ease-out',
             // idle → hover the kebab (top-right); menuOpen/verified → hover the verify item
-            phaseIndex === 0
+            phase === 'idle'
               ? 'right-4 top-5'
               : 'right-8 top-[4.5rem]',
           )}
