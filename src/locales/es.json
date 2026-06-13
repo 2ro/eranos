@@ -1126,10 +1126,7 @@
         }
       },
       "demo": {
-        "campaignTitle": "Agua limpia para Mwanza",
-        "campaignOrganizer": "de la Fundación Mradi",
-        "menuVerify": "Verificar esta campaña",
-        "verifiedBadge": "Verificada por ti"
+        "menuVerify": "Verificar esta campaña"
       }
     }
   },

@@ -1620,10 +1620,7 @@
         }
       },
       "demo": {
-        "campaignTitle": "Clean Water for Mwanza",
-        "campaignOrganizer": "by Mradi Foundation",
-        "menuVerify": "Verify this campaign",
-        "verifiedBadge": "Verified by you"
+        "menuVerify": "Verify this campaign"
       }
     }
   },

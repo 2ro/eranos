@@ -1119,10 +1119,7 @@
         "confirm": { "title": "Simbisa uye wapedza", "body": "Pupura kuti mushandirapamwe ndewechokwadi. Bheji rako rinobatana nekadhi kuti vanopa vazive kuti unowutsigira." }
       },
       "demo": {
-        "campaignTitle": "Mvura Yakachena yeMwanza",
-        "campaignOrganizer": "naMradi Foundation",
-        "menuVerify": "Simbisa mushandirapamwe uyu",
-        "verifiedBadge": "Yasimbiswa newe"
+        "menuVerify": "Simbisa mushandirapamwe uyu"
       }
     }
   },

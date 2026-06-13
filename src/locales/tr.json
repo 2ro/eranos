@@ -1560,10 +1560,7 @@
         "confirm": { "title": "Onaylayın ve işlem tamam", "body": "Kampanyanın gerçek olduğunu teyit edin. Rozetiniz kartta yerini alır, böylece bağışçılar arkasında durduğunuzu bilir." }
       },
       "demo": {
-        "campaignTitle": "Mwanza için Temiz Su",
-        "campaignOrganizer": "Mradi Vakfı tarafından",
-        "menuVerify": "Bu kampanyayı doğrula",
-        "verifiedBadge": "Sizin tarafınızdan doğrulandı"
+        "menuVerify": "Bu kampanyayı doğrula"
       }
     }
   },

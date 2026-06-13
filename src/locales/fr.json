@@ -1565,10 +1565,7 @@
         }
       },
       "demo": {
-        "campaignTitle": "De l'eau potable pour Mwanza",
-        "campaignOrganizer": "par la Fondation Mradi",
-        "menuVerify": "Vérifier cette campagne",
-        "verifiedBadge": "Vérifié par vous"
+        "menuVerify": "Vérifier cette campagne"
       }
     }
   },

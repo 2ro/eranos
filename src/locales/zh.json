@@ -1119,10 +1119,7 @@
         "confirm": { "title": "确认即可完成", "body": "证明该活动真实可信。你的徽章会出现在卡片上,让捐赠者知道你为它背书。" }
       },
       "demo": {
-        "campaignTitle": "为 Mwanza 提供清洁饮水",
-        "campaignOrganizer": "由 Mradi 基金会发起",
-        "menuVerify": "验证此活动",
-        "verifiedBadge": "已由你验证"
+        "menuVerify": "验证此活动"
       }
     }
   },

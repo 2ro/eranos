@@ -1558,10 +1558,7 @@
         "confirm": { "title": "Thibitisha na umemaliza", "body": "Shuhudia kuwa kampeni ni halisi. Beji yako huungana na kadi ili wafadhili wajue unaiunga mkono." }
       },
       "demo": {
-        "campaignTitle": "Maji Safi kwa Mwanza",
-        "campaignOrganizer": "na Mradi Foundation",
-        "menuVerify": "Thibitisha kampeni hii",
-        "verifiedBadge": "Imethibitishwa na wewe"
+        "menuVerify": "Thibitisha kampeni hii"
       }
     }
   },

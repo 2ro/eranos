@@ -1570,10 +1570,7 @@
         }
       },
       "demo": {
-        "campaignTitle": "Чистая вода для Mwanza",
-        "campaignOrganizer": "от Mradi Foundation",
-        "menuVerify": "Проверить эту кампанию",
-        "verifiedBadge": "Проверено вами"
+        "menuVerify": "Проверить эту кампанию"
       }
     }
   },

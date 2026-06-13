@@ -1559,10 +1559,7 @@
         "confirm": { "title": "Konfirmasi & selesai", "body": "Tegaskan bahwa kampanye ini autentik. Lencana Anda akan muncul di kartu sehingga para donatur tahu Anda mendukungnya." }
       },
       "demo": {
-        "campaignTitle": "Air Bersih untuk Mwanza",
-        "campaignOrganizer": "oleh Mradi Foundation",
-        "menuVerify": "Verifikasi kampanye ini",
-        "verifiedBadge": "Diverifikasi oleh Anda"
+        "menuVerify": "Verifikasi kampanye ini"
       }
     }
   },

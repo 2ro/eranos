@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 /**
@@ -247,6 +248,23 @@ export function VerifyTutorial({
 
 // ── The animated mock card ───────────────────────────────────────────────
 
+/**
+ * A real published campaign (kind 33863) used as the demo subject so the
+ * tutorial mirrors an actual card rather than invented placeholder copy.
+ * Static by design — the tutorial is purely illustrative, so we read the
+ * fields directly instead of fetching the event.
+ */
+const DEMO_CAMPAIGN = {
+  title: 'Agora App Development Fund',
+  organizer: 'Team Soapbox',
+  story: 'Help fund the development of Agora!',
+  banner:
+    'https://blossom.primal.net/aade02e86584a7ab269550992d0266bae31059a34e6e08fddba1f6f5acb6e7d6.jpg',
+  goalLabel: '$1,000',
+  raisedLabel: '$670',
+  pct: 67,
+} as const;
+
 interface DemoStageProps {
   phaseIndex: number;
   menuVisible: boolean;
@@ -270,11 +288,16 @@ function DemoStage({
 }: DemoStageProps) {
   const { t } = useTranslation();
 
-  // When a verifier identity is supplied, the badge mirrors the live
-  // verification badge (org avatar + name); otherwise it falls back to the
-  // generic "Verified by you" label.
-  const hasVerifier = !!verifierName?.trim();
-  const verifierInitial = verifierName?.trim()?.[0]?.toUpperCase() ?? '?';
+  // The badge replicates the live overlay `CampaignVerificationBadge`
+  // (dark translucent pill, single ring-bordered avatar, sky check) so the
+  // preview matches exactly how a verification surfaces on a real card.
+  const badgePicture = sanitizeUrl(verifierPicture);
+  const verifierInitials =
+    (verifierName?.trim() || '')
+      .slice(0, 2)
+      .toUpperCase() || '?';
+
+  const bannerUrl = sanitizeUrl(DEMO_CAMPAIGN.banner);
 
   return (
     <div
@@ -284,52 +307,41 @@ function DemoStage({
       )}
       aria-hidden="true"
     >
-      {/* Mock campaign card */}
+      {/* Mock campaign card — mirrors CampaignCard's structure. */}
       <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-md">
         {/* Banner */}
-        <div className="relative h-40 bg-gradient-to-br from-sky-500/80 via-cyan-500/70 to-emerald-500/80">
+        <div
+          className="relative h-40 bg-gradient-to-br from-sky-500/80 via-cyan-500/70 to-emerald-500/80 bg-cover bg-center"
+          style={bannerUrl ? { backgroundImage: `url("${bannerUrl}")` } : undefined}
+        >
+          {/* Top scrim for badge legibility — as on the real card. */}
           <div
             aria-hidden
-            className="absolute inset-0 opacity-30 mix-blend-overlay"
-            style={{
-              backgroundImage:
-                'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), transparent 45%)',
-            }}
+            className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 to-transparent"
           />
 
-          {/* Verified badge (top-left) — appears in the final phase. When a
-              verifier identity is supplied it previews that org's avatar +
-              name; otherwise a generic "Verified by you" label. */}
+          {/* Verified badge (top-left) — appears in the final phase. A faithful
+              copy of the live overlay CampaignVerificationBadge for a single
+              verifier: the org's avatar + sky check, no count text. */}
           <div
             className={cn(
-              'absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-background/90 text-xs font-semibold text-foreground shadow-sm backdrop-blur transition-all duration-500',
-              hasVerifier ? 'py-1 pl-1.5 pr-2.5' : 'px-2.5 py-1',
+              'absolute left-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-black/40 px-1.5 py-1 text-white backdrop-blur-md transition-all duration-500',
               verified
                 ? 'opacity-100 translate-y-0'
                 : 'opacity-0 -translate-y-1 pointer-events-none',
             )}
           >
-            {hasVerifier ? (
-              <>
-                <Avatar className="size-5 shrink-0 ring-2 ring-background">
-                  <AvatarImage
-                    src={verifierPicture || undefined}
-                    alt={verifierName}
-                    className="object-cover"
-                  />
-                  <AvatarFallback className="bg-secondary text-[9px] font-semibold text-secondary-foreground">
-                    {verifierInitial}
-                  </AvatarFallback>
-                </Avatar>
-                <BadgeCheck className="size-4 text-primary" />
-                <span className="max-w-[10rem] truncate">{verifierName}</span>
-              </>
-            ) : (
-              <>
-                <BadgeCheck className="size-4 text-primary" />
-                {t('organizations.tutorial.demo.verifiedBadge')}
-              </>
-            )}
+            <span className="flex items-center -space-x-2">
+              <Avatar className="size-6 ring-2 ring-background">
+                {badgePicture && <AvatarImage src={badgePicture} alt="" className="object-cover" />}
+                <AvatarFallback className="bg-secondary text-[9px] text-secondary-foreground">
+                  {verifierInitials}
+                </AvatarFallback>
+              </Avatar>
+            </span>
+            <span className="ml-0.5 inline-flex items-center gap-1 pr-1 text-xs font-semibold">
+              <BadgeCheck className="size-4 text-sky-300" />
+            </span>
           </div>
 
           {/* Three-dots button (top-right) */}
@@ -373,22 +385,37 @@ function DemoStage({
         {/* Card body */}
         <div className="space-y-3 p-4">
           <div>
-            <p className="font-semibold leading-snug">
-              {t('organizations.tutorial.demo.campaignTitle')}
+            <p className="font-semibold leading-snug truncate">
+              {DEMO_CAMPAIGN.title}
             </p>
-            <p className="text-xs text-muted-foreground">
-              {t('organizations.tutorial.demo.campaignOrganizer')}
+            <p className="text-xs text-muted-foreground truncate">
+              {DEMO_CAMPAIGN.story}
             </p>
           </div>
-          {/* Fake progress bar */}
+          {/* Progress — mirrors CampaignProgress (bar + raised / goal). */}
           <div className="space-y-1.5">
-            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-              <div className="h-full w-2/3 rounded-full bg-primary" />
+            <div className="h-2 w-full overflow-hidden rounded-full bg-foreground/15">
+              <div
+                className="h-full rounded-full bg-primary"
+                style={{ width: `${DEMO_CAMPAIGN.pct}%` }}
+              />
             </div>
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>0.45 BTC</span>
-              <span>67%</span>
+            <div className="flex items-baseline justify-between gap-2 text-sm">
+              <span className="font-semibold">{DEMO_CAMPAIGN.raisedLabel}</span>
+              <span className="text-muted-foreground">of {DEMO_CAMPAIGN.goalLabel} goal</span>
             </div>
+          </div>
+
+          {/* Organizer footer — mirrors CampaignCard's AuthorByline row. */}
+          <div className="flex items-center gap-2 border-t border-border/60 pt-3 text-xs text-muted-foreground">
+            <Avatar className="size-5">
+              <AvatarFallback className="bg-secondary text-[9px] text-secondary-foreground">
+                {DEMO_CAMPAIGN.organizer.slice(0, 1).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <span className="truncate font-medium text-foreground/80">
+              {DEMO_CAMPAIGN.organizer}
+            </span>
           </div>
         </div>
       </div>

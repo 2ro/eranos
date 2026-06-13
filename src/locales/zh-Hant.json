@@ -1119,10 +1119,7 @@
         "confirm": { "title": "確認後即完成", "body": "證明這個專案是真實的。你的徽章會加入卡片,讓捐款者知道你為它背書。" }
       },
       "demo": {
-        "campaignTitle": "為姆萬扎提供潔淨用水",
-        "campaignOrganizer": "由 Mradi 基金會發起",
-        "menuVerify": "驗證此活動",
-        "verifiedBadge": "已由你驗證"
+        "menuVerify": "驗證此活動"
       }
     }
   },
