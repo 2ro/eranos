@@ -86,6 +86,51 @@ interface ProfileField {
   value: string;
 }
 
+/**
+ * Shared dropdown of image actions used by both the avatar and the banner.
+ * Wraps the provided trigger element and surfaces "Upload file", an optional
+ * "Paste URL", and an optional "Remove" (only shown when the image exists and
+ * a remove handler is wired). Deduplicating this between avatar and banner
+ * keeps the two menus identical and the actions in one place.
+ */
+function ImageEditMenu({
+  trigger,
+  hasImage,
+  onUpload,
+  onPasteUrl,
+  onRemove,
+}: {
+  trigger: React.ReactNode;
+  hasImage: boolean;
+  onUpload: () => void;
+  onPasteUrl?: () => void;
+  onRemove?: () => void;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+      <DropdownMenuContent align="start" sideOffset={6}>
+        <DropdownMenuItem onClick={onUpload}>
+          <ImagePlus className="size-4 mr-2" />
+          Upload file
+        </DropdownMenuItem>
+        {onPasteUrl && (
+          <DropdownMenuItem onClick={onPasteUrl}>
+            <LinkIcon className="size-4 mr-2" />
+            Paste URL
+          </DropdownMenuItem>
+        )}
+        {hasImage && onRemove && (
+          <DropdownMenuItem onClick={onRemove} className="text-destructive focus:text-destructive">
+            <XIcon className="size-4 mr-2" />
+            Remove
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 interface ProfileCardProps {
   className?: string;
   pubkey?: string;
@@ -101,6 +146,8 @@ interface ProfileCardProps {
   onPasteUrl?: (field: 'picture' | 'banner') => void;
   /** Called when user removes their avatar picture. */
   onRemoveAvatar?: () => void;
+  /** Called when user removes their banner image. */
+  onRemoveBanner?: () => void;
   /** Show NIP-05 row (default true) */
   showNip05?: boolean;
   /** Show NIP-58 badge showcase row (default true). */
@@ -124,6 +171,7 @@ export function ProfileCard({
   onPickImage,
   onPasteUrl,
   onRemoveAvatar,
+  onRemoveBanner,
   showNip05 = true,
   showBadges = true,
   bioField = 'about',
@@ -158,11 +206,15 @@ export function ProfileCard({
     <div className={cn('bg-card border rounded-xl overflow-hidden', className)}>
 
       {/* Banner */}
-      {editable && onPasteUrl ? (
-        // With a paste handler, the banner opens a menu (Change / Paste URL)
-        // instead of going straight to the file picker.
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+      {editable && (onPasteUrl || onRemoveBanner) ? (
+        // When a paste or remove action exists, the banner opens the shared
+        // image menu instead of going straight to the file picker.
+        <ImageEditMenu
+          hasImage={!!metadata.banner}
+          onUpload={() => onPickImage?.('banner')}
+          onPasteUrl={onPasteUrl ? () => onPasteUrl('banner') : undefined}
+          onRemove={onRemoveBanner}
+          trigger={
             <button
               type="button"
               className="relative block w-full h-36 bg-secondary cursor-pointer group outline-none"
@@ -189,18 +241,8 @@ export function ProfileCard({
                 </div>
               )}
             </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" sideOffset={6}>
-            <DropdownMenuItem onClick={() => onPickImage?.('banner')}>
-              <ImagePlus className="size-4 mr-2" />
-              {metadata.banner ? 'Change banner' : 'Add banner'}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onPasteUrl?.('banner')}>
-              <LinkIcon className="size-4 mr-2" />
-              Paste URL
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          }
+        />
       ) : (
         <div
           className={cn('relative h-36 bg-secondary', editable && 'cursor-pointer group')}
@@ -240,8 +282,12 @@ export function ProfileCard({
         {/* Avatar */}
         <div className="flex justify-between items-start -mt-12 mb-3">
           {editable ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+            <ImageEditMenu
+              hasImage={!!metadata.picture}
+              onUpload={() => onPickImage?.('picture')}
+              onPasteUrl={onPasteUrl ? () => onPasteUrl('picture') : undefined}
+              onRemove={onRemoveAvatar}
+              trigger={
                 <button type="button" className="relative shrink-0 cursor-pointer group outline-none">
                   <Avatar className="shadow-sm size-24 border-4 border-background">
                     <AvatarImage src={metadata.picture} alt={displayName} className="object-cover" />
@@ -258,26 +304,8 @@ export function ProfileCard({
                     </div>
                   )}
                 </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" sideOffset={6}>
-                <DropdownMenuItem onClick={() => onPickImage?.('picture')}>
-                  <ImagePlus className="size-4 mr-2" />
-                  Change avatar
-                </DropdownMenuItem>
-                {onPasteUrl && (
-                  <DropdownMenuItem onClick={() => onPasteUrl?.('picture')}>
-                    <LinkIcon className="size-4 mr-2" />
-                    Paste URL
-                  </DropdownMenuItem>
-                )}
-                {metadata.picture && (
-                  <DropdownMenuItem onClick={() => onRemoveAvatar?.()} className="text-destructive focus:text-destructive">
-                    <XIcon className="size-4 mr-2" />
-                    Remove avatar
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+              }
+            />
           ) : (
             <div className="relative shrink-0">
               <Avatar className="shadow-sm size-24 border-4 border-background">

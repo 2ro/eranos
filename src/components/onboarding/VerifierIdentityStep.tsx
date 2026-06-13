@@ -251,6 +251,8 @@ export function VerifierIdentityStep({
           }}
           onPickImage={handlePickImage}
           onPasteUrl={handlePasteUrl}
+          onRemoveAvatar={() => onChange({ picture: '' })}
+          onRemoveBanner={() => onChange({ banner: '' })}
           bioField="website"
           showNip05={false}
           showBadges={false}
