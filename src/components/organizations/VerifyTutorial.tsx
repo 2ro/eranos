@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   BadgeCheck,
@@ -19,10 +19,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
  *
  * The component renders a faithful mock campaign card and drives a small
  * three-step state machine that mimics a cursor opening the kebab menu and
- * clicking the verify item. It auto-advances on a timer, loops, and exposes
- * clickable step dots so users can scrub. Motion is fully gated behind
- * `motion-safe:` / a `prefers-reduced-motion` check — with reduced motion the
- * cursor and looping are disabled and the final state is shown statically.
+ * clicking the verify item. It auto-advances on a timer and loops forever so
+ * users learn the gesture purely by watching — the step list is a
+ * non-interactive read-out synced to the animation. Motion is fully gated
+ * behind `motion-safe:` / a `prefers-reduced-motion` check — with reduced
+ * motion the cursor and looping are disabled and the final state is shown
+ * statically.
  */
 
 type Phase = 'idle' | 'menuOpen' | 'verified';
@@ -35,30 +37,6 @@ const PHASE_DURATION: Record<Phase, number> = {
   menuOpen: 2600,
   verified: 3000,
 };
-
-interface State {
-  phase: Phase;
-  /** Bumps on every manual interaction to pause autoplay briefly. */
-  paused: boolean;
-}
-
-type Action =
-  | { type: 'advance' }
-  | { type: 'goto'; phase: Phase };
-
-function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case 'advance': {
-      const idx = PHASE_ORDER.indexOf(state.phase);
-      const next = PHASE_ORDER[(idx + 1) % PHASE_ORDER.length];
-      return { phase: next, paused: false };
-    }
-    case 'goto':
-      return { phase: action.phase, paused: true };
-    default:
-      return state;
-  }
-}
 
 function usePrefersReducedMotion(): boolean {
   const ref = useRef(false);
@@ -99,35 +77,25 @@ export function VerifyTutorial({
   const { t } = useTranslation();
   const reducedMotion = usePrefersReducedMotion();
 
-  const [state, dispatch] = useReducer(reducer, {
-    phase: (reducedMotion ? 'verified' : 'idle') as Phase,
-    paused: false,
-  });
+  const [phase, setPhase] = useState<Phase>(reducedMotion ? 'verified' : 'idle');
 
-  // Autoplay timer. Disabled under reduced motion, or while paused after a
-  // manual interaction (resumes on the next phase change).
+  // Autoplay loop. Disabled under reduced motion (the static end state is shown
+  // instead). Each phase auto-advances to the next, wrapping around forever so
+  // the gesture replays on a loop with no manual controls.
   useEffect(() => {
-    if (reducedMotion || state.paused) return;
-    const id = window.setTimeout(
-      () => dispatch({ type: 'advance' }),
-      PHASE_DURATION[state.phase],
-    );
+    if (reducedMotion) return;
+    const id = window.setTimeout(() => {
+      setPhase((prev) => {
+        const idx = PHASE_ORDER.indexOf(prev);
+        return PHASE_ORDER[(idx + 1) % PHASE_ORDER.length];
+      });
+    }, PHASE_DURATION[phase]);
     return () => window.clearTimeout(id);
-  }, [state.phase, state.paused, reducedMotion]);
+  }, [phase, reducedMotion]);
 
-  // When a user scrubs (paused), resume autoplay after a grace period.
-  useEffect(() => {
-    if (!state.paused || reducedMotion) return;
-    const id = window.setTimeout(
-      () => dispatch({ type: 'advance' }),
-      PHASE_DURATION[state.phase] + 1500,
-    );
-    return () => window.clearTimeout(id);
-  }, [state.paused, state.phase, reducedMotion]);
-
-  const phaseIndex = PHASE_ORDER.indexOf(state.phase);
-  const menuVisible = state.phase === 'menuOpen' || state.phase === 'verified';
-  const verified = state.phase === 'verified';
+  const phaseIndex = PHASE_ORDER.indexOf(phase);
+  const menuVisible = phase === 'menuOpen' || phase === 'verified';
+  const verified = phase === 'verified';
 
   const stepCopy = [
     {
@@ -192,51 +160,47 @@ export function VerifyTutorial({
           verifierPicture={verifierPicture}
         />
 
-        {/* ── Step list, synced to the animation ──────────────────────── */}
+        {/* ── Step list, synced to the animation (read-only) ──────────── */}
         <ol className="space-y-3">
           {stepCopy.map((step, i) => {
             const active = i === phaseIndex;
             const done = i < phaseIndex;
             return (
-              <li key={step.title}>
-                <button
-                  type="button"
-                  onClick={() => dispatch({ type: 'goto', phase: PHASE_ORDER[i] })}
-                  aria-current={active ? 'step' : undefined}
+              <li
+                key={step.title}
+                aria-current={active ? 'step' : undefined}
+                className={cn(
+                  'flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-all',
+                  active
+                    ? 'border-primary/40 bg-primary/5 shadow-sm'
+                    : 'border-border/60 bg-background',
+                )}
+              >
+                <span
                   className={cn(
-                    'group flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-all',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60',
-                    active
-                      ? 'border-primary/40 bg-primary/5 shadow-sm'
-                      : 'border-border/60 bg-background hover:border-primary/30 hover:bg-muted/40',
+                    'flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-colors',
+                    done
+                      ? 'bg-primary text-primary-foreground'
+                      : active
+                        ? 'bg-primary/15 text-primary ring-2 ring-primary/40'
+                        : 'bg-muted text-muted-foreground',
                   )}
                 >
+                  {done ? <BadgeCheck className="size-4" /> : i + 1}
+                </span>
+                <span className="space-y-1">
                   <span
                     className={cn(
-                      'flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-colors',
-                      done
-                        ? 'bg-primary text-primary-foreground'
-                        : active
-                          ? 'bg-primary/15 text-primary ring-2 ring-primary/40'
-                          : 'bg-muted text-muted-foreground',
+                      'block text-sm font-semibold leading-snug',
+                      active ? 'text-foreground' : 'text-foreground/90',
                     )}
                   >
-                    {done ? <BadgeCheck className="size-4" /> : i + 1}
+                    {step.title}
                   </span>
-                  <span className="space-y-1">
-                    <span
-                      className={cn(
-                        'block text-sm font-semibold leading-snug',
-                        active ? 'text-foreground' : 'text-foreground/90',
-                      )}
-                    >
-                      {step.title}
-                    </span>
-                    <span className="block text-sm text-muted-foreground leading-relaxed">
-                      {step.body}
-                    </span>
+                  <span className="block text-sm text-muted-foreground leading-relaxed">
+                    {step.body}
                   </span>
-                </button>
+                </span>
               </li>
             );
           })}
