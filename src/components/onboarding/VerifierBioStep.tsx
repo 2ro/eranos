@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import type { OrgProfileDraft } from '@/components/onboarding/VerifierIdentityStep';
@@ -45,15 +44,13 @@ export function VerifierBioStep({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="verifier-org-bio" className="text-sm font-medium">
-          {t('onboarding.verifier.bio.label')}
-        </Label>
         <Textarea
           id="verifier-org-bio"
           value={draft.about}
           onChange={(e) => onChange({ about: e.target.value })}
           placeholder={t('onboarding.verifier.bio.placeholder')}
           className="min-h-[400px] resize-none p-3 text-lg leading-relaxed"
+          aria-label={t('onboarding.verifier.bio.label')}
           aria-required
         />
       </div>
