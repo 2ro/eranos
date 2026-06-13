@@ -20,11 +20,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
  * The component renders a faithful mock campaign card and drives a small
  * three-step state machine that mimics a cursor opening the kebab menu and
  * clicking the verify item. It auto-advances on a timer and loops forever so
- * users learn the gesture purely by watching — the step list is a
- * non-interactive read-out synced to the animation. Motion is fully gated
- * behind `motion-safe:` / a `prefers-reduced-motion` check — with reduced
- * motion the cursor and looping are disabled and the final state is shown
- * statically.
+ * users learn the gesture purely by watching. Motion is fully gated behind
+ * `motion-safe:` / a `prefers-reduced-motion` check — with reduced motion the
+ * cursor and looping are disabled and the final state is shown statically.
  */
 
 type Phase = 'idle' | 'menuOpen' | 'verified';
@@ -33,9 +31,9 @@ const PHASE_ORDER: Phase[] = ['idle', 'menuOpen', 'verified'];
 
 // How long each phase is held before auto-advancing (ms).
 const PHASE_DURATION: Record<Phase, number> = {
-  idle: 2200,
-  menuOpen: 2600,
-  verified: 3000,
+  idle: 1600,
+  menuOpen: 1800,
+  verified: 2400,
 };
 
 function usePrefersReducedMotion(): boolean {
@@ -53,8 +51,7 @@ interface VerifyTutorialProps {
   hideHeader?: boolean;
   /** Drop the bordered card chrome so it blends into the surrounding page. */
   bare?: boolean;
-  /** Stack the demo full-width above the step list instead of the
-   *  side-by-side two-column layout. */
+  /** Let the demo span the full available width in stacked onboarding flows. */
   stacked?: boolean;
   /**
    * When provided, the demo card's verified badge shows this organization's
@@ -94,23 +91,8 @@ export function VerifyTutorial({
   }, [phase, reducedMotion]);
 
   const phaseIndex = PHASE_ORDER.indexOf(phase);
-  const menuVisible = phase === 'menuOpen' || phase === 'verified';
+  const menuVisible = phase === 'menuOpen';
   const verified = phase === 'verified';
-
-  const stepCopy = [
-    {
-      title: t('organizations.tutorial.steps.open.title'),
-      body: t('organizations.tutorial.steps.open.body'),
-    },
-    {
-      title: t('organizations.tutorial.steps.verify.title'),
-      body: t('organizations.tutorial.steps.verify.body'),
-    },
-    {
-      title: t('organizations.tutorial.steps.confirm.title'),
-      body: t('organizations.tutorial.steps.confirm.body'),
-    },
-  ];
 
   return (
     <section
@@ -142,70 +124,16 @@ export function VerifyTutorial({
         </div>
       )}
 
-      <div
-        className={cn(
-          stacked
-            ? 'space-y-6'
-            : 'grid gap-8 lg:grid-cols-2 lg:items-center',
-        )}
-      >
-        {/* ── Animated mock campaign card ──────────────────────────────── */}
-        <DemoStage
-          phaseIndex={phaseIndex}
-          menuVisible={menuVisible}
-          verified={verified}
-          reducedMotion={reducedMotion}
-          fullWidth={stacked}
-          verifierName={verifierName}
-          verifierPicture={verifierPicture}
-        />
-
-        {/* ── Step list, synced to the animation (read-only) ──────────── */}
-        <ol className="space-y-3">
-          {stepCopy.map((step, i) => {
-            const active = i === phaseIndex;
-            const done = i < phaseIndex;
-            return (
-              <li
-                key={step.title}
-                aria-current={active ? 'step' : undefined}
-                className={cn(
-                  'flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-all',
-                  active
-                    ? 'border-primary/40 bg-primary/5 shadow-sm'
-                    : 'border-border/60 bg-background',
-                )}
-              >
-                <span
-                  className={cn(
-                    'flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-colors',
-                    done
-                      ? 'bg-primary text-primary-foreground'
-                      : active
-                        ? 'bg-primary/15 text-primary ring-2 ring-primary/40'
-                        : 'bg-muted text-muted-foreground',
-                  )}
-                >
-                  {done ? <BadgeCheck className="size-4" /> : i + 1}
-                </span>
-                <span className="space-y-1">
-                  <span
-                    className={cn(
-                      'block text-sm font-semibold leading-snug',
-                      active ? 'text-foreground' : 'text-foreground/90',
-                    )}
-                  >
-                    {step.title}
-                  </span>
-                  <span className="block text-sm text-muted-foreground leading-relaxed">
-                    {step.body}
-                  </span>
-                </span>
-              </li>
-            );
-          })}
-        </ol>
-      </div>
+      <DemoStage
+        phase={phase}
+        phaseIndex={phaseIndex}
+        menuVisible={menuVisible}
+        verified={verified}
+        reducedMotion={reducedMotion}
+        fullWidth={stacked}
+        verifierName={verifierName}
+        verifierPicture={verifierPicture}
+      />
     </section>
   );
 }
@@ -221,6 +149,8 @@ export function VerifyTutorial({
 const DEMO_CAMPAIGN = {
   title: 'Agora App Development Fund',
   organizer: 'Team Soapbox',
+  organizerPicture:
+    'https://blossom.primal.net/e93f617f8331509acdddde3df0c1cd23cda1803d92c70815fc96e2d5f8d48ac8.png',
   story: 'Help fund the development of Agora!',
   banner:
     'https://blossom.primal.net/aade02e86584a7ab269550992d0266bae31059a34e6e08fddba1f6f5acb6e7d6.jpg',
@@ -230,6 +160,7 @@ const DEMO_CAMPAIGN = {
 } as const;
 
 interface DemoStageProps {
+  phase: Phase;
   phaseIndex: number;
   menuVisible: boolean;
   verified: boolean;
@@ -242,6 +173,7 @@ interface DemoStageProps {
 }
 
 function DemoStage({
+  phase,
   phaseIndex,
   menuVisible,
   verified,
@@ -262,6 +194,7 @@ function DemoStage({
       .toUpperCase() || '?';
 
   const bannerUrl = sanitizeUrl(DEMO_CAMPAIGN.banner);
+  const organizerPicture = sanitizeUrl(DEMO_CAMPAIGN.organizerPicture);
 
   return (
     <div
@@ -373,6 +306,7 @@ function DemoStage({
           {/* Organizer footer — mirrors CampaignCard's AuthorByline row. */}
           <div className="flex items-center gap-2 border-t border-border/60 pt-3 text-xs text-muted-foreground">
             <Avatar className="size-5">
+              {organizerPicture && <AvatarImage src={organizerPicture} alt="" className="object-cover" />}
               <AvatarFallback className="bg-secondary text-[9px] text-secondary-foreground">
                 {DEMO_CAMPAIGN.organizer.slice(0, 1).toUpperCase()}
               </AvatarFallback>
@@ -396,6 +330,7 @@ function DemoStage({
           )}
         >
           <MousePointer2
+            key={phase}
             className={cn(
               'size-6 fill-foreground text-background drop-shadow-md transition-transform',
               'motion-safe:animate-tutorial-tap',
