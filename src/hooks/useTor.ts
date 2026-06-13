@@ -21,7 +21,10 @@ export interface UseTor {
   error: string | null;
   /** Tor exit-node IP from the last successful check, when connected. */
   exitIp: string | null;
-  /** Persist the enabled flag natively. Takes effect on next app launch. */
+  /**
+   * Toggle Tor live: starts/stops arti immediately and persists the flag
+   * natively (so it auto-starts again on the next cold launch).
+   */
   setEnabled: (enabled: boolean) => Promise<void>;
 }
 

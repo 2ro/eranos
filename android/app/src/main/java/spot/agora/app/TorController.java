@@ -36,10 +36,12 @@ import okhttp3.Response;
  * Capacitor WebView traffic (every {@code fetch} and relay {@code WebSocket})
  * is routed through Tor. No changes to the TypeScript HTTP layer are needed.
  *
- * <p>Activation is "apply on relaunch": the enabled flag is persisted to
- * {@link SharedPreferences} by {@link TorPlugin} and read here at startup from
- * {@link MainActivity}. arti is started <em>before</em> the WebView loads so
- * there is no pre-bootstrap leak window.
+ * <p>The enabled flag is persisted to {@link SharedPreferences} by
+ * {@link TorPlugin} and read here at startup from {@link MainActivity}, so arti
+ * auto-starts on a cold launch <em>before</em> the WebView loads — there is no
+ * pre-bootstrap leak window. Beyond that, activation is live: the settings
+ * toggle calls {@link #start}/{@link #stop} (bridged through {@link TorPlugin}),
+ * which start or stop arti immediately while also updating the persisted flag.
  *
  * <p>Pluggable transports (obfs4 via IPtProxy) are intentionally not wired up
  * yet — the builder already exposes {@code setObfs4Port}/{@code setBridgeLines}
@@ -104,13 +106,17 @@ public class TorController {
         return instance;
     }
 
-    /** Whether Tor is enabled in persisted preferences (read at next launch). */
+    /** Whether Tor is enabled in persisted preferences (read at cold-launch startup). */
     public static boolean isEnabled(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         return prefs.getBoolean(KEY_ENABLED, false);
     }
 
-    /** Persist the enabled flag. Takes effect on the next app launch. */
+    /**
+     * Persist the enabled flag only. This controls whether arti auto-starts on
+     * the next cold launch; it does not start or stop arti now. For live
+     * activation call {@link #start}/{@link #stop}, which also persist the flag.
+     */
     public static void setEnabled(Context context, boolean enabled) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .edit()

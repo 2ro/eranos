@@ -15,7 +15,13 @@ export interface TorStatusEvent {
 export interface TorPlugin {
   /** Whether Tor is enabled in persisted native preferences. */
   isEnabled(): Promise<{ enabled: boolean }>;
-  /** Persist the enabled flag. Applied on the next app launch. */
+  /**
+   * Persist the enabled flag only, without starting or stopping arti now.
+   * The persisted value controls whether arti auto-starts on the next cold
+   * launch. For live activation use {@link TorPlugin.start} /
+   * {@link TorPlugin.stop} (what the settings toggle calls), which both
+   * change state immediately *and* persist the flag.
+   */
   setEnabled(options: { enabled: boolean }): Promise<void>;
   /** Start arti now (live) and persist enabled=true. */
   start(): Promise<void>;

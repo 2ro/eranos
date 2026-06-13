@@ -290,9 +290,11 @@ export interface AppConfig {
   lowBandwidthMode: boolean;
   /**
    * Route all app traffic through the Tor network (arti). **Android only** —
-   * ignored on web and iOS. The actual proxy is installed natively at app
-   * startup, so changes take effect on the next launch (see `src/lib/tor.ts`
-   * and the native `TorController`).
+   * ignored on web and iOS. The Advanced Settings toggle applies changes live
+   * via the native `start`/`stop` bridge (arti starts/stops immediately and the
+   * relay layer remounts). The flag is also persisted natively so arti
+   * auto-starts on the next cold launch (see `src/lib/tor.ts` and the native
+   * `TorController`).
    *
    * Default: false.
    */

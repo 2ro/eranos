@@ -23,7 +23,16 @@ allprojects {
         mavenCentral()
         // Guardian Project's experimental Maven repo, hosting the prebuilt
         // org.torproject:arti-mobile AAR (Tor in Rust) used for the optional Tor mode.
-        maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
+        //
+        // Pinned to an immutable commit SHA rather than the mutable `master`
+        // branch: this artifact ships a native library with network-proxy
+        // privileges, so we don't want a force-push or new commit to gpmaven
+        // silently changing what we resolve. To bump arti, update both the
+        // commit below and the checksum pin in `app/build.gradle`, and re-verify
+        // the SHA-256 against a fresh download.
+        //
+        // Commit: guardianproject/gpmaven@b3ee2a63eec4ce37ea22fcc6b1ff009f406f2b13
+        maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/b3ee2a63eec4ce37ea22fcc6b1ff009f406f2b13" }
     }
 }
 

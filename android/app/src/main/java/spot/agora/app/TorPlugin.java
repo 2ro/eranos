@@ -10,9 +10,12 @@ import com.getcapacitor.annotation.CapacitorPlugin;
  * Capacitor bridge for the Tor (arti) mode.
  *
  * <p>Mirrors {@link DittoNotificationPlugin}'s pattern: JS configures native
- * state, native owns the work. The enabled flag is persisted only — arti is
- * actually started at launch from {@link MainActivity} (apply on relaunch).
- * Live bootstrap status is pushed to JS via the {@code torStatus} event.
+ * state, native owns the work. On a cold launch arti auto-starts from
+ * {@link MainActivity} based on the persisted flag. At runtime the settings
+ * toggle activates Tor live via {@link #start}/{@link #stop}, which start or
+ * stop arti immediately and update the persisted flag. ({@link #setEnabled}
+ * persists the flag only, without touching the running proxy.) Live bootstrap
+ * status is pushed to JS via the {@code torStatus} event.
  *
  * <p>JS interface: see {@code src/lib/tor.ts}.
  */
@@ -43,7 +46,11 @@ public class TorPlugin extends Plugin {
         call.resolve(ret);
     }
 
-    /** Persist the enabled flag. Applied on the next app launch. */
+    /**
+     * Persist the enabled flag only, without starting or stopping arti now.
+     * Controls whether arti auto-starts on the next cold launch. For live
+     * activation use {@link #start}/{@link #stop}.
+     */
     @PluginMethod
     public void setEnabled(PluginCall call) {
         Boolean enabled = call.getBoolean("enabled");

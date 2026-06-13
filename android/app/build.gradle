@@ -63,8 +63,10 @@ dependencies {
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
-    // Tor in Rust (arti) — prebuilt AAR from Guardian Project's gpmaven repo.
+    // Tor in Rust (arti) — prebuilt AAR from Guardian Project's gpmaven repo
+    // (source pinned to an immutable commit in the root build.gradle).
     // Provides org.torproject.arti.ArtiProxy used by TorController.
+    // The resolved AAR is checksum-verified below (verifyArtiChecksum).
     implementation 'org.torproject:arti-mobile:1.7.0.1'
     // arti pulls androidx.webkit in transitively but only at runtime; we
     // compile against ProxyController/WebViewFeature in TorController, so
@@ -77,6 +79,49 @@ dependencies {
 }
 
 apply from: 'capacitor.build.gradle'
+
+// Supply-chain pin for the arti-mobile AAR. It carries a native library with
+// network-proxy privileges and is sourced from Guardian Project's gpmaven repo,
+// so we verify the resolved artifact's SHA-256 against a value pinned here.
+// A mismatch fails the build before any APK is assembled. To bump arti, update
+// the version + repo commit (root build.gradle) and replace this checksum after
+// re-verifying a fresh download.
+ext.artiMobileSha256 = 'cbdb34ce3cdb32f755f25f6dd05a2d1eb9a44025a17ec9202729816e2a3af05b'
+
+task verifyArtiChecksum {
+    doLast {
+        def artifact = configurations.releaseRuntimeClasspath
+            .resolvedConfiguration
+            .resolvedArtifacts
+            .find { it.moduleVersion.id.group == 'org.torproject' && it.moduleVersion.id.name == 'arti-mobile' }
+
+        if (artifact == null) {
+            throw new GradleException("arti-mobile artifact not found on the runtime classpath; cannot verify Tor native library.")
+        }
+
+        def actual = java.security.MessageDigest.getInstance("SHA-256")
+            .digest(artifact.file.bytes)
+            .collect { String.format('%02x', it) }
+            .join('')
+
+        if (actual != project.ext.artiMobileSha256) {
+            throw new GradleException(
+                "arti-mobile AAR checksum mismatch!\n" +
+                "  expected: ${project.ext.artiMobileSha256}\n" +
+                "  actual:   ${actual}\n" +
+                "  file:     ${artifact.file}\n" +
+                "Refusing to build a Tor proxy from an unverified native artifact."
+            )
+        }
+        logger.lifecycle("Verified arti-mobile AAR checksum (${actual}).")
+    }
+}
+
+afterEvaluate {
+    tasks.matching { it.name.startsWith('assemble') || it.name.startsWith('bundle') }.configureEach {
+        dependsOn verifyArtiChecksum
+    }
+}
 
 try {
     def servicesJSON = file('google-services.json')
