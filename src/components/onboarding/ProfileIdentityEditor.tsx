@@ -40,11 +40,14 @@ interface ProfileIdentityEditorProps {
   onChange: (patch: Partial<ProfileIdentityDraft>) => void;
   /**
    * Which kind-0 field the editable text slot below the name edits:
-   * `'website'` for organizations, `'about'` (bio) for campaigners.
+   * `'website'` for organizations, `'about'` (bio) for campaigners, or
+   * `'none'` to show just the name.
    */
-  bioField: 'website' | 'about';
+  bioField: 'website' | 'about' | 'none';
   /** Placeholder for the bio textarea when `bioField` is `'about'`. */
   aboutPlaceholder?: string;
+  /** Show the banner area (default true). */
+  showBanner?: boolean;
   /** Notifies the host of upload progress so it can gate its primary button. */
   onUploadingChange?: (uploading: boolean) => void;
   className?: string;
@@ -65,6 +68,7 @@ export function ProfileIdentityEditor({
   onChange,
   bioField,
   aboutPlaceholder,
+  showBanner = true,
   onUploadingChange,
   className,
 }: ProfileIdentityEditorProps) {
@@ -245,6 +249,7 @@ export function ProfileIdentityEditor({
         onRemoveBanner={() => onChange({ banner: '' })}
         bioField={bioField}
         aboutPlaceholder={aboutPlaceholder}
+        showBanner={showBanner}
         showNip05={false}
         showBadges={false}
       />

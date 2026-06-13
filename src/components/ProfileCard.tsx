@@ -148,6 +148,8 @@ interface ProfileCardProps {
   onRemoveAvatar?: () => void;
   /** Called when user removes their banner image. */
   onRemoveBanner?: () => void;
+  /** Show the banner area (default true). When false, only the avatar shows. */
+  showBanner?: boolean;
   /** Show NIP-05 row (default true) */
   showNip05?: boolean;
   /** Show NIP-58 badge showcase row (default true). */
@@ -156,8 +158,9 @@ interface ProfileCardProps {
    * Which kind-0 field the editable text slot below the name edits.
    * - `'about'` (default): the bio textarea.
    * - `'website'`: a single-line website input, replacing the bio entirely.
+   * - `'none'`: hide the slot entirely (just name).
    */
-  bioField?: 'about' | 'website';
+  bioField?: 'about' | 'website' | 'none';
   /** Placeholder for the bio textarea when `bioField` is `'about'`. */
   aboutPlaceholder?: string;
   /** When provided, render an editable profile fields section below bio */
@@ -174,6 +177,7 @@ export function ProfileCard({
   onPasteUrl,
   onRemoveAvatar,
   onRemoveBanner,
+  showBanner = true,
   showNip05 = true,
   showBadges = true,
   bioField = 'about',
@@ -209,7 +213,7 @@ export function ProfileCard({
     <div className={cn('bg-card border rounded-xl overflow-hidden', className)}>
 
       {/* Banner */}
-      {editable && (onPasteUrl || onRemoveBanner) ? (
+      {showBanner && (editable && (onPasteUrl || onRemoveBanner) ? (
         // When a paste or remove action exists, the banner opens the shared
         // image menu instead of going straight to the file picker.
         <ImageEditMenu
@@ -277,13 +281,13 @@ export function ProfileCard({
             </>
           )}
         </div>
-      )}
+      ))}
 
       {/* Profile info */}
       <div className="px-4 pb-4">
 
         {/* Avatar */}
-        <div className="flex justify-between items-start -mt-12 mb-3">
+        <div className={cn('flex justify-between items-start mb-3', showBanner ? '-mt-12' : 'mt-3')}>
           {editable ? (
             <ImageEditMenu
               hasImage={!!metadata.picture}
@@ -368,7 +372,8 @@ export function ProfileCard({
         )}
 
         {/* Bio — or, when `bioField` is `'website'`, a website input that
-            takes the bio's place entirely. */}
+            takes the bio's place entirely; `'none'` hides the slot. */}
+        {bioField !== 'none' && (
         <div className="mt-2">
           {bioField === 'website' ? (
             editable ? (
@@ -395,6 +400,7 @@ export function ProfileCard({
             </p>
           ) : null}
         </div>
+        )}
 
         {/* Extra profile fields — collapsible, only when prop provided */}
         {extraFields !== undefined && (

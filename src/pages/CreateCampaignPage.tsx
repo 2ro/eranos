@@ -761,8 +761,8 @@ export function CreateCampaignPage() {
       )}
       draft={profileData}
       onChange={(patch) => setProfileData((prev) => ({ ...prev, ...patch }))}
-      bioField="about"
-      aboutPlaceholder={t('onboarding.profile.aboutPlaceholder')}
+      bioField="none"
+      showBanner={false}
       onUploadingChange={setProfileImageUploading}
     />
   );
