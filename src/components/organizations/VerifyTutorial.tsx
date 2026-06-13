@@ -64,6 +64,8 @@ interface VerifyTutorialProps {
    */
   verifierName?: string;
   verifierPicture?: string;
+  /** Fired after the first full replay cycle completes and resets. */
+  onLoopComplete?: () => void;
 }
 
 export function VerifyTutorial({
@@ -73,6 +75,7 @@ export function VerifyTutorial({
   stacked = false,
   verifierName,
   verifierPicture,
+  onLoopComplete,
 }: VerifyTutorialProps) {
   const { t } = useTranslation();
   const reducedMotion = usePrefersReducedMotion();
@@ -83,10 +86,13 @@ export function VerifyTutorial({
   // reveal the badge after another 2s, then pause briefly and reset.
   useEffect(() => {
     const id = window.setTimeout(() => {
+      if (phase === 'verified') {
+        onLoopComplete?.();
+      }
       setPhase((prev) => NEXT_PHASE[prev]);
     }, PHASE_DELAY[phase]);
     return () => window.clearTimeout(id);
-  }, [phase]);
+  }, [phase, onLoopComplete]);
 
   const menuVisible = phase === 'menuOpen';
   const verified = phase === 'verified';

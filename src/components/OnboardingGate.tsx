@@ -507,6 +507,9 @@ function VerifierHowtoStep({
   onFinish: () => void;
 }) {
   const { t } = useTranslation();
+  const [hasSeenLoop, setHasSeenLoop] = useState(false);
+  const handleLoopComplete = useCallback(() => setHasSeenLoop(true), []);
+
   return (
     <div className="space-y-6">
       <div className="space-y-2 text-center">
@@ -524,9 +527,14 @@ function VerifierHowtoStep({
         stacked
         verifierName={draft.name}
         verifierPicture={draft.picture}
+        onLoopComplete={handleLoopComplete}
       />
 
-      <Button onClick={onFinish} className="w-full h-12 text-base rounded-full">
+      <Button
+        onClick={onFinish}
+        disabled={!hasSeenLoop}
+        className="w-full h-12 text-base rounded-full"
+      >
         {t('onboarding.verifier.howto.finish')}
         <ArrowRight className="ml-2 h-4 w-4 rtl:rotate-180" />
       </Button>
