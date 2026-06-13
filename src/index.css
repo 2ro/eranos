@@ -690,6 +690,15 @@
   @apply min-h-[350px];
 }
 
+/* Verifier-statement instance: shorter, transparent fill so it matches the
+   muted bio textarea on the previous onboarding step. The muted background
+   and border live on the wrapper in VerifierStatementEditor, not here. */
+.milkdown-editor.verifier-statement-editor .editor,
+.milkdown-editor.verifier-statement-editor .ProseMirror,
+.milkdown-editor.verifier-statement-editor .milkdown-content .ProseMirror {
+  @apply min-h-[200px] bg-transparent;
+}
+
 /* Room navigation arrow nudge — subtle horizontal pulse */
 @keyframes room-arrow-nudge-left {
   0%, 100% { transform: translateX(0); }

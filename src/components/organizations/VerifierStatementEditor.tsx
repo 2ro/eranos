@@ -62,10 +62,18 @@ export function VerifierStatementEditor({
 
   return (
     <div className={cn('space-y-4', className)}>
-      {/* Borderless WYSIWYG markdown editor — no surrounding card/box so it
-          blends into the step. */}
-      <div className="rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-ring">
+      {/* Muted, borderless WYSIWYG markdown editor that matches the "Tell us
+          about your organization" bio box on the previous step — same muted
+          fill, no border until focus, and the same min height. */}
+      <div
+        className={cn(
+          'rounded-lg border-2 border-transparent bg-muted/40 overflow-hidden transition-colors duration-150',
+          'hover:bg-muted/60 hover:border-border',
+          'focus-within:bg-transparent focus-within:border-primary',
+        )}
+      >
         <MilkdownEditor
+          className="verifier-statement-editor"
           value={value}
           onChange={onChange}
           placeholder={t('verifier.placeholder')}

@@ -423,11 +423,12 @@ function CaptiveOverlay() {
           key={step}
           className={cn(
             'w-full mx-auto animate-in fade-in slide-in-from-bottom-2 duration-300',
-            // Bio, statement & how-to steps host a large text surface /
-            // markdown editor / two-column tutorial and need more room than
-            // the narrow base screens.
+            // Bio, statement & how-to steps host a text surface / markdown
+            // editor / tutorial and want a slightly roomier column than the
+            // narrow base screens — but not the full-width 3xl that left the
+            // text boxes and tutorial feeling oversized.
             step === 'orgBio' || step === 'orgStatement' || step === 'orgVerifyHowto'
-              ? 'max-w-3xl'
+              ? 'max-w-xl'
               : 'max-w-md',
           )}
         >
