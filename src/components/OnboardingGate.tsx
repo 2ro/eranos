@@ -512,7 +512,7 @@ function VerifierHowtoStep({ onFinish }: { onFinish: () => void }) {
         </p>
       </div>
 
-      <VerifyTutorial />
+      <VerifyTutorial hideHeader bare stacked />
 
       <Button onClick={onFinish} className="w-full h-12 text-base rounded-full">
         {t('onboarding.verifier.howto.finish')}

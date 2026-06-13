@@ -8,13 +8,10 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 
-import { VerifyTutorial } from '@/components/organizations/VerifyTutorial';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useOnboarding } from '@/contexts/onboardingContextDef';
-import { useVerifierStatement } from '@/hooks/useVerifierStatement';
 
 /**
  * The /organizations page. A landing-style document modeled on the
@@ -181,40 +178,32 @@ export function OrganizationsPage() {
  */
 function VerifierEditor() {
   const { t } = useTranslation();
-  const { user } = useCurrentUser();
-  const { isVerifier } = useVerifierStatement(user?.pubkey);
   const { startSignup } = useOnboarding();
 
   return (
-    <div className="space-y-8">
-      <Card className="border-border/60 shadow-sm">
-        <CardContent className="py-12 px-8 flex flex-col items-center gap-6 text-center">
-          <div className="p-4 rounded-full bg-primary/10">
-            <Building2 className="size-8 text-primary" />
-          </div>
-          <div className="space-y-2 max-w-sm">
-            <h3 className="text-xl font-bold tracking-tight">
-              {t('organizations.getStartedCard.title')}
-            </h3>
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              {t('organizations.getStartedCard.body')}
-            </p>
-          </div>
-          <Button
-            size="lg"
-            className="gap-2"
-            onClick={() => startSignup({ role: 'verifier' })}
-          >
-            <BadgeCheck className="size-5" />
-            {t('organizations.getStartedCard.cta')}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Once the org's statement is live, teach them the actual
-          verify gesture: the three-dots menu on any campaign card. */}
-      {isVerifier && <VerifyTutorial />}
-    </div>
+    <Card className="border-border/60 shadow-sm">
+      <CardContent className="py-12 px-8 flex flex-col items-center gap-6 text-center">
+        <div className="p-4 rounded-full bg-primary/10">
+          <Building2 className="size-8 text-primary" />
+        </div>
+        <div className="space-y-2 max-w-sm">
+          <h3 className="text-xl font-bold tracking-tight">
+            {t('organizations.getStartedCard.title')}
+          </h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            {t('organizations.getStartedCard.body')}
+          </p>
+        </div>
+        <Button
+          size="lg"
+          className="gap-2"
+          onClick={() => startSignup({ role: 'verifier' })}
+        >
+          <BadgeCheck className="size-5" />
+          {t('organizations.getStartedCard.cta')}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 

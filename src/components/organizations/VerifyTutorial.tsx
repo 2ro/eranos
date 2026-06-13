@@ -66,7 +66,24 @@ function usePrefersReducedMotion(): boolean {
   return ref.current;
 }
 
-export function VerifyTutorial({ className }: { className?: string }) {
+interface VerifyTutorialProps {
+  className?: string;
+  /** Hide the component's internal eyebrow/title/lede header (when the host
+   *  already provides one). */
+  hideHeader?: boolean;
+  /** Drop the bordered card chrome so it blends into the surrounding page. */
+  bare?: boolean;
+  /** Stack the demo full-width above the step list instead of the
+   *  side-by-side two-column layout. */
+  stacked?: boolean;
+}
+
+export function VerifyTutorial({
+  className,
+  hideHeader = false,
+  bare = false,
+  stacked = false,
+}: VerifyTutorialProps) {
   const { t } = useTranslation();
   const reducedMotion = usePrefersReducedMotion();
 
@@ -118,40 +135,50 @@ export function VerifyTutorial({ className }: { className?: string }) {
   return (
     <section
       className={cn(
-        'rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.07] via-background to-background p-6 sm:p-8 shadow-sm',
+        !bare &&
+          'rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.07] via-background to-background p-6 sm:p-8 shadow-sm',
         className,
       )}
       aria-labelledby="verify-tutorial-title"
     >
       {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
-        <div className="max-w-md">
-          <p className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-primary mb-2">
-            <BadgeCheck className="size-4" />
-            {t('organizations.tutorial.eyebrow')}
-          </p>
-          <h3
-            id="verify-tutorial-title"
-            className="text-xl sm:text-2xl font-bold tracking-tight mb-2"
-          >
-            {t('organizations.tutorial.title')}
-          </h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {t('organizations.tutorial.lede')}
-          </p>
+      {!hideHeader && (
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
+          <div className="max-w-md">
+            <p className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-primary mb-2">
+              <BadgeCheck className="size-4" />
+              {t('organizations.tutorial.eyebrow')}
+            </p>
+            <h3
+              id="verify-tutorial-title"
+              className="text-xl sm:text-2xl font-bold tracking-tight mb-2"
+            >
+              {t('organizations.tutorial.title')}
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {t('organizations.tutorial.lede')}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-        {/* ── Left: animated mock campaign card ───────────────────────── */}
+      <div
+        className={cn(
+          stacked
+            ? 'space-y-6'
+            : 'grid gap-8 lg:grid-cols-2 lg:items-center',
+        )}
+      >
+        {/* ── Animated mock campaign card ──────────────────────────────── */}
         <DemoStage
           phaseIndex={phaseIndex}
           menuVisible={menuVisible}
           verified={verified}
           reducedMotion={reducedMotion}
+          fullWidth={stacked}
         />
 
-        {/* ── Right: step list, synced to the animation ───────────────── */}
+        {/* ── Step list, synced to the animation ──────────────────────── */}
         <ol className="space-y-3">
           {stepCopy.map((step, i) => {
             const active = i === phaseIndex;
@@ -212,6 +239,8 @@ interface DemoStageProps {
   menuVisible: boolean;
   verified: boolean;
   reducedMotion: boolean;
+  /** Span the full container width instead of the narrow `max-w-sm` card. */
+  fullWidth?: boolean;
 }
 
 function DemoStage({
@@ -219,11 +248,18 @@ function DemoStage({
   menuVisible,
   verified,
   reducedMotion,
+  fullWidth = false,
 }: DemoStageProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="relative mx-auto w-full max-w-sm select-none" aria-hidden="true">
+    <div
+      className={cn(
+        'relative w-full select-none',
+        fullWidth ? 'mx-0' : 'mx-auto max-w-sm',
+      )}
+      aria-hidden="true"
+    >
       {/* Mock campaign card */}
       <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-md">
         {/* Banner */}
