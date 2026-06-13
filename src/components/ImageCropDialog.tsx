@@ -27,10 +27,12 @@ interface ImageCropDialogProps {
    * encoded smaller — see `encodeImage` in `@/lib/resizeImage`). The
    * mime/extension on the file reflects the winning format.
    */
-  onCrop: (croppedFile: File) => void;
+  onCrop: (croppedFile: File) => void | Promise<void>;
+  /** Called when source decoding/cropping fails before `onCrop` receives a file. */
+  onError?: (error: unknown) => void;
 }
 
-export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', maxOutputSize, onCancel, onCrop }: ImageCropDialogProps) {
+export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', maxOutputSize, onCancel, onCrop, onError }: ImageCropDialogProps) {
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
@@ -60,7 +62,9 @@ export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', 
         maxOutputSize,
         filename: 'cropped',
       });
-      onCrop(file);
+      await onCrop(file);
+    } catch (error) {
+      onError?.(error);
     } finally {
       setIsProcessing(false);
     }

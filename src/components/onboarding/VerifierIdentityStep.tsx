@@ -6,6 +6,7 @@ import { ProfileCard } from '@/components/ProfileCard';
 import { ImageCropDialog } from '@/components/ImageCropDialog';
 import { Button } from '@/components/ui/button';
 import { useUploadFile } from '@/hooks/useUploadFile';
+import { useImageProxy } from '@/hooks/useImageProxy';
 import { useToast } from '@/hooks/useToast';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -63,6 +64,7 @@ export function VerifierIdentityStep({
   const { t } = useTranslation();
   const { toast } = useToast();
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
+  const proxyImage = useImageProxy();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pendingFieldRef = useRef<CropField | null>(null);
@@ -102,9 +104,13 @@ export function VerifierIdentityStep({
         return;
       }
 
-      setCropState({ field, imageSrc: url, objectUrl: false });
+      setCropState({
+        field,
+        imageSrc: proxyImage(url, field === 'banner' ? 1500 : 512),
+        objectUrl: false,
+      });
     },
-    [t, toast],
+    [proxyImage, t, toast],
   );
 
   const handleFileChosen = useCallback(
@@ -152,6 +158,17 @@ export function VerifierIdentityStep({
     [cropState, uploadFile, onChange, t, toast],
   );
 
+  const handleCropError = useCallback(
+    (error: unknown) => {
+      toast({
+        title: t('onboarding.profile.uploadFailed'),
+        description: error instanceof Error ? error.message : String(error),
+        variant: 'destructive',
+      });
+    },
+    [t, toast],
+  );
+
   // ── Continue gating ──────────────────────────────────────────────────────
   // Avatar + name are required; banner is optional. Website is optional too,
   // but if entered it must be a valid https URL.
@@ -193,6 +210,7 @@ export function VerifierIdentityStep({
           maxOutputSize={cropState.field === 'banner' ? 1500 : 512}
           onCancel={handleCropCancel}
           onCrop={handleCropConfirm}
+          onError={handleCropError}
         />
       )}
 
