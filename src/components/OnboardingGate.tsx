@@ -359,7 +359,6 @@ function CaptiveOverlay() {
         return (
           <VerifierBioStep
             draft={orgDraft}
-            pubkey={user?.pubkey}
             onChange={patchOrgDraft}
             onContinue={handleBioContinue}
             isPublishing={isPublishingOrg}
@@ -376,7 +375,7 @@ function CaptiveOverlay() {
       case 'orgVerifyHowto':
         // Verifier sub-flow step 4 — teach the verify gesture, then finish.
         return (
-          <VerifierHowtoStep onFinish={handleVerifierFinish} />
+          <VerifierHowtoStep draft={orgDraft} onFinish={handleVerifierFinish} />
         );
     }
   })();
@@ -499,7 +498,13 @@ function RoleStep({ role, onPick }: RoleStepProps) {
  * Verifier sub-flow step 4 — teach the verify gesture with the shared
  * {@link VerifyTutorial}, then offer the terminal "View campaigns" CTA.
  */
-function VerifierHowtoStep({ onFinish }: { onFinish: () => void }) {
+function VerifierHowtoStep({
+  draft,
+  onFinish,
+}: {
+  draft: OrgProfileDraft;
+  onFinish: () => void;
+}) {
   const { t } = useTranslation();
   return (
     <div className="space-y-6">
@@ -512,7 +517,13 @@ function VerifierHowtoStep({ onFinish }: { onFinish: () => void }) {
         </p>
       </div>
 
-      <VerifyTutorial hideHeader bare stacked />
+      <VerifyTutorial
+        hideHeader
+        bare
+        stacked
+        verifierName={draft.name}
+        verifierPicture={draft.picture}
+      />
 
       <Button onClick={onFinish} className="w-full h-12 text-base rounded-full">
         {t('onboarding.verifier.howto.finish')}

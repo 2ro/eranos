@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 /**
  * An animated, interactive tutorial shown on /organizations once an
@@ -76,6 +77,14 @@ interface VerifyTutorialProps {
   /** Stack the demo full-width above the step list instead of the
    *  side-by-side two-column layout. */
   stacked?: boolean;
+  /**
+   * When provided, the demo card's verified badge shows this organization's
+   * avatar + name (the preview a verifier just configured) instead of the
+   * generic "Verified by you" label — so the onboarding flow previews how the
+   * org's own badge will surface on a campaign.
+   */
+  verifierName?: string;
+  verifierPicture?: string;
 }
 
 export function VerifyTutorial({
@@ -83,6 +92,8 @@ export function VerifyTutorial({
   hideHeader = false,
   bare = false,
   stacked = false,
+  verifierName,
+  verifierPicture,
 }: VerifyTutorialProps) {
   const { t } = useTranslation();
   const reducedMotion = usePrefersReducedMotion();
@@ -176,6 +187,8 @@ export function VerifyTutorial({
           verified={verified}
           reducedMotion={reducedMotion}
           fullWidth={stacked}
+          verifierName={verifierName}
+          verifierPicture={verifierPicture}
         />
 
         {/* ── Step list, synced to the animation ──────────────────────── */}
@@ -241,6 +254,9 @@ interface DemoStageProps {
   reducedMotion: boolean;
   /** Span the full container width instead of the narrow `max-w-sm` card. */
   fullWidth?: boolean;
+  /** Optional verifier identity to preview in the badge (see VerifyTutorial). */
+  verifierName?: string;
+  verifierPicture?: string;
 }
 
 function DemoStage({
@@ -249,8 +265,16 @@ function DemoStage({
   verified,
   reducedMotion,
   fullWidth = false,
+  verifierName,
+  verifierPicture,
 }: DemoStageProps) {
   const { t } = useTranslation();
+
+  // When a verifier identity is supplied, the badge mirrors the live
+  // verification badge (org avatar + name); otherwise it falls back to the
+  // generic "Verified by you" label.
+  const hasVerifier = !!verifierName?.trim();
+  const verifierInitial = verifierName?.trim()?.[0]?.toUpperCase() ?? '?';
 
   return (
     <div
@@ -273,17 +297,39 @@ function DemoStage({
             }}
           />
 
-          {/* Verified badge (top-left) — appears in the final phase */}
+          {/* Verified badge (top-left) — appears in the final phase. When a
+              verifier identity is supplied it previews that org's avatar +
+              name; otherwise a generic "Verified by you" label. */}
           <div
             className={cn(
-              'absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-background/90 px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm backdrop-blur transition-all duration-500',
+              'absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-background/90 text-xs font-semibold text-foreground shadow-sm backdrop-blur transition-all duration-500',
+              hasVerifier ? 'py-1 pl-1.5 pr-2.5' : 'px-2.5 py-1',
               verified
                 ? 'opacity-100 translate-y-0'
                 : 'opacity-0 -translate-y-1 pointer-events-none',
             )}
           >
-            <BadgeCheck className="size-4 text-primary" />
-            {t('organizations.tutorial.demo.verifiedBadge')}
+            {hasVerifier ? (
+              <>
+                <Avatar className="size-5 shrink-0 ring-2 ring-background">
+                  <AvatarImage
+                    src={verifierPicture || undefined}
+                    alt={verifierName}
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="bg-secondary text-[9px] font-semibold text-secondary-foreground">
+                    {verifierInitial}
+                  </AvatarFallback>
+                </Avatar>
+                <BadgeCheck className="size-4 text-primary" />
+                <span className="max-w-[10rem] truncate">{verifierName}</span>
+              </>
+            ) : (
+              <>
+                <BadgeCheck className="size-4 text-primary" />
+                {t('organizations.tutorial.demo.verifiedBadge')}
+              </>
+            )}
           </div>
 
           {/* Three-dots button (top-right) */}

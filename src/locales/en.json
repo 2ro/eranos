@@ -166,7 +166,6 @@
         "subtitle": "A short description of who you are and what you do. This appears on your profile.",
         "label": "About your organization",
         "placeholder": "We're a nonprofit that…",
-        "previewLabel": "How donors will see your badge",
         "publishing": "Saving your profile…"
       },
       "publishFailedTitle": "Profile not saved",
@@ -1609,15 +1608,15 @@
       "steps": {
         "open": {
           "title": "Open the menu",
-          "body": "On any campaign card, tap the three-dots button in the top-right corner of the banner."
+          "body": "Tap the three-dots button on any campaign card."
         },
         "verify": {
           "title": "Choose \"Verify this campaign\"",
-          "body": "The menu reveals a verify action — visible only to moderators and verifiers like you."
+          "body": "Pick the verify action — shown only to verifiers."
         },
         "confirm": {
           "title": "Confirm & you're done",
-          "body": "Attest the campaign is authentic. Your badge joins the card so donors know you stand behind it."
+          "body": "Attest it's authentic. Your badge joins the card."
         }
       },
       "demo": {
