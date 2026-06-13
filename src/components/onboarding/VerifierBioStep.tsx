@@ -43,14 +43,13 @@ export function VerifierBioStep({
         </p>
       </div>
 
-      <div className="space-y-1.5">
+      <div>
         <Textarea
           id="verifier-org-bio"
           value={draft.about}
           onChange={(e) => onChange({ about: e.target.value })}
           placeholder={t('onboarding.verifier.bio.placeholder')}
-          className="min-h-[400px] resize-none p-3 text-lg leading-relaxed"
-          aria-label={t('onboarding.verifier.bio.label')}
+          className="min-h-[400px] resize-none p-3 text-lg leading-7 md:text-lg"
           aria-required
         />
       </div>
