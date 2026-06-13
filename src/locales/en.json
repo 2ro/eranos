@@ -109,7 +109,7 @@
       "verifier": {
         "title": "Verify campaigns",
         "description": "Vouch for campaigns as an organization.",
-        "finderNote": "Donors see your badge on campaigns you trust."
+        "finderNote": "Donors see badge on campaigns you trust."
       }
     },
     "keygen": {
