@@ -69,6 +69,7 @@ export function VerifierIdentityStep({
   const [cropState, setCropState] = useState<{
     field: CropField;
     imageSrc: string;
+    objectUrl: boolean;
   } | null>(null);
 
   // Open the OS file picker for the requested image field.
@@ -77,8 +78,8 @@ export function VerifierIdentityStep({
     fileInputRef.current?.click();
   }, []);
 
-  // Read an image URL from the clipboard, validate it, and apply it directly
-  // to the draft field. Hosted images are used as-is (no crop/upload step).
+  // Read an image URL from the clipboard, validate it, and route it through
+  // the same crop/upload flow as local files.
   const handlePasteUrl = useCallback(
     async (field: CropField) => {
       let text = '';
@@ -101,9 +102,9 @@ export function VerifierIdentityStep({
         return;
       }
 
-      onChange({ [field]: url });
+      setCropState({ field, imageSrc: url, objectUrl: false });
     },
-    [onChange, t, toast],
+    [t, toast],
   );
 
   const handleFileChosen = useCallback(
@@ -124,21 +125,21 @@ export function VerifierIdentityStep({
       }
 
       const imageSrc = URL.createObjectURL(file);
-      setCropState({ field, imageSrc });
+      setCropState({ field, imageSrc, objectUrl: true });
     },
     [t, toast],
   );
 
   const handleCropCancel = useCallback(() => {
-    if (cropState) URL.revokeObjectURL(cropState.imageSrc);
+    if (cropState?.objectUrl) URL.revokeObjectURL(cropState.imageSrc);
     setCropState(null);
   }, [cropState]);
 
   const handleCropConfirm = useCallback(
     async (croppedFile: File) => {
       if (!cropState) return;
-      const { field, imageSrc } = cropState;
-      URL.revokeObjectURL(imageSrc);
+      const { field, imageSrc, objectUrl } = cropState;
+      if (objectUrl) URL.revokeObjectURL(imageSrc);
       setCropState(null);
       try {
         const tags = await uploadFile(croppedFile);
@@ -190,6 +191,8 @@ export function VerifierIdentityStep({
               : t('onboarding.verifier.identity.cropBanner')
           }
           maxOutputSize={cropState.field === 'banner' ? 1500 : 512}
+          hideCropBorder
+          sharpContainer
           onCancel={handleCropCancel}
           onCrop={handleCropConfirm}
         />
