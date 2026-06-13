@@ -423,9 +423,10 @@ function CaptiveOverlay() {
           key={step}
           className={cn(
             'w-full mx-auto animate-in fade-in slide-in-from-bottom-2 duration-300',
-            // Statement & how-to steps host a markdown editor / two-column
-            // tutorial and need more room than the narrow base screens.
-            step === 'orgStatement' || step === 'orgVerifyHowto'
+            // Bio, statement & how-to steps host a large text surface /
+            // markdown editor / two-column tutorial and need more room than
+            // the narrow base screens.
+            step === 'orgBio' || step === 'orgStatement' || step === 'orgVerifyHowto'
               ? 'max-w-3xl'
               : 'max-w-md',
           )}

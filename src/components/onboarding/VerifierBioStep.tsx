@@ -53,7 +53,7 @@ export function VerifierBioStep({
           value={draft.about}
           onChange={(e) => onChange({ about: e.target.value })}
           placeholder={t('onboarding.verifier.bio.placeholder')}
-          className="min-h-32 resize-none"
+          className="min-h-[400px] resize-none p-3 text-lg leading-relaxed"
           aria-required
         />
       </div>
