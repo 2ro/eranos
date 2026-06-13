@@ -948,15 +948,16 @@ function ProfileTabContent({
 
 // ----- Main Component -----
 
-// Desktop (lg+) keeps the focused 3-tab content set; the rail to the
+// Desktop (lg+) keeps the focused content set; the rail to the
 // left already shows the profile's Overview information (campaigns,
 // orgs, fields), so duplicating it as a tab would be redundant.
-const DESKTOP_TAB_LABEL_KEYS = ['activity', 'campaigns', 'pledges'] as const;
+// "Groups" and "Pledges" are temporarily hidden.
+const DESKTOP_TAB_LABEL_KEYS = ['activity', 'campaigns'] as const;
 
 // Below lg the left rail is unavailable, so its content becomes the
-// default "Overview" tab and organizations get their own "Groups"
-// tab. Order matters — "Overview" is the default on first mount.
-const MOBILE_TAB_LABEL_KEYS = ['overview', 'activity', 'campaigns', 'groups', 'pledges'] as const;
+// default "Overview" tab. Order matters — "Overview" is the default on
+// first mount. "Groups" and "Pledges" are temporarily hidden.
+const MOBILE_TAB_LABEL_KEYS = ['overview', 'activity', 'campaigns'] as const;
 
 // Map from label key → internal tab id.
 const CORE_TAB_IDS: Record<string, string> = {
@@ -969,7 +970,7 @@ const CORE_TAB_IDS: Record<string, string> = {
 };
 
 const KNOWN_TAB_IDS = new Set(['overview', 'verified', 'activity', 'campaigns', 'community', 'pledges']);
-const DESKTOP_TAB_IDS = new Set(['verified', 'activity', 'campaigns', 'pledges']);
+const DESKTOP_TAB_IDS = new Set(['verified', 'activity', 'campaigns']);
 
 /**
  * Read the viewport at first render to pick the initial active tab.
