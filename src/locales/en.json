@@ -159,7 +159,8 @@
         "cropBanner": "Crop banner",
         "uploading": "Uploading image…",
         "clipboardFailed": "Couldn't read from clipboard.",
-        "pasteUrlInvalid": "Clipboard doesn't contain a valid https URL."
+        "pasteUrlInvalid": "Clipboard doesn't contain a valid https URL.",
+        "pasteUrlFetchFailed": "Couldn't load that image. Check the URL and try again."
       },
       "bio": {
         "title": "Tell us about your organization",

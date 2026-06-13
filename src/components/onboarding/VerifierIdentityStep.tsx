@@ -6,9 +6,10 @@ import { ProfileCard } from '@/components/ProfileCard';
 import { ImageCropDialog } from '@/components/ImageCropDialog';
 import { Button } from '@/components/ui/button';
 import { useUploadFile } from '@/hooks/useUploadFile';
-import { useImageProxy } from '@/hooks/useImageProxy';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useToast } from '@/hooks/useToast';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
+import { fetchImageAsFile } from '@/lib/proxyImageUrl';
 import { cn } from '@/lib/utils';
 
 /**
@@ -64,7 +65,7 @@ export function VerifierIdentityStep({
   const { t } = useTranslation();
   const { toast } = useToast();
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
-  const proxyImage = useImageProxy();
+  const { config } = useAppContext();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pendingFieldRef = useRef<CropField | null>(null);
@@ -80,8 +81,11 @@ export function VerifierIdentityStep({
     fileInputRef.current?.click();
   }, []);
 
-  // Read an image URL from the clipboard, validate it, and route it through
-  // the same crop/upload flow as local files.
+  // Read an image URL from the clipboard, validate it, then fetch its bytes
+  // (through the image proxy so the request is CORS-safe) into an object URL.
+  // From there it joins the exact same crop → Blossom-upload flow as a local
+  // file — the cropper only ever sees a same-origin `blob:` source, so the
+  // canvas never taints and arbitrary remote hosts / SVGs work.
   const handlePasteUrl = useCallback(
     async (field: CropField) => {
       let text = '';
@@ -104,13 +108,25 @@ export function VerifierIdentityStep({
         return;
       }
 
+      let file: File;
+      try {
+        file = await fetchImageAsFile(url, config.imageProxy);
+      } catch (error) {
+        toast({
+          title: t('onboarding.verifier.identity.pasteUrlFetchFailed'),
+          description: error instanceof Error ? error.message : undefined,
+          variant: 'destructive',
+        });
+        return;
+      }
+
       setCropState({
         field,
-        imageSrc: proxyImage(url, field === 'banner' ? 1500 : 512),
-        objectUrl: false,
+        imageSrc: URL.createObjectURL(file),
+        objectUrl: true,
       });
     },
-    [proxyImage, t, toast],
+    [config.imageProxy, t, toast],
   );
 
   const handleFileChosen = useCallback(
