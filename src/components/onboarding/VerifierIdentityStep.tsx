@@ -110,7 +110,11 @@ export function VerifierIdentityStep({
 
       let file: File;
       try {
-        file = await fetchImageAsFile(url, config.imageProxy);
+        file = await fetchImageAsFile(
+          url,
+          config.imageProxy,
+          field === 'banner' ? 1500 : 1024,
+        );
       } catch (error) {
         toast({
           title: t('onboarding.verifier.identity.pasteUrlFetchFailed'),

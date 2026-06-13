@@ -80,17 +80,21 @@ export function proxyImageUrl(
  * @param proxyBaseUrl  Base URL of a wsrv.nl-compatible proxy. Falls back to
  *                      `https://wsrv.nl` when empty, since a direct fetch of an
  *                      arbitrary origin would almost always fail CORS.
+ * @param width         Target raster width in px. Small or vector (SVG)
+ *                      sources are *enlarged* to this so the cropper has a
+ *                      usable canvas instead of a tiny speck. Defaults to 1024.
  * @param filename      Base filename for the returned `File`.
  */
 export async function fetchImageAsFile(
   src: string,
   proxyBaseUrl: string,
+  width = 1024,
   filename = 'pasted-image',
 ): Promise<File> {
   // data: URIs carry their own bytes — fetch directly, no proxy, no CORS.
   const fetchUrl = src.startsWith('data:')
     ? src
-    : proxyFetchUrl(src, proxyBaseUrl || 'https://wsrv.nl');
+    : proxyFetchUrl(src, proxyBaseUrl || 'https://wsrv.nl', width);
 
   const res = await fetch(fetchUrl);
   if (!res.ok) {
@@ -111,9 +115,11 @@ export async function fetchImageAsFile(
 /**
  * Build a proxy URL for *fetching bytes* (as opposed to an `<img src>`).
  * Unlike {@link proxyImageUrl} this forces SVGs through the proxy so they
- * rasterize, and omits the width cap so the cropper gets full resolution.
+ * rasterize, and requests a target `width` so small or vector sources are
+ * enlarged to a usable crop resolution rather than handed to the cropper at
+ * a tiny intrinsic size.
  */
-function proxyFetchUrl(src: string, proxyBaseUrl: string): string {
+function proxyFetchUrl(src: string, proxyBaseUrl: string, width: number): string {
   let parsedProxy: URL;
   try {
     parsedProxy = new URL(proxyBaseUrl);
@@ -123,7 +129,15 @@ function proxyFetchUrl(src: string, proxyBaseUrl: string): string {
   if (parsedProxy.protocol !== 'https:') return src;
 
   const base = (parsedProxy.origin + parsedProxy.pathname).replace(/\/+$/, '');
-  const params = new URLSearchParams({ url: src, output: 'png' });
+  // `w` resizes to the target width. wsrv.nl enlarges smaller sources by
+  // default (no `we` flag), so a 32px SVG icon becomes a `width`-wide raster
+  // the cropper can actually work with. `fit=inside` preserves aspect ratio.
+  const params = new URLSearchParams({
+    url: src,
+    output: 'png',
+    w: String(width),
+    fit: 'inside',
+  });
   return `${base}/?${params.toString()}`;
 }
 
