@@ -164,6 +164,7 @@
         "subtitle": "A short description of who you are and what you do. This appears on your profile.",
         "label": "About your organization",
         "placeholder": "We're a nonprofit that…",
+        "previewLabel": "How donors will see your badge",
         "publishing": "Saving your profile…"
       },
       "publishFailedTitle": "Profile not saved",

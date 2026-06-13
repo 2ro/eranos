@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Loader2 } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -52,19 +52,30 @@ export function VerifierBioStep({
         </p>
       </div>
 
-      {/* Continuity header: who we're writing the bio for. */}
-      <div className="flex items-center gap-3 rounded-xl border bg-card p-4">
-        <Avatar className="size-12 shrink-0">
-          <AvatarImage src={draft.picture || undefined} alt={displayName} className="object-cover" />
-          <AvatarFallback className="bg-primary/15 text-primary font-bold">
-            {initial}
-          </AvatarFallback>
-        </Avatar>
-        <div className="min-w-0">
-          <p className="font-semibold truncate">{displayName}</p>
-          {draft.website && (
-            <p className="text-xs text-muted-foreground truncate">{draft.website}</p>
-          )}
+      {/* Preview: how this org will appear when it verifies a campaign —
+          mirrors the inline verification badge (stacked avatar + check)
+          so the user sees how their logo and name surface to donors. */}
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-muted-foreground text-center">
+          {t('onboarding.verifier.bio.previewLabel')}
+        </p>
+        <div className="flex justify-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background py-1 pl-1.5 pr-3 shadow-sm">
+            <Avatar className="size-6 shrink-0 ring-2 ring-background">
+              <AvatarImage
+                src={draft.picture || undefined}
+                alt={displayName}
+                className="object-cover"
+              />
+              <AvatarFallback className="bg-secondary text-[10px] font-semibold text-secondary-foreground">
+                {initial}
+              </AvatarFallback>
+            </Avatar>
+            <BadgeCheck className="size-4 text-sky-500" />
+            <span className="max-w-[12rem] truncate text-sm font-semibold">
+              {displayName}
+            </span>
+          </span>
         </div>
       </div>
 
