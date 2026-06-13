@@ -158,6 +158,8 @@ interface ProfileCardProps {
    * - `'website'`: a single-line website input, replacing the bio entirely.
    */
   bioField?: 'about' | 'website';
+  /** Placeholder for the bio textarea when `bioField` is `'about'`. */
+  aboutPlaceholder?: string;
   /** When provided, render an editable profile fields section below bio */
   extraFields?: ProfileField[];
   onExtraFieldsChange?: (fields: ProfileField[]) => void;
@@ -175,6 +177,7 @@ export function ProfileCard({
   showNip05 = true,
   showBadges = true,
   bioField = 'about',
+  aboutPlaceholder = 'Write a short bio…',
   extraFields,
   onExtraFieldsChange,
 }: ProfileCardProps) {
@@ -383,7 +386,7 @@ export function ProfileCard({
           ) : editable ? (
             <EditableTextarea
               value={metadata.about ?? ''}
-              placeholder="Write a short bio…"
+              placeholder={aboutPlaceholder}
               onChange={patch('about')}
             />
           ) : metadata.about ? (

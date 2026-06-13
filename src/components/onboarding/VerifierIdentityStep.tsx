@@ -1,15 +1,10 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, Loader2 } from 'lucide-react';
 
-import { ProfileCard } from '@/components/ProfileCard';
-import { ImageCropDialog } from '@/components/ImageCropDialog';
+import { ProfileIdentityEditor } from '@/components/onboarding/ProfileIdentityEditor';
 import { Button } from '@/components/ui/button';
-import { useUploadFile } from '@/hooks/useUploadFile';
-import { useAppContext } from '@/hooks/useAppContext';
-import { useToast } from '@/hooks/useToast';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
-import { fetchImageAsFile } from '@/lib/proxyImageUrl';
 import { cn } from '@/lib/utils';
 
 /**
@@ -30,15 +25,6 @@ export interface OrgProfileDraft {
   about: string;
 }
 
-/** Which image field the crop dialog is currently editing. */
-type CropField = 'picture' | 'banner';
-
-/** Aspect ratios: circular avatar crops square; banner crops 3:1. */
-const CROP_ASPECT: Record<CropField, number> = {
-  picture: 1,
-  banner: 3,
-};
-
 interface VerifierIdentityStepProps {
   draft: OrgProfileDraft;
   onChange: (patch: Partial<OrgProfileDraft>) => void;
@@ -48,11 +34,10 @@ interface VerifierIdentityStepProps {
 /**
  * Verifier sub-flow step 1 — the organization's identity.
  *
- * Reuses the app's editable {@link ProfileCard} (circular avatar,
+ * Wraps the shared {@link ProfileIdentityEditor} (circular avatar,
  * rectangular banner, inline name, and a website field that replaces the bio
- * slot) plus the shared {@link ImageCropDialog} for uploads. Avatar and name
- * are required; banner and website are optional. When a website is entered,
- * it must be a well-formed `https:` URL.
+ * slot). Avatar and name are required; banner and website are optional. When
+ * a website is entered, it must be a well-formed `https:` URL.
  *
  * Nothing is published here; the draft is published as a single kind-0 event
  * at the end of the sub-flow, so stepping back and forth never republishes.
@@ -63,130 +48,11 @@ export function VerifierIdentityStep({
   onContinue,
 }: VerifierIdentityStepProps) {
   const { t } = useTranslation();
-  const { toast } = useToast();
-  const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
-  const { config } = useAppContext();
+  const [isUploading, setIsUploading] = useState(false);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const pendingFieldRef = useRef<CropField | null>(null);
-  const [cropState, setCropState] = useState<{
-    field: CropField;
-    imageSrc: string;
-    objectUrl: boolean;
-  } | null>(null);
-
-  // Open the OS file picker for the requested image field.
-  const handlePickImage = useCallback((field: CropField) => {
-    pendingFieldRef.current = field;
-    fileInputRef.current?.click();
-  }, []);
-
-  // Read an image URL from the clipboard, validate it, then fetch its bytes
-  // (through the image proxy so the request is CORS-safe) into an object URL.
-  // From there it joins the exact same crop → Blossom-upload flow as a local
-  // file — the cropper only ever sees a same-origin `blob:` source, so the
-  // canvas never taints and arbitrary remote hosts / SVGs work.
-  const handlePasteUrl = useCallback(
-    async (field: CropField) => {
-      let text = '';
-      try {
-        text = (await navigator.clipboard.readText()).trim();
-      } catch {
-        toast({
-          title: t('onboarding.verifier.identity.clipboardFailed'),
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      const url = sanitizeUrl(text);
-      if (!url) {
-        toast({
-          title: t('onboarding.verifier.identity.pasteUrlInvalid'),
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      let file: File;
-      try {
-        file = await fetchImageAsFile(
-          url,
-          config.imageProxy,
-          field === 'banner' ? 1500 : 1024,
-        );
-      } catch (error) {
-        toast({
-          title: t('onboarding.verifier.identity.pasteUrlFetchFailed'),
-          description: error instanceof Error ? error.message : undefined,
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      setCropState({
-        field,
-        imageSrc: URL.createObjectURL(file),
-        objectUrl: true,
-      });
-    },
-    [config.imageProxy, t, toast],
-  );
-
-  const handleFileChosen = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      e.target.value = '';
-      const field = pendingFieldRef.current;
-      pendingFieldRef.current = null;
-      if (!file || !field) return;
-
-      if (!file.type.startsWith('image/')) {
-        toast({ title: t('onboarding.profile.imageOnly'), variant: 'destructive' });
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        toast({ title: t('onboarding.profile.imageTooLarge'), variant: 'destructive' });
-        return;
-      }
-
-      const imageSrc = URL.createObjectURL(file);
-      setCropState({ field, imageSrc, objectUrl: true });
-    },
-    [t, toast],
-  );
-
-  const handleCropCancel = useCallback(() => {
-    if (cropState?.objectUrl) URL.revokeObjectURL(cropState.imageSrc);
-    setCropState(null);
-  }, [cropState]);
-
-  const handleCropConfirm = useCallback(
-    async (croppedFile: File) => {
-      if (!cropState) return;
-      const { field, imageSrc, objectUrl } = cropState;
-      if (objectUrl) URL.revokeObjectURL(imageSrc);
-      setCropState(null);
-      try {
-        const tags = await uploadFile(croppedFile);
-        const url = tags[0]?.[1];
-        if (url) onChange({ [field]: url });
-      } catch {
-        toast({ title: t('onboarding.profile.uploadFailed'), variant: 'destructive' });
-      }
-    },
-    [cropState, uploadFile, onChange, t, toast],
-  );
-
-  const handleCropError = useCallback(
-    (error: unknown) => {
-      toast({
-        title: t('onboarding.profile.uploadFailed'),
-        description: error instanceof Error ? error.message : String(error),
-        variant: 'destructive',
-      });
-    },
-    [t, toast],
+  const handleChange = useCallback(
+    (patch: Partial<OrgProfileDraft>) => onChange(patch),
+    [onChange],
   );
 
   // ── Continue gating ──────────────────────────────────────────────────────
@@ -209,55 +75,13 @@ export function VerifierIdentityStep({
         </p>
       </div>
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleFileChosen}
+      <ProfileIdentityEditor
+        className={cn(isUploading && 'opacity-50 pointer-events-none')}
+        draft={draft}
+        onChange={handleChange}
+        bioField="website"
+        onUploadingChange={setIsUploading}
       />
-
-      {cropState && (
-        <ImageCropDialog
-          open
-          imageSrc={cropState.imageSrc}
-          aspect={CROP_ASPECT[cropState.field]}
-          title={
-            cropState.field === 'picture'
-              ? t('onboarding.verifier.identity.cropAvatar')
-              : t('onboarding.verifier.identity.cropBanner')
-          }
-          maxOutputSize={cropState.field === 'banner' ? 1500 : 512}
-          onCancel={handleCropCancel}
-          onCrop={handleCropConfirm}
-          onError={handleCropError}
-        />
-      )}
-
-      <div className={cn(isUploading && 'opacity-50 pointer-events-none')}>
-        <ProfileCard
-          className="rounded-none border-0 bg-transparent"
-          metadata={{
-            name: draft.name,
-            website: draft.website,
-            picture: draft.picture,
-            banner: draft.banner,
-          }}
-          onChange={(patch) => {
-            if (patch.name !== undefined) onChange({ name: patch.name });
-            if (patch.website !== undefined) {
-              onChange({ website: patch.website as string });
-            }
-          }}
-          onPickImage={handlePickImage}
-          onPasteUrl={handlePasteUrl}
-          onRemoveAvatar={() => onChange({ picture: '' })}
-          onRemoveBanner={() => onChange({ banner: '' })}
-          bioField="website"
-          showNip05={false}
-          showBadges={false}
-        />
-      </div>
 
       {/* Website is optional, but if entered it must be a valid https URL. */}
       {websiteTouched && !websiteValid && (

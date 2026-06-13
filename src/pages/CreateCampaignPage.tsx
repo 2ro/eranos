@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -12,14 +12,12 @@ import {
   ArrowRight,
   Bitcoin,
   Check,
-  ChevronDown,
   EyeOff,
   Globe,
   HandHeart,
   HelpCircle,
   Loader2,
   ShieldCheck,
-  Upload,
   Wallet,
 } from 'lucide-react';
 
@@ -29,6 +27,7 @@ import { CategoryPicker } from '@/components/CategoryPicker';
 import { Wizard } from '@/components/Wizard';
 import { FormSection } from '@/components/FormSection';
 import { OrganizationContextChip } from '@/components/OrganizationContextChip';
+import { ProfileIdentityEditor } from '@/components/onboarding/ProfileIdentityEditor';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -47,7 +46,6 @@ import { useHdWallet } from '@/hooks/useHdWallet';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
-import { useUploadFile } from '@/hooks/useUploadFile';
 import { formatBTC, satsToUSD } from '@/lib/bitcoin';
 import {
   CAMPAIGN_KIND,
@@ -138,7 +136,6 @@ export function CreateCampaignPage() {
   const queryClient = useQueryClient();
   const { nostr } = useNostr();
   const { mutateAsync: publishEvent } = useNostrPublish();
-  const { mutateAsync: uploadProfileFile, isPending: isUploadingProfileAvatar } = useUploadFile();
   const { toast } = useToast();
   const hdWallet = useHdWallet();
   const hdWalletAvailable = hdWallet.availability.status === 'available';
@@ -210,11 +207,10 @@ export function CreateCampaignPage() {
   const [organizationATag, setOrganizationATag] = useState('');
   const [formError, setFormError] = useState('');
   const [prepopulatedEventId, setPrepopulatedEventId] = useState<string | null>(null);
-  const [profileData, setProfileData] = useState({ name: '', about: '', picture: '' });
+  const [profileData, setProfileData] = useState({ name: '', about: '', picture: '', banner: '', website: '' });
   const [profilePrefilledPubkey, setProfilePrefilledPubkey] = useState<string | null>(null);
   const [includeCampaignProfileStep, setIncludeCampaignProfileStep] = useState(false);
-  const [showProfileMore, setShowProfileMore] = useState(false);
-  const profileAvatarInputRef = useRef<HTMLInputElement>(null);
+  const [profileImageUploading, setProfileImageUploading] = useState(false);
 
   const editTarget = useMemo(() => getEditTarget(editNaddr), [editNaddr]);
 
@@ -252,6 +248,8 @@ export function CreateCampaignPage() {
       name: userMetadata?.name ?? userMetadata?.display_name ?? '',
       about: userMetadata?.about ?? '',
       picture: userMetadata?.picture ?? '',
+      banner: userMetadata?.banner ?? '',
+      website: (userMetadata?.website as string) ?? '',
     });
     setProfilePrefilledPubkey(user.pubkey);
   }, [isEditMode, profilePrefilledPubkey, user, userAuthor.isLoading, userMetadata]);
@@ -379,29 +377,6 @@ export function CreateCampaignPage() {
     setPrepopulatedEventId(editCampaign.event.id);
   }, [editCampaign, prepopulatedEventId]);
 
-  const handleProfileAvatarChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    e.target.value = '';
-
-    if (!file.type.startsWith('image/')) {
-      toast({ title: t('onboarding.profile.imageOnly'), variant: 'destructive' });
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast({ title: t('onboarding.profile.imageTooLarge'), variant: 'destructive' });
-      return;
-    }
-
-    try {
-      const tags = await uploadProfileFile(file);
-      const url = tags[0]?.[1];
-      if (url) setProfileData((prev) => ({ ...prev, picture: url }));
-    } catch {
-      toast({ title: t('onboarding.profile.uploadFailed'), variant: 'destructive' });
-    }
-  };
-
   const profileMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error(t('campaignsCreate.errorLoginRequired'));
@@ -409,6 +384,7 @@ export function CreateCampaignPage() {
       const name = profileData.name.trim();
       const about = profileData.about.trim();
       const picture = profileData.picture.trim();
+      const banner = profileData.banner.trim();
 
       if (!name || !picture) {
         throw new Error(t('onboarding.profile.publishFailedDescription'));
@@ -419,6 +395,7 @@ export function CreateCampaignPage() {
       metadata.name = name;
       if (about) metadata.about = about;
       metadata.picture = picture;
+      if (banner) metadata.banner = banner;
 
       await publishEvent({ kind: 0, content: JSON.stringify(metadata), prev: prev ?? undefined });
     },
@@ -778,86 +755,16 @@ export function CreateCampaignPage() {
   const profileNameProvided = profileData.name.trim().length > 0;
   const profileAvatarProvided = profileData.picture.trim().length > 0;
   const profileSection = (
-    <div className={cn('space-y-4', profileMutation.isPending && 'opacity-50 pointer-events-none')}>
-      <div className="space-y-1.5">
-        <label htmlFor="campaign-profile-name" className="text-sm font-medium">
-          {t('onboarding.profile.nameLabel')}
-        </label>
-        <Input
-          id="campaign-profile-name"
-          value={profileData.name}
-          onChange={(e) => setProfileData((prev) => ({ ...prev, name: e.target.value }))}
-          placeholder={t('onboarding.profile.namePlaceholder')}
-          required
-          aria-required
-        />
-      </div>
-
-      <div className="space-y-1.5">
-        <label htmlFor="campaign-profile-picture" className="text-sm font-medium">
-          {t('onboarding.profile.avatarLabel')}
-        </label>
-        <div className="flex gap-2">
-          <Input
-            id="campaign-profile-picture"
-            value={profileData.picture}
-            onChange={(e) => setProfileData((prev) => ({ ...prev, picture: e.target.value }))}
-            placeholder="https://…"
-            className="flex-1"
-            required
-            aria-required
-          />
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            ref={profileAvatarInputRef}
-            onChange={handleProfileAvatarChange}
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => profileAvatarInputRef.current?.click()}
-            disabled={isUploadingProfileAvatar}
-            title={t('onboarding.profile.uploadAvatar')}
-          >
-            {isUploadingProfileAvatar ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Upload className="w-4 h-4" />
-            )}
-          </Button>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={() => setShowProfileMore((v) => !v)}
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ChevronDown
-          className={cn('h-4 w-4 transition-transform duration-200', showProfileMore && 'rotate-180')}
-        />
-        {t('onboarding.profile.advanced')}
-      </button>
-
-      {showProfileMore && (
-        <div className="space-y-1.5">
-          <label htmlFor="campaign-profile-about" className="text-sm font-medium">
-            {t('onboarding.profile.aboutLabel')}
-          </label>
-          <Textarea
-            id="campaign-profile-about"
-            value={profileData.about}
-            onChange={(e) => setProfileData((prev) => ({ ...prev, about: e.target.value }))}
-            placeholder={t('onboarding.profile.aboutPlaceholder')}
-            className="resize-none"
-            rows={3}
-          />
-        </div>
+    <ProfileIdentityEditor
+      className={cn(
+        (profileMutation.isPending || profileImageUploading) && 'opacity-50 pointer-events-none',
       )}
-    </div>
+      draft={profileData}
+      onChange={(patch) => setProfileData((prev) => ({ ...prev, ...patch }))}
+      bioField="about"
+      aboutPlaceholder={t('onboarding.profile.aboutPlaceholder')}
+      onUploadingChange={setProfileImageUploading}
+    />
   );
 
   const titleSection = (
@@ -1178,7 +1085,7 @@ export function CreateCampaignPage() {
       step1Lead={orgChip}
       steps={wizardSteps}
       canAdvanceFromStep={(s) => {
-        if (s === profileStep) return profileNameProvided && profileAvatarProvided && !isUploadingProfileAvatar;
+        if (s === profileStep) return profileNameProvided && profileAvatarProvided && !profileImageUploading;
         if (s === titleStep) return titleProvided;
         return true;
       }}
@@ -1195,7 +1102,7 @@ export function CreateCampaignPage() {
       launchNowLabel={t('campaignsCreate.wizard.launchNow')}
       errorAlert={errorAlert}
       submitButtonContent={submitButtonContent}
-      submitting={submitMutation.isPending || profileMutation.isPending || coverUploading || isUploadingProfileAvatar}
+      submitting={submitMutation.isPending || profileMutation.isPending || coverUploading || profileImageUploading}
       onSubmit={handleSubmit}
       onClose={() => navigate(-1)}
     />
