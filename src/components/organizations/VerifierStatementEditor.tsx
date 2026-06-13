@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 
 import { MilkdownEditor } from '@/components/markdown/MilkdownEditor';
-import { Button } from '@/components/ui/button';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useVerifierStatement } from '@/hooks/useVerifierStatement';
 import { cn } from '@/lib/utils';
@@ -14,10 +13,6 @@ interface VerifierStatementEditorProps {
   onChange: (value: string) => void;
   /** Hydration callback — fired once with the user's existing statement. */
   onHydrated?: (statement: string) => void;
-  /** Show a Withdraw control (only when a statement is already published). */
-  showWithdraw?: boolean;
-  onWithdraw?: () => void;
-  isWithdrawing?: boolean;
   className?: string;
 }
 
@@ -27,15 +22,13 @@ interface VerifierStatementEditorProps {
  * A controlled, borderless WYSIWYG editor: the host owns the value and the
  * publish action (publishing is wired to the onboarding step's primary
  * button). The editor only renders the editing surface, hydrating once from
- * the user's existing statement, plus an optional inline Withdraw control.
+ * the user's existing statement. Withdrawing happens from the profile's
+ * "How We Verify" card, not here.
  */
 export function VerifierStatementEditor({
   value,
   onChange,
   onHydrated,
-  showWithdraw = false,
-  onWithdraw,
-  isWithdrawing = false,
   className,
 }: VerifierStatementEditorProps) {
   const { t } = useTranslation();
@@ -79,19 +72,6 @@ export function VerifierStatementEditor({
           placeholder={t('verifier.placeholder')}
         />
       </div>
-
-      {showWithdraw && onWithdraw && (
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={onWithdraw}
-          disabled={isWithdrawing}
-          className="text-destructive hover:text-destructive px-0"
-        >
-          {isWithdrawing && <Loader2 className="size-4 animate-spin mr-2" />}
-          {t('verifier.withdraw')}
-        </Button>
-      )}
     </div>
   );
 }

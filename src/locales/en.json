@@ -1514,6 +1514,8 @@
     "publish": "Become a verifier",
     "update": "Update statement",
     "withdraw": "Withdraw",
+    "withdrawConfirmTitle": "Withdraw your verifier statement?",
+    "withdrawConfirmBody": "Your \"How We Verify\" statement will be removed from your profile. You can publish a new one anytime.",
     "loading": "Loading your statement…",
     "publishedToast": "Your verifier statement is live.",
     "withdrawnToast": "Your verifier statement has been withdrawn.",

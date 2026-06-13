@@ -914,7 +914,7 @@ function ProfileTabContent({
   }
 
   if (activeTab === 'verified') {
-    return <ProfileVerifiedTab pubkey={pubkey} displayName={displayName} />;
+    return <ProfileVerifiedTab pubkey={pubkey} displayName={displayName} isOwnProfile={isOwnProfile} />;
   }
 
   if (activeTab === 'campaigns') {

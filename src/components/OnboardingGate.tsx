@@ -553,7 +553,7 @@ interface VerifierStatementStepProps {
  * One header and one combined subtext sit above a borderless
  * {@link VerifierStatementEditor}. There's no separate publish button: the
  * primary button publishes the statement (when there's content) and then
- * advances. A returning verifier can withdraw inline.
+ * advances. Withdrawing happens later from the profile's "How We Verify" card.
  */
 function VerifierStatementStep({
   onContinue,
@@ -563,14 +563,12 @@ function VerifierStatementStep({
   const { mutateAsync: setStatement, isPending } = useSetVerifierStatement();
 
   const [value, setValue] = useState('');
-  const [alreadyPublished, setAlreadyPublished] = useState(false);
 
   const trimmed = value.trim();
 
   const handleContinue = useCallback(async () => {
     try {
       await setStatement(trimmed);
-      toast({ title: t('verifier.publishedToast') });
       onContinue();
     } catch (error) {
       toast({
@@ -580,21 +578,6 @@ function VerifierStatementStep({
       });
     }
   }, [setStatement, trimmed, toast, t, onContinue]);
-
-  const handleWithdraw = useCallback(async () => {
-    try {
-      await setStatement('');
-      setValue('');
-      setAlreadyPublished(false);
-      toast({ title: t('verifier.withdrawnToast') });
-    } catch (error) {
-      toast({
-        title: t('verifier.errorToast'),
-        description: error instanceof Error ? error.message : String(error),
-        variant: 'destructive',
-      });
-    }
-  }, [setStatement, toast, t]);
 
   return (
     <div className="space-y-6">
@@ -610,10 +593,6 @@ function VerifierStatementStep({
       <VerifierStatementEditor
         value={value}
         onChange={setValue}
-        onHydrated={(s) => setAlreadyPublished(!!s)}
-        showWithdraw={alreadyPublished}
-        onWithdraw={handleWithdraw}
-        isWithdrawing={isPending}
       />
 
       <Button

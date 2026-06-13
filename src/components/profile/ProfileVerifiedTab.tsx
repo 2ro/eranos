@@ -9,6 +9,7 @@ import { useVerifiedCampaigns } from '@/hooks/useVerifiedCampaigns';
 interface ProfileVerifiedTabProps {
   pubkey: string;
   displayName: string;
+  isOwnProfile?: boolean;
 }
 
 /**
@@ -20,14 +21,14 @@ interface ProfileVerifiedTabProps {
  * immediately see how the organization vets campaigns and what it
  * stands behind.
  */
-export function ProfileVerifiedTab({ pubkey, displayName }: ProfileVerifiedTabProps) {
+export function ProfileVerifiedTab({ pubkey, displayName, isOwnProfile = false }: ProfileVerifiedTabProps) {
   const { t } = useTranslation();
   const { campaigns, isLoading } = useVerifiedCampaigns(pubkey);
 
   if (isLoading && campaigns.length === 0) {
     return (
       <div className="px-4 sm:px-6 py-6 space-y-6">
-        <ProfileVerifierSection pubkey={pubkey} />
+        <ProfileVerifierSection pubkey={pubkey} isOwnProfile={isOwnProfile} />
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
           {Array.from({ length: 3 }).map((_, i) => (
             <CampaignCardSkeleton key={i} />
@@ -40,7 +41,7 @@ export function ProfileVerifiedTab({ pubkey, displayName }: ProfileVerifiedTabPr
   if (campaigns.length === 0) {
     return (
       <div className="px-4 sm:px-6 py-6 space-y-6" data-pubkey={pubkey}>
-        <ProfileVerifierSection pubkey={pubkey} />
+        <ProfileVerifierSection pubkey={pubkey} isOwnProfile={isOwnProfile} />
         <Card className="border-dashed">
           <div className="py-12 px-8 text-center">
             <BadgeCheck className="size-10 mx-auto mb-3 text-muted-foreground" />
@@ -55,7 +56,7 @@ export function ProfileVerifiedTab({ pubkey, displayName }: ProfileVerifiedTabPr
 
   return (
     <div className="px-4 sm:px-6 py-6 space-y-4">
-      <ProfileVerifierSection pubkey={pubkey} className="mb-2" />
+      <ProfileVerifierSection pubkey={pubkey} isOwnProfile={isOwnProfile} className="mb-2" />
       <p className="text-sm text-muted-foreground">
         {t('profile.verified.count', { count: campaigns.length })}
       </p>
