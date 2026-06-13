@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { encodeImage } from '@/lib/resizeImage';
-import { cn } from '@/lib/utils';
 
 interface ImageCropDialogProps {
   open: boolean;
@@ -22,10 +21,6 @@ interface ImageCropDialogProps {
    * silently down-rezzed without opting in.
    */
   maxOutputSize?: number;
-  /** Hide the crop selection outline. */
-  hideCropBorder?: boolean;
-  /** Render the dialog container itself with sharp corners and no border. */
-  sharpContainer?: boolean;
   onCancel: () => void;
   /**
    * Receives the cropped result as a `File` (JPEG or PNG, whichever
@@ -35,7 +30,7 @@ interface ImageCropDialogProps {
   onCrop: (croppedFile: File) => void;
 }
 
-export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', maxOutputSize, hideCropBorder = false, sharpContainer = false, onCancel, onCrop }: ImageCropDialogProps) {
+export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', maxOutputSize, onCancel, onCrop }: ImageCropDialogProps) {
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
@@ -73,7 +68,7 @@ export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', 
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onCancel(); }}>
-      <DialogContent className={cn('sm:max-w-lg p-0 gap-0 overflow-hidden', sharpContainer && 'rounded-none border-0')}>
+      <DialogContent className="sm:max-w-lg p-0 gap-0 overflow-hidden">
         <DialogHeader className="px-5 pt-5 pb-3">
           <DialogTitle className="text-base">{title}</DialogTitle>
         </DialogHeader>
@@ -90,10 +85,7 @@ export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', 
             onCropComplete={onCropComplete}
             style={{
               containerStyle: { borderRadius: 0 },
-              cropAreaStyle: {
-                border: hideCropBorder ? '0' : '2px solid hsl(var(--primary))',
-                borderRadius: 0,
-              },
+              cropAreaStyle: { border: '2px solid hsl(var(--primary))' },
             }}
           />
         </div>

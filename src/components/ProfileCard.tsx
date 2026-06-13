@@ -87,6 +87,7 @@ interface ProfileField {
 }
 
 interface ProfileCardProps {
+  className?: string;
   pubkey?: string;
   metadata: Partial<NostrMetadata>;
   onChange?: (patch: Partial<NostrMetadata>) => void;
@@ -116,6 +117,7 @@ interface ProfileCardProps {
 }
 
 export function ProfileCard({
+  className,
   pubkey,
   metadata,
   onChange,
@@ -153,7 +155,7 @@ export function ProfileCard({
     onExtraFieldsChange?.((extraFields ?? []).map((f, idx) => idx === i ? { ...f, [key]: val } : f));
 
   return (
-    <div className="bg-card border rounded-xl overflow-hidden">
+    <div className={cn('bg-card border rounded-xl overflow-hidden', className)}>
 
       {/* Banner */}
       {editable && onPasteUrl ? (

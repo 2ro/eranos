@@ -191,8 +191,6 @@ export function VerifierIdentityStep({
               : t('onboarding.verifier.identity.cropBanner')
           }
           maxOutputSize={cropState.field === 'banner' ? 1500 : 512}
-          hideCropBorder
-          sharpContainer
           onCancel={handleCropCancel}
           onCrop={handleCropConfirm}
         />
@@ -200,6 +198,7 @@ export function VerifierIdentityStep({
 
       <div className={cn(isUploading && 'opacity-50 pointer-events-none')}>
         <ProfileCard
+          className="rounded-none border-0 bg-transparent"
           metadata={{
             name: draft.name,
             website: draft.website,
