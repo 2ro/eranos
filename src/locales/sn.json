@@ -1,4 +1,17 @@
 {
+  "tor": {
+    "status": {
+      "disabled": "Dzimwa",
+      "connecting": "Kubatanidza…",
+      "connected": "Yakabatanidza",
+      "failed": "Kubatanidza kwakundikana"
+    },
+    "banner": {
+      "connecting": "Kubatanidza kuTor — zvichakara zvichirodhwa kusvikira zvasvika.",
+      "failed": "Hatina kukwanisa kubatanidza kuTor — zvichakara zvakavharwa kusvikira zvabatanidza.",
+      "retry": "Edza zvakare"
+    }
+  },
   "common": {
     "loading": "Inotakura…",
     "error": "Kukanganisa",
@@ -984,7 +997,14 @@
       "title": "Zvepamusoro",
       "subtitle": "Mibatanidzwa yechikwama, marongero esystem, nezvimwe zvinotenderwa kuvashandisi venyanzvi.",
       "intro": "Mibatanidzwa yechikwama, marongero esystem, nezvimwe zvepamusoro.",
-      "wallet": "Chikwama"
+      "wallet": "Chikwama",
+      "torHeading": "Tor",
+      "torToggle": "Fambisa traffic kuburikidza neTor",
+      "torToggleDesc": "Inobatanidza kune marelay uye inorodha media pamusoro peNetwork yeTor kuti uwane kuchengetedzeka kwakasimba. Tarisira kushanda kwakarefu uye kugumira kadiki Tor ichiri kubatanidza.",
+      "torApplyNote": "Kuvhura izvi kunofambisa traffic yose kuburikidza neTor. Ichiri kubatanidza, zvimwe zvichakara hazvizorohwi (bhana inoratidzwa ichiratidza mamiriro) — hapana chinhumwa kunze kweTor. Kudzima kunodzizoresa kubatanidza kwakanga kwakagara.",
+      "torStatusLabel": "Mamiriro:",
+      "torExitIp": "IP yokubuda kweTor:",
+      "torCheckAgain": "Tarisa zvakare"
     },
     "wallet": {
       "title": "Chikwama",

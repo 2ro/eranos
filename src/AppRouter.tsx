@@ -9,6 +9,7 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { VersionCheck } from "./components/VersionCheck";
 import { MinimizedAudioBar } from "./components/MinimizedAudioBar";
 import { AudioNavigationGuard } from "./components/AudioNavigationGuard";
+import { TorStatusBanner } from "./components/TorStatusBanner";
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useProfileUrl } from "./hooks/useProfileUrl";
 import { cn } from "@/lib/utils";
@@ -139,6 +140,9 @@ export function AppRouter() {
       <ScrollToTop />
       <AudioNavigationGuard />
       <MinimizedAudioBar />
+      {/* App-wide Tor status banner. Must live inside BrowserRouter — it
+          renders a <Link> to the Tor settings, which needs Router context. */}
+      <TorStatusBanner />
       <OnboardingGate>
         <Routes>
         {/* Narrow layout — `max-w-3xl` center column. The default for

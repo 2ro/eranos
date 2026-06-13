@@ -1,4 +1,17 @@
 {
+  "tor": {
+    "status": {
+      "disabled": "Mati",
+      "connecting": "Menghubungkan…",
+      "connected": "Terhubung",
+      "failed": "Koneksi gagal"
+    },
+    "banner": {
+      "connecting": "Menghubungkan ke Tor — konten tidak akan dimuat hingga siap.",
+      "failed": "Tidak dapat terhubung ke Tor — konten diblokir hingga berhasil terhubung.",
+      "retry": "Coba lagi"
+    }
+  },
   "common": {
     "loading": "Memuat…",
     "error": "Kesalahan",
@@ -1424,7 +1437,14 @@
       "title": "Lanjutan",
       "subtitle": "Koneksi dompet, konfigurasi sistem, dan opsi lanjutan lainnya untuk pengguna mahir.",
       "intro": "Koneksi dompet, konfigurasi sistem, dan opsi lanjutan lainnya.",
-      "wallet": "Dompet"
+      "wallet": "Dompet",
+      "torHeading": "Tor",
+      "torToggle": "Arahkan lalu lintas melalui Tor",
+      "torToggleDesc": "Terhubung ke relay dan memuat media melalui jaringan Tor untuk privasi yang lebih kuat. Performa lebih lambat dan ada jeda singkat saat Tor terhubung.",
+      "torApplyNote": "Mengaktifkan ini mengarahkan semua lalu lintas melalui Tor. Saat terhubung, konten lain tidak akan dimuat (banner menampilkan status) — tidak ada yang dikirim di luar Tor. Menonaktifkan ini beralih kembali ke koneksi langsung.",
+      "torStatusLabel": "Status:",
+      "torExitIp": "IP keluar Tor:",
+      "torCheckAgain": "Periksa lagi"
     },
     "wallet": {
       "title": "Dompet",

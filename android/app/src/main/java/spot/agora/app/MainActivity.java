@@ -25,6 +25,14 @@ public class MainActivity extends BridgeActivity {
     protected void onCreate(Bundle savedInstanceState) {
         // Register native plugins before super.onCreate.
         registerPlugin(DittoNotificationPlugin.class);
+        registerPlugin(TorPlugin.class);
+
+        // If the user enabled Tor (apply on relaunch), start arti BEFORE
+        // super.onCreate so the WebView SOCKS proxy override is installed
+        // before the WebView issues any network request — no leak window.
+        if (TorController.isEnabled(this)) {
+            TorController.getInstance().start(getApplicationContext());
+        }
 
         super.onCreate(savedInstanceState);
 

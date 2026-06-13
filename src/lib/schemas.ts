@@ -150,6 +150,7 @@ export const AppConfigSchema = z.object({
   imageQuality: z.enum(['compressed', 'original']),
   imageProxy: z.string(),
   lowBandwidthMode: z.boolean(),
+  torEnabled: z.boolean(),
   curatorPubkey: z.string().regex(/^[0-9a-f]{64}$/i).optional(),
   /**
    * Ordered list of Esplora REST roots tried in failover order. Accepts the

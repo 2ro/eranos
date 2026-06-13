@@ -1,4 +1,17 @@
 {
+  "tor": {
+    "status": {
+      "disabled": "已关闭",
+      "connecting": "连接中…",
+      "connected": "已连接",
+      "failed": "连接失败"
+    },
+    "banner": {
+      "connecting": "正在连接 Tor — 连接完成前内容无法加载。",
+      "failed": "无法连接到 Tor — 内容已被屏蔽，等待连接成功后恢复。",
+      "retry": "重试"
+    }
+  },
   "common": {
     "loading": "加载中…",
     "error": "错误",
@@ -984,7 +997,14 @@
       "title": "高级",
       "subtitle": "钱包连接、系统配置和其他面向高级用户的选项。",
       "intro": "钱包连接、系统配置和其他高级选项。",
-      "wallet": "钱包"
+      "wallet": "钱包",
+      "torHeading": "Tor",
+      "torToggle": "通过 Tor 路由流量",
+      "torToggleDesc": "连接到中继并通过 Tor 网络加载媒体内容，以获得更强的隐私保护。预计性能会有所下降，且 Tor 连接时会有短暂延迟。",
+      "torApplyNote": "开启后，所有流量将通过 Tor 路由。连接期间，其他内容将无法加载（横幅会显示状态）——不会有任何数据在 Tor 之外发送。关闭后将切换回直连。",
+      "torStatusLabel": "状态：",
+      "torExitIp": "Tor 出口 IP：",
+      "torCheckAgain": "重新检查"
     },
     "wallet": {
       "title": "钱包",

@@ -1,4 +1,17 @@
 {
+  "tor": {
+    "status": {
+      "disabled": "Off",
+      "connecting": "Connecting…",
+      "connected": "Connected",
+      "failed": "Connection failed"
+    },
+    "banner": {
+      "connecting": "Connecting to Tor — content won't load until it's ready.",
+      "failed": "Couldn't connect to Tor — content is blocked until it connects.",
+      "retry": "Try again"
+    }
+  },
   "common": {
     "loading": "Loading…",
     "error": "Error",
@@ -1435,7 +1448,14 @@
       "title": "Advanced",
       "subtitle": "Wallet connections, system configuration, and other advanced options for power users.",
       "intro": "Wallet connections, system configuration, and other advanced options.",
-      "wallet": "Wallet"
+      "wallet": "Wallet",
+      "torHeading": "Tor",
+      "torToggle": "Route traffic through Tor",
+      "torToggleDesc": "Connects to relays and loads media over the Tor network for stronger privacy. Expect slower performance and a short delay while Tor connects.",
+      "torApplyNote": "Turning this on routes all traffic through Tor. While it connects, other content won't load (a banner shows the status) — nothing is sent outside Tor. Turning it off switches back to a direct connection.",
+      "torStatusLabel": "Status:",
+      "torExitIp": "Tor exit IP:",
+      "torCheckAgain": "Check again"
     },
     "wallet": {
       "title": "Wallet",

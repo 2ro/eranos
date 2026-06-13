@@ -1,4 +1,17 @@
 {
+  "tor": {
+    "status": {
+      "disabled": "Désactivé",
+      "connecting": "Connexion…",
+      "connected": "Connecté",
+      "failed": "Échec de la connexion"
+    },
+    "banner": {
+      "connecting": "Connexion à Tor en cours — le contenu ne se chargera pas avant qu'il soit prêt.",
+      "failed": "Impossible de se connecter à Tor — le contenu est bloqué jusqu'à ce qu'il se connecte.",
+      "retry": "Réessayer"
+    }
+  },
   "common": {
     "loading": "Chargement…",
     "error": "Erreur",
@@ -1421,7 +1434,14 @@
       "title": "Avancé",
       "subtitle": "Connexions de portefeuille, configuration système et autres options avancées pour les utilisateurs expérimentés.",
       "intro": "Connexions de portefeuille, configuration système et autres options avancées.",
-      "wallet": "Portefeuille"
+      "wallet": "Portefeuille",
+      "torHeading": "Tor",
+      "torToggle": "Acheminer le trafic via Tor",
+      "torToggleDesc": "Se connecte à des relais et charge les médias via le réseau Tor pour une meilleure confidentialité. Attendez-vous à des performances réduites et un court délai le temps que Tor se connecte.",
+      "torApplyNote": "Activer cette option achemine tout le trafic via Tor. Pendant la connexion, les autres contenus ne se chargeront pas (une bannière indique l'état) — rien n'est envoyé en dehors de Tor. La désactiver rétablit une connexion directe.",
+      "torStatusLabel": "État :",
+      "torExitIp": "IP de sortie Tor :",
+      "torCheckAgain": "Vérifier à nouveau"
     },
     "wallet": {
       "title": "Portefeuille",

@@ -27,6 +27,10 @@
 -keepattributes *Annotation*
 -keep class com.outsystems.plugins.barcode.** { *; }
 
+# Keep arti (Tor) classes — ArtiJNI declares native methods invoked from the
+# Rust .so via JNI, so its names must not be obfuscated/stripped.
+-keep class org.torproject.arti.** { *; }
+
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
 #-keepattributes SourceFile,LineNumberTable

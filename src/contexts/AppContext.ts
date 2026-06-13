@@ -288,6 +288,15 @@ export interface AppConfig {
    * Default: false.
    */
   lowBandwidthMode: boolean;
+  /**
+   * Route all app traffic through the Tor network (arti). **Android only** —
+   * ignored on web and iOS. The actual proxy is installed natively at app
+   * startup, so changes take effect on the next launch (see `src/lib/tor.ts`
+   * and the native `TorController`).
+   *
+   * Default: false.
+   */
+  torEnabled: boolean;
   /** Hex pubkey of the curator whose follow list defines the curated feed. */
   curatorPubkey?: string;
   /**

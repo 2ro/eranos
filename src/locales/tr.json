@@ -1,4 +1,17 @@
 {
+  "tor": {
+    "status": {
+      "disabled": "Kapalı",
+      "connecting": "Bağlanıyor…",
+      "connected": "Bağlı",
+      "failed": "Bağlantı başarısız"
+    },
+    "banner": {
+      "connecting": "Tor'a bağlanılıyor — hazır olana kadar içerik yüklenmeyecek.",
+      "failed": "Tor'a bağlanılamadı — bağlantı kurulana kadar içerik engellendi.",
+      "retry": "Tekrar dene"
+    }
+  },
   "common": {
     "loading": "Yükleniyor…",
     "error": "Hata",
@@ -1425,7 +1438,14 @@
       "title": "Gelişmiş",
       "subtitle": "Cüzdan bağlantıları, sistem yapılandırması ve ileri kullanıcılar için diğer gelişmiş seçenekler.",
       "intro": "Cüzdan bağlantıları, sistem yapılandırması ve diğer gelişmiş seçenekler.",
-      "wallet": "Cüzdan"
+      "wallet": "Cüzdan",
+      "torHeading": "Tor",
+      "torToggle": "Trafiği Tor üzerinden yönlendir",
+      "torToggleDesc": "Daha güçlü gizlilik için Tor ağı üzerinden rölelere bağlanır ve medya yükler. Daha yavaş bir performans ve Tor bağlanırken kısa bir bekleme süresi bekleyin.",
+      "torApplyNote": "Bunu açmak tüm trafiği Tor üzerinden yönlendirir. Bağlanırken diğer içerikler yüklenmez (durum bir banner ile gösterilir) — Tor dışına hiçbir şey gönderilmez. Kapatmak doğrudan bağlantıya geri döner.",
+      "torStatusLabel": "Durum:",
+      "torExitIp": "Tor çıkış IP:",
+      "torCheckAgain": "Tekrar kontrol et"
     },
     "wallet": {
       "title": "Cüzdan",

@@ -1,4 +1,17 @@
 {
+  "tor": {
+    "status": {
+      "disabled": "Desactivado",
+      "connecting": "Conectando…",
+      "connected": "Conectado",
+      "failed": "Error de conexión"
+    },
+    "banner": {
+      "connecting": "Conectando a Tor — el contenido no cargará hasta que esté listo.",
+      "failed": "No se pudo conectar a Tor — el contenido está bloqueado hasta que se conecte.",
+      "retry": "Reintentar"
+    }
+  },
   "common": {
     "loading": "Cargando…",
     "error": "Error",
@@ -982,7 +995,14 @@
       "title": "Avanzado",
       "subtitle": "Conexiones de cartera, configuración del sistema y otras opciones para usuarios avanzados.",
       "intro": "Conexiones de cartera, configuración del sistema y otras opciones avanzadas.",
-      "wallet": "Cartera"
+      "wallet": "Cartera",
+      "torHeading": "Tor",
+      "torToggle": "Enrutar el tráfico a través de Tor",
+      "torToggleDesc": "Se conecta a relés y carga los medios a través de la red Tor para mayor privacidad. El rendimiento será más lento y habrá un breve retraso mientras Tor se conecta.",
+      "torApplyNote": "Al activar esta opción, todo el tráfico se enruta a través de Tor. Mientras se conecta, el resto del contenido no cargará (un banner muestra el estado) — nada se envía fuera de Tor. Al desactivarla, se vuelve a una conexión directa.",
+      "torStatusLabel": "Estado:",
+      "torExitIp": "IP de salida de Tor:",
+      "torCheckAgain": "Comprobar de nuevo"
     },
     "wallet": {
       "title": "Cartera",
