@@ -77,6 +77,35 @@ export function VerifierIdentityStep({
     fileInputRef.current?.click();
   }, []);
 
+  // Read an image URL from the clipboard, validate it, and apply it directly
+  // to the draft field. Hosted images are used as-is (no crop/upload step).
+  const handlePasteUrl = useCallback(
+    async (field: CropField) => {
+      let text = '';
+      try {
+        text = (await navigator.clipboard.readText()).trim();
+      } catch {
+        toast({
+          title: t('onboarding.verifier.identity.clipboardFailed'),
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const url = sanitizeUrl(text);
+      if (!url) {
+        toast({
+          title: t('onboarding.verifier.identity.pasteUrlInvalid'),
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      onChange({ [field]: url });
+    },
+    [onChange, t, toast],
+  );
+
   const handleFileChosen = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
@@ -181,6 +210,7 @@ export function VerifierIdentityStep({
             }
           }}
           onPickImage={handlePickImage}
+          onPasteUrl={handlePasteUrl}
           bioField="website"
           showNip05={false}
           showBadges={false}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { NostrMetadata } from '@nostrify/nostrify';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { CheckCircle2, Pencil, Plus, Trash2, ChevronDown, ImagePlus, X as XIcon } from 'lucide-react';
+import { CheckCircle2, Pencil, Plus, Trash2, ChevronDown, ImagePlus, X as XIcon, Link as LinkIcon } from 'lucide-react';
 import { genUserName } from '@/lib/genUserName';
 import { BioContent } from '@/components/BioContent';
 import { cn } from '@/lib/utils';
@@ -91,6 +91,13 @@ interface ProfileCardProps {
   metadata: Partial<NostrMetadata>;
   onChange?: (patch: Partial<NostrMetadata>) => void;
   onPickImage?: (field: 'picture' | 'banner') => void;
+  /**
+   * Called when the user chooses "Paste URL" for an image field. The handler
+   * is expected to read the clipboard, validate the URL, and apply it. When
+   * provided, the banner gains a dropdown menu (matching the avatar) so the
+   * paste action is reachable for both images.
+   */
+  onPasteUrl?: (field: 'picture' | 'banner') => void;
   /** Called when user removes their avatar picture. */
   onRemoveAvatar?: () => void;
   /** Show NIP-05 row (default true) */
@@ -113,6 +120,7 @@ export function ProfileCard({
   metadata,
   onChange,
   onPickImage,
+  onPasteUrl,
   onRemoveAvatar,
   showNip05 = true,
   showBadges = true,
@@ -148,36 +156,81 @@ export function ProfileCard({
     <div className="bg-card border rounded-xl overflow-hidden">
 
       {/* Banner */}
-      <div
-        className={cn('relative h-36 bg-secondary', editable && 'cursor-pointer group')}
-        style={
-          bannerUrl
-            ? { backgroundImage: `url("${bannerUrl}")`, backgroundSize: 'cover', backgroundPosition: 'center' }
-            : undefined
-        }
-        onClick={() => editable && onPickImage?.('banner')}
-      >
-        {!metadata.banner && <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />}
-        {editable && !metadata.banner && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Plus className="size-6 text-muted-foreground" strokeWidth={4} />
-          </div>
-        )}
-        {editable && (
-          <>
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-              <span className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 text-white text-xs font-medium bg-black/50 rounded-full px-3 py-1.5 backdrop-blur-sm">
-                <Pencil className="size-3.5" /> {metadata.banner ? 'Change banner' : 'Add banner'}
-              </span>
-            </div>
-            {metadata.banner && (
-              <div className="absolute bottom-2 right-2 size-7 rounded-full bg-background border border-border shadow-sm flex items-center justify-center transition-opacity">
-                <Pencil className="size-3.5 text-muted-foreground" />
+      {editable && onPasteUrl ? (
+        // With a paste handler, the banner opens a menu (Change / Paste URL)
+        // instead of going straight to the file picker.
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="relative block w-full h-36 bg-secondary cursor-pointer group outline-none"
+              style={
+                bannerUrl
+                  ? { backgroundImage: `url("${bannerUrl}")`, backgroundSize: 'cover', backgroundPosition: 'center' }
+                  : undefined
+              }
+            >
+              {!metadata.banner && <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />}
+              {!metadata.banner && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Plus className="size-6 text-muted-foreground" strokeWidth={4} />
+                </div>
+              )}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 text-white text-xs font-medium bg-black/50 rounded-full px-3 py-1.5 backdrop-blur-sm">
+                  <Pencil className="size-3.5" /> {metadata.banner ? 'Change banner' : 'Add banner'}
+                </span>
               </div>
-            )}
-          </>
-        )}
-      </div>
+              {metadata.banner && (
+                <div className="absolute bottom-2 right-2 size-7 rounded-full bg-background border border-border shadow-sm flex items-center justify-center transition-opacity">
+                  <Pencil className="size-3.5 text-muted-foreground" />
+                </div>
+              )}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" sideOffset={6}>
+            <DropdownMenuItem onClick={() => onPickImage?.('banner')}>
+              <ImagePlus className="size-4 mr-2" />
+              {metadata.banner ? 'Change banner' : 'Add banner'}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onPasteUrl?.('banner')}>
+              <LinkIcon className="size-4 mr-2" />
+              Paste URL
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <div
+          className={cn('relative h-36 bg-secondary', editable && 'cursor-pointer group')}
+          style={
+            bannerUrl
+              ? { backgroundImage: `url("${bannerUrl}")`, backgroundSize: 'cover', backgroundPosition: 'center' }
+              : undefined
+          }
+          onClick={() => editable && onPickImage?.('banner')}
+        >
+          {!metadata.banner && <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />}
+          {editable && !metadata.banner && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Plus className="size-6 text-muted-foreground" strokeWidth={4} />
+            </div>
+          )}
+          {editable && (
+            <>
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 text-white text-xs font-medium bg-black/50 rounded-full px-3 py-1.5 backdrop-blur-sm">
+                  <Pencil className="size-3.5" /> {metadata.banner ? 'Change banner' : 'Add banner'}
+                </span>
+              </div>
+              {metadata.banner && (
+                <div className="absolute bottom-2 right-2 size-7 rounded-full bg-background border border-border shadow-sm flex items-center justify-center transition-opacity">
+                  <Pencil className="size-3.5 text-muted-foreground" />
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       {/* Profile info */}
       <div className="px-4 pb-4">
@@ -209,6 +262,12 @@ export function ProfileCard({
                   <ImagePlus className="size-4 mr-2" />
                   Change avatar
                 </DropdownMenuItem>
+                {onPasteUrl && (
+                  <DropdownMenuItem onClick={() => onPasteUrl?.('picture')}>
+                    <LinkIcon className="size-4 mr-2" />
+                    Paste URL
+                  </DropdownMenuItem>
+                )}
                 {metadata.picture && (
                   <DropdownMenuItem onClick={() => onRemoveAvatar?.()} className="text-destructive focus:text-destructive">
                     <XIcon className="size-4 mr-2" />

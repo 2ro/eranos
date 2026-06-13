@@ -157,7 +157,9 @@
         "websiteInvalid": "Enter a valid website starting with https://",
         "cropAvatar": "Crop logo",
         "cropBanner": "Crop banner",
-        "uploading": "Uploading image…"
+        "uploading": "Uploading image…",
+        "clipboardFailed": "Couldn't read from clipboard.",
+        "pasteUrlInvalid": "Clipboard doesn't contain a valid https URL."
       },
       "bio": {
         "title": "Tell us about your organization",
