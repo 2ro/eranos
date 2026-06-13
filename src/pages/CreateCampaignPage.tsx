@@ -769,12 +769,27 @@ export function CreateCampaignPage() {
 
   const titleSection = (
     <FormSection title={t('forms.title')} requirement="Required">
-      <Input
+      {/* Styled to match the "Your name" field from the profile step
+          (ProfileCard's EditableInput) — muted idle bg, border on
+          hover/focus — rather than the boxed shadcn Input. */}
+      <input
+        type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder={t('campaignsCreate.titlePlaceholder')}
         maxLength={200}
         required
+        className={cn(
+          'rounded-lg px-2',
+          'border-2 border-transparent',
+          'bg-muted/40',
+          'hover:bg-muted/60 hover:border-border',
+          'focus:bg-transparent focus:border-primary',
+          'transition-colors duration-150',
+          'placeholder:text-muted-foreground/40',
+          'outline-none',
+          'w-full min-w-0 py-1.5 text-xl font-bold',
+        )}
       />
     </FormSection>
   );
@@ -1053,8 +1068,8 @@ export function CreateCampaignPage() {
       subtitle: t('campaignsCreate.wizard.titleStepSubtitle'),
       body: (
         <>
-          {titleSection}
           {bannerSection}
+          {titleSection}
         </>
       ),
     },
