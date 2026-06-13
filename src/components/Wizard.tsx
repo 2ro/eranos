@@ -63,6 +63,8 @@ export interface WizardProps {
   launchNowLabel?: string;
   onSubmit: (e: FormEvent) => void;
   onClose: () => void;
+  /** Optional back action for step 1 when there is a meaningful previous flow. */
+  onBackFromFirstStep?: () => void;
 }
 
 /**
@@ -103,6 +105,7 @@ export function Wizard({
   launchNowLabel,
   onSubmit,
   onClose,
+  onBackFromFirstStep,
 }: WizardProps) {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
@@ -124,6 +127,7 @@ export function Wizard({
   const canSubmit = isTerminal
     ? !submitting && !isAdvancing
     : launchVisible && canAdvance && !submitting && !isAdvancing;
+  const backVisible = step > 1 || !!onBackFromFirstStep;
 
   const handleAdvance = async () => {
     if (submitting || isAdvancing || !canAdvance) return;
@@ -169,12 +173,18 @@ export function Wizard({
       </button>
 
       {/* Top-left back. Mirrors the close button so the user can step
-          back through the wizard without scrolling to the footer. Only
-          rendered from step 2 onward — step 1's escape route is the X. */}
-      {step > 1 && (
+          back through the wizard without scrolling to the footer. Step 1
+          only renders it when the host provides an external back target. */}
+      {backVisible && (
         <button
           type="button"
-          onClick={() => setStep((s) => Math.max(s - 1, 1))}
+          onClick={() => {
+            if (step === 1) {
+              onBackFromFirstStep?.();
+            } else {
+              setStep((s) => Math.max(s - 1, 1));
+            }
+          }}
           disabled={submitting || isAdvancing}
           aria-label={t('common.back')}
           className="absolute left-4 top-4 z-20 sm:left-6 sm:top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"

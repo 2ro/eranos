@@ -48,6 +48,14 @@ interface ProfileIdentityEditorProps {
   aboutPlaceholder?: string;
   /** Show the banner area (default true). */
   showBanner?: boolean;
+  /** Show the avatar area (default true). */
+  showAvatar?: boolean;
+  /** Placeholder for the editable name input. */
+  namePlaceholder?: string;
+  /** Maximum length for the editable name input. */
+  nameMaxLength?: number;
+  /** Notifies the host with the Blossom/NIP-94 tags from a completed image upload. */
+  onImageUploadComplete?: (field: 'picture' | 'banner', nip94Tags: string[][]) => void;
   /** Notifies the host of upload progress so it can gate its primary button. */
   onUploadingChange?: (uploading: boolean) => void;
   className?: string;
@@ -69,6 +77,10 @@ export function ProfileIdentityEditor({
   bioField,
   aboutPlaceholder,
   showBanner = true,
+  showAvatar = true,
+  namePlaceholder,
+  nameMaxLength,
+  onImageUploadComplete,
   onUploadingChange,
   className,
 }: ProfileIdentityEditorProps) {
@@ -181,14 +193,17 @@ export function ProfileIdentityEditor({
       try {
         const tags = await uploadFile(croppedFile);
         const url = tags[0]?.[1];
-        if (url) onChange({ [field]: url });
+        if (url) {
+          onChange({ [field]: url });
+          onImageUploadComplete?.(field, tags);
+        }
       } catch {
         toast({ title: t('onboarding.profile.uploadFailed'), variant: 'destructive' });
       } finally {
         onUploadingChange?.(false);
       }
     },
-    [cropState, uploadFile, onChange, onUploadingChange, t, toast],
+    [cropState, uploadFile, onChange, onImageUploadComplete, onUploadingChange, t, toast],
   );
 
   const handleCropError = useCallback(
@@ -250,6 +265,9 @@ export function ProfileIdentityEditor({
         bioField={bioField}
         aboutPlaceholder={aboutPlaceholder}
         showBanner={showBanner}
+        showAvatar={showAvatar}
+        namePlaceholder={namePlaceholder}
+        nameMaxLength={nameMaxLength}
         showNip05={false}
         showBadges={false}
       />

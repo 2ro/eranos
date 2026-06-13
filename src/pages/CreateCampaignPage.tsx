@@ -45,6 +45,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { useOnboarding } from '@/contexts/onboardingContextDef';
 import { useToast } from '@/hooks/useToast';
 import { formatBTC, satsToUSD } from '@/lib/bitcoin';
 import {
@@ -136,6 +137,7 @@ export function CreateCampaignPage() {
   const queryClient = useQueryClient();
   const { nostr } = useNostr();
   const { mutateAsync: publishEvent } = useNostrPublish();
+  const { role: onboardingRole, startSignup } = useOnboarding();
   const { toast } = useToast();
   const hdWallet = useHdWallet();
   const hdWalletAvailable = hdWallet.availability.status === 'available';
@@ -881,6 +883,35 @@ export function CreateCampaignPage() {
     </FormSection>
   );
 
+  const campaignIdentitySection = (
+    <ProfileIdentityEditor
+      className={cn(coverUploading && 'opacity-50 pointer-events-none')}
+      draft={{
+        name: title,
+        website: '',
+        about: '',
+        picture: '',
+        banner: bannerUrl,
+      }}
+      onChange={(patch) => {
+        if (patch.name !== undefined) setTitle(patch.name);
+        if (patch.banner !== undefined) {
+          setBannerUrl(patch.banner);
+          setBannerNip94Tags(null);
+        }
+      }}
+      bioField="none"
+      showBanner
+      showAvatar={false}
+      namePlaceholder="Campaign title"
+      nameMaxLength={200}
+      onUploadingChange={setCoverUploading}
+      onImageUploadComplete={(field, nip94Tags) => {
+        if (field === 'banner') setBannerNip94Tags(nip94Tags);
+      }}
+    />
+  );
+
   const storySection = (
     <Textarea
       id="campaign-story"
@@ -1066,12 +1097,7 @@ export function CreateCampaignPage() {
     {
       title: t('campaignsCreate.wizard.titleStepTitle'),
       subtitle: t('campaignsCreate.wizard.titleStepSubtitle'),
-      body: (
-        <>
-          {bannerSection}
-          {titleSection}
-        </>
-      ),
+      body: campaignIdentitySection,
     },
     {
       title: t('campaignsCreate.wizard.walletStepTitle'),
@@ -1135,6 +1161,7 @@ export function CreateCampaignPage() {
       submitting={submitMutation.isPending || profileMutation.isPending || coverUploading || profileImageUploading}
       onSubmit={handleSubmit}
       onClose={() => navigate(-1)}
+      onBackFromFirstStep={onboardingRole === 'creator' ? () => startSignup() : undefined}
     />
   );
 }

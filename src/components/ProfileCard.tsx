@@ -33,11 +33,13 @@ function EditableInput({
   value,
   placeholder,
   onChange,
+  maxLength,
   className,
 }: {
   value: string;
   placeholder: string;
   onChange: (v: string) => void;
+  maxLength?: number;
   className?: string;
 }) {
   return (
@@ -45,6 +47,7 @@ function EditableInput({
       type="text"
       value={value}
       placeholder={placeholder}
+      maxLength={maxLength}
       onChange={(e) => onChange(e.target.value)}
       className={cn(editableBase, 'w-full min-w-0 py-0.5', className)}
     />
@@ -150,6 +153,12 @@ interface ProfileCardProps {
   onRemoveBanner?: () => void;
   /** Show the banner area (default true). When false, only the avatar shows. */
   showBanner?: boolean;
+  /** Show the avatar area (default true). */
+  showAvatar?: boolean;
+  /** Placeholder for the editable name input. */
+  namePlaceholder?: string;
+  /** Maximum length for the editable name input. */
+  nameMaxLength?: number;
   /** Show NIP-05 row (default true) */
   showNip05?: boolean;
   /** Show NIP-58 badge showcase row (default true). */
@@ -178,6 +187,9 @@ export function ProfileCard({
   onRemoveAvatar,
   onRemoveBanner,
   showBanner = true,
+  showAvatar = true,
+  namePlaceholder = 'Your name',
+  nameMaxLength,
   showNip05 = true,
   showBadges = true,
   bioField = 'about',
@@ -284,10 +296,10 @@ export function ProfileCard({
       ))}
 
       {/* Profile info */}
-      <div className="px-4 pb-4">
+      <div className={cn('px-4 pb-4', !showAvatar && (showBanner ? 'pt-3' : 'pt-4'))}>
 
         {/* Avatar */}
-        <div className={cn('flex justify-between items-start mb-3', showBanner ? '-mt-12' : 'mt-3')}>
+        {showAvatar && <div className={cn('flex justify-between items-start mb-3', showBanner ? '-mt-12' : 'mt-3')}>
           {editable ? (
             <ImageEditMenu
               hasImage={!!metadata.picture}
@@ -323,13 +335,14 @@ export function ProfileCard({
               </Avatar>
             </div>
           )}
-        </div>
+        </div>}
 
         {/* Name */}
         {editable ? (
           <EditableInput
             value={metadata.name ?? ''}
-            placeholder="Your name"
+            placeholder={namePlaceholder}
+            maxLength={nameMaxLength}
             onChange={patch('name')}
             className="text-xl font-bold"
           />
