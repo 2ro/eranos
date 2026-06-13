@@ -867,16 +867,31 @@ export function CreateCampaignPage() {
   );
 
   const storySection = (
-    <FormSection title={t('campaignsCreate.story')} requirement="Recommended">
-      <Textarea
-        id="campaign-story"
-        value={story}
-        onChange={(e) => setStory(e.target.value)}
-        placeholder={t('campaignsCreate.storyPlaceholder')}
-        rows={7}
-        className="font-mono text-base md:text-sm"
-      />
-    </FormSection>
+    <Textarea
+      id="campaign-story"
+      value={story}
+      onChange={(e) => {
+        setStory(e.target.value);
+        // Auto-grow: reset then size to content so the box expands
+        // downward as the user types instead of scrolling internally.
+        e.target.style.height = 'auto';
+        e.target.style.height = `${e.target.scrollHeight}px`;
+      }}
+      onFocus={(e) => {
+        e.target.style.height = 'auto';
+        e.target.style.height = `${e.target.scrollHeight}px`;
+      }}
+      placeholder={t('campaignsCreate.storyPlaceholder')}
+      className={cn(
+        'min-h-[200px] w-full resize-none overflow-hidden p-3',
+        'text-lg leading-7 md:text-lg',
+        // Match the muted, borderless look of the organization bio step.
+        'rounded-lg border-2 border-transparent bg-muted/40',
+        'hover:bg-muted/60 hover:border-border',
+        'focus-visible:bg-transparent focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0',
+        'placeholder:text-muted-foreground/40 transition-colors duration-150',
+      )}
+    />
   );
 
   const goalSection = (
