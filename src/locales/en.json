@@ -153,7 +153,7 @@
     "verifier": {
       "identity": {
         "title": "Set up your organization",
-        "subtitle": "Add your organization's name and logo. A website and banner are optional. Donors will see these on every campaign you verify.",
+        "subtitle": "Name and logo are required. Website and banner are optional.",
         "websiteInvalid": "Enter a valid website starting with https://",
         "cropAvatar": "Crop logo",
         "cropBanner": "Crop banner",
@@ -163,7 +163,7 @@
       },
       "bio": {
         "title": "Tell us about your organization",
-        "subtitle": "A short description of who you are and what you do. This appears on your profile.",
+        "subtitle": "A short description for your profile.",
         "label": "About your organization",
         "placeholder": "We're a nonprofit that…",
         "publishing": "Saving your profile…"
@@ -172,7 +172,7 @@
       "publishFailedDescription": "Your account is ready, but the organization profile couldn't be published. You can finish it later from settings.",
       "statement": {
         "title": "Publish your verifier statement",
-        "subtitle": "Explain how your organization checks out campaigns before vouching for them — the checks you run, the evidence you require, how you confirm an organizer's identity. This is published publicly and shown on your profile so donors can trust your badge."
+        "subtitle": "Describe how you vet campaigns before vouching. Published publicly so donors can trust your badge."
       },
       "howto": {
         "title": "How to verify a campaign",
