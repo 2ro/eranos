@@ -97,6 +97,12 @@ interface ProfileCardProps {
   showNip05?: boolean;
   /** Show NIP-58 badge showcase row (default true). */
   showBadges?: boolean;
+  /**
+   * Which kind-0 field the editable text slot below the name edits.
+   * - `'about'` (default): the bio textarea.
+   * - `'website'`: a single-line website input, replacing the bio entirely.
+   */
+  bioField?: 'about' | 'website';
   /** When provided, render an editable profile fields section below bio */
   extraFields?: ProfileField[];
   onExtraFieldsChange?: (fields: ProfileField[]) => void;
@@ -110,6 +116,7 @@ export function ProfileCard({
   onRemoveAvatar,
   showNip05 = true,
   showBadges = true,
+  bioField = 'about',
   extraFields,
   onExtraFieldsChange,
 }: ProfileCardProps) {
@@ -268,9 +275,23 @@ export function ProfileCard({
           </div>
         )}
 
-        {/* Bio */}
+        {/* Bio — or, when `bioField` is `'website'`, a website input that
+            takes the bio's place entirely. */}
         <div className="mt-2">
-          {editable ? (
+          {bioField === 'website' ? (
+            editable ? (
+              <EditableInput
+                value={(metadata.website as string) ?? ''}
+                placeholder="https://your-website.com"
+                onChange={patch('website')}
+                className="text-sm"
+              />
+            ) : metadata.website ? (
+              <p className="text-sm text-muted-foreground leading-relaxed truncate">
+                {metadata.website}
+              </p>
+            ) : null
+          ) : editable ? (
             <EditableTextarea
               value={metadata.about ?? ''}
               placeholder="Write a short bio…"

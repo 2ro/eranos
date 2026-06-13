@@ -5,8 +5,6 @@ import { ArrowRight, Loader2 } from 'lucide-react';
 import { ProfileCard } from '@/components/ProfileCard';
 import { ImageCropDialog } from '@/components/ImageCropDialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useUploadFile } from '@/hooks/useUploadFile';
 import { useToast } from '@/hooks/useToast';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -49,10 +47,10 @@ interface VerifierIdentityStepProps {
  * Verifier sub-flow step 1 — the organization's identity.
  *
  * Reuses the app's editable {@link ProfileCard} (circular avatar,
- * rectangular banner, inline name + website fields) plus the shared
- * {@link ImageCropDialog} for uploads. All four fields — name, website,
- * avatar, banner — are required before the user can continue. The website
- * must be a well-formed `https:` URL.
+ * rectangular banner, inline name, and a website field that replaces the bio
+ * slot) plus the shared {@link ImageCropDialog} for uploads. Avatar and name
+ * are required; banner and website are optional. When a website is entered,
+ * it must be a well-formed `https:` URL.
  *
  * Nothing is published here; the draft is published as a single kind-0 event
  * at the end of the sub-flow, so stepping back and forth never republishes.
@@ -125,13 +123,13 @@ export function VerifierIdentityStep({
   );
 
   // ── Continue gating ──────────────────────────────────────────────────────
+  // Avatar + name are required; banner is optional. Website is optional too,
+  // but if entered it must be a valid https URL.
   const nameProvided = draft.name.trim().length > 0;
-  const websiteValid = !!sanitizeUrl(draft.website.trim());
-  const websiteTouched = draft.website.trim().length > 0;
   const avatarProvided = draft.picture.trim().length > 0;
-  const bannerProvided = draft.banner.trim().length > 0;
-  const canContinue =
-    nameProvided && websiteValid && avatarProvided && bannerProvided && !isUploading;
+  const websiteTouched = draft.website.trim().length > 0;
+  const websiteValid = !websiteTouched || !!sanitizeUrl(draft.website.trim());
+  const canContinue = nameProvided && avatarProvided && websiteValid && !isUploading;
 
   return (
     <div className="space-y-6">
@@ -172,41 +170,29 @@ export function VerifierIdentityStep({
         <ProfileCard
           metadata={{
             name: draft.name,
+            website: draft.website,
             picture: draft.picture,
             banner: draft.banner,
           }}
           onChange={(patch) => {
             if (patch.name !== undefined) onChange({ name: patch.name });
+            if (patch.website !== undefined) {
+              onChange({ website: patch.website as string });
+            }
           }}
           onPickImage={handlePickImage}
+          bioField="website"
           showNip05={false}
           showBadges={false}
         />
       </div>
 
-      {/* Website — a first-class required field for organizations, so it
-          gets its own labeled input rather than living in ProfileCard's
-          collapsible extra-fields section. */}
-      <div className="space-y-1.5">
-        <Label htmlFor="verifier-org-website" className="text-sm font-medium">
-          {t('onboarding.verifier.identity.websiteLabel')}
-        </Label>
-        <Input
-          id="verifier-org-website"
-          type="url"
-          inputMode="url"
-          value={draft.website}
-          onChange={(e) => onChange({ website: e.target.value })}
-          placeholder="https://your-org.org"
-          aria-required
-          aria-invalid={websiteTouched && !websiteValid}
-        />
-        {websiteTouched && !websiteValid && (
-          <p className="text-xs text-destructive">
-            {t('onboarding.verifier.identity.websiteInvalid')}
-          </p>
-        )}
-      </div>
+      {/* Website is optional, but if entered it must be a valid https URL. */}
+      {websiteTouched && !websiteValid && (
+        <p className="text-xs text-destructive">
+          {t('onboarding.verifier.identity.websiteInvalid')}
+        </p>
+      )}
 
       {isUploading && (
         <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
