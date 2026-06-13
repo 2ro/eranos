@@ -34,8 +34,8 @@ const NEXT_PHASE: Record<Phase, Phase> = {
 };
 
 const PHASE_DELAY: Record<Phase, number> = {
-  idle: 500,
-  menuOpen: 500,
+  idle: 1000,
+  menuOpen: 1000,
   verified: 1200,
 };
 
@@ -79,8 +79,8 @@ export function VerifyTutorial({
 
   const [phase, setPhase] = useState<Phase>('idle');
 
-  // Simple visibility loop: start with the card, reveal the menu after 0.5s,
-  // reveal the badge after another 0.5s, then pause briefly and reset.
+  // Simple visibility loop: start with the card, reveal the menu after 1s,
+  // reveal the badge after another 1s, then pause briefly and reset.
   useEffect(() => {
     const id = window.setTimeout(() => {
       setPhase((prev) => NEXT_PHASE[prev]);
