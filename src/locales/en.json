@@ -1094,7 +1094,7 @@
     "errorPublishedInvalid": "Published event failed validation. Please refresh and try again.",
     "wizard": {
       "titleStepTitle": "Name your campaign",
-      "titleStepSubtitle": "A short, clear name donors will recognize.",
+      "titleStepSubtitle": "A short, clear name and a striking banner donors will recognize.",
       "walletStepTitle": "Where do donations go?",
       "walletStepSubtitle": "Pick your Agora wallet or paste your own address.",
       "bannerStepTitle": "Add a banner",

@@ -1036,17 +1036,17 @@ export function CreateCampaignPage() {
     {
       title: t('campaignsCreate.wizard.titleStepTitle'),
       subtitle: t('campaignsCreate.wizard.titleStepSubtitle'),
-      body: titleSection,
+      body: (
+        <>
+          {titleSection}
+          {bannerSection}
+        </>
+      ),
     },
     {
       title: t('campaignsCreate.wizard.walletStepTitle'),
       subtitle: t('campaignsCreate.wizard.walletStepSubtitle'),
       body: walletSection,
-    },
-    {
-      title: t('campaignsCreate.wizard.bannerStepTitle'),
-      subtitle: t('campaignsCreate.wizard.bannerStepSubtitle'),
-      body: bannerSection,
     },
     {
       title: t('campaignsCreate.wizard.storyStepTitle'),
@@ -1077,7 +1077,7 @@ export function CreateCampaignPage() {
   const titleProvided = title.trim().length > 0;
   const profileStep = needsCampaignProfile ? 1 : null;
   const titleStep = needsCampaignProfile ? 2 : 1;
-  const launchStep = needsCampaignProfile ? 4 : 3;
+  const launchStep = needsCampaignProfile ? 3 : 2;
 
   return (
     <Wizard
@@ -1086,7 +1086,7 @@ export function CreateCampaignPage() {
       steps={wizardSteps}
       canAdvanceFromStep={(s) => {
         if (s === profileStep) return profileNameProvided && profileAvatarProvided && !profileImageUploading;
-        if (s === titleStep) return titleProvided;
+        if (s === titleStep) return titleProvided && !coverUploading;
         return true;
       }}
       onBeforeAdvance={async (s) => {
