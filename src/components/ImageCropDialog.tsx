@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
-import type { Area, Point } from 'react-easy-crop';
+import type { Area, Point, Size } from 'react-easy-crop';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -12,6 +12,18 @@ interface ImageCropDialogProps {
   imageSrc: string;
   aspect: number;
   title?: string;
+  /**
+   * When true, overlays a dashed circle inscribed in the (square) crop
+   * area to preview how the picture is clipped when shown circularly by
+   * the `Avatar` primitive (`rounded-full`) elsewhere in the app. This is
+   * purely a visual aid — the crop stays rectangular and the encoded
+   * output is still the full square image, so clicking a profile picture
+   * still shows the whole uncropped photo. Intended for avatars (use with
+   * `aspect={1}`). The circle tracks the cropper's actual rendered crop
+   * boundary via `onCropSizeChange`, so it stays inscribed even as the
+   * boundary resizes responsively.
+   */
+  showCircleGuide?: boolean;
   /**
    * Cap on the output's long edge, in pixels. When the selected crop
    * region in source-pixel space exceeds this, the canvas downscales with
@@ -32,10 +44,11 @@ interface ImageCropDialogProps {
   onError?: (error: unknown) => void;
 }
 
-export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', maxOutputSize, onCancel, onCrop, onError }: ImageCropDialogProps) {
+export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', showCircleGuide, maxOutputSize, onCancel, onCrop, onError }: ImageCropDialogProps) {
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [cropSize, setCropSize] = useState<Size | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const onCropComplete = useCallback((_: Area, areaPixels: Area) => {
@@ -87,11 +100,25 @@ export function ImageCropDialog({ open, imageSrc, aspect, title = 'Crop Image', 
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={onCropComplete}
+            onCropSizeChange={showCircleGuide ? setCropSize : undefined}
             style={{
               containerStyle: { borderRadius: 0 },
               cropAreaStyle: { border: '2px solid hsl(var(--primary))' },
             }}
           />
+          {showCircleGuide && cropSize && (
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              {/* Dashed circle inscribed in the square crop boundary to
+                  preview how the picture is clipped when shown circularly
+                  elsewhere. Sized to the cropper's actual rendered crop
+                  area (tracked via `onCropSizeChange`) so it sits flush
+                  inside the existing crop border at any size. */}
+              <div
+                className="rounded-full border-2 border-dashed border-white/80"
+                style={{ width: cropSize.width, height: cropSize.height }}
+              />
+            </div>
+          )}
         </div>
 
         {/* Controls */}

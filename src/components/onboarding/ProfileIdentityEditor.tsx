@@ -232,6 +232,7 @@ export function ProfileIdentityEditor({
           open
           imageSrc={cropState.imageSrc}
           aspect={CROP_ASPECT[cropState.field]}
+          showCircleGuide={cropState.field === 'picture'}
           title={
             cropState.field === 'picture'
               ? t('onboarding.verifier.identity.cropAvatar')

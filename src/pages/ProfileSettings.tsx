@@ -283,6 +283,7 @@ export function ProfileSettings() {
           open
           imageSrc={cropState.imageSrc}
           aspect={cropState.aspect}
+          showCircleGuide={cropState.field === 'picture'}
           title={cropState.title}
           onCancel={handleCropCancel}
           onCrop={handleCropConfirm}

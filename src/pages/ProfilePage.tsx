@@ -1361,7 +1361,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     if (isNip05Param && nip05Loading) {
       return (
         <main className="min-h-screen pb-16">
-          <div className="h-36 md:h-48 bg-secondary animate-pulse" />
+          <div className="h-48 bg-secondary animate-pulse" />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-4">
             <div className="flex justify-between items-start -mt-12 md:-mt-16 mb-3">
               <Skeleton className="size-24 md:size-32 rounded-full border-4 border-background" />
@@ -1397,7 +1397,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
       <PullToRefresh onRefresh={handleRefresh}>
         {/* Banner — full-bleed at the top of the page. The avatar lives in
             the identity rail below and overlaps this banner via -mt-16. */}
-        <div className="h-36 md:h-48 bg-secondary relative">
+        <div className="h-48 bg-secondary relative">
           {author.isLoading ? (
             <Skeleton className="w-full h-full rounded-none" />
           ) : bannerUrl ? (
