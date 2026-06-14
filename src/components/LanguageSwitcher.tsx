@@ -1,4 +1,4 @@
-import { Languages } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { SUPPORTED_LANGUAGES, changeAppLanguage, isRTLLanguage } from '@/i18n';
+import { SUPPORTED_LANGUAGES, changeAppLanguage } from '@/i18n';
 import { cn } from '@/lib/utils';
 
 /**
@@ -47,8 +47,10 @@ interface LanguageSwitcherProps {
  * position, the campaign they're reading, or any in-progress form state. The
  * full `/settings/language` page remains the canonical deep-link.
  *
- * Each row renders in its own language and direction (`lang` + `dir`) so the
- * native names read correctly regardless of the current UI direction.
+ * Every row stays LTR-aligned (one consistent left edge for the selected dot
+ * and the text), so the list reads as a tidy column rather than RTL names
+ * floating to the far edge. Each name still carries its own `lang` so the
+ * browser shapes Arabic/Persian/Khmer/CJK glyphs correctly.
  */
 export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   const { t, i18n: i18nInstance } = useTranslation();
@@ -66,11 +68,11 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
           aria-label={t('nav.language')}
           title={t('nav.language')}
         >
-          <Languages className="size-5" />
+          <Globe className="size-5" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="max-h-[70vh] w-56 overflow-y-auto">
-        <DropdownMenuLabel>{t('language.title')}</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-left">{t('language.title')}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup
           value={currentLng}
@@ -83,7 +85,8 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
               key={language.code}
               value={language.code}
               lang={language.code}
-              dir={isRTLLanguage(language.code) ? 'rtl' : 'ltr'}
+              dir="ltr"
+              className="text-left"
             >
               {language.nativeName}
             </DropdownMenuRadioItem>
