@@ -200,7 +200,7 @@ function DemoStage({
     <div
       className={cn(
         'relative w-full select-none',
-        fullWidth ? 'mx-0' : 'mx-auto max-w-sm',
+        fullWidth ? 'mx-0' : 'mx-auto max-w-md',
       )}
       aria-hidden="true"
     >
