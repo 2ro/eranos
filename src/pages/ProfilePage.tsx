@@ -63,6 +63,7 @@ import {
   ProfileIdentityRail,
   ProfileAvatarBlock,
   ProfileIdentityHeader,
+  ActionBar,
   ProfileOverviewSections,
   ProfileOrganizationsSection,
 } from '@/components/profile/ProfileIdentityRail';
@@ -1509,22 +1510,42 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                 </div>
               ) : (
                 <>
-                  {/* Avatar sits outside any subsequent scroll/overflow
-                      container so the `-mt-16` overhang into the banner
-                      isn't clipped. */}
-                  <ProfileAvatarBlock
-                    metadata={metadata}
-                    displayName={displayName}
-                    status={feedSettings.showUserStatuses !== false && profileStatus.status
-                      ? { text: profileStatus.status, url: profileStatus.url ?? undefined }
-                      : undefined}
-                    onLightbox={(url) => setLightboxImage(url)}
-                  />
+                  {/* Avatar + action buttons share one row, Twitter/X-style:
+                      the avatar overhangs the banner on the left while the
+                      Edit Profile / QR / more (or Follow / Donate) buttons sit
+                      bottom-right. The avatar sits outside any subsequent
+                      scroll/overflow container so its `-mt-20` overhang into
+                      the banner isn't clipped. */}
+                  <div className="flex items-end justify-between gap-2">
+                    <ProfileAvatarBlock
+                      metadata={metadata}
+                      displayName={displayName}
+                      status={feedSettings.showUserStatuses !== false && profileStatus.status
+                        ? { text: profileStatus.status, url: profileStatus.url ?? undefined }
+                        : undefined}
+                      onLightbox={(url) => setLightboxImage(url)}
+                    />
+                    <ActionBar
+                      align="end"
+                      isOwnProfile={isOwnProfile}
+                      isFollowing={isFollowing}
+                      followPending={followPending}
+                      canFollow={!!user}
+                      onToggleFollow={handleToggleFollow}
+                      onMoreMenuOpen={() => setMoreMenuOpen(true)}
+                      onFollowQROpen={() => setFollowQROpen(true)}
+                      authorEvent={authorEvent}
+                      onchainCampaigns={profileCampaignStats.campaigns.filter((c) => !!c.wallets?.onchain)}
+                      onDonate={openDonateForCampaign}
+                    />
+                  </div>
 
                   {/* Persistent identity header above the tab bar — name,
-                      bio, action bar, and the top-level stats row. */}
+                      bio, and the top-level stats row. The action bar is
+                      hidden here because it now lives on the avatar row. */}
                   <ProfileIdentityHeader
-                    className="mt-5"
+                    className="mt-4"
+                    hideActionBar
                     pubkey={pubkey}
                     isOwnProfile={isOwnProfile}
                     metadata={metadata}

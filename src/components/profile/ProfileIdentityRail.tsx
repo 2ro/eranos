@@ -250,6 +250,13 @@ interface ProfileIdentityHeaderProps {
   onTabChange: (tabId: string) => void;
   authorEvent: NostrEvent | undefined;
   className?: string;
+  /**
+   * Suppress the internal action bar (Edit Profile / QR / more, or
+   * Follow / Donate). The mobile layout sets this and renders its own
+   * `ActionBar` on the avatar row so the buttons sit top-right beside the
+   * avatar, Twitter/X-style, instead of in a full-width row below the bio.
+   */
+  hideActionBar?: boolean;
 }
 
 /**
@@ -284,6 +291,7 @@ export function ProfileIdentityHeader({
   onTabChange,
   authorEvent,
   className,
+  hideActionBar = false,
 }: ProfileIdentityHeaderProps) {
   return (
     <div className={cn('flex flex-col gap-5', className)}>
@@ -317,19 +325,23 @@ export function ProfileIdentityHeader({
         )}
       </div>
 
-      {/* Action bar — wraps onto multiple rows in a 340px-wide rail. */}
-      <ActionBar
-        isOwnProfile={isOwnProfile}
-        isFollowing={isFollowing}
-        followPending={followPending}
-        canFollow={canFollow}
-        onToggleFollow={onToggleFollow}
-        onMoreMenuOpen={onMoreMenuOpen}
-        onFollowQROpen={onFollowQROpen}
-        authorEvent={authorEvent}
-        onchainCampaigns={onchainCampaigns}
-        onDonate={onDonate}
-      />
+      {/* Action bar — wraps onto multiple rows in a 340px-wide rail. On
+          mobile this is suppressed (`hideActionBar`) and rendered on the
+          avatar row instead. */}
+      {!hideActionBar && (
+        <ActionBar
+          isOwnProfile={isOwnProfile}
+          isFollowing={isFollowing}
+          followPending={followPending}
+          canFollow={canFollow}
+          onToggleFollow={onToggleFollow}
+          onMoreMenuOpen={onMoreMenuOpen}
+          onFollowQROpen={onFollowQROpen}
+          authorEvent={authorEvent}
+          onchainCampaigns={onchainCampaigns}
+          onDonate={onDonate}
+        />
+      )}
 
       {/* Stats: Followers + Following inline; Raised below if applicable. */}
       <StatList
@@ -508,7 +520,7 @@ export function ProfileAvatarBlock({
 
 // ─── Action bar ──────────────────────────────────────────────────────────────
 
-function ActionBar({
+export function ActionBar({
   isOwnProfile,
   isFollowing,
   followPending,
@@ -519,6 +531,7 @@ function ActionBar({
   authorEvent,
   onchainCampaigns,
   onDonate,
+  align = 'start',
 }: {
   isOwnProfile: boolean;
   isFollowing: boolean;
@@ -530,14 +543,22 @@ function ActionBar({
   authorEvent: NostrEvent | undefined;
   onchainCampaigns: ParsedCampaign[];
   onDonate: (campaign: ParsedCampaign) => void;
+  /**
+   * `start` (default) — the primary button stretches to fill the row,
+   * matching the narrow desktop rail. `end` — buttons size to their
+   * content and the group is right-justified, used on the mobile avatar
+   * row so the actions sit top-right beside the avatar.
+   */
+  align?: 'start' | 'end';
 }) {
   const { t } = useTranslation();
+  const alignEnd = align === 'end';
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className={cn('flex flex-wrap items-center gap-2', alignEnd && 'justify-end')}>
       {isOwnProfile ? (
         <>
-          <Link to="/settings/profile" className="flex-1 min-w-[140px]">
-            <Button variant="outline" className="rounded-full font-bold w-full">
+          <Link to="/settings/profile" className={cn(!alignEnd && 'flex-1 min-w-[140px]')}>
+            <Button variant="outline" className={cn('rounded-full font-bold', !alignEnd && 'w-full')}>
               {t('profile.header.editProfile')}
             </Button>
           </Link>
