@@ -19,6 +19,7 @@ import { nip19 } from 'nostr-tools';
 import { Capacitor } from '@capacitor/core';
 
 import { LoginArea } from '@/components/auth/LoginArea';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { LogoIcon } from '@/components/icons/LogoIcon';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -120,6 +121,11 @@ export function TopNav() {
 
         {/* Right cluster */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Always-visible language switcher so a visitor who can't read the
+              current UI language can find and pick theirs — independent of
+              login state. Switches in place without leaving the page. */}
+          <LanguageSwitcher />
+
           {user ? (
             <DeferredWalletBalancePill />
           ) : (
