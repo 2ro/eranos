@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { NostrMetadata } from '@nostrify/nostrify';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { CheckCircle2, Pencil, Plus, Trash2, ChevronDown, ImagePlus, X as XIcon, Link as LinkIcon } from 'lucide-react';
@@ -108,24 +109,25 @@ function ImageEditMenu({
   onPasteUrl?: () => void;
   onRemove?: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent align="start" sideOffset={6}>
         <DropdownMenuItem onClick={onUpload}>
           <ImagePlus className="size-4 mr-2" />
-          Upload file
+          {t('profile.imageMenu.upload')}
         </DropdownMenuItem>
         {onPasteUrl && (
           <DropdownMenuItem onClick={onPasteUrl}>
             <LinkIcon className="size-4 mr-2" />
-            Paste URL
+            {t('profile.imageMenu.pasteUrl')}
           </DropdownMenuItem>
         )}
         {hasImage && onRemove && (
           <DropdownMenuItem onClick={onRemove} className="text-destructive focus:text-destructive">
             <XIcon className="size-4 mr-2" />
-            Remove
+            {t('profile.imageMenu.remove')}
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>
@@ -196,6 +198,7 @@ export function ProfileCard({
   extraFields,
   onExtraFieldsChange,
 }: ProfileCardProps) {
+  const { t } = useTranslation();
   const editable = !!onChange;
   const [nip05Focused, setNip05Focused] = useState(false);
   const [fieldsOpen, setFieldsOpen] = useState(false);
@@ -391,7 +394,7 @@ export function ProfileCard({
             editable ? (
               <EditableInput
                 value={(metadata.website as string) ?? ''}
-                placeholder="https://your-website.com"
+                placeholder={t('profile.websitePlaceholder')}
                 onChange={patch('website')}
                 className="text-sm"
               />

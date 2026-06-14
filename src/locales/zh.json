@@ -130,6 +130,7 @@
       "campaignSubtitle": "名字和照片能帮助人们与你的众筹活动建立联系。",
       "nameLabel": "显示名称",
       "namePlaceholder": "你的名字",
+      "campaignNamePlaceholder": "众筹标题",
       "aboutLabel": "简介",
       "aboutPlaceholder": "介绍一下你自己……",
       "avatarLabel": "头像",
@@ -1869,6 +1870,12 @@
       "ended": "已结束",
       "pledged": "已承诺"
     },
+    "imageMenu": {
+      "upload": "上传文件",
+      "pasteUrl": "粘贴网址",
+      "remove": "移除"
+    },
+    "websitePlaceholder": "https://your-website.com",
     "moreMenu": {
       "title": "资料选项",
       "copyPubkey": "复制公钥",

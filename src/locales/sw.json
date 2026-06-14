@@ -129,6 +129,7 @@
       "campaignSubtitle": "Jina na picha husaidia watu kuungana na kampeni yako.",
       "nameLabel": "Jina la kuonyesha",
       "namePlaceholder": "Jina lako",
+      "campaignNamePlaceholder": "Kichwa cha kampeni",
       "aboutLabel": "Wasifu mfupi",
       "aboutPlaceholder": "Kidogo kukuhusu…",
       "avatarLabel": "Avatari",
@@ -2192,6 +2193,12 @@
       "ended": "Imeisha",
       "pledged": "Imeahidiwa"
     },
+    "imageMenu": {
+      "upload": "Pakia faili",
+      "pasteUrl": "Bandika URL",
+      "remove": "Ondoa"
+    },
+    "websitePlaceholder": "https://your-website.com",
     "moreMenu": {
       "title": "Chaguzi za wasifu",
       "copyPubkey": "Nakili funguo ya umma",

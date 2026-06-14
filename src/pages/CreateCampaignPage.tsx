@@ -877,7 +877,7 @@ export function CreateCampaignPage() {
       bioField="none"
       showBanner
       showAvatar={false}
-      namePlaceholder="Campaign title"
+      namePlaceholder={t('onboarding.profile.campaignNamePlaceholder')}
       nameMaxLength={200}
       onUploadingChange={setCoverUploading}
       onImageUploadComplete={(field, nip94Tags) => {

@@ -129,6 +129,7 @@
       "campaignSubtitle": "Bir ad ve fotoğraf, insanların kampanyanızla bağ kurmasına yardımcı olur.",
       "nameLabel": "Görünen ad",
       "namePlaceholder": "Adınız",
+      "campaignNamePlaceholder": "Kampanya başlığı",
       "aboutLabel": "Hakkında",
       "aboutPlaceholder": "Kendiniz hakkında birkaç söz…",
       "avatarLabel": "Avatar",
@@ -2234,6 +2235,12 @@
       "ended": "Bitti",
       "pledged": "Taahhüt edildi"
     },
+    "imageMenu": {
+      "upload": "Dosya yükle",
+      "pasteUrl": "URL yapıştır",
+      "remove": "Kaldır"
+    },
+    "websitePlaceholder": "https://your-website.com",
     "moreMenu": {
       "title": "Profil seçenekleri",
       "copyPubkey": "Açık anahtarı kopyala",

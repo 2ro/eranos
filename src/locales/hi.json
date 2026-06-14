@@ -130,6 +130,7 @@
       "campaignSubtitle": "नाम और फ़ोटो लोगों को आपके अभियान से जुड़ने में मदद करते हैं।",
       "nameLabel": "दिखने वाला नाम",
       "namePlaceholder": "आपका नाम",
+      "campaignNamePlaceholder": "अभियान का शीर्षक",
       "aboutLabel": "बायो",
       "aboutPlaceholder": "अपने बारे में थोड़ा सा…",
       "avatarLabel": "अवतार",
@@ -2233,6 +2234,12 @@
       "ended": "समाप्त",
       "pledged": "प्लेज किया गया"
     },
+    "imageMenu": {
+      "upload": "फ़ाइल अपलोड करें",
+      "pasteUrl": "URL पेस्ट करें",
+      "remove": "हटाएँ"
+    },
+    "websitePlaceholder": "https://your-website.com",
     "moreMenu": {
       "title": "प्रोफ़ाइल विकल्प",
       "copyPubkey": "पब्लिक key कॉपी करें",

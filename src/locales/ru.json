@@ -130,6 +130,7 @@
       "campaignSubtitle": "Имя и фото помогают людям почувствовать связь с вашей кампанией.",
       "nameLabel": "Отображаемое имя",
       "namePlaceholder": "Ваше имя",
+      "campaignNamePlaceholder": "Название кампании",
       "aboutLabel": "О себе",
       "aboutPlaceholder": "Немного о вас…",
       "avatarLabel": "Аватар",
@@ -2320,6 +2321,12 @@
       "ended": "Завершено",
       "pledged": "Обещано"
     },
+    "imageMenu": {
+      "upload": "Загрузить файл",
+      "pasteUrl": "Вставить URL",
+      "remove": "Удалить"
+    },
+    "websitePlaceholder": "https://your-website.com",
     "moreMenu": {
       "title": "Параметры профиля",
       "copyPubkey": "Копировать публичный ключ",

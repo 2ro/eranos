@@ -130,6 +130,7 @@
       "campaignSubtitle": "名字和照片能幫助人們與你的募款活動建立連結。",
       "nameLabel": "顯示名稱",
       "namePlaceholder": "你的名稱",
+      "campaignNamePlaceholder": "眾籌標題",
       "aboutLabel": "個人簡介",
       "aboutPlaceholder": "簡單介紹一下你自己…",
       "avatarLabel": "頭像",
@@ -1793,6 +1794,12 @@
       "ended": "已結束",
       "pledged": "已承諾"
     },
+    "imageMenu": {
+      "upload": "上傳檔案",
+      "pasteUrl": "貼上網址",
+      "remove": "移除"
+    },
+    "websitePlaceholder": "https://your-website.com",
     "moreMenu": {
       "title": "資料選項",
       "copyPubkey": "複製公鑰",

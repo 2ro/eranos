@@ -129,6 +129,7 @@
       "campaignSubtitle": "Un nom et une photo aident les gens à se connecter à votre campagne.",
       "nameLabel": "Nom affiché",
       "namePlaceholder": "Votre nom",
+      "campaignNamePlaceholder": "Titre de la campagne",
       "aboutLabel": "Bio",
       "aboutPlaceholder": "Un mot sur vous…",
       "avatarLabel": "Avatar",
@@ -2315,6 +2316,12 @@
       "ended": "Terminée",
       "pledged": "Promis"
     },
+    "imageMenu": {
+      "upload": "Téléverser un fichier",
+      "pasteUrl": "Coller l'URL",
+      "remove": "Supprimer"
+    },
+    "websitePlaceholder": "https://your-website.com",
     "moreMenu": {
       "title": "Options du profil",
       "copyPubkey": "Copier la clé publique",

@@ -136,6 +136,7 @@
       "campaignSubtitle": "A name and photo help people connect with your campaign.",
       "nameLabel": "Display name",
       "namePlaceholder": "Your name",
+      "campaignNamePlaceholder": "Campaign title",
       "aboutLabel": "Bio",
       "aboutPlaceholder": "A little about you…",
       "avatarLabel": "Avatar",
@@ -2442,6 +2443,12 @@
       "ended": "Ended",
       "pledged": "Pledged"
     },
+    "imageMenu": {
+      "upload": "Upload file",
+      "pasteUrl": "Paste URL",
+      "remove": "Remove"
+    },
+    "websitePlaceholder": "https://your-website.com",
     "moreMenu": {
       "title": "Profile options",
       "copyPubkey": "Copy public key",

@@ -130,6 +130,7 @@
       "campaignSubtitle": "Zita nemufananidzo zvinobatsira vanhu kubatana nemushandirapamwe wako.",
       "nameLabel": "Zita rinoratidzwa",
       "namePlaceholder": "Zita rako",
+      "campaignNamePlaceholder": "Musoro wemushandirapamwe",
       "aboutLabel": "Nhoroondo",
       "aboutPlaceholder": "Zvishoma pamusoro pako…",
       "avatarLabel": "Avatar",
@@ -1869,6 +1870,12 @@
       "ended": "Zvapera",
       "pledged": "Chakavimbiswa"
     },
+    "imageMenu": {
+      "upload": "Isa faira",
+      "pasteUrl": "Namira URL",
+      "remove": "Bvisa"
+    },
+    "websitePlaceholder": "https://your-website.com",
     "moreMenu": {
       "title": "Zvisarudzo zvepfungidziro",
       "copyPubkey": "Kopa kiyi yeruzhinji",

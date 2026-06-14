@@ -130,6 +130,7 @@
       "campaignSubtitle": "نوم او عکس خلکو سره مرسته کوي چې ستاسو کمپاین سره اړیکه ونیسي.",
       "nameLabel": "د ښودنې نوم",
       "namePlaceholder": "ستاسو نوم",
+      "campaignNamePlaceholder": "د کمپاین سرلیک",
       "aboutLabel": "بیوګرافي",
       "aboutPlaceholder": "د ځان په اړه یو څه…",
       "avatarLabel": "اواتار",
@@ -1867,8 +1868,14 @@
       "moderator": "څارونکی",
       "mod": "څارونکی",
       "ended": "پای ته رسیدلی",
-      "pledged": "ژمنه شوې"
+       "pledged": "ژمنه شوې"
     },
+    "imageMenu": {
+      "upload": "فایل پورته کړئ",
+      "pasteUrl": "نشاني پیست کړئ",
+      "remove": "لرې کړئ"
+    },
+    "websitePlaceholder": "https://your-website.com",
     "moreMenu": {
       "title": "د پروفایل انتخابونه",
       "copyPubkey": "عمومي کیلي کاپي کړئ",

@@ -126,6 +126,7 @@
       "campaignSubtitle": "يساعد الاسم والصورة الناس على التواصل مع حملتك.",
       "nameLabel": "الاسم المعروض",
       "namePlaceholder": "اسمك",
+      "campaignNamePlaceholder": "عنوان الحملة",
       "aboutLabel": "نبذة",
       "aboutPlaceholder": "نبذة قصيرة عنك…",
       "avatarLabel": "الصورة الرمزية",
@@ -1857,6 +1858,12 @@
       "ended": "انتهت",
       "pledged": "تم التعهّد"
     },
+    "imageMenu": {
+      "upload": "رفع ملف",
+      "pasteUrl": "لصق الرابط",
+      "remove": "إزالة"
+    },
+    "websitePlaceholder": "https://your-website.com",
     "moreMenu": {
       "title": "خيارات الملف الشخصي",
       "copyPubkey": "نسخ المفتاح العام",

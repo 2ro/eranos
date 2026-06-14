@@ -130,6 +130,7 @@
       "campaignSubtitle": "نام و عکس به مردم کمک می‌کند با کمپین شما ارتباط برقرار کنند.",
       "nameLabel": "نام نمایشی",
       "namePlaceholder": "نام شما",
+      "campaignNamePlaceholder": "عنوان کارزار",
       "aboutLabel": "بیوگرافی",
       "aboutPlaceholder": "کمی دربارهٔ شما…",
       "avatarLabel": "آواتار",
@@ -1865,8 +1866,14 @@
       "moderator": "ناظر",
       "mod": "ناظر",
       "ended": "پایان‌یافته",
-      "pledged": "تعهد شد"
+       "pledged": "تعهد شد"
     },
+    "imageMenu": {
+      "upload": "بارگذاری فایل",
+      "pasteUrl": "چسباندن نشانی",
+      "remove": "حذف"
+    },
+    "websitePlaceholder": "https://your-website.com",
     "moreMenu": {
       "title": "گزینه‌های نمایه",
       "copyPubkey": "کپی کلید عمومی",

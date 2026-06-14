@@ -130,6 +130,7 @@
       "campaignSubtitle": "Nama dan foto membantu orang terhubung dengan kampanye Anda.",
       "nameLabel": "Nama tampilan",
       "namePlaceholder": "Nama Anda",
+      "campaignNamePlaceholder": "Judul kampanye",
       "aboutLabel": "Bio",
       "aboutPlaceholder": "Sedikit tentang Anda…",
       "avatarLabel": "Avatar",
@@ -2233,6 +2234,12 @@
       "ended": "Berakhir",
       "pledged": "Diikrarkan"
     },
+    "imageMenu": {
+      "upload": "Unggah berkas",
+      "pasteUrl": "Tempel URL",
+      "remove": "Hapus"
+    },
+    "websitePlaceholder": "https://your-website.com",
     "moreMenu": {
       "title": "Opsi profil",
       "copyPubkey": "Salin kunci publik",
