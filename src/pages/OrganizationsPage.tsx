@@ -14,7 +14,7 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { useOnboarding } from '@/contexts/onboardingContextDef';
 
 /**
- * The /organizations page. A landing-style document modeled on the
+ * The /verify page. A landing-style document modeled on the
  * /about page that doubles as a functional onboarding tool. Sections:
  *
  *   1. Hero (dark) — pitch + CTA that scrolls to the form

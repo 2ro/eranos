@@ -11,7 +11,7 @@ import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 /**
- * An animated, interactive tutorial shown on /organizations once an
+ * An animated, interactive tutorial shown on /verify once an
  * organization has published its verifier statement. It demonstrates the
  * exact gesture a verifier uses to vouch for a campaign: tapping the
  * three-dots (kebab) button on a campaign card and choosing

@@ -99,7 +99,7 @@ function SiteFooter() {
         </button>
         <nav className="flex items-center gap-5">
           <Link to="/about" className="hover:text-foreground motion-safe:transition-colors">{t('nav.about')}</Link>
-          <Link to="/organizations" className="hover:text-foreground motion-safe:transition-colors">{t('nav.organizations')}</Link>
+          <Link to="/verify" className="hover:text-foreground motion-safe:transition-colors">{t('nav.verify')}</Link>
           <Link to="/privacy" className="hover:text-foreground motion-safe:transition-colors">{t('nav.privacy')}</Link>
           <Link to="/safety" className="hover:text-foreground motion-safe:transition-colors">{t('nav.safety')}</Link>
           <Link to="/changelog" className="hover:text-foreground motion-safe:transition-colors">{t('nav.changelog')}</Link>
@@ -190,9 +190,9 @@ export function AppRouter() {
           <Route path="/safety" element={<CSAEPolicyPage />} />
           <Route path="/changelog" element={<ChangelogPage />} />
           <Route path="/organizers" element={<OrganizersPage />} />
-          {/* `/settings/verifier` moved to the public `/organizations` onboarding
+          {/* `/settings/verifier` moved to the public `/verify` onboarding
               page. Keep the old path as a redirect so existing links resolve. */}
-          <Route path="/settings/verifier" element={<Navigate to="/organizations" replace />} />
+          <Route path="/settings/verifier" element={<Navigate to="/verify" replace />} />
           {/* Callback target for remote signers (e.g. Amber, Primal) after NIP-46 approval */}
           <Route path="/remoteloginsuccess" element={<RemoteLoginSuccessPage />} />
         </Route>
@@ -221,9 +221,10 @@ export function AppRouter() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/about/donors" element={<DonorGuidePage />} />
           <Route path="/about/recipients" element={<RecipientGuidePage />} />
-          {/* Organizations onboarding / marketing page. Wide layout so the
+          {/* Verification onboarding / marketing page. Wide layout so the
               hero and section backgrounds can span the viewport like /about. */}
-          <Route path="/organizations" element={<OrganizationsPage />} />
+          <Route path="/verify" element={<OrganizationsPage />} />
+          <Route path="/organizations" element={<Navigate to="/verify" replace />} />
           {/* Legacy URL: the recipient guide lived at `/about/activists`
               before the "activist" → "recipient" copy change. Redirect so
               external links and bookmarks still resolve. */}
