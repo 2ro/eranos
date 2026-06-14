@@ -16,8 +16,10 @@ import { VerifyTutorial } from '@/components/organizations/VerifyTutorial';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAppContext } from '@/hooks/useAppContext';
+import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useToast } from '@/hooks/useToast';
+import { genUserName } from '@/lib/genUserName';
 import {
   useSetVerifierStatement,
   useVerifierStatement,
@@ -191,6 +193,9 @@ function VerifierEditor() {
   const { user } = useCurrentUser();
   const { toast } = useToast();
 
+  const author = useAuthor(user?.pubkey);
+  const metadata = author.data?.metadata;
+
   const { statement, isLoading } = useVerifierStatement(user?.pubkey);
   const { mutateAsync: setStatement, isPending } = useSetVerifierStatement();
 
@@ -319,7 +324,12 @@ function VerifierEditor() {
         </CardContent>
       </Card>
 
-      {isPublished && <VerifyTutorial />}
+      {isPublished && (
+        <VerifyTutorial
+          verifierName={metadata?.name ?? (user ? genUserName(user.pubkey) : undefined)}
+          verifierPicture={metadata?.picture}
+        />
+      )}
     </div>
   );
 }
