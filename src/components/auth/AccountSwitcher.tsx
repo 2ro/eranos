@@ -7,10 +7,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Capacitor } from '@capacitor/core';
-import { Activity, Bell, ChevronDown, CircleHelp, Download, LayoutDashboard, LogOut, Search, Settings, User, UserIcon, UserPlus, Wallet } from 'lucide-react';
+import { Activity, Bell, ChevronDown, LayoutDashboard, LogOut, Settings, UserIcon, UserPlus, Wallet } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
-import { ZAPSTORE_URL } from '@/lib/zapstore';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -80,6 +78,18 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-56 p-2 animate-scale-in'>
+        <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
+          <Link to={`/${nip19.npubEncode(currentUser.pubkey)}`}>
+            <Avatar className='w-8 h-8'>
+              <AvatarImage src={currentPicture} alt={currentDisplayName} />
+              <AvatarFallback>{currentDisplayName?.charAt(0) || <UserIcon />}</AvatarFallback>
+            </Avatar>
+            <div className='flex-1 truncate'>
+              <p className='text-sm font-medium'>{currentDisplayName}</p>
+            </div>
+            <div className='w-2 h-2 rounded-full bg-primary'></div>
+          </Link>
+        </DropdownMenuItem>
         {otherUsers.map((user) => (
           <DropdownMenuItem
             key={user.id}
@@ -93,7 +103,6 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
             <div className='flex-1 truncate'>
               <p className='text-sm font-medium'>{getDisplayName(user)}</p>
             </div>
-            {user.id === currentUser.id && <div className='w-2 h-2 rounded-full bg-primary'></div>}
           </DropdownMenuItem>
         ))}
         {orderedItems.includes('dashboard') && (
@@ -104,12 +113,6 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
             </Link>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
-          <Link to="/my-dashboard">
-            <LayoutDashboard className='w-4 h-4' />
-            <span>{t('nav.myDashboard')}</span>
-          </Link>
-        </DropdownMenuItem>
         <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
           <Link to="/wallet">
             <Wallet className='w-4 h-4' />
@@ -123,15 +126,9 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
-          <Link to={`/${nip19.npubEncode(currentUser.pubkey)}`}>
-            <User className='w-4 h-4' />
-            <span>{t('nav.profile')}</span>
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
-          <Link to="/search">
-            <Search className='w-4 h-4' />
-            <span>{t('nav.search')}</span>
+          <Link to="/my-dashboard">
+            <LayoutDashboard className='w-4 h-4' />
+            <span>{t('nav.myDashboard')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
@@ -140,20 +137,6 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
             <span>{t('nav.settings')}</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
-          <Link to="/about">
-            <CircleHelp className='w-4 h-4' />
-            <span>{t('nav.about')}</span>
-          </Link>
-        </DropdownMenuItem>
-        {!Capacitor.isNativePlatform() && (
-          <DropdownMenuItem asChild className='flex items-center gap-2 cursor-pointer p-2 rounded-md'>
-            <a href={ZAPSTORE_URL} target="_blank" rel="noopener noreferrer">
-              <Download className='w-4 h-4' />
-              <span>{t('nav.getApp')}</span>
-            </a>
-          </DropdownMenuItem>
-        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={onAddAccountClick}
