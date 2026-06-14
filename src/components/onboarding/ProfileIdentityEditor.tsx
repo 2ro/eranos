@@ -8,23 +8,16 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { useToast } from '@/hooks/useToast';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { fetchImageAsFile } from '@/lib/proxyImageUrl';
+import type { ProfileDraft } from '@/lib/profileDraft';
 
 /**
  * The mutable kind-0 identity fields this editor manages. The host owns the
  * draft; the editor only emits patches.
+ *
+ * @deprecated Use {@link ProfileDraft} from `@/lib/profileDraft` directly.
+ * Retained as a re-export so existing imports keep working.
  */
-export interface ProfileIdentityDraft {
-  /** kind-0 `name` (and `display_name`). */
-  name: string;
-  /** kind-0 `picture` (avatar) — a Blossom URL. */
-  picture: string;
-  /** kind-0 `banner` — a Blossom URL. */
-  banner: string;
-  /** kind-0 `website`. Used when `bioField` is `'website'`. */
-  website: string;
-  /** kind-0 `about` (bio). Used when `bioField` is `'about'`. */
-  about: string;
-}
+export type ProfileIdentityDraft = ProfileDraft;
 
 /** Which image field the crop dialog is currently editing. */
 type CropField = 'picture' | 'banner';

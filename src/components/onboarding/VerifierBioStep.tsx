@@ -2,13 +2,13 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { AutoGrowTextarea } from '@/components/ui/auto-grow-textarea';
 import { cn } from '@/lib/utils';
-import type { OrgProfileDraft } from '@/components/onboarding/VerifierIdentityStep';
+import type { ProfileDraft } from '@/lib/profileDraft';
 
 interface VerifierBioStepProps {
-  draft: OrgProfileDraft;
-  onChange: (patch: Partial<OrgProfileDraft>) => void;
+  draft: ProfileDraft;
+  onChange: (patch: Partial<ProfileDraft>) => void;
   onContinue: () => void;
   /** True while the kind-0 profile is being published on continue. */
   isPublishing?: boolean;
@@ -44,31 +44,11 @@ export function VerifierBioStep({
       </div>
 
       <div>
-        <Textarea
+        <AutoGrowTextarea
           id="verifier-org-bio"
           value={draft.about}
-          onChange={(e) => {
-            onChange({ about: e.target.value });
-            // Auto-grow: reset then size to content so the box expands
-            // downward as the user types instead of scrolling internally.
-            e.target.style.height = 'auto';
-            e.target.style.height = `${e.target.scrollHeight}px`;
-          }}
-          onFocus={(e) => {
-            e.target.style.height = 'auto';
-            e.target.style.height = `${e.target.scrollHeight}px`;
-          }}
+          onValueChange={(value) => onChange({ about: value })}
           placeholder={t('onboarding.verifier.bio.placeholder')}
-          className={cn(
-            'min-h-[200px] w-full resize-none overflow-hidden p-3',
-            'text-lg leading-7 md:text-lg',
-            // Match the muted, borderless look of the "Your name" field on
-            // the previous identity step (ProfileCard's editable inputs).
-            'rounded-lg border-2 border-transparent bg-muted/40',
-            'hover:bg-muted/60 hover:border-border',
-            'focus-visible:bg-transparent focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0',
-            'placeholder:text-muted-foreground/40 transition-colors duration-150',
-          )}
           aria-required
         />
       </div>

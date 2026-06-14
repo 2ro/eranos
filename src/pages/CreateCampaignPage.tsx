@@ -35,7 +35,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Textarea } from '@/components/ui/textarea';
+import { AutoGrowTextarea } from '@/components/ui/auto-grow-textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -45,6 +45,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useHdWallet } from '@/hooks/useHdWallet';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { usePublishOrgProfile } from '@/hooks/usePublishOrgProfile';
 import { useOnboarding } from '@/contexts/onboardingContextDef';
 import { useToast } from '@/hooks/useToast';
 import { formatBTC, satsToUSD } from '@/lib/bitcoin';
@@ -111,21 +112,6 @@ function buildImetaFromNip94(nip94Tags: string[][]): string[] {
     result.push(`${key} ${value}`);
   }
   return result;
-}
-
-function parseProfileMetadata(content: string | undefined): Record<string, unknown> {
-  if (!content) return {};
-
-  try {
-    const parsed: unknown = JSON.parse(content);
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-      return parsed as Record<string, unknown>;
-    }
-  } catch {
-    // Invalid profile JSON should not block required campaign setup.
-  }
-
-  return {};
 }
 
 export function CreateCampaignPage() {
@@ -379,30 +365,18 @@ export function CreateCampaignPage() {
     setPrepopulatedEventId(editCampaign.event.id);
   }, [editCampaign, prepopulatedEventId]);
 
+  // Campaign creators who lack a display name or avatar publish them via the
+  // shared kind-0 publisher (read-modify-write, preserves other metadata).
+  // The required-field gate (name + avatar) and the campaign-specific failure
+  // toast live here; everything else is handled by the hook.
+  const publishProfile = usePublishOrgProfile();
   const profileMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error(t('campaignsCreate.errorLoginRequired'));
-
-      const name = profileData.name.trim();
-      const about = profileData.about.trim();
-      const picture = profileData.picture.trim();
-      const banner = profileData.banner.trim();
-
-      if (!name || !picture) {
+      if (!profileData.name.trim() || !profileData.picture.trim()) {
         throw new Error(t('onboarding.profile.publishFailedDescription'));
       }
-
-      const prev = await fetchFreshEvent(nostr, { kinds: [0], authors: [user.pubkey] });
-      const metadata = parseProfileMetadata(prev?.content);
-      metadata.name = name;
-      if (about) metadata.about = about;
-      metadata.picture = picture;
-      if (banner) metadata.banner = banner;
-
-      await publishEvent({ kind: 0, content: JSON.stringify(metadata), prev: prev ?? undefined });
-    },
-    onSuccess: () => {
-      if (user) void queryClient.invalidateQueries({ queryKey: ['author', user.pubkey] });
+      await publishProfile.mutateAsync({ draft: profileData });
     },
     onError: () => {
       toast({
@@ -913,30 +887,11 @@ export function CreateCampaignPage() {
   );
 
   const storySection = (
-    <Textarea
+    <AutoGrowTextarea
       id="campaign-story"
       value={story}
-      onChange={(e) => {
-        setStory(e.target.value);
-        // Auto-grow: reset then size to content so the box expands
-        // downward as the user types instead of scrolling internally.
-        e.target.style.height = 'auto';
-        e.target.style.height = `${e.target.scrollHeight}px`;
-      }}
-      onFocus={(e) => {
-        e.target.style.height = 'auto';
-        e.target.style.height = `${e.target.scrollHeight}px`;
-      }}
+      onValueChange={setStory}
       placeholder={t('campaignsCreate.storyPlaceholder')}
-      className={cn(
-        'min-h-[200px] w-full resize-none overflow-hidden p-3',
-        'text-lg leading-7 md:text-lg',
-        // Match the muted, borderless look of the organization bio step.
-        'rounded-lg border-2 border-transparent bg-muted/40',
-        'hover:bg-muted/60 hover:border-border',
-        'focus-visible:bg-transparent focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0',
-        'placeholder:text-muted-foreground/40 transition-colors duration-150',
-      )}
     />
   );
 

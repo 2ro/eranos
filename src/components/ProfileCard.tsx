@@ -16,6 +16,7 @@ import { useBadgeDefinitions } from '@/hooks/useBadgeDefinitions';
 import { BadgeShowcaseGrid } from '@/components/BadgeShowcaseGrid';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
+import { autoGrowTextarea } from '@/lib/autoGrowTextarea';
 
 /** Shared classes for all editable fields — static muted bg when idle, border on hover/focus */
 const editableBase = [
@@ -71,12 +72,10 @@ function EditableTextarea({
       placeholder={placeholder}
       onChange={(e) => {
         onChange(e.target.value);
-        e.target.style.height = 'auto';
-        e.target.style.height = e.target.scrollHeight + 'px';
+        autoGrowTextarea(e.target);
       }}
       onFocus={(e) => {
-        e.target.style.height = 'auto';
-        e.target.style.height = e.target.scrollHeight + 'px';
+        autoGrowTextarea(e.target);
       }}
       rows={1}
       className={cn(editableBase, 'w-full min-w-0 py-1 resize-none overflow-hidden text-base md:text-sm text-muted-foreground leading-relaxed', className)}

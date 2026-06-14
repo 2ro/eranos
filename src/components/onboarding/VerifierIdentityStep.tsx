@@ -6,24 +6,17 @@ import { ProfileIdentityEditor } from '@/components/onboarding/ProfileIdentityEd
 import { Button } from '@/components/ui/button';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
+import type { ProfileDraft } from '@/lib/profileDraft';
 
 /**
  * The mutable draft of the organization's kind-0 profile, shared across the
  * verifier sub-flow steps (identity here, bio next) and published once at
  * the end. Held by the captive overlay so back-navigation preserves entries.
+ *
+ * @deprecated Use {@link ProfileDraft} from `@/lib/profileDraft` directly.
+ * Retained as a re-export so existing imports keep working.
  */
-export interface OrgProfileDraft {
-  /** Maps to kind-0 `name` (and `display_name`). */
-  name: string;
-  /** Maps to kind-0 `website`. */
-  website: string;
-  /** Maps to kind-0 `picture` (avatar) — a Blossom URL. */
-  picture: string;
-  /** Maps to kind-0 `banner` — a Blossom URL. */
-  banner: string;
-  /** Maps to kind-0 `about` (collected in the bio step). */
-  about: string;
-}
+export type OrgProfileDraft = ProfileDraft;
 
 interface VerifierIdentityStepProps {
   draft: OrgProfileDraft;

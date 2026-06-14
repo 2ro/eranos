@@ -24,15 +24,13 @@ import {
 import { generateSecretKey, getPublicKey, nip19 } from 'nostr-tools';
 
 import { AgoraBoltIcon } from '@/components/icons/AgoraBoltIcon';
-import {
-  VerifierIdentityStep,
-  type OrgProfileDraft,
-} from '@/components/onboarding/VerifierIdentityStep';
+import { VerifierIdentityStep } from '@/components/onboarding/VerifierIdentityStep';
 import { VerifierBioStep } from '@/components/onboarding/VerifierBioStep';
 import { VerifierStatementEditor } from '@/components/organizations/VerifierStatementEditor';
 import { VerifyTutorial } from '@/components/organizations/VerifyTutorial';
 import { usePublishOrgProfile } from '@/hooks/usePublishOrgProfile';
 import { useSetVerifierStatement } from '@/hooks/useVerifierStatement';
+import { emptyProfileDraft, type ProfileDraft } from '@/lib/profileDraft';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -156,15 +154,9 @@ function CaptiveOverlay() {
   // Verifier sub-flow: the organization's kind-0 profile draft, accumulated
   // across the identity + bio steps and published once at the end. Held here
   // so back-navigation between sub-flow steps preserves what's entered.
-  const [orgDraft, setOrgDraft] = useState<OrgProfileDraft>({
-    name: '',
-    website: '',
-    picture: '',
-    banner: '',
-    about: '',
-  });
+  const [orgDraft, setOrgDraft] = useState<ProfileDraft>(emptyProfileDraft);
   const patchOrgDraft = useCallback(
-    (patch: Partial<OrgProfileDraft>) =>
+    (patch: Partial<ProfileDraft>) =>
       setOrgDraft((prev) => ({ ...prev, ...patch })),
     [],
   );
@@ -504,7 +496,7 @@ function VerifierHowtoStep({
   draft,
   onFinish,
 }: {
-  draft: OrgProfileDraft;
+  draft: ProfileDraft;
   onFinish: () => void;
 }) {
   const { t } = useTranslation();
