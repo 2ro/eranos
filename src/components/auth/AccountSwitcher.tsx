@@ -87,7 +87,6 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
             <div className='flex-1 truncate'>
               <p className='text-sm font-medium'>{currentDisplayName}</p>
             </div>
-            <div className='w-2 h-2 rounded-full bg-primary'></div>
           </Link>
         </DropdownMenuItem>
         {otherUsers.map((user) => (
