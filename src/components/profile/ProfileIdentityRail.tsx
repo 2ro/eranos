@@ -454,7 +454,7 @@ interface ProfileAvatarBlockProps {
 
 /**
  * Avatar + NIP-38 status bubble. Always rendered as the first thing below
- * the banner; the avatar uses `-mt-16 md:-mt-20` to overlap into the banner
+ * the banner; the avatar uses `-mt-20` to overlap into the banner
  * area. Must NOT be wrapped in any element with `overflow: hidden` /
  * `overflow-y: auto` or the overhang will be clipped.
  */
@@ -468,12 +468,12 @@ export function ProfileAvatarBlock({
   return (
     <div className="relative">
       <button
-        className="relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full -mt-16 md:-mt-20 block"
+        className="relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full -mt-20 block"
         onClick={() => picture && onLightbox(picture)}
         disabled={!picture}
       >
         <Avatar className={cn(
-          'size-28 md:size-32 border-4 border-background shadow-lg',
+          'size-32 border-4 border-background shadow-lg',
           picture && 'cursor-pointer',
         )}>
           <AvatarImage src={picture} alt={displayName} proxyWidth={256} />
@@ -485,7 +485,7 @@ export function ProfileAvatarBlock({
 
       {/* NIP-38 thought bubble — floats to the right of the avatar over the banner area. */}
       {status?.text && (
-        <div className="absolute top-2 left-[calc(7rem+8px)] md:left-[calc(8rem+8px)] z-10 max-w-[200px] animate-in fade-in slide-in-from-left-1 duration-300">
+        <div className="absolute top-2 left-[calc(8rem+8px)] z-10 max-w-[200px] animate-in fade-in slide-in-from-left-1 duration-300">
           <div className="relative bg-background/90 backdrop-blur-sm border border-border rounded-xl px-3 py-1.5 shadow-lg">
             <p className="text-xs text-foreground italic truncate">
               {status.url ? (
@@ -908,7 +908,7 @@ function RailSectionHeader({
 function RailSkeleton() {
   return (
     <div className="flex flex-col gap-5">
-      <Skeleton className="size-28 md:size-32 rounded-full -mt-16 md:-mt-20 border-4 border-background" />
+      <Skeleton className="size-32 rounded-full -mt-20 border-4 border-background" />
       <div className="space-y-2">
         <Skeleton className="h-6 w-40" />
         <Skeleton className="h-4 w-32" />

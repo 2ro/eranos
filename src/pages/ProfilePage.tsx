@@ -1363,8 +1363,8 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
         <main className="min-h-screen pb-16">
           <div className="h-48 bg-secondary animate-pulse" />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-4">
-            <div className="flex justify-between items-start -mt-12 md:-mt-16 mb-3">
-              <Skeleton className="size-24 md:size-32 rounded-full border-4 border-background" />
+            <div className="flex justify-between items-start -mt-16 mb-3">
+              <Skeleton className="size-32 rounded-full border-4 border-background" />
             </div>
             <Skeleton className="h-6 w-40 mt-2" />
             <Skeleton className="h-4 w-56 mt-2" />
@@ -1498,7 +1498,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
             <div className="lg:hidden">
               {author.isLoading ? (
                 <div className="flex flex-col gap-5 pt-2">
-                  <Skeleton className="size-28 md:size-32 rounded-full -mt-16 md:-mt-20 border-4 border-background" />
+                  <Skeleton className="size-32 rounded-full -mt-20 border-4 border-background" />
                   <div className="space-y-2">
                     <Skeleton className="h-6 w-40" />
                     <Skeleton className="h-4 w-32" />
