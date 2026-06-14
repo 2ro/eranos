@@ -3,7 +3,6 @@ import { Link, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Activity,
-  BadgeCheck,
   Bell,
   Download,
   HandHeart,
@@ -43,7 +42,6 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { labelKey: 'nav.campaigns', to: '/campaigns', icon: HandHeart },
   { labelKey: 'nav.activity', to: '/feed', icon: Activity },
-  { labelKey: 'nav.verify', to: '/verify', icon: BadgeCheck },
   // Groups and Pledges are intentionally hidden from the main nav for
   // launch — keep the routes and feature code intact so we can re-add
   // them later by uncommenting these two lines (and re-importing the

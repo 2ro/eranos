@@ -187,6 +187,12 @@ export function CampaignsPage() {
                 <ArrowRight className="ml-2 size-4 rtl:rotate-180" />
               </Link>
             </Button>
+            <Button asChild size="lg" variant="outline" className="rounded-full">
+              <Link to="/verify">
+                <BadgeCheck className="mr-2 size-4" />
+                {t('campaigns.home.verifyCampaigns')}
+              </Link>
+            </Button>
             <Button asChild size="lg" className="rounded-full">
               <StartCampaignLink>
                 <PlusCircle className="mr-2 size-4" />

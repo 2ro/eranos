@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
-import { EyeOff, HandHeart, PlusCircle } from 'lucide-react';
+import { BadgeCheck, EyeOff, HandHeart, PlusCircle } from 'lucide-react';
+
 
 import { Button } from '@/components/ui/button';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
@@ -253,6 +254,22 @@ function AllCampaignsHero({ campaignCount }: AllCampaignsHeroProps) {
               <PlusCircle className="mr-2" />
               {t('campaigns.all.startCampaign')}
             </StartCampaignLink>
+          </Button>
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className={cn(
+              'rounded-full text-white font-semibold text-base h-12 px-7 [&_svg]:size-[18px]',
+              'bg-white/5 hover:bg-white/10 backdrop-blur-xl backdrop-saturate-150',
+              'border border-white/25 hover:border-white/35',
+              'motion-safe:transition-colors motion-safe:duration-200',
+            )}
+          >
+            <Link to="/verify">
+              <BadgeCheck className="mr-2" />
+              {t('campaigns.all.verifyCampaigns')}
+            </Link>
           </Button>
         </div>
       </div>
