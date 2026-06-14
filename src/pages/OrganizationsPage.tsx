@@ -326,6 +326,7 @@ function VerifierEditor() {
 
       {isPublished && (
         <VerifyTutorial
+          stacked
           verifierName={metadata?.name ?? (user ? genUserName(user.pubkey) : undefined)}
           verifierPicture={metadata?.picture}
         />
