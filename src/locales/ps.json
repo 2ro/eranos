@@ -95,7 +95,9 @@
     "login": "ننوتل",
     "signup": "نوم لیکنه",
     "logout": "وتل",
-    "addAccount": "بل حساب اضافه کول"
+    "addAccount": "بل حساب اضافه کول",
+    "createNewAccount": "نوی حساب جوړ کړئ",
+    "loginExisting": "د موجوده حساب سره ننوتل"
   },
   "onboarding": {
     "ariaLabel": "د حساب جوړونه",

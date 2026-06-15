@@ -95,7 +95,9 @@
     "login": "लॉग इन करें",
     "signup": "साइन अप करें",
     "logout": "लॉग आउट करें",
-    "addAccount": "एक और अकाउंट जोड़ें"
+    "addAccount": "एक और अकाउंट जोड़ें",
+    "createNewAccount": "नया खाता बनाएँ",
+    "loginExisting": "मौजूदा खाते से लॉग इन करें"
   },
   "onboarding": {
     "ariaLabel": "अकाउंट सेटअप",

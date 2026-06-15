@@ -94,7 +94,9 @@
     "login": "Ingia",
     "signup": "Jisajili",
     "logout": "Toka",
-    "addAccount": "Ongeza akaunti nyingine"
+    "addAccount": "Ongeza akaunti nyingine",
+    "createNewAccount": "Fungua akaunti mpya",
+    "loginExisting": "Ingia kwa iliyopo"
   },
   "onboarding": {
     "ariaLabel": "Usanidi wa akaunti",

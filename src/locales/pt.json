@@ -95,7 +95,9 @@
     "login": "Entrar",
     "signup": "Cadastrar",
     "logout": "Sair",
-    "addAccount": "Adicionar outra conta"
+    "addAccount": "Adicionar outra conta",
+    "createNewAccount": "Criar nova conta",
+    "loginExisting": "Entrar com uma conta existente"
   },
   "onboarding": {
     "ariaLabel": "Configuração da conta",

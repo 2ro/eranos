@@ -94,7 +94,9 @@
     "login": "Giriş yap",
     "signup": "Kaydol",
     "logout": "Çıkış yap",
-    "addAccount": "Başka hesap ekle"
+    "addAccount": "Başka hesap ekle",
+    "createNewAccount": "Yeni hesap oluştur",
+    "loginExisting": "Mevcut hesapla giriş yap"
   },
   "onboarding": {
     "ariaLabel": "Hesap kurulumu",

@@ -95,7 +95,9 @@
     "login": "ចូលគណនី",
     "signup": "ចុះឈ្មោះ",
     "logout": "ចេញពីគណនី",
-    "addAccount": "បន្ថែមគណនីផ្សេងទៀត"
+    "addAccount": "បន្ថែមគណនីផ្សេងទៀត",
+    "createNewAccount": "បង្កើតគណនីថ្មី",
+    "loginExisting": "ចូលដោយគណនីដែលមានស្រាប់"
   },
   "onboarding": {
     "ariaLabel": "ការរៀបចំគណនី",

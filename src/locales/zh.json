@@ -95,7 +95,9 @@
     "login": "登录",
     "signup": "注册",
     "logout": "退出登录",
-    "addAccount": "添加其他账户"
+    "addAccount": "添加其他账户",
+    "createNewAccount": "创建新账户",
+    "loginExisting": "使用现有账户登录"
   },
   "onboarding": {
     "ariaLabel": "账户设置",

@@ -95,7 +95,9 @@
     "login": "ورود",
     "signup": "ثبت‌نام",
     "logout": "خروج",
-    "addAccount": "افزودن حساب دیگر"
+    "addAccount": "افزودن حساب دیگر",
+    "createNewAccount": "ایجاد حساب جدید",
+    "loginExisting": "ورود با حساب موجود"
   },
   "onboarding": {
     "ariaLabel": "راه‌اندازی حساب",

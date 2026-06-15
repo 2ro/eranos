@@ -94,7 +94,9 @@
     "login": "Se connecter",
     "signup": "S'inscrire",
     "logout": "Se déconnecter",
-    "addAccount": "Ajouter un autre compte"
+    "addAccount": "Ajouter un autre compte",
+    "createNewAccount": "Créer un compte",
+    "loginExisting": "Se connecter avec un compte existant"
   },
   "onboarding": {
     "ariaLabel": "Configuration du compte",

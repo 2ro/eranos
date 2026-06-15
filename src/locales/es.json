@@ -95,7 +95,9 @@
     "login": "Iniciar sesión",
     "signup": "Registrarse",
     "logout": "Cerrar sesión",
-    "addAccount": "Agregar otra cuenta"
+    "addAccount": "Agregar otra cuenta",
+    "createNewAccount": "Crear cuenta nueva",
+    "loginExisting": "Iniciar sesión con una existente"
   },
   "onboarding": {
     "ariaLabel": "Configuración de la cuenta",

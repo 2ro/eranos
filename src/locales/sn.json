@@ -95,7 +95,9 @@
     "login": "Pinda",
     "signup": "Nyoresa",
     "logout": "Buda",
-    "addAccount": "Wedzera imwe akaunti"
+    "addAccount": "Wedzera imwe akaunti",
+    "createNewAccount": "Gadzira account itsva",
+    "loginExisting": "Pinda neyiripo"
   },
   "onboarding": {
     "ariaLabel": "Kugadzira akaunti",

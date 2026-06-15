@@ -27,6 +27,7 @@ import {
 } from '@/hooks/useLoginActions';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useOnboarding } from '@/contexts/onboardingContextDef';
+import { useTranslation } from 'react-i18next';
 
 interface AuthDialogProps {
   isOpen: boolean;
@@ -92,6 +93,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
   const login = useLoginActions();
   const { config } = useAppContext();
   const { startSignup } = useOnboarding();
+  const { t } = useTranslation();
   // Stable refs so the nostrconnect listening effect below doesn't restart on
   // every parent render. Parents typically pass inline arrow functions for
   // onClose, and useLoginActions returns a fresh object each render — without
@@ -306,12 +308,12 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
 
   const getTitle = () => {
     switch (step) {
-      case 'welcome':
-        return `Welcome to ${config.appName}`;
       case 'login':
         return 'Log in';
       case 'connect':
         return 'Connect signer';
+      default:
+        return '';
     }
   };
 
@@ -330,6 +332,41 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[95vw] sm:max-w-sm max-h-[90dvh] p-0 gap-0 overflow-hidden rounded-2xl overflow-y-auto">
+        {step === 'welcome' ? (
+          /* Welcome step — the unified entry point. The Agora logo and
+             wordmark are the focal point (and double as the dialog's
+             accessible title), so there's no separate header row or
+             subtext — just the brand and the two paths in. */
+          <div className="px-6 pb-8 pt-10 space-y-8 text-center">
+            <div className="flex items-center justify-center">
+              <AgoraBoltIcon className="size-20 drop-shadow-md" />
+              <DialogTitle
+                className="latin-display font-display font-normal tracking-wide leading-none uppercase text-6xl text-primary inline-block -ml-0.5"
+                style={{
+                  WebkitTextStroke: '0.022em currentColor',
+                  transform: 'skewX(-6deg) scaleX(1.1)',
+                  transformOrigin: '0 100%',
+                }}
+              >
+                {config.appName}
+              </DialogTitle>
+            </div>
+
+            <div className="space-y-2">
+              <Button onClick={goToSignup} className="w-full h-12">
+                {t('auth.createNewAccount')}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setStep('login')}
+                className="w-full h-12"
+              >
+                {t('auth.loginExisting')}
+              </Button>
+            </div>
+          </div>
+        ) : (
+        <>
         <DialogHeader className="px-6 pt-6">
           <DialogTitle className="text-lg font-semibold leading-none tracking-tight text-center">
             {getTitle()}
@@ -337,31 +374,6 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
         </DialogHeader>
 
         <div className="px-6 pb-6 pt-4 space-y-5">
-          {/* Welcome step — the unified entry point. */}
-          {step === 'welcome' && (
-            <div className="space-y-5 text-center">
-              <div className="flex justify-center pt-2">
-                <AgoraBoltIcon className="size-20 drop-shadow-md" />
-              </div>
-
-              <p className="text-sm text-muted-foreground">
-                Join with a new Nostr account, or log in with one you already have.
-              </p>
-
-              <div className="space-y-2">
-                <Button onClick={goToSignup} className="w-full h-12">
-                  Create a new Nostr account
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setStep('login')}
-                  className="w-full h-12"
-                >
-                  Log in to an existing account
-                </Button>
-              </div>
-            </div>
-          )}
 
           {/* Login step. */}
           {step === 'login' && (
@@ -533,6 +545,8 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
             </div>
           )}
         </div>
+        </>
+        )}
       </DialogContent>
     </Dialog>
   );

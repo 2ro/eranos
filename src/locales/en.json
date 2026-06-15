@@ -96,7 +96,9 @@
     "login": "Log in",
     "signup": "Sign up",
     "logout": "Log out",
-    "addAccount": "Add another account"
+    "addAccount": "Add another account",
+    "createNewAccount": "Create new account",
+    "loginExisting": "Log in with existing"
   },
   "onboarding": {
     "ariaLabel": "Account setup",

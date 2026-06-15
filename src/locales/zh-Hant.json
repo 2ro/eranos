@@ -95,7 +95,9 @@
     "login": "登入",
     "signup": "註冊",
     "logout": "退出登入",
-    "addAccount": "新增其他賬戶"
+    "addAccount": "新增其他賬戶",
+    "createNewAccount": "建立新帳戶",
+    "loginExisting": "使用現有帳戶登入"
   },
   "onboarding": {
     "ariaLabel": "帳號設定",

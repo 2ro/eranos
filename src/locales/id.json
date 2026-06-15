@@ -95,7 +95,9 @@
     "login": "Masuk",
     "signup": "Daftar",
     "logout": "Keluar",
-    "addAccount": "Tambah akun lain"
+    "addAccount": "Tambah akun lain",
+    "createNewAccount": "Buat akun baru",
+    "loginExisting": "Masuk dengan akun yang ada"
   },
   "onboarding": {
     "ariaLabel": "Penyiapan akun",
