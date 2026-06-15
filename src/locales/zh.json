@@ -132,7 +132,8 @@
       "permanenceBody": "没有重置、没有客服热线，也无法通过邮箱恢复。请先保存好，再继续。",
       "button": "下载并继续",
       "downloadFailedTitle": "下载失败",
-      "downloadFailedDescription": "无法下载密钥文件。请手动复制保存。"
+      "downloadFailedDescription": "无法下载密钥文件。请手动复制保存。",
+      "secretKeyAriaLabel": "私钥"
     },
     "profile": {
       "title": "打造属于你的个人资料",

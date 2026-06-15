@@ -138,7 +138,8 @@
       "permanenceBody": "No reset, no support line, no email recovery. Save it before continuing.",
       "button": "Download & continue",
       "downloadFailedTitle": "Download failed",
-      "downloadFailedDescription": "Could not download the key file. Please copy it manually."
+      "downloadFailedDescription": "Could not download the key file. Please copy it manually.",
+      "secretKeyAriaLabel": "Secret key"
     },
     "profile": {
       "title": "Make it yours",

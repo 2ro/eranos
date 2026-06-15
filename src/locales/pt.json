@@ -132,7 +132,8 @@
       "permanenceBody": "Sem redefinição, sem suporte, sem recuperação por e-mail. Salve-a antes de continuar.",
       "button": "Baixar e continuar",
       "downloadFailedTitle": "Falha no download",
-      "downloadFailedDescription": "Não foi possível baixar o arquivo da chave. Por favor, copie-a manualmente."
+      "downloadFailedDescription": "Não foi possível baixar o arquivo da chave. Por favor, copie-a manualmente.",
+      "secretKeyAriaLabel": "Chave secreta"
     },
     "profile": {
       "title": "Deixe do seu jeito",

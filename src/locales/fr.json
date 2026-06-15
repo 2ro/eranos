@@ -131,7 +131,8 @@
       "permanenceBody": "Aucune réinitialisation, aucun service d'assistance, aucune récupération par e-mail. Enregistrez-la avant de continuer.",
       "button": "Télécharger et continuer",
       "downloadFailedTitle": "Échec du téléchargement",
-      "downloadFailedDescription": "Impossible de télécharger le fichier de clé. Veuillez le copier manuellement."
+      "downloadFailedDescription": "Impossible de télécharger le fichier de clé. Veuillez le copier manuellement.",
+      "secretKeyAriaLabel": "Clé secrète"
     },
     "profile": {
       "title": "Personnalisez-le",

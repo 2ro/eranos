@@ -131,7 +131,8 @@
       "permanenceBody": "Sıfırlama yok, destek hattı yok, e-posta kurtarma yok. Devam etmeden önce kaydedin.",
       "button": "İndir ve devam et",
       "downloadFailedTitle": "İndirme başarısız",
-      "downloadFailedDescription": "Anahtar dosyası indirilemedi. Lütfen elle kopyalayın."
+      "downloadFailedDescription": "Anahtar dosyası indirilemedi. Lütfen elle kopyalayın.",
+      "secretKeyAriaLabel": "Gizli anahtar"
     },
     "profile": {
       "title": "Profilinizi kişiselleştirin",

@@ -132,7 +132,8 @@
       "permanenceBody": "Tidak ada reset, tidak ada saluran dukungan, tidak ada pemulihan lewat email. Simpan sebelum melanjutkan.",
       "button": "Unduh & lanjutkan",
       "downloadFailedTitle": "Unduh gagal",
-      "downloadFailedDescription": "Tidak dapat mengunduh berkas kunci. Silakan salin secara manual."
+      "downloadFailedDescription": "Tidak dapat mengunduh berkas kunci. Silakan salin secara manual.",
+      "secretKeyAriaLabel": "Kunci rahasia"
     },
     "profile": {
       "title": "Jadikan milik Anda",

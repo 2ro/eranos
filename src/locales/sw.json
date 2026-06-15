@@ -131,7 +131,8 @@
       "permanenceBody": "Hakuna kuweka upya, hakuna huduma ya msaada, hakuna urejeshaji kwa barua pepe. Uhifadhi kabla ya kuendelea.",
       "button": "Pakua na uendelee",
       "downloadFailedTitle": "Upakuaji umeshindikana",
-      "downloadFailedDescription": "Haikuweza kupakua faili la ufunguo. Tafadhali inakili mwenyewe."
+      "downloadFailedDescription": "Haikuweza kupakua faili la ufunguo. Tafadhali inakili mwenyewe.",
+      "secretKeyAriaLabel": "Ufunguo wa siri"
     },
     "profile": {
       "title": "Uifanye yako",

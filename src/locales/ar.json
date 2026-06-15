@@ -128,7 +128,8 @@
       "permanenceBody": "لا إعادة تعيين، ولا خطّ دعم، ولا استعادة عبر البريد الإلكتروني. احفظه قبل المتابعة.",
       "button": "تنزيل ومتابعة",
       "downloadFailedTitle": "فشل التنزيل",
-      "downloadFailedDescription": "تعذّر تنزيل ملف المفتاح. يرجى نسخه يدويًّا."
+      "downloadFailedDescription": "تعذّر تنزيل ملف المفتاح. يرجى نسخه يدويًّا.",
+      "secretKeyAriaLabel": "المفتاح السري"
     },
     "profile": {
       "title": "اجعله ملفك",

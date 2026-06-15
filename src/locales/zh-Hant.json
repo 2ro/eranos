@@ -132,7 +132,8 @@
       "permanenceBody": "沒有重設、沒有客服、也無法透過電子郵件找回。請先妥善保存，再繼續下一步。",
       "button": "下載並繼續",
       "downloadFailedTitle": "下載失敗",
-      "downloadFailedDescription": "無法下載金鑰檔案。請手動複製。"
+      "downloadFailedDescription": "無法下載金鑰檔案。請手動複製。",
+      "secretKeyAriaLabel": "私鑰"
     },
     "profile": {
       "title": "打造你的個人資料",

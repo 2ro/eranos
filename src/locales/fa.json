@@ -132,7 +132,8 @@
       "permanenceBody": "نه بازنشانی، نه پشتیبانی، نه بازیابی از طریق ایمیل. پیش از ادامه آن را ذخیره کنید.",
       "button": "دانلود و ادامه",
       "downloadFailedTitle": "دانلود ناموفق بود",
-      "downloadFailedDescription": "فایل کلید دانلود نشد. لطفاً آن را به‌صورت دستی کپی کنید."
+      "downloadFailedDescription": "فایل کلید دانلود نشد. لطفاً آن را به‌صورت دستی کپی کنید.",
+      "secretKeyAriaLabel": "کلید مخفی"
     },
     "profile": {
       "title": "آن را از آن خود کنید",

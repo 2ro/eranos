@@ -717,7 +717,7 @@ function SecureStep({ nsec, showKey, onToggleShow, onContinue }: SecureStepProps
           value={nsec}
           readOnly
           className="pr-10 font-mono text-sm"
-          aria-label="Secret key"
+          aria-label={t('onboarding.secure.secretKeyAriaLabel')}
         />
         <Button
           type="button"

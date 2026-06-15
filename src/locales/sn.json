@@ -132,7 +132,8 @@
       "permanenceBody": "Hapana kuireseta, hapana nhare yerubatsiro, hapana kudzoswa neemail. Ichengete usati waenderera mberi.",
       "button": "Daunirodha & enderera mberi",
       "downloadFailedTitle": "Kudaunirodha kwakundikana",
-      "downloadFailedDescription": "Hatina kukwanisa kudaunirodha faira rekiyi. Ndapota ikope nemaoko."
+      "downloadFailedDescription": "Hatina kukwanisa kudaunirodha faira rekiyi. Ndapota ikope nemaoko.",
+      "secretKeyAriaLabel": "Kiyi yakavanzika"
     },
     "profile": {
       "title": "Ita seyako",

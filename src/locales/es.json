@@ -132,7 +132,8 @@
       "permanenceBody": "Sin restablecimiento, sin soporte, sin recuperación por correo. Guárdala antes de continuar.",
       "button": "Descargar y continuar",
       "downloadFailedTitle": "Error al descargar",
-      "downloadFailedDescription": "No se pudo descargar el archivo de la clave. Por favor, cópiala manualmente."
+      "downloadFailedDescription": "No se pudo descargar el archivo de la clave. Por favor, cópiala manualmente.",
+      "secretKeyAriaLabel": "Clave secreta"
     },
     "profile": {
       "title": "Hazlo tuyo",
