@@ -2275,6 +2275,7 @@
   "profile": {
     "seoDescriptionFallback": "Nostr profili",
     "anonymous": "Anonim",
+    "namePlaceholder": "Adınız",
     "userNotFound": "Kullanıcı bulunamadı.",
     "userNotFoundNip05": "Kullanıcı bulunamadı: {{handle}}",
     "couldNotResolveNip05": "Bu NIP-05 tanımlayıcısı çözülemedi.",

@@ -2347,6 +2347,7 @@
   "profile": {
     "seoDescriptionFallback": "Профиль Nostr",
     "anonymous": "Аноним",
+    "namePlaceholder": "Ваше имя",
     "userNotFound": "Пользователь не найден.",
     "userNotFoundNip05": "Пользователь не найден: {{handle}}",
     "couldNotResolveNip05": "Не удалось распознать этот идентификатор NIP-05.",

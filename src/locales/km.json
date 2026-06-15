@@ -1905,6 +1905,7 @@
   "profile": {
     "seoDescriptionFallback": "ប្រវត្តិរូប Nostr",
     "anonymous": "អនាមិក",
+    "namePlaceholder": "ឈ្មោះរបស់អ្នក",
     "userNotFound": "មិនបានរកឃើញអ្នកប្រើ។",
     "userNotFoundNip05": "មិនបានរកឃើញអ្នកប្រើ៖ {{handle}}",
     "couldNotResolveNip05": "មិនអាចបកស្រាយឧបករណ៍សម្គាល់ NIP-05 នេះបានទេ។",

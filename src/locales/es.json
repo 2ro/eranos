@@ -1905,6 +1905,7 @@
   "profile": {
     "seoDescriptionFallback": "Perfil de Nostr",
     "anonymous": "Anónimo",
+    "namePlaceholder": "Tu nombre",
     "userNotFound": "Usuario no encontrado.",
     "userNotFoundNip05": "Usuario no encontrado: {{handle}}",
     "couldNotResolveNip05": "No se pudo resolver este identificador NIP-05.",

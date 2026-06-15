@@ -1905,6 +1905,7 @@
   "profile": {
     "seoDescriptionFallback": "Nostr 资料",
     "anonymous": "匿名",
+    "namePlaceholder": "你的名字",
     "userNotFound": "未找到用户。",
     "userNotFoundNip05": "未找到用户：{{handle}}",
     "couldNotResolveNip05": "无法解析此 NIP-05 标识符。",

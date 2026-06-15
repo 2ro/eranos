@@ -2410,6 +2410,7 @@
   "profile": {
     "seoDescriptionFallback": "Nostr profile",
     "anonymous": "Anonymous",
+    "namePlaceholder": "Your name",
     "userNotFound": "User not found.",
     "userNotFoundNip05": "User not found: {{handle}}",
     "couldNotResolveNip05": "Could not resolve this NIP-05 identifier.",

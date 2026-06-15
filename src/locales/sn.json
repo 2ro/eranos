@@ -1905,6 +1905,7 @@
   "profile": {
     "seoDescriptionFallback": "Pfungidziro yeNostr",
     "anonymous": "Asingazivikanwe",
+    "namePlaceholder": "Zita rako",
     "userNotFound": "Mushandisi haana kuwanikwa.",
     "userNotFoundNip05": "Mushandisi haana kuwanikwa: {{handle}}",
     "couldNotResolveNip05": "Hatina kukwanisa kuziva chiratidzo cheNIP-05 ichi.",

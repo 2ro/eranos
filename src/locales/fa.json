@@ -1905,6 +1905,7 @@
   "profile": {
     "seoDescriptionFallback": "نمایه Nostr",
     "anonymous": "ناشناس",
+    "namePlaceholder": "نام شما",
     "userNotFound": "کاربر پیدا نشد.",
     "userNotFoundNip05": "کاربر پیدا نشد: {{handle}}",
     "couldNotResolveNip05": "این شناسه NIP-05 قابل حل نیست.",

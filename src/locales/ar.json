@@ -1905,6 +1905,7 @@
   "profile": {
     "seoDescriptionFallback": "ملف Nostr",
     "anonymous": "مجهول",
+    "namePlaceholder": "اسمك",
     "userNotFound": "لم يتم العثور على المستخدم.",
     "userNotFoundNip05": "لم يتم العثور على المستخدم: {{handle}}",
     "couldNotResolveNip05": "تعذّر تحليل معرّف NIP-05 هذا.",

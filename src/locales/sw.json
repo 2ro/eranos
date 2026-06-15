@@ -2232,6 +2232,7 @@
   "profile": {
     "seoDescriptionFallback": "Wasifu wa Nostr",
     "anonymous": "Asiyejulikana",
+    "namePlaceholder": "Jina lako",
     "userNotFound": "Mtumiaji hajapatikana.",
     "userNotFoundNip05": "Mtumiaji hajapatikana: {{handle}}",
     "couldNotResolveNip05": "Haikuweza kutatua kitambulisho hiki cha NIP-05.",

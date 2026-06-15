@@ -2275,6 +2275,7 @@
   "profile": {
     "seoDescriptionFallback": "Nostr प्रोफ़ाइल",
     "anonymous": "अज्ञात",
+    "namePlaceholder": "आपका नाम",
     "userNotFound": "यूज़र नहीं मिला।",
     "userNotFoundNip05": "यूज़र नहीं मिला: {{handle}}",
     "couldNotResolveNip05": "इस NIP-05 पहचानकर्ता को resolve नहीं कर सके।",

@@ -1833,6 +1833,7 @@
   "profile": {
     "seoDescriptionFallback": "Nostr 資料",
     "anonymous": "匿名",
+    "namePlaceholder": "你的名字",
     "userNotFound": "未找到使用者。",
     "userNotFoundNip05": "未找到使用者：{{handle}}",
     "couldNotResolveNip05": "無法解析此 NIP-05 識別符號。",

@@ -189,7 +189,7 @@ export function ProfileCard({
   onRemoveBanner,
   showBanner = true,
   showAvatar = true,
-  namePlaceholder = 'Your name',
+  namePlaceholder,
   nameMaxLength,
   showNip05 = true,
   showBadges = true,
@@ -343,7 +343,7 @@ export function ProfileCard({
         {editable ? (
           <EditableInput
             value={metadata.name ?? ''}
-            placeholder={namePlaceholder}
+            placeholder={namePlaceholder ?? t('profile.namePlaceholder')}
             maxLength={nameMaxLength}
             onChange={patch('name')}
             className="text-xl font-bold"

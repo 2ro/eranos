@@ -2275,6 +2275,7 @@
   "profile": {
     "seoDescriptionFallback": "Profil Nostr",
     "anonymous": "Anonim",
+    "namePlaceholder": "Nama Anda",
     "userNotFound": "Pengguna tidak ditemukan.",
     "userNotFoundNip05": "Pengguna tidak ditemukan: {{handle}}",
     "couldNotResolveNip05": "Tidak dapat menyelesaikan pengenal NIP-05 ini.",

@@ -1905,6 +1905,7 @@
   "profile": {
     "seoDescriptionFallback": "د Nostr پروفایل",
     "anonymous": "ناڅرګند",
+    "namePlaceholder": "ستاسو نوم",
     "userNotFound": "کارن ونه موندل شو.",
     "userNotFoundNip05": "کارن ونه موندل شو: {{handle}}",
     "couldNotResolveNip05": "د NIP-05 پیژندونکی نه شو حل کیدلی.",
