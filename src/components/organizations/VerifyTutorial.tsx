@@ -299,7 +299,7 @@ function DemoStage({
             </div>
             <div className="flex items-baseline justify-between gap-2 text-sm">
               <span className="font-semibold">{DEMO_CAMPAIGN.raisedLabel}</span>
-              <span className="text-muted-foreground">of {DEMO_CAMPAIGN.goalLabel} goal</span>
+              <span className="text-muted-foreground">{t('campaignsDetail.ofGoal', { amount: DEMO_CAMPAIGN.goalLabel })}</span>
             </div>
           </div>
 

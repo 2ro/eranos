@@ -51,6 +51,14 @@
     "countryNoResults": "Ülke bulunamadı.",
     "countryGlobal": "Küresel"
   },
+  "imageCrop": {
+    "title": "Görseli Kırp",
+    "reset": "Sıfırla",
+    "hint": "Yeniden konumlandırmak için sürükleyin · Yakınlaştırmak için sıkıştırın veya kaydırın",
+    "cancel": "İptal",
+    "processing": "İşleniyor…",
+    "apply": "Kırpmayı Uygula"
+  },
   "translate": {
     "translate": "Çevir",
     "translating": "Çevriliyor…",
@@ -1557,9 +1565,18 @@
       "title": "Bir kampanya nasıl doğrulanır",
       "lede": "Beyanınız yayında. Güvendiğiniz bir kampanyaya nasıl kefil olacağınız işte burada — herhangi bir kampanya kartından iki dokunuşla yapılır.",
       "steps": {
-        "open": { "title": "Menüyü açın", "body": "Herhangi bir kampanya kartında, afişin sağ üst köşesindeki üç nokta düğmesine dokunun." },
-        "verify": { "title": "\"Bu kampanyayı doğrula\" seçeneğini seçin", "body": "Menüde bir doğrulama işlemi belirir — yalnızca sizin gibi moderatörler ve doğrulayıcılar tarafından görülebilir." },
-        "confirm": { "title": "Onaylayın ve işlem tamam", "body": "Kampanyanın gerçek olduğunu teyit edin. Rozetiniz kartta yerini alır, böylece bağışçılar arkasında durduğunuzu bilir." }
+        "open": {
+          "title": "Menüyü açın",
+          "body": "Herhangi bir kampanya kartında, afişin sağ üst köşesindeki üç nokta düğmesine dokunun."
+        },
+        "verify": {
+          "title": "\"Bu kampanyayı doğrula\" seçeneğini seçin",
+          "body": "Menüde bir doğrulama işlemi belirir — yalnızca sizin gibi moderatörler ve doğrulayıcılar tarafından görülebilir."
+        },
+        "confirm": {
+          "title": "Onaylayın ve işlem tamam",
+          "body": "Kampanyanın gerçek olduğunu teyit edin. Rozetiniz kartta yerini alır, böylece bağışçılar arkasında durduğunuzu bilir."
+        }
       },
       "demo": {
         "menuVerify": "Bu kampanyayı doğrula"

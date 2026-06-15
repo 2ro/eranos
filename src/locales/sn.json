@@ -52,6 +52,14 @@
     "countryNoResults": "Hapana nyika dzakawanikwa.",
     "countryGlobal": "Pasi rose"
   },
+  "imageCrop": {
+    "title": "Cheka Mufananidzo",
+    "reset": "Dzosera",
+    "hint": "Dhonza kuti uchinje nzvimbo · Manya kana kufambisa kuti ukurise",
+    "cancel": "Kanzura",
+    "processing": "Kuita basa…",
+    "apply": "Shandisa Kucheka"
+  },
   "translate": {
     "translate": "Dudzira",
     "translating": "Kududzira…",
@@ -1116,9 +1124,18 @@
       "title": "Mashandisirwo ekusimbisa mushandirapamwe",
       "lede": "Chirevo chako chava pachena. Heano matanho ekutsigira mushandirapamwe waunovimba nawo — zvinotora kubata kaviri chete kubva pakadhi rapi nerapi remushandirapamwe.",
       "steps": {
-        "open": { "title": "Vhura menyu", "body": "Pakadhi ripi neripi remushandirapamwe, baya bhatani remadhoti matatu kona yekumusoro kurudyi kwebhanga." },
-        "verify": { "title": "Sarudza \"Simbisa mushandirapamwe uyu\"", "body": "Menyu inoratidza chiito chekusimbisa — chinoonekwa chete nevatariri nevaongorori sewe." },
-        "confirm": { "title": "Simbisa uye wapedza", "body": "Pupura kuti mushandirapamwe ndewechokwadi. Bheji rako rinobatana nekadhi kuti vanopa vazive kuti unowutsigira." }
+        "open": {
+          "title": "Vhura menyu",
+          "body": "Pakadhi ripi neripi remushandirapamwe, baya bhatani remadhoti matatu kona yekumusoro kurudyi kwebhanga."
+        },
+        "verify": {
+          "title": "Sarudza \"Simbisa mushandirapamwe uyu\"",
+          "body": "Menyu inoratidza chiito chekusimbisa — chinoonekwa chete nevatariri nevaongorori sewe."
+        },
+        "confirm": {
+          "title": "Simbisa uye wapedza",
+          "body": "Pupura kuti mushandirapamwe ndewechokwadi. Bheji rako rinobatana nekadhi kuti vanopa vazive kuti unowutsigira."
+        }
       },
       "demo": {
         "menuVerify": "Simbisa mushandirapamwe uyu"

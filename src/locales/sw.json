@@ -52,6 +52,14 @@
     "countryNoResults": "Hakuna nchi zilizopatikana.",
     "countryGlobal": "Kimataifa"
   },
+  "imageCrop": {
+    "title": "Punguza Picha",
+    "reset": "Weka upya",
+    "hint": "Buruta kuhamisha · Banza au sogeza ili kukuza",
+    "cancel": "Ghairi",
+    "processing": "Inachakata…",
+    "apply": "Tumia Upunguzaji"
+  },
   "translate": {
     "translate": "Tafsiri",
     "translating": "Inatafsiri…",
@@ -1553,11 +1561,20 @@
     "tutorial": {
       "eyebrow": "Sasa wewe ni mthibitishaji",
       "title": "Jinsi ya kuthibitisha kampeni",
-      "lede": "Taarifa yako iko hewani. Hivi ndivyo unavyoweza kuiunga mkono kampeni unayoiamini \u2014 inachukua mibofyo miwili kutoka kwa kadi yoyote ya kampeni.",
+      "lede": "Taarifa yako iko hewani. Hivi ndivyo unavyoweza kuiunga mkono kampeni unayoiamini — inachukua mibofyo miwili kutoka kwa kadi yoyote ya kampeni.",
       "steps": {
-        "open": { "title": "Fungua menyu", "body": "Kwenye kadi yoyote ya kampeni, gusa kitufe cha nukta tatu kwenye kona ya juu kulia ya bango." },
-        "verify": { "title": "Chagua \"Thibitisha kampeni hii\"", "body": "Menyu hufunua kitendo cha kuthibitisha \u2014 kinachoonekana kwa wasimamizi na wathibitishaji kama wewe pekee." },
-        "confirm": { "title": "Thibitisha na umemaliza", "body": "Shuhudia kuwa kampeni ni halisi. Beji yako huungana na kadi ili wafadhili wajue unaiunga mkono." }
+        "open": {
+          "title": "Fungua menyu",
+          "body": "Kwenye kadi yoyote ya kampeni, gusa kitufe cha nukta tatu kwenye kona ya juu kulia ya bango."
+        },
+        "verify": {
+          "title": "Chagua \"Thibitisha kampeni hii\"",
+          "body": "Menyu hufunua kitendo cha kuthibitisha — kinachoonekana kwa wasimamizi na wathibitishaji kama wewe pekee."
+        },
+        "confirm": {
+          "title": "Thibitisha na umemaliza",
+          "body": "Shuhudia kuwa kampeni ni halisi. Beji yako huungana na kadi ili wafadhili wajue unaiunga mkono."
+        }
       },
       "demo": {
         "menuVerify": "Thibitisha kampeni hii"

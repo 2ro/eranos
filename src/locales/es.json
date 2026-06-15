@@ -52,6 +52,14 @@
     "countryNoResults": "No se encontraron países.",
     "countryGlobal": "Global"
   },
+  "imageCrop": {
+    "title": "Recortar imagen",
+    "reset": "Restablecer",
+    "hint": "Arrastra para reposicionar · Pellizca o desplaza para hacer zoom",
+    "cancel": "Cancelar",
+    "processing": "Procesando…",
+    "apply": "Aplicar recorte"
+  },
   "translate": {
     "translate": "Traducir",
     "translating": "Traduciendo…",

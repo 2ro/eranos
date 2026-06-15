@@ -51,6 +51,14 @@
     "countryNoResults": "Aucun pays trouvé.",
     "countryGlobal": "Mondial"
   },
+  "imageCrop": {
+    "title": "Recadrer l’image",
+    "reset": "Réinitialiser",
+    "hint": "Faites glisser pour repositionner · Pincez ou faites défiler pour zoomer",
+    "cancel": "Annuler",
+    "processing": "Traitement…",
+    "apply": "Appliquer le recadrage"
+  },
   "translate": {
     "translate": "Traduire",
     "translating": "Traduction…",

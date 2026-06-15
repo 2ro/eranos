@@ -52,6 +52,14 @@
     "countryNoResults": "Tidak ada negara yang ditemukan.",
     "countryGlobal": "Global"
   },
+  "imageCrop": {
+    "title": "Pangkas Gambar",
+    "reset": "Atur ulang",
+    "hint": "Seret untuk memindahkan · Cubit atau gulir untuk memperbesar",
+    "cancel": "Batal",
+    "processing": "Memproses…",
+    "apply": "Terapkan Pangkasan"
+  },
   "translate": {
     "translate": "Terjemahkan",
     "translating": "Menerjemahkan…",
@@ -1556,9 +1564,18 @@
       "title": "Cara memverifikasi kampanye",
       "lede": "Pernyataan Anda sudah aktif. Berikut cara menjamin kampanye yang Anda percaya — cukup dua ketukan dari kartu kampanye mana pun.",
       "steps": {
-        "open": { "title": "Buka menu", "body": "Pada kartu kampanye mana pun, ketuk tombol tiga titik di sudut kanan atas banner." },
-        "verify": { "title": "Pilih \"Verifikasi kampanye ini\"", "body": "Menu menampilkan aksi verifikasi — hanya terlihat oleh moderator dan verifikator seperti Anda." },
-        "confirm": { "title": "Konfirmasi & selesai", "body": "Tegaskan bahwa kampanye ini autentik. Lencana Anda akan muncul di kartu sehingga para donatur tahu Anda mendukungnya." }
+        "open": {
+          "title": "Buka menu",
+          "body": "Pada kartu kampanye mana pun, ketuk tombol tiga titik di sudut kanan atas banner."
+        },
+        "verify": {
+          "title": "Pilih \"Verifikasi kampanye ini\"",
+          "body": "Menu menampilkan aksi verifikasi — hanya terlihat oleh moderator dan verifikator seperti Anda."
+        },
+        "confirm": {
+          "title": "Konfirmasi & selesai",
+          "body": "Tegaskan bahwa kampanye ini autentik. Lencana Anda akan muncul di kartu sehingga para donatur tahu Anda mendukungnya."
+        }
       },
       "demo": {
         "menuVerify": "Verifikasi kampanye ini"
