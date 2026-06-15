@@ -50,7 +50,8 @@
     "countryFilterAriaLabel": "按国家筛选",
     "countrySearchPlaceholder": "搜索国家…",
     "countryNoResults": "未找到国家。",
-    "countryGlobal": "全球"
+    "countryGlobal": "全球",
+    "continue": "继续"
   },
   "imageCrop": {
     "title": "裁剪图片",
@@ -115,6 +116,11 @@
         "title": "支持活动",
         "description": "用 Bitcoin 支持你认同的事业。",
         "finderNote": "你的捐款直接进入发起人的钱包。"
+      },
+      "verifier": {
+        "title": "验证活动",
+        "description": "以组织身份为活动背书。",
+        "finderNote": "捐赠者会在你信任的活动上看到徽章。"
       }
     },
     "keygen": {
@@ -156,6 +162,37 @@
       "uploadFailed": "上传失败。",
       "publishFailedTitle": "个人资料设置失败",
       "publishFailedDescription": "你的账户已创建，但个人资料未能保存。你可以稍后再更新。"
+    },
+    "verifier": {
+      "identity": {
+        "title": "设置你的组织",
+        "subtitle": "名称和徽标为必填项。网站和横幅为选填。",
+        "websiteInvalid": "请输入以 https:// 开头的有效网站地址",
+        "cropAvatar": "裁剪徽标",
+        "cropBanner": "裁剪横幅",
+        "uploading": "正在上传图片…",
+        "clipboardFailed": "无法读取剪贴板。",
+        "pasteUrlInvalid": "剪贴板未包含有效的 https URL。",
+        "pasteUrlFetchFailed": "无法加载该图片。请检查 URL 后重试。"
+      },
+      "bio": {
+        "title": "介绍一下你的组织",
+        "subtitle": "为你的个人资料撰写一段简短的描述。",
+        "label": "关于你的组织",
+        "placeholder": "我们是一家致力于……的非营利组织",
+        "publishing": "正在保存你的个人资料…"
+      },
+      "publishFailedTitle": "个人资料未保存",
+      "publishFailedDescription": "你的账户已就绪，但组织个人资料未能发布。你可以稍后在设置中完成它。",
+      "statement": {
+        "title": "发布你的验证者声明",
+        "subtitle": "描述你在背书前如何审核活动。该声明会公开发布，让捐赠者能够信任你的徽章。"
+      },
+      "howto": {
+        "title": "如何验证一个活动",
+        "subtitle": "一切准备就绪。下面介绍在核实活动后如何为其背书。",
+        "finish": "查看活动"
+      }
     }
   },
   "feed": {
@@ -224,7 +261,9 @@
     "imageDropzone": "点击或拖拽图片到这里",
     "countryClearAria": "清除国家",
     "flagOfAria": "{{name}} 国旗",
-    "countryHint": "发布 <0>i: iso3166:{{code}}</0> 用于按国家排序。"
+    "countryHint": "发布 <0>i: iso3166:{{code}}</0> 用于按国家排序。",
+    "publishing": "发布中…",
+    "uploadingCover": "上传封面中…"
   },
   "organizationContext": {
     "attachedToGroup": "已关联到群组",
@@ -638,7 +677,9 @@
       "next": "下一步",
       "back": "返回",
       "skip": "跳过",
-      "launchNow": "跳过并直接发布"
+      "launchNow": "跳过并直接发布",
+      "tagsStepTitle": "国家和分类",
+      "tagsStepSubtitle": "帮助合适的人发现你的活动。"
     }
   },
   "campaignsDetail": {
@@ -708,7 +749,11 @@
     "attestation": "验证此活动即表示您证实该活动真实可信。您本人认识活动组织者，或已切实核实其声明属实。谨防冒充者和骗子。",
     "verified": "活动已验证",
     "unverified": "验证已移除",
-    "actionFailed": "操作失败"
+    "actionFailed": "操作失败",
+    "verifiedByCount_zero": "已由 {{count}} 位审核员验证",
+    "verifiedByCount_two": "已由 {{count}} 位审核员验证",
+    "verifiedByCount_few": "已由 {{count}} 位审核员验证",
+    "verifiedByCount_many": "已由 {{count}} 位审核员验证"
   },
   "calendarEvents": {
     "create": {
@@ -839,7 +884,8 @@
       "searchPlaceholder": "搜索活动…",
       "searchAriaLabel": "搜索活动",
       "noMatch": "没有活动匹配「{{query}}」",
-      "noMatchHint": "尝试其他搜索词，或清除搜索。"
+      "noMatchHint": "尝试其他搜索词，或清除搜索。",
+      "verifyCampaigns": "验证活动"
     },
     "all": {
       "title": "活动",
@@ -865,7 +911,8 @@
       "allHidden": "没有活动可显示",
       "allHiddenHint": "网络上的所有活动都已被版主隐藏。打开「显示已隐藏」即可查看。",
       "empty": "暂无活动",
-      "emptyHint": "尚未发布任何活动。来当第一个吧。"
+      "emptyHint": "尚未发布任何活动。来当第一个吧。",
+      "verifyCampaigns": "验证活动"
     },
     "lists": {
       "stripAria": "精选活动主题列表",
@@ -945,7 +992,8 @@
         "movedToTop": "已移到顶部",
         "movedUp": "已上移",
         "movedDown": "已下移"
-      }
+      },
+      "label": "版主操作"
     }
   },
   "settings": {
@@ -1046,7 +1094,9 @@
     "disclaimer": "任何人都可以成为验证者。你的声明会公开发布到 Nostr 并在你的个人资料上醒目显示。它不会授予任何特殊权限——只是告诉捐赠者你如何审核活动。",
     "loginGateTitle": "登录以成为验证者",
     "loginGateBody": "你需要登录才能发布验证者声明。",
-    "howWeVerifyTitle": "我们如何验证"
+    "howWeVerifyTitle": "我们如何验证",
+    "withdrawConfirmTitle": "撤回你的验证者声明？",
+    "withdrawConfirmBody": "你的「我们如何验证」声明将从你的个人资料中移除。你可以随时发布新的声明。"
   },
   "mdEditor": {
     "toolbar": {
@@ -1143,6 +1193,11 @@
       "demo": {
         "menuVerify": "验证此活动"
       }
+    },
+    "getStartedCard": {
+      "title": "设置你的组织",
+      "body": "我们将引导你创建组织的个人资料、发布你的验证声明，并验证你的第一个活动。",
+      "cta": "开始验证"
     }
   },
   "organizers": {
@@ -1240,6 +1295,10 @@
       "v1Breeze": {
         "label": "V1 Breeze 钱包",
         "description": "归集旧 Lightning 托管钱包中的链上余额。"
+      },
+      "doubleTweak": {
+        "label": "Double-tweak SP 修复",
+        "description": "找回因早先发送漏洞而滞留的静默支付，并将它们归集回你的钱包。"
       }
     },
     "footnote": "每个选项都是一次性的单向归集到你当前的钱包。旧钱包本身不会被恢复——只有其中保存的资金会被找回。"
@@ -2958,5 +3017,68 @@
         "body": "托管型混币器可能盗取你的硬币、记录谁向谁发送了什么，或最终被证明是执法部门的诱饵。改用静默支付中转或非托管的 coinjoin 吧。"
       }
     }
+  },
+  "walletDoubleTweak": {
+    "seoTitle": "Double-tweak SP 修复",
+    "seoDescription": "找回因早先发送漏洞而滞留在链上的静默支付，并将它们归集到你的钱包。",
+    "title": "Double-tweak SP 修复",
+    "heading": "找回滞留的静默支付",
+    "subheading": "早先版本的 Agora 将部分静默支付输出编码到了错误的密钥，因此它们从未出现在你的钱包中。此工具会重新扫描链上的这些输出，并将找到的任何一笔归集到你的钱包。",
+    "back": "返回",
+    "loggedOut": "请使用收到这些静默支付的 Nostr 身份登录，以便将其找回。",
+    "unsupported": {
+      "title": "钱包不可用",
+      "description": "找回功能需要一个可在本地签名的钱包。请使用你的 nsec 登录以继续。"
+    },
+    "noIndexer": {
+      "title": "未配置静默支付索引器",
+      "description": "扫描滞留的支付需要一个 BIP-352 索引器 URL。请在钱包设置中设置一个后重试。"
+    },
+    "scan": {
+      "title": "扫描滞留的支付",
+      "description": "选择开始扫描的区块高度。找回功能会从该高度逐块检查至链尖。",
+      "fromHeightLabel": "起始区块高度",
+      "tipHint": "当前链尖：{{tip}}",
+      "start": "扫描",
+      "cancel": "取消扫描",
+      "progress": "正在扫描区块 {{current}} / {{to}} — 已发现 {{found}} 笔",
+      "tipMissing": "正在解析链尖…"
+    },
+    "noFunds": {
+      "title": "无可找回的资金",
+      "description": "在扫描范围内未发现滞留的静默支付。如果你预期有资金，请尝试更早的起始高度。"
+    },
+    "found": {
+      "title": "发现滞留的支付",
+      "description": "这些输出可以被归集回你的钱包。",
+      "count": "输出",
+      "recoverable": "可找回"
+    },
+    "destination": {
+      "title": "资金将发送至",
+      "description": "你当前钱包中的一个新接收地址。"
+    },
+    "sweepButton": "找回资金",
+    "sweeping": "正在找回你的资金…",
+    "dontClose": "找回完成前请勿关闭此页面。",
+    "success": {
+      "title": "找回完成",
+      "sent": "已将 {{sats}} sats 找回到你的钱包。",
+      "viewTx": "查看交易"
+    },
+    "error": {
+      "title": "找回失败",
+      "tryAgain": "重试"
+    },
+    "errors": {
+      "noDestination": "没有可用的目标地址。请先打开你的钱包。",
+      "noBlockbook": "未配置 Blockbook 服务器。请在钱包设置中设置一个。",
+      "sweepGeneric": "无法完成找回归集。"
+    },
+    "toast": {
+      "successTitle": "资金已找回",
+      "successDesc": "已将 {{sats}} sats 归集到你的钱包。"
+    },
+    "footnote": "这是一次单向归集到你当前钱包的操作。只会处理受影响的静默支付；其他一切保持不变。"
   }
 }

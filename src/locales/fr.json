@@ -49,7 +49,9 @@
     "countryFilterAriaLabel": "Filtrer par pays",
     "countrySearchPlaceholder": "Rechercher des pays…",
     "countryNoResults": "Aucun pays trouvé.",
-    "countryGlobal": "Mondial"
+    "countryGlobal": "Mondial",
+    "continue": "Continuer",
+    "sortDefault": "Par défaut"
   },
   "imageCrop": {
     "title": "Recadrer l’image",
@@ -114,6 +116,11 @@
         "title": "Soutenir des campagnes",
         "description": "Soutenez des causes avec Bitcoin.",
         "finderNote": "Votre don va directement dans le portefeuille de l'organisateur."
+      },
+      "verifier": {
+        "title": "Vérifier des campagnes",
+        "description": "Portez-vous garant de campagnes en tant qu'organisation.",
+        "finderNote": "Les donateurs voient un badge sur les campagnes en lesquelles vous avez confiance."
       }
     },
     "keygen": {
@@ -155,6 +162,37 @@
       "uploadFailed": "Échec du téléversement.",
       "publishFailedTitle": "Échec de la configuration du profil",
       "publishFailedDescription": "Votre compte a été créé mais le profil n'a pas pu être enregistré. Vous pourrez le mettre à jour plus tard."
+    },
+    "verifier": {
+      "identity": {
+        "title": "Configurez votre organisation",
+        "subtitle": "Le nom et le logo sont obligatoires. Le site web et la bannière sont facultatifs.",
+        "websiteInvalid": "Saisissez un site web valide commençant par https://",
+        "cropAvatar": "Recadrer le logo",
+        "cropBanner": "Recadrer la bannière",
+        "uploading": "Téléversement de l'image…",
+        "clipboardFailed": "Impossible de lire le presse-papiers.",
+        "pasteUrlInvalid": "Le presse-papiers ne contient pas d'URL https valide.",
+        "pasteUrlFetchFailed": "Impossible de charger cette image. Vérifiez l'URL et réessayez."
+      },
+      "bio": {
+        "title": "Parlez-nous de votre organisation",
+        "subtitle": "Une courte description pour votre profil.",
+        "label": "À propos de votre organisation",
+        "placeholder": "Nous sommes une association à but non lucratif qui…",
+        "publishing": "Enregistrement de votre profil…"
+      },
+      "publishFailedTitle": "Profil non enregistré",
+      "publishFailedDescription": "Votre compte est prêt, mais le profil de l'organisation n'a pas pu être publié. Vous pourrez le terminer plus tard depuis les paramètres.",
+      "statement": {
+        "title": "Publiez votre déclaration de vérificateur",
+        "subtitle": "Décrivez comment vous examinez les campagnes avant de vous en porter garant. Publiée publiquement afin que les donateurs puissent faire confiance à votre badge."
+      },
+      "howto": {
+        "title": "Comment vérifier une campagne",
+        "subtitle": "Tout est prêt. Voici comment vous porter garant d'une campagne une fois que vous l'avez examinée.",
+        "finish": "Voir les campagnes"
+      }
     }
   },
   "feed": {
@@ -276,7 +314,8 @@
       "setAsDefault": "Définir par défaut",
       "defaultUpdated": "Destination par défaut mise à jour",
       "defaultUpdatedCountry": "Les nouvelles publications iront vers {{name}} par défaut.",
-      "defaultUpdatedGlobal": "Les nouvelles publications seront globales par défaut."
+      "defaultUpdatedGlobal": "Les nouvelles publications seront globales par défaut.",
+      "label": "Publier vers"
     }
   },
   "replyModal": {
@@ -664,7 +703,9 @@
     "imageDropzone": "Cliquez ou faites glisser une image ici",
     "countryClearAria": "Effacer le pays",
     "flagOfAria": "Drapeau de {{name}}",
-    "countryHint": "Publie <0>i: iso3166:{{code}}</0> pour le tri par pays."
+    "countryHint": "Publie <0>i: iso3166:{{code}}</0> pour le tri par pays.",
+    "publishing": "Publication…",
+    "uploadingCover": "Téléversement de la couverture…"
   },
   "organizationContext": {
     "attachedToGroup": "Attaché au groupe",
@@ -1074,8 +1115,14 @@
       "next": "Suivant",
       "back": "Retour",
       "skip": "Passer",
-      "launchNow": "Passer et lancer"
-    }
+      "launchNow": "Passer et lancer",
+      "goalStepTitle": "Objectif",
+      "goalStepSubtitle": "Facultatif — laissez vide pour une campagne sans limite.",
+      "tagsStepTitle": "Pays et catégories",
+      "tagsStepSubtitle": "Aidez les bonnes personnes à trouver votre campagne."
+    },
+    "customOnchainMeaning": "Public. Tout le monde peut voir ces dons.",
+    "customSpMeaning": "Privé. L'identité du donateur reste cachée."
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | Collectes de fonds {{appName}}",
@@ -1144,7 +1191,11 @@
     "attestation": "En vérifiant cette campagne, vous attestez qu'elle est authentique et véridique. Vous connaissez personnellement l'organisateur de la campagne ou vous avez vérifié de manière sérieuse que ses affirmations sont vraies. Méfiez-vous des usurpateurs d'identité et des escrocs.",
     "verified": "Campagne vérifiée",
     "unverified": "Vérification retirée",
-    "actionFailed": "Échec de l’action"
+    "actionFailed": "Échec de l’action",
+    "verifiedByCount_zero": "Vérifié par {{count}} modérateur",
+    "verifiedByCount_two": "Vérifié par {{count}} modérateurs",
+    "verifiedByCount_few": "Vérifié par {{count}} modérateurs",
+    "verifiedByCount_many": "Vérifié par {{count}} modérateurs"
   },
   "calendarEvents": {
     "create": {
@@ -1275,7 +1326,8 @@
       "searchPlaceholder": "Rechercher des campagnes…",
       "searchAriaLabel": "Rechercher des campagnes",
       "noMatch": "Aucune campagne ne correspond à « {{query}} »",
-      "noMatchHint": "Essayez un autre terme de recherche, ou effacez la recherche."
+      "noMatchHint": "Essayez un autre terme de recherche, ou effacez la recherche.",
+      "verifyCampaigns": "Vérifier des campagnes"
     },
     "all": {
       "title": "Campagnes",
@@ -1301,7 +1353,8 @@
       "allHidden": "Aucune campagne à afficher",
       "allHiddenHint": "Toutes les campagnes du réseau ont été masquées par les modérateurs. Activez « Afficher les masquées » pour les voir.",
       "empty": "Aucune campagne pour l'instant",
-      "emptyHint": "Aucune campagne n'a encore été publiée. Soyez le premier."
+      "emptyHint": "Aucune campagne n'a encore été publiée. Soyez le premier.",
+      "verifyCampaigns": "Vérifier des campagnes"
     },
     "lists": {
       "stripAria": "Listes thématiques de campagnes",
@@ -1483,7 +1536,9 @@
     "disclaimer": "Tout le monde peut devenir vérificateur. Votre déclaration est publiée publiquement sur Nostr et affichée bien en évidence sur votre profil. Elle n'accorde aucune permission particulière — elle indique simplement aux donateurs comment vous examinez les campagnes.",
     "loginGateTitle": "Connectez-vous pour devenir vérificateur",
     "loginGateBody": "Vous devez être connecté pour publier une déclaration de vérificateur.",
-    "howWeVerifyTitle": "Comment nous vérifions"
+    "howWeVerifyTitle": "Comment nous vérifions",
+    "withdrawConfirmTitle": "Retirer votre déclaration de vérificateur ?",
+    "withdrawConfirmBody": "Votre déclaration « Comment nous vérifions » sera retirée de votre profil. Vous pourrez en publier une nouvelle à tout moment."
   },
   "mdEditor": {
     "toolbar": {
@@ -1580,6 +1635,11 @@
       "demo": {
         "menuVerify": "Vérifier cette campagne"
       }
+    },
+    "getStartedCard": {
+      "title": "Configurez votre organisation",
+      "body": "Nous vous guiderons pour créer le profil de votre organisation, publier votre déclaration de vérification et vérifier votre première campagne.",
+      "cta": "Commencer à vérifier"
     }
   },
   "organizers": {
@@ -1677,6 +1737,10 @@
       "v1Breeze": {
         "label": "Portefeuille V1 Breeze",
         "description": "Balayez le solde on-chain de l'ancienne custodie Lightning."
+      },
+      "doubleTweak": {
+        "label": "Correctif SP double-tweak",
+        "description": "Récupérez les paiements silencieux bloqués par un ancien bug d'envoi et balayez-les vers votre portefeuille."
       }
     },
     "footnote": "Chaque option est un balayage à sens unique vers votre portefeuille actuel. L'ancien portefeuille lui-même n'est pas restauré — seuls les fonds qu'il détenait sont récupérés."
@@ -2953,5 +3017,68 @@
         "body": "Les mélangeurs dépositaires peuvent voler vos pièces, enregistrer qui a envoyé quoi, ou s'avérer être des pots de miel pour les forces de l'ordre. Utilisez un saut vers les paiements silencieux ou un coinjoin non-dépositaire à la place."
       }
     }
+  },
+  "walletDoubleTweak": {
+    "seoTitle": "Correctif SP double-tweak",
+    "seoDescription": "Récupérez les paiements silencieux bloqués on-chain par un ancien bug d'envoi et balayez-les vers votre portefeuille.",
+    "title": "Correctif SP double-tweak",
+    "heading": "Récupérer les paiements silencieux bloqués",
+    "subheading": "Une version antérieure d'Agora a encodé certaines sorties de paiement silencieux vers la mauvaise clé, si bien qu'elles ne sont jamais apparues dans votre portefeuille. Cet outil réanalyse la chaîne à la recherche de ces sorties et balaie celles qu'il trouve vers votre portefeuille.",
+    "back": "Retour",
+    "loggedOut": "Connectez-vous avec l'identité Nostr qui a reçu les paiements silencieux afin qu'ils puissent être récupérés.",
+    "unsupported": {
+      "title": "Portefeuille indisponible",
+      "description": "La récupération nécessite un portefeuille capable de signer localement. Connectez-vous avec votre nsec pour continuer."
+    },
+    "noIndexer": {
+      "title": "Aucun indexeur de paiement silencieux configuré",
+      "description": "Une URL d'indexeur BIP-352 est requise pour rechercher les paiements bloqués. Configurez-en une dans les paramètres du portefeuille et réessayez."
+    },
+    "scan": {
+      "title": "Rechercher les paiements bloqués",
+      "description": "Choisissez la hauteur de bloc à partir de laquelle commencer l'analyse. La récupération vérifie chaque bloc depuis celle-ci jusqu'au sommet de la chaîne.",
+      "fromHeightLabel": "Hauteur de bloc de départ",
+      "tipHint": "Sommet de chaîne actuel : {{tip}}",
+      "start": "Analyser",
+      "cancel": "Annuler l'analyse",
+      "progress": "Analyse du bloc {{current}} sur {{to}} — {{found}} trouvé(s)",
+      "tipMissing": "Résolution du sommet de chaîne…"
+    },
+    "noFunds": {
+      "title": "Rien à récupérer",
+      "description": "Aucun paiement silencieux bloqué n'a été trouvé dans la plage analysée. Essayez une hauteur de départ antérieure si vous attendiez des fonds."
+    },
+    "found": {
+      "title": "Paiements bloqués trouvés",
+      "description": "Ces sorties peuvent être balayées vers votre portefeuille.",
+      "count": "Sorties",
+      "recoverable": "Récupérable"
+    },
+    "destination": {
+      "title": "Les fonds seront envoyés à",
+      "description": "Une nouvelle adresse de réception dans votre portefeuille actuel."
+    },
+    "sweepButton": "Récupérer les fonds",
+    "sweeping": "Récupération de vos fonds…",
+    "dontClose": "Ne fermez pas cette page avant la fin de la récupération.",
+    "success": {
+      "title": "Récupération terminée",
+      "sent": "{{sats}} sats récupérés vers votre portefeuille.",
+      "viewTx": "Voir la transaction"
+    },
+    "error": {
+      "title": "Échec de la récupération",
+      "tryAgain": "Réessayer"
+    },
+    "errors": {
+      "noDestination": "Aucune adresse de destination disponible. Ouvrez d'abord votre portefeuille.",
+      "noBlockbook": "Aucun serveur Blockbook configuré. Configurez-en un dans les paramètres du portefeuille.",
+      "sweepGeneric": "Impossible de terminer le balayage de récupération."
+    },
+    "toast": {
+      "successTitle": "Fonds récupérés",
+      "successDesc": "{{sats}} sats balayés vers votre portefeuille."
+    },
+    "footnote": "Il s'agit d'un balayage à sens unique vers votre portefeuille actuel. Seuls les paiements silencieux concernés sont touchés ; rien d'autre ne change."
   }
 }

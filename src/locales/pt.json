@@ -50,7 +50,8 @@
     "countryFilterAriaLabel": "Filtrar por país",
     "countrySearchPlaceholder": "Pesquisar países…",
     "countryNoResults": "Nenhum país encontrado.",
-    "countryGlobal": "Global"
+    "countryGlobal": "Global",
+    "continue": "Continuar"
   },
   "imageCrop": {
     "title": "Recortar imagem",
@@ -115,6 +116,11 @@
         "title": "Doar para campanhas",
         "description": "Apoie causas com Bitcoin.",
         "finderNote": "Sua doação vai direto para a carteira do organizador."
+      },
+      "verifier": {
+        "title": "Verificar campanhas",
+        "description": "Avalize campanhas como uma organização.",
+        "finderNote": "Os doadores veem o selo nas campanhas em que você confia."
       }
     },
     "keygen": {
@@ -156,6 +162,37 @@
       "uploadFailed": "Falha no envio.",
       "publishFailedTitle": "Falha na configuração do perfil",
       "publishFailedDescription": "Sua conta foi criada, mas o perfil não pôde ser salvo. Você pode atualizá-lo depois."
+    },
+    "verifier": {
+      "identity": {
+        "title": "Configure sua organização",
+        "subtitle": "Nome e logo são obrigatórios. Site e banner são opcionais.",
+        "websiteInvalid": "Digite um site válido começando com https://",
+        "cropAvatar": "Recortar logo",
+        "cropBanner": "Recortar banner",
+        "uploading": "Enviando imagem…",
+        "clipboardFailed": "Não foi possível ler da área de transferência.",
+        "pasteUrlInvalid": "A área de transferência não contém uma URL https válida.",
+        "pasteUrlFetchFailed": "Não foi possível carregar essa imagem. Verifique a URL e tente novamente."
+      },
+      "bio": {
+        "title": "Conte-nos sobre sua organização",
+        "subtitle": "Uma breve descrição para o seu perfil.",
+        "label": "Sobre sua organização",
+        "placeholder": "Somos uma organização sem fins lucrativos que…",
+        "publishing": "Salvando seu perfil…"
+      },
+      "publishFailedTitle": "Perfil não salvo",
+      "publishFailedDescription": "Sua conta está pronta, mas o perfil da organização não pôde ser publicado. Você pode concluí-lo depois nas configurações.",
+      "statement": {
+        "title": "Publique sua declaração de verificador",
+        "subtitle": "Descreva como você avalia as campanhas antes de avalizá-las. Publicada publicamente para que os doadores possam confiar no seu selo."
+      },
+      "howto": {
+        "title": "Como verificar uma campanha",
+        "subtitle": "Tudo pronto. Veja como avalizar uma campanha depois de verificá-la.",
+        "finish": "Ver campanhas"
+      }
     }
   },
   "feed": {
@@ -277,7 +314,8 @@
       "setAsDefault": "Definir como padrão",
       "defaultUpdated": "Padrão atualizado",
       "defaultUpdatedCountry": "Novas publicações irão para {{name}} por padrão.",
-      "defaultUpdatedGlobal": "Novas publicações serão globais por padrão."
+      "defaultUpdatedGlobal": "Novas publicações serão globais por padrão.",
+      "label": "Publicar em"
     }
   },
   "replyModal": {
@@ -665,7 +703,9 @@
     "imageDropzone": "Clique ou arraste uma imagem aqui",
     "countryClearAria": "Limpar país",
     "flagOfAria": "Bandeira de {{name}}",
-    "countryHint": "Publica <0>i: iso3166:{{code}}</0> para ordenação por país."
+    "countryHint": "Publica <0>i: iso3166:{{code}}</0> para ordenação por país.",
+    "publishing": "Publicando…",
+    "uploadingCover": "Enviando capa…"
   },
   "organizationContext": {
     "attachedToGroup": "Anexado ao grupo",
@@ -1079,7 +1119,9 @@
       "next": "Próximo",
       "back": "Voltar",
       "skip": "Pular",
-      "launchNow": "Pular Próximo e Lançar"
+      "launchNow": "Pular Próximo e Lançar",
+      "tagsStepTitle": "País e categorias",
+      "tagsStepSubtitle": "Ajude as pessoas certas a encontrar sua campanha."
     }
   },
   "campaignsDetail": {
@@ -1149,7 +1191,11 @@
     "attestation": "Ao verificar esta campanha, você atesta que a campanha é autêntica e verdadeira. Você conhece o organizador da campanha pessoalmente ou verificou de forma significativa que as alegações dele são verdadeiras. Cuidado com impostores e golpistas.",
     "verified": "Campanha verificada",
     "unverified": "Verificação removida",
-    "actionFailed": "Falha na ação"
+    "actionFailed": "Falha na ação",
+    "verifiedByCount_zero": "Verificado por {{count}} moderadores",
+    "verifiedByCount_two": "Verificado por {{count}} moderadores",
+    "verifiedByCount_few": "Verificado por {{count}} moderadores",
+    "verifiedByCount_many": "Verificado por {{count}} moderadores"
   },
   "calendarEvents": {
     "create": {
@@ -1280,7 +1326,8 @@
       "searchPlaceholder": "Pesquisar campanhas…",
       "searchAriaLabel": "Pesquisar campanhas",
       "noMatch": "Nenhuma campanha corresponde a “{{query}}”",
-      "noMatchHint": "Tente um termo de pesquisa diferente, ou limpe a pesquisa."
+      "noMatchHint": "Tente um termo de pesquisa diferente, ou limpe a pesquisa.",
+      "verifyCampaigns": "Verificar campanhas"
     },
     "all": {
       "title": "Campanhas",
@@ -1306,7 +1353,8 @@
       "allHidden": "Nenhuma campanha para mostrar",
       "allHiddenHint": "Todas as campanhas na rede foram ocultadas pelos moderadores. Ative “Mostrar ocultas” para visualizá-las.",
       "empty": "Nenhuma campanha ainda",
-      "emptyHint": "Nenhuma campanha foi publicada ainda. Seja o primeiro."
+      "emptyHint": "Nenhuma campanha foi publicada ainda. Seja o primeiro.",
+      "verifyCampaigns": "Verificar campanhas"
     },
     "lists": {
       "stripAria": "Listas de tópicos de campanhas curadas",
@@ -1488,7 +1536,9 @@
     "disclaimer": "Qualquer pessoa pode se tornar um verificador. Sua declaração é publicada publicamente no Nostr e exibida com destaque no seu perfil. Ela não concede nenhuma permissão especial — apenas informa aos doadores como você avalia campanhas.",
     "loginGateTitle": "Entre para se tornar um verificador",
     "loginGateBody": "Você precisa estar conectado para publicar uma declaração de verificador.",
-    "howWeVerifyTitle": "Como verificamos"
+    "howWeVerifyTitle": "Como verificamos",
+    "withdrawConfirmTitle": "Retirar sua declaração de verificador?",
+    "withdrawConfirmBody": "Sua declaração \"Como verificamos\" será removida do seu perfil. Você pode publicar uma nova a qualquer momento."
   },
   "mdEditor": {
     "toolbar": {
@@ -1585,6 +1635,11 @@
       "demo": {
         "menuVerify": "Verificar esta campanha"
       }
+    },
+    "getStartedCard": {
+      "title": "Configure sua organização",
+      "body": "Vamos guiá-lo na criação do perfil da sua organização, na publicação da sua declaração de verificação e na verificação da sua primeira campanha.",
+      "cta": "Começar a verificar"
     }
   },
   "organizers": {
@@ -1682,6 +1737,10 @@
       "v1Breeze": {
         "label": "Carteira V1 Breeze",
         "description": "Varra o saldo on-chain da custódia Lightning legada."
+      },
+      "doubleTweak": {
+        "label": "Correção de SP de duplo ajuste",
+        "description": "Recupere pagamentos silenciosos perdidos por um bug de envio anterior e varra-os de volta para sua carteira."
       }
     },
     "footnote": "Cada opção é uma varredura única e de via única para sua carteira atual. A carteira antiga em si não é restaurada — apenas os fundos que ela continha são recuperados."
@@ -2958,5 +3017,68 @@
         "body": "Misturadores custodiais podem roubar suas moedas, registrar quem enviou o que ou acabar sendo armadilhas das autoridades. Use um salto para pagamentos silenciosos ou um coinjoin não-custodial em vez disso."
       }
     }
+  },
+  "walletDoubleTweak": {
+    "seoTitle": "Correção de SP de duplo ajuste",
+    "seoDescription": "Recupere pagamentos silenciosos perdidos on-chain por um bug de envio anterior e varra-os para sua carteira.",
+    "title": "Correção de SP de duplo ajuste",
+    "heading": "Recupere pagamentos silenciosos perdidos",
+    "subheading": "Uma versão anterior do Agora codificou algumas saídas de pagamento silencioso para a chave errada, então elas nunca apareceram na sua carteira. Esta ferramenta reescaneia a blockchain em busca dessas saídas e varre quaisquer que encontre para sua carteira.",
+    "back": "Voltar",
+    "loggedOut": "Entre com a identidade Nostr que recebeu os pagamentos silenciosos para que eles possam ser recuperados.",
+    "unsupported": {
+      "title": "Carteira indisponível",
+      "description": "A recuperação precisa de uma carteira que possa assinar localmente. Entre com sua nsec para continuar."
+    },
+    "noIndexer": {
+      "title": "Nenhum indexador de pagamento silencioso configurado",
+      "description": "Uma URL de indexador BIP-352 é necessária para escanear em busca de pagamentos perdidos. Defina uma nas configurações da carteira e tente novamente."
+    },
+    "scan": {
+      "title": "Escanear em busca de pagamentos perdidos",
+      "description": "Escolha a altura do bloco a partir da qual começar o escaneamento. A recuperação verifica cada bloco a partir daí até o topo da blockchain.",
+      "fromHeightLabel": "Altura do bloco inicial",
+      "tipHint": "Topo atual da blockchain: {{tip}}",
+      "start": "Escanear",
+      "cancel": "Cancelar escaneamento",
+      "progress": "Escaneando o bloco {{current}} de {{to}} — {{found}} encontrados",
+      "tipMissing": "Resolvendo o topo da blockchain…"
+    },
+    "noFunds": {
+      "title": "Nada para recuperar",
+      "description": "Nenhum pagamento silencioso perdido foi encontrado no intervalo escaneado. Tente uma altura inicial anterior se você esperava fundos."
+    },
+    "found": {
+      "title": "Pagamentos perdidos encontrados",
+      "description": "Essas saídas podem ser varridas de volta para sua carteira.",
+      "count": "Saídas",
+      "recoverable": "Recuperável"
+    },
+    "destination": {
+      "title": "Os fundos serão enviados para",
+      "description": "Um novo endereço de recebimento na sua carteira atual."
+    },
+    "sweepButton": "Recuperar fundos",
+    "sweeping": "Recuperando seus fundos…",
+    "dontClose": "Não feche esta página até a recuperação terminar.",
+    "success": {
+      "title": "Recuperação concluída",
+      "sent": "{{sats}} sats recuperados para sua carteira.",
+      "viewTx": "Ver transação"
+    },
+    "error": {
+      "title": "Recuperação falhou",
+      "tryAgain": "Tentar novamente"
+    },
+    "errors": {
+      "noDestination": "Nenhum endereço de destino disponível. Abra sua carteira primeiro.",
+      "noBlockbook": "Nenhum servidor Blockbook configurado. Defina um nas configurações da carteira.",
+      "sweepGeneric": "Não foi possível concluir a varredura de recuperação."
+    },
+    "toast": {
+      "successTitle": "Fundos recuperados",
+      "successDesc": "{{sats}} sats varridos para sua carteira."
+    },
+    "footnote": "Esta é uma varredura de via única para sua carteira atual. Apenas os pagamentos silenciosos afetados são tocados; nada mais muda."
   }
 }

@@ -50,7 +50,8 @@
     "countryFilterAriaLabel": "Chuja kwa nchi",
     "countrySearchPlaceholder": "Tafuta nchi…",
     "countryNoResults": "Hakuna nchi zilizopatikana.",
-    "countryGlobal": "Kimataifa"
+    "countryGlobal": "Kimataifa",
+    "continue": "Endelea"
   },
   "imageCrop": {
     "title": "Punguza Picha",
@@ -87,7 +88,8 @@
     "safety": "Usalama",
     "changelog": "Kumbukumbu ya mabadiliko",
     "sourceCode": "Msimbo wa chanzo",
-    "getApp": "Pata programu"
+    "getApp": "Pata programu",
+    "myDashboard": "Dashibodi Yangu"
   },
   "auth": {
     "join": "Jiunge",
@@ -114,6 +116,11 @@
         "title": "Changia kampeni",
         "description": "Saidia malengo kwa Bitcoin.",
         "finderNote": "Mchango wako huenda moja kwa moja kwenye pochi ya mratibu."
+      },
+      "verifier": {
+        "title": "Thibitisha kampeni",
+        "description": "Shuhudia kampeni kama shirika.",
+        "finderNote": "Wafadhili huona beji kwenye kampeni unazoziamini."
       }
     },
     "keygen": {
@@ -155,6 +162,37 @@
       "uploadFailed": "Upakiaji umeshindikana.",
       "publishFailedTitle": "Usanidi wa wasifu umeshindikana",
       "publishFailedDescription": "Akaunti yako iliundwa lakini wasifu haukuweza kuhifadhiwa. Unaweza kuusasisha baadaye."
+    },
+    "verifier": {
+      "identity": {
+        "title": "Anzisha shirika lako",
+        "subtitle": "Jina na nembo vinahitajika. Tovuti na bango si lazima.",
+        "websiteInvalid": "Weka tovuti halali inayoanza na https://",
+        "cropAvatar": "Punguza nembo",
+        "cropBanner": "Punguza bango",
+        "uploading": "Inapakia picha…",
+        "clipboardFailed": "Haikuweza kusoma kutoka kwa ubao wa kunakili.",
+        "pasteUrlInvalid": "Ubao wa kunakili hauna URL halali ya https.",
+        "pasteUrlFetchFailed": "Haikuweza kupakia picha hiyo. Angalia URL na ujaribu tena."
+      },
+      "bio": {
+        "title": "Tuambie kuhusu shirika lako",
+        "subtitle": "Maelezo mafupi kwa wasifu wako.",
+        "label": "Kuhusu shirika lako",
+        "placeholder": "Sisi ni shirika lisilo la kibiashara ambalo…",
+        "publishing": "Inahifadhi wasifu wako…"
+      },
+      "publishFailedTitle": "Wasifu haukuhifadhiwa",
+      "publishFailedDescription": "Akaunti yako iko tayari, lakini wasifu wa shirika haukuweza kuchapishwa. Unaweza kuumaliza baadaye kutoka kwa mipangilio.",
+      "statement": {
+        "title": "Chapisha taarifa yako ya mthibitishaji",
+        "subtitle": "Eleza jinsi unavyochunguza kampeni kabla ya kuzishuhudia. Huchapishwa hadharani ili wafadhili waweze kuamini beji yako."
+      },
+      "howto": {
+        "title": "Jinsi ya kuthibitisha kampeni",
+        "subtitle": "Uko tayari. Hivi ndivyo jinsi ya kushuhudia kampeni mara tu umeichunguza.",
+        "finish": "Tazama kampeni"
+      }
     }
   },
   "feed": {
@@ -276,7 +314,8 @@
       "setAsDefault": "Weka kama chaguo-msingi",
       "defaultUpdated": "Chaguo-msingi limesasishwa",
       "defaultUpdatedCountry": "Machapisho mapya yataenda {{name}} kwa chaguo-msingi.",
-      "defaultUpdatedGlobal": "Machapisho mapya yatakuwa ya kimataifa kwa chaguo-msingi."
+      "defaultUpdatedGlobal": "Machapisho mapya yatakuwa ya kimataifa kwa chaguo-msingi.",
+      "label": "Chapisha kwa"
     }
   },
   "replyModal": {
@@ -664,7 +703,9 @@
     "imageDropzone": "Bonyeza au buruta picha hapa",
     "countryClearAria": "Futa nchi",
     "flagOfAria": "Bendera ya {{name}}",
-    "countryHint": "Inachapisha <0>i: iso3166:{{code}}</0> kwa upangaji wa nchi."
+    "countryHint": "Inachapisha <0>i: iso3166:{{code}}</0> kwa upangaji wa nchi.",
+    "publishing": "Inachapisha…",
+    "uploadingCover": "Inapakia jalada…"
   },
   "organizationContext": {
     "attachedToGroup": "Imeunganishwa na kikundi",
@@ -1076,7 +1117,11 @@
       "next": "Inayofuata",
       "back": "Rudi",
       "skip": "Ruka",
-      "launchNow": "Ruka Inayofuata na Uzindue"
+      "launchNow": "Ruka Inayofuata na Uzindue",
+      "goalStepTitle": "Lengo",
+      "goalStepSubtitle": "Si lazima — acha tupu kwa kampeni isiyo na mwisho.",
+      "tagsStepTitle": "Nchi na kategoria",
+      "tagsStepSubtitle": "Saidia watu sahihi kupata kampeni yako."
     }
   },
   "campaignsDetail": {
@@ -1146,7 +1191,11 @@
     "attestation": "Kwa kuthibitisha kampeni hii unashuhudia kwamba kampeni ni halisi na ya kweli. Unamfahamu mwandaaji wa kampeni binafsi au umethibitisha kwa kina kwamba madai yao ni ya kweli. Jihadhari na waigizaji na walaghai.",
     "verified": "Kampeni imethibitishwa",
     "unverified": "Uthibitisho umeondolewa",
-    "actionFailed": "Kitendo kimeshindwa"
+    "actionFailed": "Kitendo kimeshindwa",
+    "verifiedByCount_zero": "Imethibitishwa na wasimamizi {{count}}",
+    "verifiedByCount_two": "Imethibitishwa na wasimamizi {{count}}",
+    "verifiedByCount_few": "Imethibitishwa na wasimamizi {{count}}",
+    "verifiedByCount_many": "Imethibitishwa na wasimamizi {{count}}"
   },
   "calendarEvents": {
     "create": {
@@ -1277,7 +1326,8 @@
           "privateSummary": "Malipo ya kimya ya BIP-352. Michango hufika kwenye outputs zisizoweza kuunganishwa."
         },
         "readMore": "Soma uchambuzi kamili"
-      }
+      },
+      "verifyCampaigns": "Thibitisha kampeni"
     },
     "all": {
       "title": "Kampeni",
@@ -1303,7 +1353,8 @@
       "heroHeadingLine2": "mahali pamoja.",
       "heroBody": "Kila kampeni iliyochapishwa kwenye Nostr, imekusanywa mahali pamoja. Vinjari mtandao mzima, pata lengo linalokuhusu, na liunge mkono moja kwa moja kwa Bitcoin.",
       "campaignsCount_one": "kampeni kwenye mtandao",
-      "campaignsCount_other": "kampeni kwenye mtandao"
+      "campaignsCount_other": "kampeni kwenye mtandao",
+      "verifyCampaigns": "Thibitisha kampeni"
     },
     "lists": {
       "stripAria": "Orodha za mada za kampeni zilizoratibiwa",
@@ -1485,7 +1536,9 @@
     "disclaimer": "Yeyote anaweza kuwa mthibitishaji. Taarifa yako huchapishwa hadharani kwenye Nostr na huonyeshwa kwa uwazi kwenye wasifu wako. Haitoi ruhusa zozote maalum — inawaambia tu wafadhili jinsi unavyochunguza kampeni.",
     "loginGateTitle": "Ingia ili kuwa mthibitishaji",
     "loginGateBody": "Unahitaji kuwa umeingia ili kuchapisha taarifa ya mthibitishaji.",
-    "howWeVerifyTitle": "Jinsi tunavyothibitisha"
+    "howWeVerifyTitle": "Jinsi tunavyothibitisha",
+    "withdrawConfirmTitle": "Ondoa taarifa yako ya mthibitishaji?",
+    "withdrawConfirmBody": "Taarifa yako ya \"Jinsi Tunavyothibitisha\" itaondolewa kwenye wasifu wako. Unaweza kuchapisha mpya wakati wowote."
   },
   "mdEditor": {
     "toolbar": {
@@ -1582,6 +1635,11 @@
       "demo": {
         "menuVerify": "Thibitisha kampeni hii"
       }
+    },
+    "getStartedCard": {
+      "title": "Anzisha shirika lako",
+      "body": "Tutakuongoza katika kuunda wasifu wa shirika lako, kuchapisha taarifa yako ya uthibitishaji, na kuthibitisha kampeni yako ya kwanza.",
+      "cta": "Anza kuthibitisha"
     }
   },
   "organizers": {
@@ -1649,7 +1707,8 @@
     "tabs": {
       "public": "Hadharani",
       "private": "Faragha"
-    }
+    },
+    "openMenu": "Menyu ya pochi"
   },
   "walletRecovery": {
     "seoTitle": "Rejesha Pochi ya Zamani",
@@ -1920,6 +1979,10 @@
       "checked_other": "Imekaguliwa UTXO {{count}} · imeondolewa {{pruned}}.",
       "reconciling": "Inapatanisha…",
       "reconcileNow": "Patanisha sasa"
+    },
+    "autoScan": {
+      "label": "Changanua kiotomatiki",
+      "description": "Endelea kukagua malipo mapya ya faragha nyuma ya pazia, hata unapoondoka kwenye ukurasa huu."
     }
   },
   "notifications": {
@@ -2839,5 +2902,183 @@
         "body": "Vichanganyaji vya uhifadhi vinaweza kuiba sarafu zako, kuandika ni nani aliyetuma nini, au kuwa mitego ya watekelezaji wa sheria. Tumia mruko wa malipo ya kimya au coinjoin isiyo ya uhifadhi badala yake."
       }
     }
+  },
+  "walletSettings": {
+    "backup": {
+      "label": "Hifadhi nakala ya pochi"
+    },
+    "legacy": {
+      "label": "Urejeshaji wa pochi ya zamani"
+    }
+  },
+  "walletLegacy": {
+    "seoTitle": "Urejeshaji wa Pochi ya Zamani",
+    "seoDescription": "Rejesha fedha kutoka kwa vizazi vya awali vya pochi ya Agora.",
+    "title": "Urejeshaji wa pochi ya zamani",
+    "subtitle": "Chagua pochi ya awali uliyoitumia na ukaushe salio lake kwenye pochi yako ya sasa.",
+    "loggedOut": "Ingia na utambulisho wako wa Nostr ili kutafuta fedha katika pochi zako za zamani.",
+    "scanning": "Inachanganua pochi ya beta ya V2 kutafuta fedha…",
+    "v2Detected": {
+      "title": "Fedha zimepatikana katika Pochi ya Beta ya Kabla ya Uzinduzi ya V2",
+      "body": "Tulipata <0>{{amount}}</0> kwenye anwani kutoka kwa pochi yako ya zamani ya beta ya V2. Fungua ukaushaji wa V2 hapa chini ili kuzihamisha kwenye pochi yako ya sasa."
+    },
+    "options": {
+      "v2Beta": {
+        "label": "Pochi ya Beta ya Kabla ya Uzinduzi ya V2",
+        "description": "Kausha fedha kutoka kwa pochi ya BIP-86 ya nsec-kama-mbegu iliyokuwepo kabla ya upataji wa BIP-39."
+      },
+      "v1Breeze": {
+        "label": "Pochi ya Breeze ya V1",
+        "description": "Kausha salio la katika-mnyororo kutoka kwa ulinzi wa zamani wa Lightning."
+      },
+      "doubleTweak": {
+        "label": "Marekebisho ya SP ya Double-tweak",
+        "description": "Rejesha malipo ya kimya yaliyokwama kutokana na hitilafu ya awali ya kutuma na uyakaushe tena kwenye pochi yako."
+      }
+    },
+    "footnote": "Kila chaguo ni ukaushaji wa upande mmoja kwenye pochi yako ya sasa. Pochi ya zamani yenyewe hairejeshwi — ni fedha tu zilizokuwa ndani yake ndizo zinazorejeshwa."
+  },
+  "walletBackup": {
+    "heading": "Kifungu cha maneno cha mbegu ya pochi",
+    "dialogDescription": "Unaweza kufikia pochi yako ya Agora katika pochi yoyote ya Bitcoin kwa kuleta nakala hii ya maneno 24.",
+    "hidden": "Gusa ili kuonyesha kifungu chako cha maneno 24 cha mbegu.",
+    "revealAria": "Onyesha kifungu cha mbegu",
+    "hideAria": "Ficha kifungu cha mbegu",
+    "warning": "Yeyote mwenye maneno haya anaweza kutumia Bitcoin yako. Kamwe usiyashiriki, kamwe usiyaandike kwenye tovuti, kamwe usiyahifadhi kama maandishi wazi nje ya msimamizi wa nywila."
+  },
+  "walletMigrate": {
+    "seoTitle": "Hamisha Pochi ya Zamani",
+    "seoDescription": "Kausha fedha kutoka kwa pochi yako ya zamani ya Agora (nsec-kama-mbegu) kwenye pochi mpya ya BIP-39.",
+    "title": "Hamisha Pochi ya Zamani",
+    "heading": "Hamia kwenye pochi yako mpya",
+    "subheading": "Pochi ya Bitcoin ya Agora sasa inatumia kifungu cha maneno cha mbegu cha BIP-39 ili iletwe katika programu yoyote ya pochi. Fedha kwenye anwani zako za zamani bado ziko salama — ukurasa huu unazikausha kwenye pochi yako mpya katika muamala mmoja.",
+    "backToWallet": "Rudi kwenye pochi",
+    "loading": "Inakagua pochi yako ya zamani…",
+    "warning": "Hii inajenga muamala mmoja wa ukaushaji unaotumia kila UTXO kutoka kwa pochi yako ya zamani na kutuma jumla (ukiondoa ada ndogo ya mtandao) kwa anwani ya kwanza ya kupokea ya pochi yako mpya. Mara tu unapotangazwa, hatua hii ni ya mwisho na haiwezi kutenduliwa.",
+    "startButton": "Kausha kwenye pochi mpya",
+    "loggedOut": {
+      "title": "Ingia ili kuhamisha",
+      "description": "Ingia na utambulisho wa Nostr unaomiliki pochi ya zamani ili fedha ziweze kukaushwa kwenye anwani yako mpya."
+    },
+    "unsupported": {
+      "title": "Pochi haipatikani",
+      "description": "Uhamishaji hufanya kazi tu kwa kuingia kwa nsec, kwa sababu funguo za pochi ya zamani zilipatikana moja kwa moja kutoka kwa nsec yako. Kuingia kwa kiendelezi cha kivinjari na kisainishi cha mbali hakuwezi kuendesha uhamishaji huu."
+    },
+    "noBlockbook": {
+      "title": "Blockbook haijasanidiwa",
+      "description": "Uhamishaji unahitaji URL ya kifaa cha kuorodhesha cha Blockbook ili kuchanganua anwani zako za zamani na kutangaza muamala wa ukaushaji."
+    },
+    "noFunds": {
+      "title": "Hakuna cha kuhamisha",
+      "description": "Pochi yako ya zamani haina salio linaloweza kutumika. Kila kitu tayari kiko katika pochi yako mpya."
+    },
+    "detected": {
+      "title": "Fedha katika pochi yako ya zamani",
+      "description": "Fedha hizi zitahamishwa kwenye pochi yako mpya katika muamala mmoja.",
+      "bip86": "Katika-mnyororo",
+      "sp": "Malipo ya kimya",
+      "total": "Jumla"
+    },
+    "destination": {
+      "title": "Lengwa",
+      "description": "Anwani ya kwanza ya kupokea ya pochi yako mpya."
+    },
+    "progress": {
+      "building": "Inajenga muamala…",
+      "signing": "Inatia saini pembejeo…",
+      "broadcasting": "Inatangaza muamala…",
+      "dontClose": "Usifunge kichupo hiki wakati ukaushaji unaendelea."
+    },
+    "success": {
+      "title": "Uhamishaji umekamilika",
+      "sent": "Imetuma sats {{sats}} kwenye pochi yako mpya (ada ya sats {{fee}}).",
+      "viewTx": "Tazama muamala"
+    },
+    "error": {
+      "title": "Uhamishaji umeshindikana",
+      "tryAgain": "Jaribu tena"
+    },
+    "errors": {
+      "noV1Account": "Haikuweza kufikia funguo za pochi ya zamani.",
+      "noDestination": "Pochi yako mpya bado haina anwani ya kupokea. Subiri ukurasa wa pochi upakie na ujaribu tena.",
+      "noBlockbook": "Kifaa cha kuorodhesha cha Blockbook hakijasanidiwa. Uhamishaji hauwezi kuchanganua anwani zako za zamani.",
+      "noFunds": "Hakuna fedha zinazoweza kutumika zilizopatikana kwenye anwani za zamani.",
+      "sweepGeneric": "Uhamishaji umeshindikana. Tafadhali jaribu tena."
+    },
+    "toast": {
+      "successTitle": "Uhamishaji umekamilika",
+      "successDesc": "Sats {{sats}} zimehamishwa kwenye pochi yako mpya."
+    }
+  },
+  "walletDoubleTweak": {
+    "seoTitle": "Marekebisho ya SP ya Double-tweak",
+    "seoDescription": "Rejesha malipo ya kimya yaliyokwama katika-mnyororo kutokana na hitilafu ya awali ya kutuma na uyakaushe kwenye pochi yako.",
+    "title": "Marekebisho ya SP ya Double-tweak",
+    "heading": "Rejesha malipo ya kimya yaliyokwama",
+    "subheading": "Toleo la awali la Agora liliandika baadhi ya matokeo ya malipo ya kimya kwa funguo isiyo sahihi, kwa hivyo hayakuonekana kamwe katika pochi yako. Zana hii inachanganua tena mnyororo kutafuta matokeo hayo na kukausha yoyote inayoyapata kwenye pochi yako.",
+    "back": "Rudi",
+    "loggedOut": "Ingia na utambulisho wa Nostr uliopokea malipo ya kimya ili yaweze kurejeshwa.",
+    "unsupported": {
+      "title": "Pochi haipatikani",
+      "description": "Urejeshaji unahitaji pochi inayoweza kutia saini ndani ya kifaa. Ingia na nsec yako ili kuendelea."
+    },
+    "noIndexer": {
+      "title": "Hakuna kifaa cha kuorodhesha cha malipo ya kimya kilichosanidiwa",
+      "description": "URL ya kifaa cha kuorodhesha cha BIP-352 inahitajika ili kuchanganua malipo yaliyokwama. Weka moja katika mipangilio ya pochi na ujaribu tena."
+    },
+    "scan": {
+      "title": "Changanua malipo yaliyokwama",
+      "description": "Chagua urefu wa block wa kuanzia kuchanganua. Urejeshaji hukagua kila block kutoka hapo hadi kilele cha mnyororo.",
+      "fromHeightLabel": "Urefu wa block wa kuanzia",
+      "tipHint": "Kilele cha sasa cha mnyororo: {{tip}}",
+      "start": "Changanua",
+      "cancel": "Ghairi uchanganuzi",
+      "progress": "Inachanganua block {{current}} kati ya {{to}} — {{found}} zimepatikana",
+      "tipMissing": "Inapata kilele cha mnyororo…"
+    },
+    "noFunds": {
+      "title": "Hakuna cha kurejesha",
+      "description": "Hakuna malipo ya kimya yaliyokwama yaliyopatikana katika eneo lililochanganuliwa. Jaribu urefu wa kuanzia wa awali zaidi ikiwa ulitarajia fedha."
+    },
+    "found": {
+      "title": "Malipo yaliyokwama yamepatikana",
+      "description": "Matokeo haya yanaweza kukaushwa tena kwenye pochi yako.",
+      "count": "Matokeo",
+      "recoverable": "Yanayoweza kurejeshwa"
+    },
+    "destination": {
+      "title": "Fedha zitatumwa kwa",
+      "description": "Anwani mpya ya kupokea katika pochi yako ya sasa."
+    },
+    "sweepButton": "Rejesha fedha",
+    "sweeping": "Inarejesha fedha zako…",
+    "dontClose": "Usifunge ukurasa huu hadi urejeshaji ukamilike.",
+    "success": {
+      "title": "Urejeshaji umekamilika",
+      "sent": "Sats {{sats}} zimerejeshwa kwenye pochi yako.",
+      "viewTx": "Tazama muamala"
+    },
+    "error": {
+      "title": "Urejeshaji umeshindikana",
+      "tryAgain": "Jaribu tena"
+    },
+    "errors": {
+      "noDestination": "Hakuna anwani ya lengwa inayopatikana. Fungua pochi yako kwanza.",
+      "noBlockbook": "Hakuna seva ya Blockbook iliyosanidiwa. Weka moja katika mipangilio ya pochi.",
+      "sweepGeneric": "Haikuweza kukamilisha ukaushaji wa urejeshaji."
+    },
+    "toast": {
+      "successTitle": "Fedha zimerejeshwa",
+      "successDesc": "Sats {{sats}} zimekaushwa kwenye pochi yako."
+    },
+    "footnote": "Huu ni ukaushaji wa upande mmoja kwenye pochi yako ya sasa. Ni malipo ya kimya yaliyoathirika tu yanayoguswa; hakuna kingine kinachobadilika."
+  },
+  "spAutoScan": {
+    "scanning": "Inachanganua… block {{current}} / {{to}}",
+    "caughtUp": "Hadi sasa",
+    "neverScanned": "Bado haijachanganuliwa",
+    "lastScanned": "Imechanganuliwa hadi block {{height}}",
+    "paused": "Uchanganuzi wa kiotomatiki umezimwa",
+    "manualLink": "Chaguzi za uchanganuzi"
   }
 }

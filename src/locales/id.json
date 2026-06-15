@@ -50,7 +50,8 @@
     "countryFilterAriaLabel": "Saring berdasarkan negara",
     "countrySearchPlaceholder": "Cari negara…",
     "countryNoResults": "Tidak ada negara yang ditemukan.",
-    "countryGlobal": "Global"
+    "countryGlobal": "Global",
+    "continue": "Lanjutkan"
   },
   "imageCrop": {
     "title": "Pangkas Gambar",
@@ -115,6 +116,11 @@
         "title": "Beri donasi untuk kampanye",
         "description": "Dukung berbagai tujuan dengan Bitcoin.",
         "finderNote": "Donasi Anda langsung masuk ke dompet penyelenggara."
+      },
+      "verifier": {
+        "title": "Verifikasi kampanye",
+        "description": "Jamin kampanye sebagai sebuah organisasi.",
+        "finderNote": "Donatur melihat lencana pada kampanye yang Anda percaya."
       }
     },
     "keygen": {
@@ -156,6 +162,37 @@
       "uploadFailed": "Unggah gagal.",
       "publishFailedTitle": "Penyiapan profil gagal",
       "publishFailedDescription": "Akun Anda telah dibuat tetapi profil tidak dapat disimpan. Anda bisa memperbaruinya nanti."
+    },
+    "verifier": {
+      "identity": {
+        "title": "Siapkan organisasi Anda",
+        "subtitle": "Nama dan logo wajib diisi. Situs web dan banner opsional.",
+        "websiteInvalid": "Masukkan situs web valid yang diawali dengan https://",
+        "cropAvatar": "Pangkas logo",
+        "cropBanner": "Pangkas banner",
+        "uploading": "Mengunggah gambar…",
+        "clipboardFailed": "Tidak dapat membaca dari papan klip.",
+        "pasteUrlInvalid": "Papan klip tidak berisi URL https yang valid.",
+        "pasteUrlFetchFailed": "Tidak dapat memuat gambar itu. Periksa URL-nya dan coba lagi."
+      },
+      "bio": {
+        "title": "Ceritakan tentang organisasi Anda",
+        "subtitle": "Deskripsi singkat untuk profil Anda.",
+        "label": "Tentang organisasi Anda",
+        "placeholder": "Kami adalah organisasi nirlaba yang…",
+        "publishing": "Menyimpan profil Anda…"
+      },
+      "publishFailedTitle": "Profil tidak tersimpan",
+      "publishFailedDescription": "Akun Anda sudah siap, tetapi profil organisasi tidak dapat dipublikasikan. Anda bisa menyelesaikannya nanti dari pengaturan.",
+      "statement": {
+        "title": "Publikasikan pernyataan verifikator Anda",
+        "subtitle": "Jelaskan cara Anda memeriksa kampanye sebelum menjaminnya. Dipublikasikan secara publik agar donatur dapat memercayai lencana Anda."
+      },
+      "howto": {
+        "title": "Cara memverifikasi kampanye",
+        "subtitle": "Semuanya sudah siap. Berikut cara menjamin kampanye setelah Anda memeriksanya.",
+        "finish": "Lihat kampanye"
+      }
     }
   },
   "feed": {
@@ -277,7 +314,8 @@
       "setAsDefault": "Tetapkan sebagai default",
       "defaultUpdated": "Default diperbarui",
       "defaultUpdatedCountry": "Unggahan baru akan dikirim ke {{name}} secara default.",
-      "defaultUpdatedGlobal": "Unggahan baru akan menjadi global secara default."
+      "defaultUpdatedGlobal": "Unggahan baru akan menjadi global secara default.",
+      "label": "Posting ke"
     }
   },
   "replyModal": {
@@ -665,7 +703,9 @@
     "imageDropzone": "Klik atau seret gambar ke sini",
     "countryClearAria": "Hapus negara",
     "flagOfAria": "Bendera {{name}}",
-    "countryHint": "Memublikasikan <0>i: iso3166:{{code}}</0> untuk pengurutan negara."
+    "countryHint": "Memublikasikan <0>i: iso3166:{{code}}</0> untuk pengurutan negara.",
+    "publishing": "Memublikasikan…",
+    "uploadingCover": "Mengunggah sampul…"
   },
   "organizationContext": {
     "attachedToGroup": "Terlampir ke grup",
@@ -1077,7 +1117,11 @@
       "next": "Berikutnya",
       "back": "Kembali",
       "skip": "Lewati",
-      "launchNow": "Lewati Berikutnya & Luncurkan"
+      "launchNow": "Lewati Berikutnya & Luncurkan",
+      "goalStepTitle": "Target",
+      "goalStepSubtitle": "Opsional — kosongkan untuk kampanye tanpa batas.",
+      "tagsStepTitle": "Negara dan kategori",
+      "tagsStepSubtitle": "Bantu orang yang tepat menemukan kampanye Anda."
     }
   },
   "campaignsDetail": {
@@ -1147,7 +1191,11 @@
     "attestation": "Dengan memverifikasi kampanye ini, Anda menyatakan bahwa kampanye ini asli dan benar. Anda mengenal penyelenggara kampanye secara pribadi atau telah memverifikasi secara meyakinkan bahwa klaim mereka benar. Waspadalah terhadap peniru dan penipu.",
     "verified": "Kampanye terverifikasi",
     "unverified": "Verifikasi dihapus",
-    "actionFailed": "Tindakan gagal"
+    "actionFailed": "Tindakan gagal",
+    "verifiedByCount_zero": "Diverifikasi oleh {{count}} moderator",
+    "verifiedByCount_two": "Diverifikasi oleh {{count}} moderator",
+    "verifiedByCount_few": "Diverifikasi oleh {{count}} moderator",
+    "verifiedByCount_many": "Diverifikasi oleh {{count}} moderator"
   },
   "calendarEvents": {
     "create": {
@@ -1278,7 +1326,8 @@
           "privateSummary": "Silent payments BIP-352. Donasi masuk ke output yang tidak dapat ditautkan."
         },
         "readMore": "Baca uraian lengkap"
-      }
+      },
+      "verifyCampaigns": "Verifikasi kampanye"
     },
     "all": {
       "title": "Kampanye",
@@ -1304,7 +1353,8 @@
       "allHidden": "Tidak ada kampanye untuk ditampilkan",
       "allHiddenHint": "Setiap kampanye di jaringan telah disembunyikan oleh moderator. Aktifkan “Tampilkan yang tersembunyi” untuk melihatnya.",
       "empty": "Belum ada kampanye",
-      "emptyHint": "Belum ada kampanye yang dipublikasikan. Jadilah yang pertama."
+      "emptyHint": "Belum ada kampanye yang dipublikasikan. Jadilah yang pertama.",
+      "verifyCampaigns": "Verifikasi kampanye"
     },
     "lists": {
       "stripAria": "Daftar topik kampanye terkurasi",
@@ -1486,7 +1536,9 @@
     "disclaimer": "Siapa pun dapat menjadi verifikator. Pernyataan Anda dipublikasikan secara publik ke Nostr dan ditampilkan secara menonjol di profil Anda. Pernyataan ini tidak memberikan izin khusus apa pun — pernyataan ini hanya memberi tahu donatur cara Anda memeriksa kampanye.",
     "loginGateTitle": "Masuk untuk menjadi verifikator",
     "loginGateBody": "Anda harus masuk untuk memublikasikan pernyataan verifikator.",
-    "howWeVerifyTitle": "Cara kami memverifikasi"
+    "howWeVerifyTitle": "Cara kami memverifikasi",
+    "withdrawConfirmTitle": "Tarik pernyataan verifikator Anda?",
+    "withdrawConfirmBody": "Pernyataan \"Cara Kami Memverifikasi\" Anda akan dihapus dari profil Anda. Anda bisa memublikasikan yang baru kapan saja."
   },
   "mdEditor": {
     "toolbar": {
@@ -1583,6 +1635,11 @@
       "demo": {
         "menuVerify": "Verifikasi kampanye ini"
       }
+    },
+    "getStartedCard": {
+      "title": "Siapkan organisasi Anda",
+      "body": "Kami akan memandu Anda membuat profil organisasi, memublikasikan pernyataan verifikasi, dan memverifikasi kampanye pertama Anda.",
+      "cta": "Mulai verifikasi"
     }
   },
   "organizers": {
@@ -1680,6 +1737,10 @@
       "v1Breeze": {
         "label": "V1 Breeze Wallet",
         "description": "Sapu saldo on-chain dari kustodian Lightning lawas."
+      },
+      "doubleTweak": {
+        "label": "Perbaikan SP Double-tweak",
+        "description": "Pulihkan silent payment yang terdampar akibat bug pengiriman sebelumnya dan sapu kembali ke dompet Anda."
       }
     },
     "footnote": "Setiap opsi adalah penyapuan satu arah ke dompet Anda saat ini. Dompet lawas itu sendiri tidak dipulihkan — hanya dana yang dimilikinya yang dipulihkan."
@@ -1961,6 +2022,10 @@
       "checked_other": "Memeriksa {{count}} UTXO · dipangkas {{pruned}}.",
       "reconciling": "Merekonsiliasi…",
       "reconcileNow": "Rekonsiliasi sekarang"
+    },
+    "autoScan": {
+      "label": "Pindai otomatis",
+      "description": "Terus memeriksa pembayaran privat baru di latar belakang, bahkan saat Anda meninggalkan halaman ini."
     }
   },
   "notifications": {
@@ -2880,5 +2945,140 @@
         "body": "Mixer kustodial bisa mencuri koin Anda, mencatat siapa mengirim apa, atau ternyata adalah honeypot penegak hukum. Gunakan lompatan silent-payments atau coinjoin non-kustodial sebagai gantinya."
       }
     }
+  },
+  "walletMigrate": {
+    "seoTitle": "Migrasikan Dompet Lama",
+    "seoDescription": "Sapu dana dari dompet Agora lawas Anda (nsec-sebagai-seed) ke dompet BIP-39 yang baru.",
+    "title": "Migrasikan Dompet Lama",
+    "heading": "Migrasikan ke dompet baru Anda",
+    "subheading": "Dompet Bitcoin Agora kini menggunakan frasa seed BIP-39 sehingga bisa diimpor ke aplikasi dompet mana pun. Dana di alamat lama Anda tetap aman — halaman ini menyapunya ke dompet baru Anda dalam satu transaksi.",
+    "backToWallet": "Kembali ke dompet",
+    "loading": "Memeriksa dompet lama Anda…",
+    "warning": "Ini membangun satu transaksi penyapuan yang menghabiskan setiap UTXO dari dompet lama Anda dan mengirim totalnya (dikurangi biaya jaringan kecil) ke alamat penerimaan pertama dompet baru Anda. Setelah disiarkan, pemindahan ini bersifat final dan tidak dapat dibatalkan.",
+    "startButton": "Sapu ke dompet baru",
+    "loggedOut": {
+      "title": "Masuk untuk migrasi",
+      "description": "Masuk dengan identitas Nostr yang memiliki dompet lama agar dana bisa disapu ke alamat baru Anda."
+    },
+    "unsupported": {
+      "title": "Dompet tidak tersedia",
+      "description": "Migrasi hanya berfungsi untuk login nsec, karena kunci dompet lama diturunkan langsung dari nsec Anda. Login ekstensi browser dan penandatangan jarak jauh tidak bisa menjalankan migrasi ini."
+    },
+    "noBlockbook": {
+      "title": "Blockbook belum dikonfigurasi",
+      "description": "Migrasi memerlukan URL indexer Blockbook untuk memindai alamat lama Anda dan menyiarkan transaksi penyapuan."
+    },
+    "noFunds": {
+      "title": "Tidak ada yang perlu dimigrasikan",
+      "description": "Dompet lama Anda tidak memiliki saldo yang bisa dibelanjakan. Semuanya sudah ada di dompet baru Anda."
+    },
+    "detected": {
+      "title": "Dana di dompet lama Anda",
+      "description": "Dana ini akan dipindahkan ke dompet baru Anda dalam satu transaksi.",
+      "bip86": "On-chain",
+      "sp": "Silent payment",
+      "total": "Total"
+    },
+    "destination": {
+      "title": "Tujuan",
+      "description": "Alamat penerimaan pertama dompet baru Anda."
+    },
+    "progress": {
+      "building": "Membangun transaksi…",
+      "signing": "Menandatangani input…",
+      "broadcasting": "Menyiarkan transaksi…",
+      "dontClose": "Jangan tutup tab ini selama penyapuan berlangsung."
+    },
+    "success": {
+      "title": "Migrasi selesai",
+      "sent": "Mengirim {{sats}} sats ke dompet baru Anda (biaya {{fee}} sats).",
+      "viewTx": "Lihat transaksi"
+    },
+    "error": {
+      "title": "Migrasi gagal",
+      "tryAgain": "Coba lagi"
+    },
+    "errors": {
+      "noV1Account": "Tidak dapat mengakses kunci dompet lama.",
+      "noDestination": "Dompet baru Anda belum memiliki alamat penerimaan. Tunggu halaman dompet selesai dimuat dan coba lagi.",
+      "noBlockbook": "Indexer Blockbook belum dikonfigurasi. Migrasi tidak bisa memindai alamat lama Anda.",
+      "noFunds": "Tidak ada dana yang bisa dibelanjakan di alamat lama.",
+      "sweepGeneric": "Migrasi gagal. Silakan coba lagi."
+    },
+    "toast": {
+      "successTitle": "Migrasi selesai",
+      "successDesc": "{{sats}} sats dipindahkan ke dompet baru Anda."
+    }
+  },
+  "walletDoubleTweak": {
+    "seoTitle": "Perbaikan SP Double-tweak",
+    "seoDescription": "Pulihkan silent payment yang terdampar on-chain akibat bug pengiriman sebelumnya dan sapu ke dompet Anda.",
+    "title": "Perbaikan SP Double-tweak",
+    "heading": "Pulihkan silent payment yang terdampar",
+    "subheading": "Versi Agora sebelumnya mengkodekan beberapa output silent-payment ke kunci yang salah, sehingga tidak pernah muncul di dompet Anda. Alat ini memindai ulang rantai untuk output tersebut dan menyapu apa pun yang ditemukan ke dompet Anda.",
+    "back": "Kembali",
+    "loggedOut": "Masuk dengan identitas Nostr yang menerima silent payment tersebut agar bisa dipulihkan.",
+    "unsupported": {
+      "title": "Dompet tidak tersedia",
+      "description": "Pemulihan memerlukan dompet yang bisa menandatangani secara lokal. Masuk dengan nsec Anda untuk melanjutkan."
+    },
+    "noIndexer": {
+      "title": "Tidak ada indexer silent-payment yang dikonfigurasi",
+      "description": "URL indexer BIP-352 diperlukan untuk memindai pembayaran yang terdampar. Atur satu di pengaturan dompet dan coba lagi."
+    },
+    "scan": {
+      "title": "Pindai pembayaran yang terdampar",
+      "description": "Pilih tinggi blok untuk mulai memindai. Pemulihan memeriksa setiap blok dari sana hingga ujung rantai.",
+      "fromHeightLabel": "Tinggi blok awal",
+      "tipHint": "Ujung rantai saat ini: {{tip}}",
+      "start": "Pindai",
+      "cancel": "Batalkan pindaian",
+      "progress": "Memindai blok {{current}} dari {{to}} — {{found}} ditemukan",
+      "tipMissing": "Mencari ujung rantai…"
+    },
+    "noFunds": {
+      "title": "Tidak ada yang perlu dipulihkan",
+      "description": "Tidak ada silent payment yang terdampar ditemukan dalam rentang yang dipindai. Coba tinggi awal yang lebih lama jika Anda mengharapkan dana."
+    },
+    "found": {
+      "title": "Pembayaran terdampar ditemukan",
+      "description": "Output ini dapat disapu kembali ke dompet Anda.",
+      "count": "Output",
+      "recoverable": "Dapat dipulihkan"
+    },
+    "destination": {
+      "title": "Dana akan dikirim ke",
+      "description": "Alamat penerimaan baru di dompet Anda saat ini."
+    },
+    "sweepButton": "Pulihkan dana",
+    "sweeping": "Memulihkan dana Anda…",
+    "dontClose": "Jangan tutup halaman ini sampai pemulihan selesai.",
+    "success": {
+      "title": "Pemulihan selesai",
+      "sent": "{{sats}} sats dipulihkan ke dompet Anda.",
+      "viewTx": "Lihat transaksi"
+    },
+    "error": {
+      "title": "Pemulihan gagal",
+      "tryAgain": "Coba lagi"
+    },
+    "errors": {
+      "noDestination": "Tidak ada alamat tujuan yang tersedia. Buka dompet Anda terlebih dahulu.",
+      "noBlockbook": "Tidak ada server Blockbook yang dikonfigurasi. Atur satu di pengaturan dompet.",
+      "sweepGeneric": "Tidak dapat menyelesaikan penyapuan pemulihan."
+    },
+    "toast": {
+      "successTitle": "Dana dipulihkan",
+      "successDesc": "{{sats}} sats disapu ke dompet Anda."
+    },
+    "footnote": "Ini adalah penyapuan satu arah ke dompet Anda saat ini. Hanya silent payment yang terdampak yang disentuh; tidak ada yang lain berubah."
+  },
+  "spAutoScan": {
+    "scanning": "Memindai… blok {{current}} / {{to}}",
+    "caughtUp": "Sudah mutakhir",
+    "neverScanned": "Belum dipindai",
+    "lastScanned": "Dipindai hingga blok {{height}}",
+    "paused": "Pemindaian otomatis nonaktif",
+    "manualLink": "Opsi pindaian"
   }
 }

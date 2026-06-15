@@ -50,7 +50,8 @@
     "countryFilterAriaLabel": "依國家篩選",
     "countrySearchPlaceholder": "搜尋國家…",
     "countryNoResults": "找不到國家。",
-    "countryGlobal": "全球"
+    "countryGlobal": "全球",
+    "continue": "繼續"
   },
   "imageCrop": {
     "title": "裁剪圖片",
@@ -115,6 +116,11 @@
         "title": "捐助活動",
         "description": "用 Bitcoin 支援各種議題。",
         "finderNote": "你的捐款會直接進入發起人的錢包。"
+      },
+      "verifier": {
+        "title": "驗證活動",
+        "description": "以組織身分為活動背書。",
+        "finderNote": "捐贈者會在你信任的活動上看到徽章。"
       }
     },
     "keygen": {
@@ -156,6 +162,37 @@
       "uploadFailed": "上傳失敗。",
       "publishFailedTitle": "個人資料設定失敗",
       "publishFailedDescription": "你的帳號已建立，但個人資料無法儲存。你可以稍後再更新。"
+    },
+    "verifier": {
+      "identity": {
+        "title": "設定你的組織",
+        "subtitle": "名稱與標誌為必填。網站與橫幅為選填。",
+        "websiteInvalid": "請輸入以 https:// 開頭的有效網站",
+        "cropAvatar": "裁剪標誌",
+        "cropBanner": "裁剪橫幅",
+        "uploading": "正在上傳圖片…",
+        "clipboardFailed": "無法讀取剪貼簿。",
+        "pasteUrlInvalid": "剪貼簿不包含有效的 https URL。",
+        "pasteUrlFetchFailed": "無法載入該圖片。請檢查 URL 後再試一次。"
+      },
+      "bio": {
+        "title": "向我們介紹你的組織",
+        "subtitle": "為你的個人資料寫一段簡短描述。",
+        "label": "關於你的組織",
+        "placeholder": "我們是一個非營利組織，致力於…",
+        "publishing": "正在儲存你的個人資料…"
+      },
+      "publishFailedTitle": "個人資料未儲存",
+      "publishFailedDescription": "你的帳號已就緒，但組織個人資料無法發布。你可以稍後從設定中完成它。",
+      "statement": {
+        "title": "發布你的驗證者聲明",
+        "subtitle": "說明你在背書前如何審核活動。將公開發布，讓捐贈者能信任你的徽章。"
+      },
+      "howto": {
+        "title": "如何驗證一個活動",
+        "subtitle": "一切就緒。以下說明在你查核完一個活動後如何為它背書。",
+        "finish": "瀏覽活動"
+      }
     }
   },
   "feed": {
@@ -224,7 +261,9 @@
     "imageDropzone": "點選或拖拽圖片到這裡",
     "countryClearAria": "清除國家",
     "flagOfAria": "{{name}} 國旗",
-    "countryHint": "釋出 <0>i: iso3166:{{code}}</0> 用於按國家排序。"
+    "countryHint": "釋出 <0>i: iso3166:{{code}}</0> 用於按國家排序。",
+    "publishing": "發布中…",
+    "uploadingCover": "上傳封面中…"
   },
   "organizationContext": {
     "attachedToGroup": "已關聯到群組",
@@ -638,7 +677,9 @@
       "next": "下一步",
       "back": "返回",
       "skip": "跳過",
-      "launchNow": "跳過後續並啟動"
+      "launchNow": "跳過後續並啟動",
+      "tagsStepTitle": "國家與分類",
+      "tagsStepSubtitle": "幫助合適的人找到你的活動。"
     }
   },
   "campaignsDetail": {
@@ -708,7 +749,11 @@
     "attestation": "驗證此活動即表示您證實該活動真實可信。您本人認識活動組織者，或已切實核實其聲明屬實。謹防冒充者和騙子。",
     "verified": "活動已驗證",
     "unverified": "驗證已移除",
-    "actionFailed": "操作失敗"
+    "actionFailed": "操作失敗",
+    "verifiedByCount_zero": "已由 {{count}} 位審核員驗證",
+    "verifiedByCount_two": "已由 {{count}} 位審核員驗證",
+    "verifiedByCount_few": "已由 {{count}} 位審核員驗證",
+    "verifiedByCount_many": "已由 {{count}} 位審核員驗證"
   },
   "calendarEvents": {
     "create": {
@@ -839,7 +884,8 @@
           "privateSummary": "BIP-352 silent payments。捐款會落到無法關聯的 outputs。"
         },
         "readMore": "閱讀完整說明"
-      }
+      },
+      "verifyCampaigns": "驗證活動"
     },
     "all": {
       "title": "活動",
@@ -865,7 +911,8 @@
       "allHidden": "沒有活動可顯示",
       "allHiddenHint": "網路上的所有活動都已被版主隱藏。開啟「顯示已隱藏」即可檢視。",
       "empty": "暫無活動",
-      "emptyHint": "尚未釋出任何活動。來當第一個吧。"
+      "emptyHint": "尚未釋出任何活動。來當第一個吧。",
+      "verifyCampaigns": "驗證活動"
     },
     "lists": {
       "stripAria": "精選活動主題清單",
@@ -945,7 +992,8 @@
         "movedToTop": "已移至頂端",
         "movedUp": "已上移",
         "movedDown": "已下移"
-      }
+      },
+      "label": "版主操作"
     }
   },
   "settings": {
@@ -1046,7 +1094,9 @@
     "disclaimer": "任何人都可以成為驗證者。你的聲明會公開發布到 Nostr 並在你的個人資料上醒目顯示。它不會授予任何特殊權限——只是告訴捐贈者你如何審核活動。",
     "loginGateTitle": "登入以成為驗證者",
     "loginGateBody": "你需要登入才能發布驗證者聲明。",
-    "howWeVerifyTitle": "我們如何驗證"
+    "howWeVerifyTitle": "我們如何驗證",
+    "withdrawConfirmTitle": "撤回你的驗證者聲明？",
+    "withdrawConfirmBody": "你的「我們如何驗證」聲明將從你的個人資料中移除。你可以隨時發布新的聲明。"
   },
   "mdEditor": {
     "toolbar": {
@@ -1143,6 +1193,11 @@
       "demo": {
         "menuVerify": "驗證此活動"
       }
+    },
+    "getStartedCard": {
+      "title": "設定你的組織",
+      "body": "我們會引導你建立組織的個人資料、發布你的驗證聲明，並驗證你的第一個活動。",
+      "cta": "開始驗證"
     }
   },
   "organizers": {
@@ -1240,6 +1295,10 @@
       "v1Breeze": {
         "label": "V1 Breeze 錢包",
         "description": "從舊版 Lightning 託管中轉移鏈上餘額。"
+      },
+      "doubleTweak": {
+        "label": "雙重 tweak SP 修復",
+        "description": "找回因早期傳送錯誤而擱淺的靜默支付，並將其轉回你的錢包。"
       }
     },
     "footnote": "每個選項都是將資金一次性單向轉入你目前的錢包。舊錢包本身不會被恢復——只有其中持有的資金會被取回。"
@@ -1521,6 +1580,10 @@
       "checked_other": "已檢查 {{count}} 個 UTXO · 已清理 {{pruned}}。",
       "reconciling": "正在對賬…",
       "reconcileNow": "立即對賬"
+    },
+    "autoScan": {
+      "label": "自動掃描",
+      "description": "在後臺持續檢查新的私密支付，即使你離開此頁面也是如此。"
     }
   },
   "notifications": {
@@ -2882,5 +2945,140 @@
         "body": "託管型混幣器可能盜取你的硬幣、記錄誰向誰傳送了什麼，或最終被證明是執法部門的誘餌。改用靜默支付中轉或非託管的 coinjoin 吧。"
       }
     }
+  },
+  "walletMigrate": {
+    "seoTitle": "遷移舊錢包",
+    "seoDescription": "將你舊版 Agora 錢包（以 nsec 作為種子）中的資金轉入新的 BIP-39 錢包。",
+    "title": "遷移舊錢包",
+    "heading": "遷移到你的新錢包",
+    "subheading": "Agora 的比特幣錢包現在採用 BIP-39 助記詞，因此可匯入任何錢包應用。你舊地址中的資金仍然安全——此頁面會在一筆交易中將它們轉入你的新錢包。",
+    "backToWallet": "返回錢包",
+    "loading": "正在檢查你的舊錢包…",
+    "warning": "這會建立一筆單一的轉移交易，消耗你舊錢包中的每個 UTXO，並將總額（扣除少量網路費用後）傳送到你新錢包的第一個收款地址。一經廣播，此操作即為最終結果，無法撤銷。",
+    "startButton": "轉入新錢包",
+    "loggedOut": {
+      "title": "登入以遷移",
+      "description": "請使用擁有舊錢包的 Nostr 身份登入，以便將資金轉入你的新地址。"
+    },
+    "unsupported": {
+      "title": "錢包不可用",
+      "description": "遷移僅適用於 nsec 登入，因為舊錢包的金鑰是直接從你的 nsec 派生的。瀏覽器擴充套件和遠端簽名器登入無法執行此遷移。"
+    },
+    "noBlockbook": {
+      "title": "未配置 Blockbook",
+      "description": "遷移需要一個 Blockbook 索引器 URL 來掃描你的舊地址並廣播轉移交易。"
+    },
+    "noFunds": {
+      "title": "沒有可遷移的資金",
+      "description": "你的舊錢包沒有可花費的餘額。一切都已在你的新錢包中。"
+    },
+    "detected": {
+      "title": "你舊錢包中的資金",
+      "description": "這些資金將在一筆交易中轉入你的新錢包。",
+      "bip86": "鏈上",
+      "sp": "靜默支付",
+      "total": "總計"
+    },
+    "destination": {
+      "title": "目的地",
+      "description": "你新錢包的第一個收款地址。"
+    },
+    "progress": {
+      "building": "正在構建交易…",
+      "signing": "正在簽名輸入…",
+      "broadcasting": "正在廣播交易…",
+      "dontClose": "轉移進行期間請勿關閉此標籤頁。"
+    },
+    "success": {
+      "title": "遷移完成",
+      "sent": "已向你的新錢包傳送 {{sats}} sats（{{fee}} sats 費用）。",
+      "viewTx": "檢視交易"
+    },
+    "error": {
+      "title": "遷移失敗",
+      "tryAgain": "重試"
+    },
+    "errors": {
+      "noV1Account": "無法存取舊錢包的金鑰。",
+      "noDestination": "你的新錢包尚無收款地址。請等待錢包頁面載入後再試一次。",
+      "noBlockbook": "未配置 Blockbook 索引器。遷移無法掃描你的舊地址。",
+      "noFunds": "在舊地址中未找到可花費的資金。",
+      "sweepGeneric": "遷移失敗。請重試。"
+    },
+    "toast": {
+      "successTitle": "遷移完成",
+      "successDesc": "{{sats}} sats 已轉入你的新錢包。"
+    }
+  },
+  "walletDoubleTweak": {
+    "seoTitle": "雙重 tweak SP 修復",
+    "seoDescription": "找回因早期傳送錯誤而擱淺在鏈上的靜默支付，並將其轉入你的錢包。",
+    "title": "雙重 tweak SP 修復",
+    "heading": "找回擱淺的靜默支付",
+    "subheading": "早期版本的 Agora 將某些靜默支付輸出編碼到了錯誤的金鑰上，因此它們從未出現在你的錢包中。此工具會重新掃描鏈上以尋找這些輸出，並將找到的任何輸出轉入你的錢包。",
+    "back": "返回",
+    "loggedOut": "請使用接收這些靜默支付的 Nostr 身份登入，以便將它們找回。",
+    "unsupported": {
+      "title": "錢包不可用",
+      "description": "找回需要一個能在本地簽名的錢包。請使用你的 nsec 登入以繼續。"
+    },
+    "noIndexer": {
+      "title": "未配置靜默支付索引器",
+      "description": "需要一個 BIP-352 索引器 URL 來掃描擱淺的支付。請在錢包設定中設定一個後再試一次。"
+    },
+    "scan": {
+      "title": "掃描擱淺的支付",
+      "description": "選擇開始掃描的區塊高度。找回會檢查從該處到鏈尖的每一個區塊。",
+      "fromHeightLabel": "起始區塊高度",
+      "tipHint": "目前鏈尖：{{tip}}",
+      "start": "掃描",
+      "cancel": "取消掃描",
+      "progress": "正在掃描區塊 {{current}} / {{to}} — 已發現 {{found}}",
+      "tipMissing": "正在查詢鏈尖…"
+    },
+    "noFunds": {
+      "title": "沒有可找回的內容",
+      "description": "在掃描範圍內未找到擱淺的靜默支付。若你預期有資金，請嘗試更早的起始高度。"
+    },
+    "found": {
+      "title": "找到擱淺的支付",
+      "description": "這些輸出可以轉回你的錢包。",
+      "count": "輸出",
+      "recoverable": "可找回"
+    },
+    "destination": {
+      "title": "資金將被傳送到",
+      "description": "你目前錢包中的一個全新收款地址。"
+    },
+    "sweepButton": "找回資金",
+    "sweeping": "正在找回你的資金…",
+    "dontClose": "在找回完成前請勿關閉此頁面。",
+    "success": {
+      "title": "找回完成",
+      "sent": "已將 {{sats}} sats 找回到你的錢包。",
+      "viewTx": "檢視交易"
+    },
+    "error": {
+      "title": "找回失敗",
+      "tryAgain": "重試"
+    },
+    "errors": {
+      "noDestination": "沒有可用的目的地地址。請先開啟你的錢包。",
+      "noBlockbook": "未配置 Blockbook 伺服器。請在錢包設定中設定一個。",
+      "sweepGeneric": "無法完成找回轉移。"
+    },
+    "toast": {
+      "successTitle": "資金已找回",
+      "successDesc": "{{sats}} sats 已轉入你的錢包。"
+    },
+    "footnote": "這是一次單向轉入你目前錢包的轉移。只會觸及受影響的靜默支付；其他內容不會有任何變動。"
+  },
+  "spAutoScan": {
+    "scanning": "正在掃描… 區塊 {{current}} / {{to}}",
+    "caughtUp": "已是最新",
+    "neverScanned": "尚未掃描",
+    "lastScanned": "已掃描至區塊 {{height}}",
+    "paused": "自動掃描已關閉",
+    "manualLink": "掃描選項"
   }
 }

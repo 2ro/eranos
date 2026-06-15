@@ -50,7 +50,8 @@
     "countryFilterAriaLabel": "Sefa nenyika",
     "countrySearchPlaceholder": "Tsvaga nyika…",
     "countryNoResults": "Hapana nyika dzakawanikwa.",
-    "countryGlobal": "Pasi rose"
+    "countryGlobal": "Pasi rose",
+    "continue": "Enderera mberi"
   },
   "imageCrop": {
     "title": "Cheka Mufananidzo",
@@ -115,6 +116,11 @@
         "title": "Ipa kumishandirapamwe",
         "description": "Tsigira zvikonzero neBitcoin.",
         "finderNote": "Mupiro wako unoenda zvakananga kuchikwama chemurongi."
+      },
+      "verifier": {
+        "title": "Simbisa mishandirapamwe",
+        "description": "Pupurira mishandirapamwe sesangano.",
+        "finderNote": "Vapi vanoona bheji pamishandirapamwe yaunovimba nayo."
       }
     },
     "keygen": {
@@ -156,6 +162,37 @@
       "uploadFailed": "Kuisa kwakundikana.",
       "publishFailedTitle": "Kugadzira profile kwakundikana",
       "publishFailedDescription": "Akaunti yako yagadzirwa asi profile haina kukwanisa kuchengetwa. Unogona kuivandudza gare gare."
+    },
+    "verifier": {
+      "identity": {
+        "title": "Gadzirira sangano rako",
+        "subtitle": "Zita nelogo zvinodiwa. Webhusaiti nebhana zvinosarudzika.",
+        "websiteInvalid": "Isa webhusaiti inoshanda inotanga ne https://",
+        "cropAvatar": "Cheka logo",
+        "cropBanner": "Cheka bhana",
+        "uploading": "Kuisa mufananidzo…",
+        "clipboardFailed": "Hatina kukwanisa kuverenga kubva muclipboard.",
+        "pasteUrlInvalid": "Clipboard haina URL ye https inoshanda.",
+        "pasteUrlFetchFailed": "Hatina kukwanisa kurodha mufananidzo iwoyo. Tarisa URL woedza zvakare."
+      },
+      "bio": {
+        "title": "Tiudze nezvesangano rako",
+        "subtitle": "Tsananguro pfupi ye profile yako.",
+        "label": "Nezvesangano rako",
+        "placeholder": "Tiri sangano risingaiti purofiti rinoti…",
+        "publishing": "Kuchengeta profile yako…"
+      },
+      "publishFailedTitle": "Profile haina kuchengetwa",
+      "publishFailedDescription": "Akaunti yako yagadzirira, asi profile yesangano haina kukwanisa kuburitswa. Unogona kuipedzisa gare gare uchibva mumarongero.",
+      "statement": {
+        "title": "Buritsa chirevo chako chemusimbisi",
+        "subtitle": "Tsanangura mautariro aunoita mishandirapamwe usati wapupura. Chinoburitswa pachena kuti vapi vavimbe nebheji rako."
+      },
+      "howto": {
+        "title": "Mashandisirwo ekusimbisa mushandirapamwe",
+        "subtitle": "Wagadzirira zvose. Heano mashandisirwo ekupupurira mushandirapamwe kana waumusimbisa.",
+        "finish": "Ona mishandirapamwe"
+      }
     }
   },
   "feed": {
@@ -224,7 +261,9 @@
     "imageDropzone": "Dzvanya kana kukwevera mufananidzo pano",
     "countryClearAria": "Bvisa nyika",
     "flagOfAria": "Mureza we{{name}}",
-    "countryHint": "Zvinoburitsa <0>i: iso3166:{{code}}</0> yekuronga nenyika."
+    "countryHint": "Zvinoburitsa <0>i: iso3166:{{code}}</0> yekuronga nenyika.",
+    "publishing": "Kuburitsa…",
+    "uploadingCover": "Kuisa mufananidzo wepamusoro…"
   },
   "organizationContext": {
     "attachedToGroup": "Chakabatanidzwa kugroup",
@@ -638,7 +677,9 @@
       "next": "Inotevera",
       "back": "Dzokera",
       "skip": "Darika",
-      "launchNow": "Darika Inotevera & Vhura"
+      "launchNow": "Darika Inotevera & Vhura",
+      "tagsStepTitle": "Nyika nemapoka",
+      "tagsStepSubtitle": "Batsira vanhu vakakodzera kuwana campaign yako."
     }
   },
   "campaignsDetail": {
@@ -708,7 +749,11 @@
     "attestation": "Nekusimbisa mushandirapamwe uyu unopupura kuti mushandirapamwe ndewechokwadi uye wechokwadi. Unoziva mukuru wemushandirapamwe pachako kana kuti wakasimbisa zvine musoro kuti zvavanotaura ndezvechokwadi. Chenjera vanhu vanonyepedzera uye makororo.",
     "verified": "Mushandirapamwe wasimbiswa",
     "unverified": "Kusimbisa kwabviswa",
-    "actionFailed": "Chiito chatadza"
+    "actionFailed": "Chiito chatadza",
+    "verifiedByCount_zero": "Yasimbiswa nevadzori {{count}}",
+    "verifiedByCount_two": "Yasimbiswa nevadzori {{count}}",
+    "verifiedByCount_few": "Yasimbiswa nevadzori {{count}}",
+    "verifiedByCount_many": "Yasimbiswa nevadzori {{count}}"
   },
   "calendarEvents": {
     "create": {
@@ -839,7 +884,8 @@
       "searchPlaceholder": "Tsvaga mishandirapamwe…",
       "searchAriaLabel": "Tsvaga mishandirapamwe",
       "noMatch": "Hapana mushandirapamwe unoenderana ne«{{query}}»",
-      "noMatchHint": "Edza chimwe chinotsvagwa, kana ubvise kutsvaga."
+      "noMatchHint": "Edza chimwe chinotsvagwa, kana ubvise kutsvaga.",
+      "verifyCampaigns": "Simbisa mishandirapamwe"
     },
     "all": {
       "title": "Mishandirapamwe",
@@ -865,7 +911,8 @@
       "allHidden": "Hapana mishandirapamwe yekuratidza",
       "allHiddenHint": "Mishandirapamwe yose pamutambo yakavanzwa nevatariri. Vhura «Ratidza dzakavanzwa» kuti uione.",
       "empty": "Hapana mishandirapamwe parizvino",
-      "emptyHint": "Hapana mushandirapamwe wakatumirwa parizvino. Iva wokutanga."
+      "emptyHint": "Hapana mushandirapamwe wakatumirwa parizvino. Iva wokutanga.",
+      "verifyCampaigns": "Simbisa mishandirapamwe"
     },
     "lists": {
       "stripAria": "Manjuriro emisoro yemishandirapamwe yakasarudzwa",
@@ -945,7 +992,8 @@
         "movedToTop": "Zvaendeswa kumusoro",
         "movedUp": "Zvaendeswa kumusoro",
         "movedDown": "Zvaendeswa pasi"
-      }
+      },
+      "label": "Zviito zvemudzori"
     }
   },
   "settings": {
@@ -1046,7 +1094,9 @@
     "disclaimer": "Munhu wese anogona kuva musimbisi. Chirevo chako chinoburitswa pachena kuNostr uye chinoratidzwa pachena pa profile yako. Hachipi mvumo dzakasiyana — chinongoudza vapi mautariro aunoita mishandirapamwe.",
     "loginGateTitle": "Pinda kuti uve musimbisi",
     "loginGateBody": "Unofanira kunge wakapinda kuti uburitse chirevo chemusimbisi.",
-    "howWeVerifyTitle": "Matiro atinosimbisa nawo"
+    "howWeVerifyTitle": "Matiro atinosimbisa nawo",
+    "withdrawConfirmTitle": "Bvisa chirevo chako chemusimbisi?",
+    "withdrawConfirmBody": "Chirevo chako che\"Matiro Atinosimbisa Nawo\" chichabviswa pa profile yako. Unogona kuburitsa chitsva chero nguva."
   },
   "mdEditor": {
     "toolbar": {
@@ -1143,6 +1193,11 @@
       "demo": {
         "menuVerify": "Simbisa mushandirapamwe uyu"
       }
+    },
+    "getStartedCard": {
+      "title": "Gadzirira sangano rako",
+      "body": "Tichakutungamirira mukugadzira profile yesangano rako, kuburitsa chirevo chako chekusimbisa, uye kusimbisa mushandirapamwe wako wekutanga.",
+      "cta": "Tanga kusimbisa"
     }
   },
   "organizers": {
@@ -1240,6 +1295,10 @@
       "v1Breeze": {
         "label": "V1 Breeze Wallet",
         "description": "Bvisa bharanzi yepa-chain kubva paLightning custody yekare."
+      },
+      "doubleTweak": {
+        "label": "Kugadzirisa SP yeDouble-tweak",
+        "description": "Garisa mibhadharo yakanyararira yakasara nokuda kwebug yekutumira yekare uye uitumire zvakare muchikwama chako."
       }
     },
     "footnote": "Sarudzo yega yega ndeyokubvisa kekamwe chete uchiisa muchikwama chako chazvino. Chikwama chekare pacho hachidzosererwi — mari yaiva mukati ndiyo chete inogariswa."
@@ -2958,5 +3017,68 @@
         "body": "Mavhukauto akachengeterwa anokwanisa kuba mari yako, kunyora kuti ndiani akatumira chii, kana kuva matsvuura emagumbo eaw. Shandisa kufambisa kwemibhadharo yakanyarara kana coinjoin isinochengetwa pachinzvimbo chacho."
       }
     }
+  },
+  "walletDoubleTweak": {
+    "seoTitle": "Kugadzirisa SP yeDouble-tweak",
+    "seoDescription": "Garisa mibhadharo yakanyararira yakasara pachain nokuda kwebug yekutumira yekare uye uitumire muchikwama chako.",
+    "title": "Kugadzirisa SP yeDouble-tweak",
+    "heading": "Garisa mibhadharo yakanyararira yakasara",
+    "subheading": "Shanduro yekare yeAgora yakanyora mamwe maoutput emubhadharo wakanyararira pakiyi isiri iyo, saka haana kana kumboonekwa muchikwama chako. Chishandiso ichi chinoongorora chain zvakare kutsvaga maoutput iwayo uye chinotumira chero aanowana muchikwama chako.",
+    "back": "Dzokera",
+    "loggedOut": "Pinda nemuviri weNostr wakagamuchira mibhadharo yakanyararira kuti igone kugariswa.",
+    "unsupported": {
+      "title": "Chikwama hachiwanike",
+      "description": "Kugarisa kunoda chikwama chinogona kusaina panyangani. Pinda nensec yako kuti uenderere mberi."
+    },
+    "noIndexer": {
+      "title": "Hapana muongorori wemubhadharo wakanyararira wakaiswa",
+      "description": "URL yemuongorori weBIP-352 inodiwa kuti uongorore mibhadharo yakasara. Isa imwe mumarongero echikwama woedza zvakare."
+    },
+    "scan": {
+      "title": "Ongorora mibhadharo yakasara",
+      "description": "Sarudza kureba kweblock kwekutangira kuongorora. Kugarisa kunotarisa block yega yega kubva ipapo kusvika kumusoro wechain.",
+      "fromHeightLabel": "Kureba kweblock kwekutanga",
+      "tipHint": "Musoro wechain wazvino: {{tip}}",
+      "start": "Ongorora",
+      "cancel": "Kanzura kuongorora",
+      "progress": "Kuongorora block {{current}} ye{{to}} — {{found}} dzawanikwa",
+      "tipMissing": "Kuwana musoro wechain…"
+    },
+    "noFunds": {
+      "title": "Hapana chokugarisa",
+      "description": "Hapana mibhadharo yakanyararira yakasara yakawanikwa muchikamu chakaongororwa. Edza kureba kwekutanga kwekutangira kana waitarisira mari."
+    },
+    "found": {
+      "title": "Mibhadharo yakasara yawanikwa",
+      "description": "Maoutput aya anogona kutumirwa zvakare muchikwama chako.",
+      "count": "Maoutput",
+      "recoverable": "Zvinogona kugariswa"
+    },
+    "destination": {
+      "title": "Mari ichatumirwa kuna",
+      "description": "Kero itsva yokugamuchira muchikwama chako chazvino."
+    },
+    "sweepButton": "Garisa mari",
+    "sweeping": "Kugarisa mari yako…",
+    "dontClose": "Usavhare peji rino kusvika kugarisa kwapera.",
+    "success": {
+      "title": "Kugarisa kwapera",
+      "sent": "{{sats}} sats dzagariswa muchikwama chako.",
+      "viewTx": "Tarisa chiitiko"
+    },
+    "error": {
+      "title": "Kugarisa kwakundikana",
+      "tryAgain": "Edza zvakare"
+    },
+    "errors": {
+      "noDestination": "Hapana kero yokutumira inowanikwa. Vhura chikwama chako kutanga.",
+      "noBlockbook": "Hapana server yeBlockbook yakaiswa. Isa imwe mumarongero echikwama.",
+      "sweepGeneric": "Hatina kukwanisa kupedza kugarisa."
+    },
+    "toast": {
+      "successTitle": "Mari yagariswa",
+      "successDesc": "{{sats}} sats dzatumirwa muchikwama chako."
+    },
+    "footnote": "Uku kutumira kwenzira imwe chete muchikwama chako chazvino. Mibhadharo yakanyararira yakakanganiswa chete ndiyo inobatwa; hapana chimwe chinochinja."
   }
 }

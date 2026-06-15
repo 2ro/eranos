@@ -49,7 +49,9 @@
     "countryFilterAriaLabel": "Ülkeye göre filtrele",
     "countrySearchPlaceholder": "Ülke ara…",
     "countryNoResults": "Ülke bulunamadı.",
-    "countryGlobal": "Küresel"
+    "countryGlobal": "Küresel",
+    "continue": "Devam et",
+    "sortDefault": "Varsayılan"
   },
   "imageCrop": {
     "title": "Görseli Kırp",
@@ -114,6 +116,11 @@
         "title": "Kampanyalara bağış yapın",
         "description": "Davaları Bitcoin ile destekleyin.",
         "finderNote": "Bağışınız doğrudan kampanya sahibinin cüzdanına gider."
+      },
+      "verifier": {
+        "title": "Kampanyaları doğrula",
+        "description": "Bir organizasyon olarak kampanyalara kefil olun.",
+        "finderNote": "Bağışçılar, güvendiğiniz kampanyalarda rozeti görür."
       }
     },
     "keygen": {
@@ -155,6 +162,37 @@
       "uploadFailed": "Yükleme başarısız.",
       "publishFailedTitle": "Profil kurulumu başarısız",
       "publishFailedDescription": "Hesabınız oluşturuldu ancak profil kaydedilemedi. Daha sonra güncelleyebilirsiniz."
+    },
+    "verifier": {
+      "identity": {
+        "title": "Organizasyonunuzu kurun",
+        "subtitle": "Ad ve logo zorunludur. Web sitesi ve afiş isteğe bağlıdır.",
+        "websiteInvalid": "https:// ile başlayan geçerli bir web sitesi girin",
+        "cropAvatar": "Logoyu kırp",
+        "cropBanner": "Afişi kırp",
+        "uploading": "Görsel yükleniyor…",
+        "clipboardFailed": "Panodan okunamadı.",
+        "pasteUrlInvalid": "Pano geçerli bir https URL'i içermiyor.",
+        "pasteUrlFetchFailed": "Bu görsel yüklenemedi. URL'i kontrol edip tekrar deneyin."
+      },
+      "bio": {
+        "title": "Bize organizasyonunuzdan bahsedin",
+        "subtitle": "Profiliniz için kısa bir açıklama.",
+        "label": "Organizasyonunuz hakkında",
+        "placeholder": "Biz, …yapan kâr amacı gütmeyen bir kuruluşuz",
+        "publishing": "Profiliniz kaydediliyor…"
+      },
+      "publishFailedTitle": "Profil kaydedilmedi",
+      "publishFailedDescription": "Hesabınız hazır, ancak organizasyon profili yayımlanamadı. Daha sonra ayarlardan tamamlayabilirsiniz.",
+      "statement": {
+        "title": "Doğrulayıcı beyanınızı yayımlayın",
+        "subtitle": "Kefil olmadan önce kampanyaları nasıl denetlediğinizi anlatın. Bağışçıların rozetinize güvenebilmesi için herkese açık olarak yayımlanır."
+      },
+      "howto": {
+        "title": "Bir kampanya nasıl doğrulanır",
+        "subtitle": "Her şey hazır. İncelediğiniz bir kampanyaya nasıl kefil olacağınız işte burada.",
+        "finish": "Kampanyaları görüntüle"
+      }
     }
   },
   "feed": {
@@ -276,7 +314,8 @@
       "setAsDefault": "Varsayılan yap",
       "defaultUpdated": "Varsayılan güncellendi",
       "defaultUpdatedCountry": "Yeni gönderiler varsayılan olarak {{name}}'a gidecek.",
-      "defaultUpdatedGlobal": "Yeni gönderiler varsayılan olarak küresel olacak."
+      "defaultUpdatedGlobal": "Yeni gönderiler varsayılan olarak küresel olacak.",
+      "label": "Şuraya gönder"
     }
   },
   "replyModal": {
@@ -664,7 +703,9 @@
     "imageDropzone": "Buraya tıklayın veya bir resim sürükleyin",
     "countryClearAria": "Ülkeyi temizle",
     "flagOfAria": "{{name}} bayrağı",
-    "countryHint": "Ülke sıralaması için <0>i: iso3166:{{code}}</0> yayımlar."
+    "countryHint": "Ülke sıralaması için <0>i: iso3166:{{code}}</0> yayımlar.",
+    "publishing": "Yayımlanıyor…",
+    "uploadingCover": "Kapak yükleniyor…"
   },
   "organizationContext": {
     "attachedToGroup": "Gruba eklendi",
@@ -1078,7 +1119,9 @@
       "next": "İleri",
       "back": "Geri",
       "skip": "Atla",
-      "launchNow": "Atla ve Yayınla"
+      "launchNow": "Atla ve Yayınla",
+      "tagsStepTitle": "Ülke ve kategoriler",
+      "tagsStepSubtitle": "Doğru insanların kampanyanızı bulmasına yardımcı olun."
     }
   },
   "campaignsDetail": {
@@ -1148,7 +1191,11 @@
     "attestation": "Bu kampanyayı doğrulayarak kampanyanın gerçek ve doğru olduğunu beyan edersiniz. Kampanya düzenleyicisini şahsen tanıyorsunuz veya iddialarının doğru olduğunu anlamlı bir şekilde doğruladınız. Sahtekarlardan ve dolandırıcılardan sakının.",
     "verified": "Kampanya doğrulandı",
     "unverified": "Doğrulama kaldırıldı",
-    "actionFailed": "İşlem başarısız oldu"
+    "actionFailed": "İşlem başarısız oldu",
+    "verifiedByCount_zero": "{{count}} moderatör tarafından doğrulandı",
+    "verifiedByCount_two": "{{count}} moderatör tarafından doğrulandı",
+    "verifiedByCount_few": "{{count}} moderatör tarafından doğrulandı",
+    "verifiedByCount_many": "{{count}} moderatör tarafından doğrulandı"
   },
   "calendarEvents": {
     "create": {
@@ -1279,7 +1326,8 @@
           "privateSummary": "BIP-352 silent payments. Bağışlar ilişkilendirilemeyen çıktılara ulaşır."
         },
         "readMore": "Tam dökümü oku"
-      }
+      },
+      "verifyCampaigns": "Kampanyaları doğrula"
     },
     "all": {
       "title": "Kampanyalar",
@@ -1305,7 +1353,8 @@
       "heroHeadingLine2": "tek bir yerde.",
       "heroBody": "Nostr'da yayımlanan her bağış kampanyası tek bir yerde toplandı. Ağın tamamına göz atın, sizin için önemli bir dava bulun ve doğrudan Bitcoin ile destekleyin.",
       "campaignsCount_one": "ağdaki kampanya",
-      "campaignsCount_other": "ağdaki kampanya"
+      "campaignsCount_other": "ağdaki kampanya",
+      "verifyCampaigns": "Kampanyaları doğrula"
     },
     "lists": {
       "stripAria": "Özenle seçilmiş kampanya konu listeleri",
@@ -1487,7 +1536,9 @@
     "disclaimer": "Herkes doğrulayıcı olabilir. Beyanınız Nostr'a herkese açık olarak yayımlanır ve profilinizde belirgin biçimde gösterilir. Herhangi bir özel izin vermez — yalnızca kampanyaları nasıl denetlediğinizi bağışçılara anlatır.",
     "loginGateTitle": "Doğrulayıcı olmak için giriş yapın",
     "loginGateBody": "Doğrulayıcı beyanı yayımlamak için giriş yapmış olmanız gerekir.",
-    "howWeVerifyTitle": "Nasıl doğrularız"
+    "howWeVerifyTitle": "Nasıl doğrularız",
+    "withdrawConfirmTitle": "Doğrulayıcı beyanınız geri çekilsin mi?",
+    "withdrawConfirmBody": "\"Nasıl Doğrularız\" beyanınız profilinizden kaldırılacak. İstediğiniz zaman yenisini yayımlayabilirsiniz."
   },
   "mdEditor": {
     "toolbar": {
@@ -1584,6 +1635,11 @@
       "demo": {
         "menuVerify": "Bu kampanyayı doğrula"
       }
+    },
+    "getStartedCard": {
+      "title": "Organizasyonunuzu kurun",
+      "body": "Organizasyonunuzun profilini oluşturmanız, doğrulama beyanınızı yayımlamanız ve ilk kampanyanızı doğrulamanız için size adım adım yol göstereceğiz.",
+      "cta": "Doğrulamaya başla"
     }
   },
   "organizers": {
@@ -1681,6 +1737,10 @@
       "v1Breeze": {
         "label": "V1 Breeze Cüzdanı",
         "description": "Eski Lightning saklama hizmetinden zincir üstü bakiyeyi toplayın."
+      },
+      "doubleTweak": {
+        "label": "Çift Tweak SP Düzeltmesi",
+        "description": "Önceki bir gönderim hatası nedeniyle takılı kalan sessiz ödemeleri kurtarın ve tekrar cüzdanınıza toplayın."
       }
     },
     "footnote": "Her seçenek, mevcut cüzdanınıza tek yönlü bir toplamadır. Eski cüzdanın kendisi geri yüklenmez — yalnızca tuttuğu fonlar kurtarılır."
@@ -1962,6 +2022,10 @@
       "checked_other": "{{count}} UTXO kontrol edildi · {{pruned}} kaldırıldı.",
       "reconciling": "Uzlaştırılıyor…",
       "reconcileNow": "Şimdi uzlaştır"
+    },
+    "autoScan": {
+      "label": "Otomatik tara",
+      "description": "Bu sayfadan ayrılsanız bile arka planda yeni özel ödemeleri kontrol etmeyi sürdürün."
     }
   },
   "notifications": {
@@ -2881,5 +2945,140 @@
         "body": "Saklayıcı karıştırıcılar paranızı çalabilir, kimin neyi gönderdiğini kayıt altına alabilir ya da kolluk kuvvetlerinin bal tuzakları çıkabilir. Bunun yerine sessiz ödeme adımı veya saklayıcı olmayan bir coinjoin kullanın."
       }
     }
+  },
+  "walletMigrate": {
+    "seoTitle": "Eski Cüzdanı Taşı",
+    "seoDescription": "Eski Agora cüzdanınızdaki (tohum olarak nsec) fonları yeni BIP-39 cüzdanına toplayın.",
+    "title": "Eski Cüzdanı Taşı",
+    "heading": "Yeni cüzdanınıza taşıyın",
+    "subheading": "Agora'nın Bitcoin cüzdanı artık BIP-39 tohum ifadesi kullanıyor, böylece herhangi bir cüzdan uygulamasına içe aktarılabiliyor. Eski adreslerinizdeki fonlar hâlâ güvende — bu sayfa onları tek bir işlemle yeni cüzdanınıza toplar.",
+    "backToWallet": "Cüzdana dön",
+    "loading": "Eski cüzdanınız kontrol ediliyor…",
+    "warning": "Bu, eski cüzdanınızdaki her UTXO'yu tüketen ve toplamı (küçük bir ağ ücreti düşülerek) yeni cüzdanınızın ilk alım adresine gönderen tek bir toplama işlemi oluşturur. Yayınlandıktan sonra bu işlem kesindir ve geri alınamaz.",
+    "startButton": "Yeni cüzdana topla",
+    "loggedOut": {
+      "title": "Taşımak için giriş yapın",
+      "description": "Fonların yeni adresinize toplanabilmesi için eski cüzdana sahip olan Nostr kimliğiyle giriş yapın."
+    },
+    "unsupported": {
+      "title": "Cüzdan kullanılamıyor",
+      "description": "Taşıma yalnızca nsec girişlerinde çalışır, çünkü eski cüzdanın anahtarları doğrudan nsec'inizden türetilmişti. Tarayıcı uzantısı ve uzak imzalayıcı girişleri bu taşımayı çalıştıramaz."
+    },
+    "noBlockbook": {
+      "title": "Blockbook yapılandırılmamış",
+      "description": "Taşıma, eski adreslerinizi taramak ve toplama işlemini yayınlamak için bir Blockbook indeksleyici URL'ine ihtiyaç duyar."
+    },
+    "noFunds": {
+      "title": "Taşınacak bir şey yok",
+      "description": "Eski cüzdanınızda harcanabilir bakiye yok. Her şey zaten yeni cüzdanınızda."
+    },
+    "detected": {
+      "title": "Eski cüzdanınızdaki fonlar",
+      "description": "Bu fonlar tek bir işlemle yeni cüzdanınıza taşınacak.",
+      "bip86": "Zincir üstü",
+      "sp": "Sessiz ödemeler",
+      "total": "Toplam"
+    },
+    "destination": {
+      "title": "Hedef",
+      "description": "Yeni cüzdanınızın ilk alım adresi."
+    },
+    "progress": {
+      "building": "İşlem oluşturuluyor…",
+      "signing": "Girdiler imzalanıyor…",
+      "broadcasting": "İşlem yayınlanıyor…",
+      "dontClose": "Toplama işlemi sürerken bu sekmeyi kapatmayın."
+    },
+    "success": {
+      "title": "Taşıma tamamlandı",
+      "sent": "Yeni cüzdanınıza {{sats}} sat gönderildi ({{fee}} sat ücret).",
+      "viewTx": "İşlemi görüntüle"
+    },
+    "error": {
+      "title": "Taşıma başarısız",
+      "tryAgain": "Tekrar dene"
+    },
+    "errors": {
+      "noV1Account": "Eski cüzdanın anahtarlarına erişilemedi.",
+      "noDestination": "Yeni cüzdanınızda henüz alım adresi yok. Cüzdan sayfasının yüklenmesini bekleyip tekrar deneyin.",
+      "noBlockbook": "Blockbook indeksleyici yapılandırılmamış. Taşıma, eski adreslerinizi tarayamaz.",
+      "noFunds": "Eski adreslerde harcanabilir fon bulunamadı.",
+      "sweepGeneric": "Taşıma başarısız. Lütfen tekrar deneyin."
+    },
+    "toast": {
+      "successTitle": "Taşıma tamamlandı",
+      "successDesc": "{{sats}} sat yeni cüzdanınıza taşındı."
+    }
+  },
+  "walletDoubleTweak": {
+    "seoTitle": "Çift Tweak SP Düzeltmesi",
+    "seoDescription": "Önceki bir gönderim hatası nedeniyle zincir üstünde takılı kalan sessiz ödemeleri kurtarın ve cüzdanınıza toplayın.",
+    "title": "Çift Tweak SP Düzeltmesi",
+    "heading": "Takılı kalan sessiz ödemeleri kurtarın",
+    "subheading": "Agora'nın önceki bir sürümü bazı sessiz ödeme çıkışlarını yanlış anahtara kodladı, bu yüzden cüzdanınızda hiç görünmediler. Bu araç, o çıkışlar için zinciri yeniden tarar ve bulduklarını cüzdanınıza toplar.",
+    "back": "Geri",
+    "loggedOut": "Sessiz ödemelerin kurtarılabilmesi için onları alan Nostr kimliğiyle giriş yapın.",
+    "unsupported": {
+      "title": "Cüzdan kullanılamıyor",
+      "description": "Kurtarma, yerel olarak imzalayabilen bir cüzdana ihtiyaç duyar. Devam etmek için nsec'inizle giriş yapın."
+    },
+    "noIndexer": {
+      "title": "Sessiz ödeme indeksleyicisi yapılandırılmamış",
+      "description": "Takılı kalan ödemeleri taramak için bir BIP-352 indeksleyici URL'i gereklidir. Cüzdan ayarlarından bir tane belirleyip tekrar deneyin."
+    },
+    "scan": {
+      "title": "Takılı kalan ödemeleri tara",
+      "description": "Taramaya başlanacak blok yüksekliğini seçin. Kurtarma, oradan zincirin ucuna kadar her bloğu kontrol eder.",
+      "fromHeightLabel": "Başlangıç blok yüksekliği",
+      "tipHint": "Mevcut zincir ucu: {{tip}}",
+      "start": "Tara",
+      "cancel": "Taramayı iptal et",
+      "progress": "Blok {{current}} / {{to}} taranıyor — {{found}} bulundu",
+      "tipMissing": "Zincir ucu çözümleniyor…"
+    },
+    "noFunds": {
+      "title": "Kurtarılacak bir şey yok",
+      "description": "Taranan aralıkta takılı kalan sessiz ödeme bulunamadı. Fon beklediyseniz daha erken bir başlangıç yüksekliği deneyin."
+    },
+    "found": {
+      "title": "Takılı kalan ödemeler bulundu",
+      "description": "Bu çıkışlar tekrar cüzdanınıza toplanabilir.",
+      "count": "Çıkışlar",
+      "recoverable": "Kurtarılabilir"
+    },
+    "destination": {
+      "title": "Fonlar şuraya gönderilecek:",
+      "description": "Mevcut cüzdanınızda yeni bir alım adresi."
+    },
+    "sweepButton": "Fonları kurtar",
+    "sweeping": "Fonlarınız kurtarılıyor…",
+    "dontClose": "Kurtarma bitene kadar bu sayfayı kapatmayın.",
+    "success": {
+      "title": "Kurtarma tamamlandı",
+      "sent": "Cüzdanınıza {{sats}} sat kurtarıldı.",
+      "viewTx": "İşlemi görüntüle"
+    },
+    "error": {
+      "title": "Kurtarma başarısız",
+      "tryAgain": "Tekrar dene"
+    },
+    "errors": {
+      "noDestination": "Kullanılabilir hedef adres yok. Önce cüzdanınızı açın.",
+      "noBlockbook": "Yapılandırılmış Blockbook sunucusu yok. Cüzdan ayarlarından bir tane belirleyin.",
+      "sweepGeneric": "Kurtarma toplaması tamamlanamadı."
+    },
+    "toast": {
+      "successTitle": "Fonlar kurtarıldı",
+      "successDesc": "{{sats}} sat cüzdanınıza toplandı."
+    },
+    "footnote": "Bu, mevcut cüzdanınıza tek yönlü bir toplamadır. Yalnızca etkilenen sessiz ödemelere dokunulur; başka hiçbir şey değişmez."
+  },
+  "spAutoScan": {
+    "scanning": "Taranıyor… blok {{current}} / {{to}}",
+    "caughtUp": "Güncel",
+    "neverScanned": "Henüz taranmadı",
+    "lastScanned": "Blok {{height}}'a kadar tarandı",
+    "paused": "Otomatik tarama kapalı",
+    "manualLink": "Tarama seçenekleri"
   }
 }

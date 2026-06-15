@@ -50,7 +50,8 @@
     "countryFilterAriaLabel": "Filtrar por país",
     "countrySearchPlaceholder": "Buscar países…",
     "countryNoResults": "No se encontraron países.",
-    "countryGlobal": "Global"
+    "countryGlobal": "Global",
+    "continue": "Continuar"
   },
   "imageCrop": {
     "title": "Recortar imagen",
@@ -115,6 +116,11 @@
         "title": "Donar a campañas",
         "description": "Apoya causas con Bitcoin.",
         "finderNote": "Tu donación va directamente a la cartera del organizador."
+      },
+      "verifier": {
+        "title": "Verificar campañas",
+        "description": "Avala campañas como organización.",
+        "finderNote": "Los donantes ven una insignia en las campañas en las que confías."
       }
     },
     "keygen": {
@@ -156,6 +162,37 @@
       "uploadFailed": "Error al subir.",
       "publishFailedTitle": "Error en la configuración del perfil",
       "publishFailedDescription": "Tu cuenta se creó, pero no se pudo guardar el perfil. Puedes actualizarlo más tarde."
+    },
+    "verifier": {
+      "identity": {
+        "title": "Configura tu organización",
+        "subtitle": "El nombre y el logotipo son obligatorios. El sitio web y la portada son opcionales.",
+        "websiteInvalid": "Introduce un sitio web válido que comience con https://",
+        "cropAvatar": "Recortar logotipo",
+        "cropBanner": "Recortar portada",
+        "uploading": "Subiendo imagen…",
+        "clipboardFailed": "No se pudo leer del portapapeles.",
+        "pasteUrlInvalid": "El portapapeles no contiene una URL https válida.",
+        "pasteUrlFetchFailed": "No se pudo cargar esa imagen. Comprueba la URL e inténtalo de nuevo."
+      },
+      "bio": {
+        "title": "Cuéntanos sobre tu organización",
+        "subtitle": "Una breve descripción para tu perfil.",
+        "label": "Acerca de tu organización",
+        "placeholder": "Somos una organización sin fines de lucro que…",
+        "publishing": "Guardando tu perfil…"
+      },
+      "publishFailedTitle": "Perfil no guardado",
+      "publishFailedDescription": "Tu cuenta está lista, pero no se pudo publicar el perfil de la organización. Puedes terminarlo más tarde desde los ajustes.",
+      "statement": {
+        "title": "Publica tu declaración de verificador",
+        "subtitle": "Describe cómo examinas las campañas antes de avalarlas. Se publica de forma pública para que los donantes puedan confiar en tu insignia."
+      },
+      "howto": {
+        "title": "Cómo verificar una campaña",
+        "subtitle": "Ya está todo listo. Así es como avalar una campaña una vez que la hayas revisado.",
+        "finish": "Ver campañas"
+      }
     }
   },
   "feed": {
@@ -224,7 +261,9 @@
     "imageDropzone": "Haz clic o arrastra una imagen aquí",
     "countryClearAria": "Borrar país",
     "flagOfAria": "Bandera de {{name}}",
-    "countryHint": "Publica <0>i: iso3166:{{code}}</0> para el orden por país."
+    "countryHint": "Publica <0>i: iso3166:{{code}}</0> para el orden por país.",
+    "publishing": "Publicando…",
+    "uploadingCover": "Subiendo portada…"
   },
   "organizationContext": {
     "attachedToGroup": "Adjunto al grupo",
@@ -636,7 +675,11 @@
       "next": "Siguiente",
       "back": "Atrás",
       "skip": "Omitir",
-      "launchNow": "Omitir y Publicar"
+      "launchNow": "Omitir y Publicar",
+      "goalStepTitle": "Meta",
+      "goalStepSubtitle": "Opcional — déjalo en blanco para una campaña sin meta fija.",
+      "tagsStepTitle": "País y categorías",
+      "tagsStepSubtitle": "Ayuda a que las personas adecuadas encuentren tu campaña."
     }
   },
   "campaignsDetail": {
@@ -706,7 +749,11 @@
     "attestation": "Al verificar esta campaña, declaras que la campaña es auténtica y veraz. Conoces personalmente al organizador de la campaña o has verificado de forma significativa que sus afirmaciones son ciertas. Ten cuidado con los impostores y estafadores.",
     "verified": "Campaña verificada",
     "unverified": "Verificación eliminada",
-    "actionFailed": "La acción falló"
+    "actionFailed": "La acción falló",
+    "verifiedByCount_zero": "Verificado por {{count}} moderadores",
+    "verifiedByCount_two": "Verificado por {{count}} moderadores",
+    "verifiedByCount_few": "Verificado por {{count}} moderadores",
+    "verifiedByCount_many": "Verificado por {{count}} moderadores"
   },
   "calendarEvents": {
     "create": {
@@ -837,7 +884,8 @@
       "searchPlaceholder": "Buscar campañas…",
       "searchAriaLabel": "Buscar campañas",
       "noMatch": "Ninguna campaña coincide con «{{query}}»",
-      "noMatchHint": "Prueba con otro término de búsqueda o bórrala."
+      "noMatchHint": "Prueba con otro término de búsqueda o bórrala.",
+      "verifyCampaigns": "Verificar campañas"
     },
     "all": {
       "title": "Campañas",
@@ -863,7 +911,8 @@
       "allHidden": "No hay campañas que mostrar",
       "allHiddenHint": "Todas las campañas de la red han sido ocultadas por moderadores. Activa «Mostrar ocultas» para verlas.",
       "empty": "Aún no hay campañas",
-      "emptyHint": "Todavía no se ha publicado ninguna campaña. Sé el primero."
+      "emptyHint": "Todavía no se ha publicado ninguna campaña. Sé el primero.",
+      "verifyCampaigns": "Verificar campañas"
     },
     "lists": {
       "stripAria": "Listas temáticas de campañas curadas",
@@ -943,7 +992,8 @@
         "movedToTop": "Movido al principio",
         "movedUp": "Movido hacia arriba",
         "movedDown": "Movido hacia abajo"
-      }
+      },
+      "label": "Acciones de moderador"
     }
   },
   "settings": {
@@ -1044,7 +1094,9 @@
     "disclaimer": "Cualquiera puede convertirse en verificador. Tu declaración se publica públicamente en Nostr y se muestra de forma destacada en tu perfil. No otorga ningún permiso especial: simplemente indica a los donantes cómo evalúas las campañas.",
     "loginGateTitle": "Inicia sesión para convertirte en verificador",
     "loginGateBody": "Debes haber iniciado sesión para publicar una declaración de verificador.",
-    "howWeVerifyTitle": "Cómo verificamos"
+    "howWeVerifyTitle": "Cómo verificamos",
+    "withdrawConfirmTitle": "¿Retirar tu declaración de verificador?",
+    "withdrawConfirmBody": "Tu declaración «Cómo verificamos» se eliminará de tu perfil. Puedes publicar una nueva en cualquier momento."
   },
   "mdEditor": {
     "toolbar": {
@@ -1141,6 +1193,11 @@
       "demo": {
         "menuVerify": "Verificar esta campaña"
       }
+    },
+    "getStartedCard": {
+      "title": "Configura tu organización",
+      "body": "Te guiaremos para crear el perfil de tu organización, publicar tu declaración de verificación y verificar tu primera campaña.",
+      "cta": "Empezar a verificar"
     }
   },
   "organizers": {
@@ -1238,6 +1295,10 @@
       "v1Breeze": {
         "label": "Cartera V1 Breeze",
         "description": "Barre el saldo on-chain de la antigua custodia Lightning."
+      },
+      "doubleTweak": {
+        "label": "Arreglo de doble ajuste de SP",
+        "description": "Recupera los pagos silenciosos que quedaron atrapados por un error de envío anterior y bárrelos de vuelta a tu cartera."
       }
     },
     "footnote": "Cada opción es un barrido único hacia tu cartera actual. La cartera antigua en sí no se restaura — solo se recuperan los fondos que contenía."
@@ -2956,5 +3017,68 @@
         "body": "Los mezcladores custodiales pueden robarte las monedas, registrar quién envió qué o resultar ser cebos de las fuerzas del orden. Usa un salto por silent payments o un coinjoin no custodial en su lugar."
       }
     }
+  },
+  "walletDoubleTweak": {
+    "seoTitle": "Arreglo de doble ajuste de SP",
+    "seoDescription": "Recupera los pagos silenciosos que quedaron atrapados en cadena por un error de envío anterior y bárrelos a tu cartera.",
+    "title": "Arreglo de doble ajuste de SP",
+    "heading": "Recupera pagos silenciosos atrapados",
+    "subheading": "Una versión anterior de Agora codificó algunas salidas de pago silencioso con la clave equivocada, así que nunca aparecieron en tu cartera. Esta herramienta vuelve a escanear la cadena en busca de esas salidas y barre las que encuentre a tu cartera.",
+    "back": "Atrás",
+    "loggedOut": "Inicia sesión con la identidad de Nostr que recibió los pagos silenciosos para poder recuperarlos.",
+    "unsupported": {
+      "title": "Cartera no disponible",
+      "description": "La recuperación necesita una cartera que pueda firmar localmente. Inicia sesión con tu nsec para continuar."
+    },
+    "noIndexer": {
+      "title": "No hay un indexador de pagos silenciosos configurado",
+      "description": "Se requiere una URL de indexador BIP-352 para escanear pagos atrapados. Configura una en los ajustes de la cartera e inténtalo de nuevo."
+    },
+    "scan": {
+      "title": "Escanear pagos atrapados",
+      "description": "Elige la altura de bloque desde la que empezar a escanear. La recuperación revisa cada bloque desde ahí hasta la punta de la cadena.",
+      "fromHeightLabel": "Altura de bloque inicial",
+      "tipHint": "Punta actual de la cadena: {{tip}}",
+      "start": "Escanear",
+      "cancel": "Cancelar escaneo",
+      "progress": "Escaneando el bloque {{current}} de {{to}} — {{found}} encontrados",
+      "tipMissing": "Resolviendo la punta de la cadena…"
+    },
+    "noFunds": {
+      "title": "Nada que recuperar",
+      "description": "No se encontraron pagos silenciosos atrapados en el rango escaneado. Prueba con una altura inicial anterior si esperabas fondos."
+    },
+    "found": {
+      "title": "Pagos atrapados encontrados",
+      "description": "Estas salidas pueden barrerse de vuelta a tu cartera.",
+      "count": "Salidas",
+      "recoverable": "Recuperable"
+    },
+    "destination": {
+      "title": "Los fondos se enviarán a",
+      "description": "Una nueva dirección de recepción de tu cartera actual."
+    },
+    "sweepButton": "Recuperar fondos",
+    "sweeping": "Recuperando tus fondos…",
+    "dontClose": "No cierres esta página hasta que termine la recuperación.",
+    "success": {
+      "title": "Recuperación completada",
+      "sent": "Se recuperaron {{sats}} sats a tu cartera.",
+      "viewTx": "Ver transacción"
+    },
+    "error": {
+      "title": "La recuperación falló",
+      "tryAgain": "Intentar de nuevo"
+    },
+    "errors": {
+      "noDestination": "No hay una dirección de destino disponible. Abre tu cartera primero.",
+      "noBlockbook": "No hay un servidor Blockbook configurado. Configura uno en los ajustes de la cartera.",
+      "sweepGeneric": "No se pudo completar el barrido de recuperación."
+    },
+    "toast": {
+      "successTitle": "Fondos recuperados",
+      "successDesc": "{{sats}} sats barridos a tu cartera."
+    },
+    "footnote": "Este es un barrido en un solo sentido hacia tu cartera actual. Solo se tocan los pagos silenciosos afectados; nada más cambia."
   }
 }
