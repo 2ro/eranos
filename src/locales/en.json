@@ -84,6 +84,7 @@
     "profile": "Profile",
     "settings": "Settings",
     "about": "About",
+    "sponsors": "Sponsors",
     "verify": "Verify",
     "privacy": "Privacy",
     "safety": "Safety",
@@ -687,6 +688,94 @@
       "stillStuck": "Still stuck?",
       "followTeam": "Follow Team Soapbox on Nostr",
       "stillStuckSuffix": ". We triage questions there."
+    }
+  },
+  "corporateSponsorship": {
+    "seoTitle": "Corporate Sponsorship",
+    "seoDescription": "Partner with {{appName}} to fund causes that matter. Donate to the Seed Fund, match donations to campaigns you care about, or promote {{appName}} to your customers as part of your philanthropic initiatives.",
+    "hero": {
+      "eyebrow": "Partner with {{appName}}",
+      "headlinePart1": "Fund what",
+      "headlineHighlight": "matters.",
+      "body": "{{appName}} connects donors directly to causes through Bitcoin — no frozen accounts, no middlemen, no platform taking a cut. Bring the same uncensorable, transparent giving to your company's philanthropy.",
+      "trustChips": {
+        "nonCustodial": "Non-custodial",
+        "transparent": "Transparent on-chain",
+        "noFees": "No platform fees"
+      },
+      "ctaPrimary": "Get in touch",
+      "ctaSecondary": "See the ways to partner"
+    },
+    "intro": {
+      "eyebrow": "Why partner",
+      "title": "Corporate giving without the gatekeepers",
+      "lede": "Every dollar your company commits goes straight to the cause — verifiably, on the Bitcoin blockchain. There is no custodian to freeze funds, no payment processor to deplatform a campaign, and no opaque overhead eating into your impact.",
+      "stats": {
+        "feesLabel": "Platform fees on donations",
+        "feesValue": "0%",
+        "custodyLabel": "Funds we ever custody",
+        "custodyValue": "None",
+        "reachLabel": "Borders that can stop a donation",
+        "reachValue": "Zero"
+      }
+    },
+    "ways": {
+      "eyebrow": "Ways to get involved",
+      "title": "Three ways to partner",
+      "lede": "Pick the level of involvement that fits your company — or combine all three.",
+      "seedFund": {
+        "kicker": "01 · Direct support",
+        "title": "Donate to the Agora Seed Fund",
+        "description": "Make an unrestricted gift to the {{appName}} Seed Fund. The Seed Fund seeds new and high-need campaigns across the platform, getting verified causes off the ground when they need it most.",
+        "bullet1": "Give in Bitcoin (BTC) or US dollars (USD)",
+        "bullet2": "Unrestricted — directed where the need is greatest",
+        "bullet3": "Recurring or one-time commitments welcome",
+        "cta": "Fund the Seed Fund"
+      },
+      "matching": {
+        "kicker": "02 · Multiply impact",
+        "title": "Match donations to campaigns",
+        "description": "Commit a matching pool and we will double every donor's gift up to your cap. Choose exactly what your company stands behind:",
+        "bullet1": "Match an individual campaign you care about",
+        "bullet2": "Match a featured or staff-picked campaign",
+        "bullet3": "Match every campaign on a curated list — e.g. campaigns supporting political prisoners, or women's sovereignty across Africa",
+        "cta": "Set up a match"
+      },
+      "promote": {
+        "kicker": "03 · Amplify",
+        "title": "Promote {{appName}} to your customers",
+        "description": "Make {{appName}} giving a centerpiece of your philanthropic initiatives. Invite your customers and community to give alongside you, and turn your reach into real, uncensorable funding for causes.",
+        "bullet1": "Co-branded campaigns and donation drives",
+        "bullet2": "Checkout round-ups and customer match prompts",
+        "bullet3": "Shared transparency reports your customers can verify on-chain",
+        "cta": "Plan a campaign"
+      }
+    },
+    "matchingExamples": {
+      "eyebrow": "Matching in action",
+      "title": "Match the causes that move you",
+      "lede": "Curated lists let you back an entire movement with a single commitment. A few examples of what a matching pool can target:",
+      "example1": {
+        "title": "Political prisoners",
+        "body": "Match every donation to campaigns providing legal defense and family support for political prisoners worldwide."
+      },
+      "example2": {
+        "title": "Women's sovereignty in Africa",
+        "body": "Double gifts to campaigns advancing women's economic independence and self-determination across the African continent."
+      },
+      "example3": {
+        "title": "Your own list",
+        "body": "Tell us the cause and we'll build a curated list of verified campaigns for your matching pool to back."
+      }
+    },
+    "cta": {
+      "eyebrow": "Let's talk",
+      "title": "Ready to put your company behind a cause?",
+      "body": "Tell us how you'd like to get involved and we'll help you set up the right partnership — Seed Fund gift, matching pool, or a customer campaign.",
+      "button": "Contact the {{appName}} team",
+      "followLine": "Prefer Nostr?",
+      "followLink": "Follow Team Soapbox",
+      "followSuffix": " and send us a message."
     }
   },
   "forms": {

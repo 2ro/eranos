@@ -43,6 +43,7 @@ const MyDashboardPage = lazy(() => import("./pages/MyDashboardPage").then(m => (
 const AboutPage = lazy(() => import("./pages/AboutPage").then(m => ({ default: m.AboutPage })));
 const DonorGuidePage = lazy(() => import("./pages/DonorGuidePage").then(m => ({ default: m.DonorGuidePage })));
 const RecipientGuidePage = lazy(() => import("./pages/RecipientGuidePage").then(m => ({ default: m.RecipientGuidePage })));
+const CorporateSponsorshipPage = lazy(() => import("./pages/CorporateSponsorshipPage").then(m => ({ default: m.CorporateSponsorshipPage })));
 const LanguageSettingsPage = lazy(() => import("./pages/LanguageSettingsPage").then(m => ({ default: m.LanguageSettingsPage })));
 const NetworkSettingsPage = lazy(() => import("./pages/NetworkSettingsPage").then(m => ({ default: m.NetworkSettingsPage })));
 const NIP19Page = lazy(() => import("./pages/NIP19Page").then(m => ({ default: m.NIP19Page })));
@@ -99,6 +100,7 @@ function SiteFooter() {
         </button>
         <nav className="flex items-center gap-5">
           <Link to="/about" className="hover:text-foreground motion-safe:transition-colors">{t('nav.about')}</Link>
+          <Link to="/sponsors" className="hover:text-foreground motion-safe:transition-colors">{t('nav.sponsors')}</Link>
           <Link to="/verify" className="hover:text-foreground motion-safe:transition-colors">{t('nav.verify')}</Link>
           <Link to="/privacy" className="hover:text-foreground motion-safe:transition-colors">{t('nav.privacy')}</Link>
           <Link to="/safety" className="hover:text-foreground motion-safe:transition-colors">{t('nav.safety')}</Link>
@@ -221,6 +223,9 @@ export function AppRouter() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/about/donors" element={<DonorGuidePage />} />
           <Route path="/about/recipients" element={<RecipientGuidePage />} />
+          {/* Corporate sponsorship / partnership marketing page. Wide layout
+              so the hero and section backgrounds span the viewport like /about. */}
+          <Route path="/sponsors" element={<CorporateSponsorshipPage />} />
           {/* Verification onboarding / marketing page. Wide layout so the
               hero and section backgrounds can span the viewport like /about. */}
           <Route path="/verify" element={<OrganizationsPage />} />
