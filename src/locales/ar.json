@@ -81,6 +81,7 @@
     "myDashboard": "لوحتي",
     "wallet": "المحفظة",
     "notifications": "الإشعارات",
+    "messages": "الرسائل",
     "profile": "الملف الشخصي",
     "settings": "الإعدادات",
     "about": "حول",
@@ -90,6 +91,21 @@
     "changelog": "سجل التغييرات",
     "sourceCode": "الكود المصدري",
     "getApp": "احصل على التطبيق"
+  },
+  "messages": {
+    "title": "الرسائل",
+    "subtitle": "رسائلك المباشرة الخاصة والمشفرة.",
+    "conversations": "المحادثات",
+    "empty": "لا توجد رسائل بعد. ستظهر هنا المحادثات التي تجريها.",
+    "selectPrompt": "اختر محادثة لقراءة رسائلك.",
+    "composePlaceholder": "اكتب رسالة…",
+    "send": "إرسال",
+    "sendFailed": "فشل إرسال الرسالة",
+    "youPrefix": "أنت:",
+    "encryptedSent": "رسالة مشفرة",
+    "encryptedReceived": "رسالة مشفرة",
+    "decryptFailed": "تعذّر فك تشفير هذه الرسالة.",
+    "unsupported": "طريقة تسجيل الدخول الحالية لا تدعم الرسائل المباشرة المشفرة."
   },
   "auth": {
     "join": "انضمام",

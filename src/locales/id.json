@@ -81,6 +81,7 @@
     "myDashboard": "Dasbor Saya",
     "wallet": "Dompet",
     "notifications": "Notifikasi",
+    "messages": "Pesan",
     "profile": "Profil",
     "settings": "Pengaturan",
     "about": "Tentang",
@@ -90,6 +91,21 @@
     "changelog": "Catatan Versi",
     "sourceCode": "Kode sumber",
     "getApp": "Dapatkan aplikasi"
+  },
+  "messages": {
+    "title": "Pesan",
+    "subtitle": "Pesan langsung pribadi Anda yang terenkripsi.",
+    "conversations": "Percakapan",
+    "empty": "Belum ada pesan. Percakapan yang Anda miliki akan muncul di sini.",
+    "selectPrompt": "Pilih percakapan untuk membaca pesan Anda.",
+    "composePlaceholder": "Tulis pesan…",
+    "send": "Kirim",
+    "sendFailed": "Gagal mengirim pesan",
+    "youPrefix": "Anda:",
+    "encryptedSent": "Pesan terenkripsi",
+    "encryptedReceived": "Pesan terenkripsi",
+    "decryptFailed": "Tidak dapat mendekripsi pesan ini.",
+    "unsupported": "Metode masuk Anda saat ini tidak mendukung pesan langsung terenkripsi."
   },
   "auth": {
     "join": "Gabung",

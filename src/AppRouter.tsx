@@ -39,6 +39,7 @@ const CSAEPolicyPage = lazy(() => import("./pages/CSAEPolicyPage").then(m => ({ 
 const ExternalContentPage = lazy(() => import("./pages/ExternalContentPage").then(m => ({ default: m.ExternalContentPage })));
 const GeotagPage = lazy(() => import("./pages/GeotagPage").then(m => ({ default: m.GeotagPage })));
 const HashtagPage = lazy(() => import("./pages/HashtagPage").then(m => ({ default: m.HashtagPage })));
+const MessagesPage = lazy(() => import("./pages/MessagesPage").then(m => ({ default: m.MessagesPage })));
 const MyDashboardPage = lazy(() => import("./pages/MyDashboardPage").then(m => ({ default: m.MyDashboardPage })));
 const AboutPage = lazy(() => import("./pages/AboutPage").then(m => ({ default: m.AboutPage })));
 const DonorGuidePage = lazy(() => import("./pages/DonorGuidePage").then(m => ({ default: m.DonorGuidePage })));
@@ -152,6 +153,7 @@ export function AppRouter() {
         <Route element={<FundraiserLayout narrow />}>
           <Route path="/feed" element={<Index />} />
           <Route path="/my-dashboard" element={<MyDashboardPage />} />
+          <Route path="/messages" element={<MessagesPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/profile" element={<ProfileRedirect />} />

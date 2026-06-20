@@ -81,6 +81,7 @@
     "myDashboard": "Dashboard Yangu",
     "wallet": "Chikwama",
     "notifications": "Zviziviso",
+    "messages": "Mameseji",
     "profile": "Profile",
     "settings": "Marongero",
     "about": "Nezve",
@@ -90,6 +91,21 @@
     "changelog": "Rondedzero yeshanduko",
     "sourceCode": "Kodhi yetsime",
     "getApp": "Tora app"
+  },
+  "messages": {
+    "title": "Mameseji",
+    "subtitle": "Mameseji ako akavanzika akakodheswa.",
+    "conversations": "Nhaurirano",
+    "empty": "Hapana mameseji parizvino. Nhaurirano dzaunazvo dzichaonekwa pano.",
+    "selectPrompt": "Sarudza nhaurirano kuti uverenge mameseji ako.",
+    "composePlaceholder": "Nyora meseji…",
+    "send": "Tumira",
+    "sendFailed": "Kutumira meseji kwakundikana",
+    "youPrefix": "Iwe:",
+    "encryptedSent": "Meseji yakakodheswa",
+    "encryptedReceived": "Meseji yakakodheswa",
+    "decryptFailed": "Hazvigoneki kudekodha meseji iyi.",
+    "unsupported": "Nzira yako yazvino yekupinda haitsigire mameseji akavanzika akakodheswa."
   },
   "auth": {
     "join": "Joinha",

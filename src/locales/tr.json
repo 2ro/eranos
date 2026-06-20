@@ -81,6 +81,7 @@
     "myDashboard": "Panelim",
     "wallet": "Cüzdan",
     "notifications": "Bildirimler",
+    "messages": "Mesajlar",
     "profile": "Profil",
     "settings": "Ayarlar",
     "about": "Hakkında",
@@ -90,6 +91,21 @@
     "changelog": "Sürüm notları",
     "sourceCode": "Kaynak kod",
     "getApp": "Uygulamayı edinin"
+  },
+  "messages": {
+    "title": "Mesajlar",
+    "subtitle": "Özel şifreli doğrudan mesajlarınız.",
+    "conversations": "Sohbetler",
+    "empty": "Henüz mesaj yok. Sahip olduğunuz sohbetler burada görünecek.",
+    "selectPrompt": "Mesajlarınızı okumak için bir sohbet seçin.",
+    "composePlaceholder": "Bir mesaj yazın…",
+    "send": "Gönder",
+    "sendFailed": "Mesaj gönderilemedi",
+    "youPrefix": "Siz:",
+    "encryptedSent": "Şifreli mesaj",
+    "encryptedReceived": "Şifreli mesaj",
+    "decryptFailed": "Bu mesajın şifresi çözülemiyor.",
+    "unsupported": "Mevcut giriş yönteminiz şifreli doğrudan mesajları desteklemiyor."
   },
   "auth": {
     "join": "Katıl",

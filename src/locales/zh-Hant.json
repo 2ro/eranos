@@ -81,6 +81,7 @@
     "myDashboard": "我的儀表板",
     "wallet": "錢包",
     "notifications": "通知",
+    "messages": "私訊",
     "profile": "個人資料",
     "settings": "設定",
     "about": "關於",
@@ -90,6 +91,21 @@
     "changelog": "更新日誌",
     "sourceCode": "原始碼",
     "getApp": "取得應用程式"
+  },
+  "messages": {
+    "title": "私訊",
+    "subtitle": "您的私密加密私訊。",
+    "conversations": "對話",
+    "empty": "暫無訊息。您的對話將顯示在此處。",
+    "selectPrompt": "選擇一個對話以閱讀您的訊息。",
+    "composePlaceholder": "撰寫訊息…",
+    "send": "傳送",
+    "sendFailed": "訊息傳送失敗",
+    "youPrefix": "您：",
+    "encryptedSent": "加密訊息",
+    "encryptedReceived": "加密訊息",
+    "decryptFailed": "無法解密此訊息。",
+    "unsupported": "您目前的登入方式不支援加密私訊。"
   },
   "auth": {
     "join": "加入",

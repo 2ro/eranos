@@ -81,6 +81,7 @@
     "myDashboard": "Mon tableau de bord",
     "wallet": "Portefeuille",
     "notifications": "Notifications",
+    "messages": "Messages",
     "profile": "Profil",
     "settings": "Paramètres",
     "about": "À propos",
@@ -90,6 +91,21 @@
     "changelog": "Journal des modifications",
     "sourceCode": "Code source",
     "getApp": "Télécharger l'application"
+  },
+  "messages": {
+    "title": "Messages",
+    "subtitle": "Vos messages directs privés et chiffrés.",
+    "conversations": "Conversations",
+    "empty": "Aucun message pour le moment. Les conversations que vous aurez apparaîtront ici.",
+    "selectPrompt": "Sélectionnez une conversation pour lire vos messages.",
+    "composePlaceholder": "Écrire un message…",
+    "send": "Envoyer",
+    "sendFailed": "Échec de l'envoi du message",
+    "youPrefix": "Vous :",
+    "encryptedSent": "Message chiffré",
+    "encryptedReceived": "Message chiffré",
+    "decryptFailed": "Impossible de déchiffrer ce message.",
+    "unsupported": "Votre méthode de connexion actuelle ne prend pas en charge les messages directs chiffrés."
   },
   "auth": {
     "join": "Rejoindre",

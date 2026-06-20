@@ -81,6 +81,7 @@
     "myDashboard": "Mi panel",
     "wallet": "Cartera",
     "notifications": "Notificaciones",
+    "messages": "Mensajes",
     "profile": "Perfil",
     "settings": "Ajustes",
     "about": "Acerca de",
@@ -90,6 +91,21 @@
     "changelog": "Novedades",
     "sourceCode": "Código fuente",
     "getApp": "Descargar la app"
+  },
+  "messages": {
+    "title": "Mensajes",
+    "subtitle": "Tus mensajes directos privados y cifrados.",
+    "conversations": "Conversaciones",
+    "empty": "Aún no hay mensajes. Las conversaciones que tengas aparecerán aquí.",
+    "selectPrompt": "Selecciona una conversación para leer tus mensajes.",
+    "composePlaceholder": "Escribe un mensaje…",
+    "send": "Enviar",
+    "sendFailed": "No se pudo enviar el mensaje",
+    "youPrefix": "Tú:",
+    "encryptedSent": "Mensaje cifrado",
+    "encryptedReceived": "Mensaje cifrado",
+    "decryptFailed": "No se pudo descifrar este mensaje.",
+    "unsupported": "Tu método de inicio de sesión actual no admite mensajes directos cifrados."
   },
   "auth": {
     "join": "Unirse",

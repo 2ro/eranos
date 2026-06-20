@@ -81,6 +81,7 @@
     "myDashboard": "我的仪表板",
     "wallet": "钱包",
     "notifications": "通知",
+    "messages": "私信",
     "profile": "个人资料",
     "settings": "设置",
     "about": "关于",
@@ -90,6 +91,21 @@
     "changelog": "更新日志",
     "sourceCode": "源代码",
     "getApp": "获取应用"
+  },
+  "messages": {
+    "title": "私信",
+    "subtitle": "您的私密加密私信。",
+    "conversations": "对话",
+    "empty": "暂无消息。您的对话将显示在此处。",
+    "selectPrompt": "选择一个对话以阅读您的消息。",
+    "composePlaceholder": "写一条消息…",
+    "send": "发送",
+    "sendFailed": "消息发送失败",
+    "youPrefix": "您：",
+    "encryptedSent": "加密消息",
+    "encryptedReceived": "加密消息",
+    "decryptFailed": "无法解密此消息。",
+    "unsupported": "您当前的登录方式不支持加密私信。"
   },
   "auth": {
     "join": "加入",

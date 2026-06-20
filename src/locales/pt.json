@@ -81,6 +81,7 @@
     "myDashboard": "Meu painel",
     "wallet": "Carteira",
     "notifications": "Notificações",
+    "messages": "Mensagens",
     "profile": "Perfil",
     "settings": "Configurações",
     "about": "Sobre",
@@ -90,6 +91,21 @@
     "changelog": "Notas de versão",
     "sourceCode": "Código-fonte",
     "getApp": "Baixar o app"
+  },
+  "messages": {
+    "title": "Mensagens",
+    "subtitle": "Suas mensagens diretas privadas e criptografadas.",
+    "conversations": "Conversas",
+    "empty": "Ainda não há mensagens. As conversas que você tiver aparecerão aqui.",
+    "selectPrompt": "Selecione uma conversa para ler suas mensagens.",
+    "composePlaceholder": "Escreva uma mensagem…",
+    "send": "Enviar",
+    "sendFailed": "Falha ao enviar a mensagem",
+    "youPrefix": "Você:",
+    "encryptedSent": "Mensagem criptografada",
+    "encryptedReceived": "Mensagem criptografada",
+    "decryptFailed": "Não foi possível descriptografar esta mensagem.",
+    "unsupported": "Seu método de login atual não oferece suporte a mensagens diretas criptografadas."
   },
   "auth": {
     "join": "Entrar",

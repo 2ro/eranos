@@ -81,6 +81,7 @@
     "myDashboard": "My Dashboard",
     "wallet": "Wallet",
     "notifications": "Notifications",
+    "messages": "Messages",
     "profile": "Profile",
     "settings": "Settings",
     "about": "About",
@@ -91,6 +92,21 @@
     "changelog": "Changelog",
     "sourceCode": "Source code",
     "getApp": "Get the app"
+  },
+  "messages": {
+    "title": "Messages",
+    "subtitle": "Your private encrypted direct messages.",
+    "conversations": "Conversations",
+    "empty": "No messages yet. Conversations you have will appear here.",
+    "selectPrompt": "Select a conversation to read your messages.",
+    "composePlaceholder": "Write a message…",
+    "send": "Send",
+    "sendFailed": "Failed to send message",
+    "youPrefix": "You:",
+    "encryptedSent": "Encrypted message",
+    "encryptedReceived": "Encrypted message",
+    "decryptFailed": "Unable to decrypt this message.",
+    "unsupported": "Your current login method does not support encrypted direct messages."
   },
   "auth": {
     "join": "Join",

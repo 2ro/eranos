@@ -80,6 +80,7 @@
     "dashboard": "Dashibodi",
     "wallet": "Pochi",
     "notifications": "Arifa",
+    "messages": "Ujumbe",
     "profile": "Wasifu",
     "settings": "Mipangilio",
     "about": "Kuhusu",
@@ -90,6 +91,21 @@
     "sourceCode": "Msimbo wa chanzo",
     "getApp": "Pata programu",
     "myDashboard": "Dashibodi Yangu"
+  },
+  "messages": {
+    "title": "Ujumbe",
+    "subtitle": "Ujumbe wako wa moja kwa moja wa faragha uliosimbwa.",
+    "conversations": "Mazungumzo",
+    "empty": "Hakuna ujumbe bado. Mazungumzo uliyo nayo yataonekana hapa.",
+    "selectPrompt": "Chagua mazungumzo ili kusoma ujumbe wako.",
+    "composePlaceholder": "Andika ujumbe…",
+    "send": "Tuma",
+    "sendFailed": "Imeshindwa kutuma ujumbe",
+    "youPrefix": "Wewe:",
+    "encryptedSent": "Ujumbe uliosimbwa",
+    "encryptedReceived": "Ujumbe uliosimbwa",
+    "decryptFailed": "Imeshindwa kusimbua ujumbe huu.",
+    "unsupported": "Njia yako ya sasa ya kuingia hairuhusu ujumbe wa moja kwa moja uliosimbwa."
   },
   "auth": {
     "join": "Jiunge",
