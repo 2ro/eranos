@@ -93,7 +93,7 @@ interface ProfileIdentityRailProps {
 }
 
 const RAIL_CAMPAIGN_LIMIT = 2;
-const RAIL_ORG_LIMIT = 4;
+const RAIL_ORG_LIMIT = 2;
 
 /**
  * ProfileIdentityRail — the left rail of the two-column profile.
@@ -798,8 +798,8 @@ function RailOrganizationsSection({ pubkey }: { pubkey: string }) {
     return (
       <section className="space-y-3">
         <RailSectionHeader icon={<Users className="size-4 text-primary" />} title={t('profile.sections.groups')} />
-        <div className="grid grid-cols-2 gap-3">
-          {Array.from({ length: 2 }).map((_, i) => (
+        <div className="space-y-3">
+          {Array.from({ length: RAIL_ORG_LIMIT }).map((_, i) => (
             <CommunityMiniCardSkeleton key={i} className="w-full" />
           ))}
         </div>
@@ -819,7 +819,7 @@ function RailOrganizationsSection({ pubkey }: { pubkey: string }) {
         title={t('profile.sections.groups')}
         count={orgs.length}
       />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-3">
         {shown.map((entry) => (
           <RailOrgCell key={entry.community.aTag} entry={entry} />
         ))}
