@@ -105,7 +105,18 @@
     "encryptedSent": "加密訊息",
     "encryptedReceived": "加密訊息",
     "decryptFailed": "無法解密此訊息。",
-    "unsupported": "您目前的登入方式不支援加密私訊。"
+    "unsupported": "您目前的登入方式不支援加密私訊。",
+    "searchConversation": "搜尋對話",
+    "searchPlaceholder": "搜尋訊息",
+    "noSearchResults": "沒有符合的訊息。",
+    "visitProfile": "查看 {{name}} 的個人檔案",
+    "muteUser": "封鎖 {{name}}",
+    "muteDialogTitle": "封鎖 {{name}}？",
+    "muteDialogDescription": "這會將 {{name}} 加入您的封鎖清單，並從訊息中移除此對話。您稍後可以從封鎖清單中取消封鎖。",
+    "confirmMute": "封鎖使用者",
+    "mutedToastTitle": "使用者已封鎖",
+    "mutedToastDescription": "已封鎖 {{name}}，並移除了該對話。",
+    "muteFailed": "封鎖使用者失敗"
   },
   "auth": {
     "join": "加入",

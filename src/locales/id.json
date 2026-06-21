@@ -105,7 +105,18 @@
     "encryptedSent": "Pesan terenkripsi",
     "encryptedReceived": "Pesan terenkripsi",
     "decryptFailed": "Tidak dapat mendekripsi pesan ini.",
-    "unsupported": "Metode masuk Anda saat ini tidak mendukung pesan langsung terenkripsi."
+    "unsupported": "Metode masuk Anda saat ini tidak mendukung pesan langsung terenkripsi.",
+    "searchConversation": "Cari di percakapan",
+    "searchPlaceholder": "Cari pesan",
+    "noSearchResults": "Tidak ada pesan yang cocok.",
+    "visitProfile": "Kunjungi profil {{name}}",
+    "muteUser": "Bisukan {{name}}",
+    "muteDialogTitle": "Bisukan {{name}}?",
+    "muteDialogDescription": "Ini akan menambahkan {{name}} ke daftar bisu Anda dan menghapus percakapan ini dari Pesan. Anda dapat membatalkannya nanti dari daftar bisu Anda.",
+    "confirmMute": "Bisukan pengguna",
+    "mutedToastTitle": "Pengguna dibisukan",
+    "mutedToastDescription": "{{name}} dibisukan dan percakapan dihapus.",
+    "muteFailed": "Gagal membisukan pengguna"
   },
   "auth": {
     "join": "Gabung",

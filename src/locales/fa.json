@@ -105,7 +105,18 @@
     "encryptedSent": "پیام رمزگذاری‌شده",
     "encryptedReceived": "پیام رمزگذاری‌شده",
     "decryptFailed": "رمزگشایی این پیام ممکن نیست.",
-    "unsupported": "روش ورود فعلی شما از پیام‌های مستقیم رمزگذاری‌شده پشتیبانی نمی‌کند."
+    "unsupported": "روش ورود فعلی شما از پیام‌های مستقیم رمزگذاری‌شده پشتیبانی نمی‌کند.",
+    "searchConversation": "جستجو در گفتگو",
+    "searchPlaceholder": "جستجوی پیام‌ها",
+    "noSearchResults": "پیام مطابقی پیدا نشد.",
+    "visitProfile": "مشاهده نمایه {{name}}",
+    "muteUser": "بی‌صدا کردن {{name}}",
+    "muteDialogTitle": "{{name}} بی‌صدا شود؟",
+    "muteDialogDescription": "با این کار {{name}} به فهرست بی‌صدای شما اضافه می‌شود و این گفتگو از پیام‌ها حذف می‌شود. بعداً می‌توانید از فهرست بی‌صداها او را دوباره فعال کنید.",
+    "confirmMute": "بی‌صدا کردن کاربر",
+    "mutedToastTitle": "کاربر بی‌صدا شد",
+    "mutedToastDescription": "{{name}} بی‌صدا شد و گفتگو حذف شد.",
+    "muteFailed": "بی‌صدا کردن کاربر ناموفق بود"
   },
   "auth": {
     "join": "پیوستن",

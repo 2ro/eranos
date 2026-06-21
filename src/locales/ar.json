@@ -105,7 +105,18 @@
     "encryptedSent": "رسالة مشفرة",
     "encryptedReceived": "رسالة مشفرة",
     "decryptFailed": "تعذّر فك تشفير هذه الرسالة.",
-    "unsupported": "طريقة تسجيل الدخول الحالية لا تدعم الرسائل المباشرة المشفرة."
+    "unsupported": "طريقة تسجيل الدخول الحالية لا تدعم الرسائل المباشرة المشفرة.",
+    "searchConversation": "البحث في المحادثة",
+    "searchPlaceholder": "البحث في الرسائل",
+    "noSearchResults": "لا توجد رسائل مطابقة.",
+    "visitProfile": "زيارة ملف {{name}} الشخصي",
+    "muteUser": "كتم {{name}}",
+    "muteDialogTitle": "كتم {{name}}؟",
+    "muteDialogDescription": "سيؤدي هذا إلى إضافة {{name}} إلى قائمة الكتم لديك وإزالة هذه المحادثة من الرسائل. يمكنك إلغاء كتمه لاحقًا من قائمة الكتم.",
+    "confirmMute": "كتم المستخدم",
+    "mutedToastTitle": "تم كتم المستخدم",
+    "mutedToastDescription": "تم كتم {{name}} وإزالة المحادثة.",
+    "muteFailed": "فشل كتم المستخدم"
   },
   "auth": {
     "join": "انضمام",

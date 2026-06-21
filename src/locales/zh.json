@@ -105,7 +105,18 @@
     "encryptedSent": "加密消息",
     "encryptedReceived": "加密消息",
     "decryptFailed": "无法解密此消息。",
-    "unsupported": "您当前的登录方式不支持加密私信。"
+    "unsupported": "您当前的登录方式不支持加密私信。",
+    "searchConversation": "搜索对话",
+    "searchPlaceholder": "搜索消息",
+    "noSearchResults": "没有匹配的消息。",
+    "visitProfile": "访问 {{name}} 的个人资料",
+    "muteUser": "屏蔽 {{name}}",
+    "muteDialogTitle": "屏蔽 {{name}}？",
+    "muteDialogDescription": "这会将 {{name}} 添加到您的屏蔽列表，并从消息中移除此对话。您稍后可以从屏蔽列表中取消屏蔽。",
+    "confirmMute": "屏蔽用户",
+    "mutedToastTitle": "用户已屏蔽",
+    "mutedToastDescription": "已屏蔽 {{name}}，并移除了该对话。",
+    "muteFailed": "屏蔽用户失败"
   },
   "auth": {
     "join": "加入",

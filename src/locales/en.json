@@ -106,7 +106,18 @@
     "encryptedSent": "Encrypted message",
     "encryptedReceived": "Encrypted message",
     "decryptFailed": "Unable to decrypt this message.",
-    "unsupported": "Your current login method does not support encrypted direct messages."
+    "unsupported": "Your current login method does not support encrypted direct messages.",
+    "searchConversation": "Search conversation",
+    "searchPlaceholder": "Search messages",
+    "noSearchResults": "No matching messages.",
+    "visitProfile": "Visit {{name}}'s profile",
+    "muteUser": "Mute {{name}}",
+    "muteDialogTitle": "Mute {{name}}?",
+    "muteDialogDescription": "This will add {{name}} to your mute list and remove this conversation from Messages. You can unmute them later from your mute list.",
+    "confirmMute": "Mute user",
+    "mutedToastTitle": "User muted",
+    "mutedToastDescription": "{{name}} was muted and the conversation was removed.",
+    "muteFailed": "Failed to mute user"
   },
   "auth": {
     "join": "Join",

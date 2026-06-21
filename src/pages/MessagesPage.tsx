@@ -1,10 +1,20 @@
 import { useSeoMeta } from '@unhead/react';
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useInView } from 'react-intersection-observer';
-import { ArrowLeft, ArrowUp, Loader2, Lock, MessageSquare, Search } from 'lucide-react';
+import { ArrowLeft, ArrowUp, BellOff, Loader2, Lock, MessageSquare, Search, X } from 'lucide-react';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +31,8 @@ import {
   type Conversation,
   type DirectMessage,
 } from '@/hooks/useDirectMessages';
+import { useMuteList } from '@/hooks/useMuteList';
+import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
 import { getDisplayName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -31,9 +43,11 @@ import { cn } from '@/lib/utils';
 function usePeerProfile(pubkey: string) {
   const author = useAuthor(pubkey);
   const metadata = author.data?.metadata;
+  const profileUrl = useProfileUrl(pubkey, metadata);
   return {
     name: getDisplayName(metadata, pubkey),
     picture: sanitizeUrl(metadata?.picture),
+    profileUrl,
   };
 }
 
@@ -132,18 +146,36 @@ function MessageBubble({ message }: { message: DirectMessage }) {
 }
 
 /** The active conversation thread plus a send composer. */
-function MessageThread({ conversation, onBack }: { conversation: Conversation; onBack: () => void }) {
+function MessageThread({
+  conversation,
+  onBack,
+  onMuted,
+}: {
+  conversation: Conversation;
+  onBack: () => void;
+  onMuted: (peer: string) => void;
+}) {
   const { t } = useTranslation();
-  const { name, picture } = usePeerProfile(conversation.peer);
+  const { name, picture, profileUrl } = usePeerProfile(conversation.peer);
   const { data: messages, isLoading } = useDirectMessageThread(conversation);
   const { mutateAsync: send, isPending } = useSendDirectMessage();
+  const { addMute } = useMuteList();
   const { toast } = useToast();
   const [draft, setDraft] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [muteConfirmOpen, setMuteConfirmOpen] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const hasDraft = draft.trim().length > 0;
+  const normalizedThreadSearch = searchQuery.trim().toLocaleLowerCase();
+  const visibleMessages = normalizedThreadSearch
+    ? messages?.filter((message) => message.content?.toLocaleLowerCase().includes(normalizedThreadSearch))
+    : messages;
 
   useEffect(() => {
     setDraft('');
+    setSearchOpen(false);
+    setSearchQuery('');
   }, [conversation.peer]);
 
   useEffect(() => {
@@ -173,6 +205,24 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
     e.currentTarget.form?.requestSubmit();
   };
 
+  const handleMute = async () => {
+    try {
+      await addMute.mutateAsync({ type: 'pubkey', value: conversation.peer });
+      setMuteConfirmOpen(false);
+      onMuted(conversation.peer);
+      toast({
+        title: t('messages.mutedToastTitle'),
+        description: t('messages.mutedToastDescription', { name }),
+      });
+    } catch (err) {
+      toast({
+        title: t('messages.muteFailed'),
+        description: err instanceof Error ? err.message : undefined,
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <div className="flex h-full min-h-0 flex-col bg-gradient-to-b from-muted/30 via-background to-background">
       <div className="flex items-center gap-3 p-4">
@@ -180,12 +230,61 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
           <ArrowLeft className="size-4" />
           <span className="sr-only">{t('messages.conversations')}</span>
         </Button>
-        <Avatar className="size-10 ring-2 ring-background">
-          <AvatarImage src={picture} alt={name} />
-          <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-        </Avatar>
+        <Link to={profileUrl} aria-label={t('messages.visitProfile', { name })} className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <Avatar className="size-10 ring-2 ring-background transition-opacity hover:opacity-85">
+            <AvatarImage src={picture} alt={name} />
+            <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+          </Avatar>
+        </Link>
         <p className="min-w-0 flex-1 truncate font-semibold">{name}</p>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="shrink-0"
+          onClick={() => setSearchOpen((open) => !open)}
+          aria-label={t('messages.searchConversation')}
+          aria-pressed={searchOpen}
+        >
+          {searchOpen ? <X className="size-4" /> : <Search className="size-4" />}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="shrink-0 text-muted-foreground hover:text-destructive"
+          onClick={() => setMuteConfirmOpen(true)}
+          aria-label={t('messages.muteUser', { name })}
+        >
+          <BellOff className="size-4" />
+        </Button>
       </div>
+
+      {searchOpen && (
+        <div className="px-4 pb-3">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('messages.searchPlaceholder')}
+              aria-label={t('messages.searchConversation')}
+              className="h-10 rounded-full border-0 bg-muted/40 pl-9 pr-9 shadow-none focus-visible:ring-2 focus-visible:ring-ring"
+              autoFocus
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={t('common.clear')}
+              >
+                <X className="size-4" />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       <ScrollArea className="min-h-0 flex-1 px-4">
         <div className="space-y-3 py-5">
@@ -196,7 +295,11 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
               <Skeleton className="h-10 w-1/2 rounded-3xl" />
             </div>
           ) : (
-            messages?.map((message) => <MessageBubble key={message.id} message={message} />)
+            visibleMessages && visibleMessages.length > 0 ? (
+              visibleMessages.map((message) => <MessageBubble key={message.id} message={message} />)
+            ) : normalizedThreadSearch ? (
+              <p className="px-4 py-10 text-center text-sm text-muted-foreground">{t('messages.noSearchResults')}</p>
+            ) : null
           )}
           <div ref={endRef} />
         </div>
@@ -224,6 +327,31 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
           </button>
         )}
       </form>
+
+      <AlertDialog open={muteConfirmOpen} onOpenChange={setMuteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('messages.muteDialogTitle', { name })}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('messages.muteDialogDescription', { name })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={addMute.isPending}>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                void handleMute();
+              }}
+              disabled={addMute.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {addMute.isPending ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
+              {t('messages.confirmMute')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -240,8 +368,10 @@ export function MessagesPage() {
     isFetchingNextPage,
     pageCount,
   } = useDirectMessages();
+  const { muteItems } = useMuteList();
   const [selectedPeer, setSelectedPeer] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [hiddenMutedPeers, setHiddenMutedPeers] = useState<Set<string>>(() => new Set());
   const { ref: olderMessagesRef, inView: olderMessagesInView } = useInView({ threshold: 0, rootMargin: '300px' });
 
   useSeoMeta({
@@ -249,10 +379,25 @@ export function MessagesPage() {
     description: t('messages.subtitle'),
   });
 
-  const selected = useMemo(
-    () => conversations?.find((c) => c.peer === selectedPeer) ?? null,
-    [conversations, selectedPeer],
+  const mutedPubkeys = useMemo(
+    () => new Set(muteItems.filter((item) => item.type === 'pubkey').map((item) => item.value)),
+    [muteItems],
   );
+  const visibleConversations = useMemo(
+    () => conversations?.filter((conversation) => (
+      !hiddenMutedPeers.has(conversation.peer) && !mutedPubkeys.has(conversation.peer)
+    )),
+    [conversations, hiddenMutedPeers, mutedPubkeys],
+  );
+  const selected = useMemo(
+    () => visibleConversations?.find((c) => c.peer === selectedPeer) ?? null,
+    [visibleConversations, selectedPeer],
+  );
+
+  const handleMuted = (peer: string) => {
+    setHiddenMutedPeers((prev) => new Set(prev).add(peer));
+    setSelectedPeer(null);
+  };
 
   useEffect(() => {
     if (pageCount === 1 && hasNextPage && !isFetchingNextPage) {
@@ -312,8 +457,8 @@ export function MessagesPage() {
                       </div>
                     </div>
                   ))
-                ) : conversations && conversations.length > 0 ? (
-                  conversations.map((conversation) => (
+                ) : visibleConversations && visibleConversations.length > 0 ? (
+                  visibleConversations.map((conversation) => (
                     <ConversationRow
                       key={conversation.peer}
                       conversation={conversation}
@@ -329,7 +474,7 @@ export function MessagesPage() {
                     </p>
                   </div>
                 )}
-                {hasNextPage && conversations && conversations.length > 0 && !search.trim() && (
+                {hasNextPage && visibleConversations && visibleConversations.length > 0 && !search.trim() && (
                   <div ref={olderMessagesRef} className="flex justify-center py-4">
                     {isFetchingNextPage && <Loader2 className="size-4 animate-spin text-muted-foreground" />}
                   </div>
@@ -341,7 +486,7 @@ export function MessagesPage() {
           {/* Thread */}
           <div className={cn('h-full min-h-0 min-w-0', !selected && 'hidden md:block')}>
             {selected ? (
-              <MessageThread conversation={selected} onBack={() => setSelectedPeer(null)} />
+              <MessageThread conversation={selected} onBack={() => setSelectedPeer(null)} onMuted={handleMuted} />
             ) : (
               <div className="flex h-full items-center justify-center bg-gradient-to-br from-background via-muted/20 to-primary/5 p-8 text-center">
                 <div className="max-w-sm space-y-3">

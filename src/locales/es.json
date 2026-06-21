@@ -105,7 +105,18 @@
     "encryptedSent": "Mensaje cifrado",
     "encryptedReceived": "Mensaje cifrado",
     "decryptFailed": "No se pudo descifrar este mensaje.",
-    "unsupported": "Tu método de inicio de sesión actual no admite mensajes directos cifrados."
+    "unsupported": "Tu método de inicio de sesión actual no admite mensajes directos cifrados.",
+    "searchConversation": "Buscar en la conversación",
+    "searchPlaceholder": "Buscar mensajes",
+    "noSearchResults": "No hay mensajes coincidentes.",
+    "visitProfile": "Visitar el perfil de {{name}}",
+    "muteUser": "Silenciar a {{name}}",
+    "muteDialogTitle": "¿Silenciar a {{name}}?",
+    "muteDialogDescription": "Esto agregará a {{name}} a tu lista de silenciados y eliminará esta conversación de Mensajes. Puedes dejar de silenciarle más tarde desde tu lista de silenciados.",
+    "confirmMute": "Silenciar usuario",
+    "mutedToastTitle": "Usuario silenciado",
+    "mutedToastDescription": "Se silenció a {{name}} y se eliminó la conversación.",
+    "muteFailed": "No se pudo silenciar al usuario"
   },
   "auth": {
     "join": "Unirse",

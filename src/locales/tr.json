@@ -105,7 +105,18 @@
     "encryptedSent": "Şifreli mesaj",
     "encryptedReceived": "Şifreli mesaj",
     "decryptFailed": "Bu mesajın şifresi çözülemiyor.",
-    "unsupported": "Mevcut giriş yönteminiz şifreli doğrudan mesajları desteklemiyor."
+    "unsupported": "Mevcut giriş yönteminiz şifreli doğrudan mesajları desteklemiyor.",
+    "searchConversation": "Sohbette ara",
+    "searchPlaceholder": "Mesajlarda ara",
+    "noSearchResults": "Eşleşen mesaj yok.",
+    "visitProfile": "{{name}} profilini ziyaret et",
+    "muteUser": "{{name}} kullanıcısını sessize al",
+    "muteDialogTitle": "{{name}} sessize alınsın mı?",
+    "muteDialogDescription": "Bu, {{name}} kullanıcısını sessize alma listenize ekler ve bu sohbeti Mesajlar'dan kaldırır. Daha sonra sessize alma listenizden geri alabilirsiniz.",
+    "confirmMute": "Kullanıcıyı sessize al",
+    "mutedToastTitle": "Kullanıcı sessize alındı",
+    "mutedToastDescription": "{{name}} sessize alındı ve sohbet kaldırıldı.",
+    "muteFailed": "Kullanıcı sessize alınamadı"
   },
   "auth": {
     "join": "Katıl",

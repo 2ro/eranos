@@ -105,7 +105,18 @@
     "encryptedSent": "Mensagem criptografada",
     "encryptedReceived": "Mensagem criptografada",
     "decryptFailed": "Não foi possível descriptografar esta mensagem.",
-    "unsupported": "Seu método de login atual não oferece suporte a mensagens diretas criptografadas."
+    "unsupported": "Seu método de login atual não oferece suporte a mensagens diretas criptografadas.",
+    "searchConversation": "Pesquisar na conversa",
+    "searchPlaceholder": "Pesquisar mensagens",
+    "noSearchResults": "Nenhuma mensagem correspondente.",
+    "visitProfile": "Visitar o perfil de {{name}}",
+    "muteUser": "Silenciar {{name}}",
+    "muteDialogTitle": "Silenciar {{name}}?",
+    "muteDialogDescription": "Isso adicionará {{name}} à sua lista de silenciados e removerá esta conversa de Mensagens. Você poderá reverter isso depois pela sua lista de silenciados.",
+    "confirmMute": "Silenciar usuário",
+    "mutedToastTitle": "Usuário silenciado",
+    "mutedToastDescription": "{{name}} foi silenciado e a conversa foi removida.",
+    "muteFailed": "Falha ao silenciar usuário"
   },
   "auth": {
     "join": "Entrar",

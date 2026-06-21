@@ -105,7 +105,18 @@
     "encryptedSent": "Ujumbe uliosimbwa",
     "encryptedReceived": "Ujumbe uliosimbwa",
     "decryptFailed": "Imeshindwa kusimbua ujumbe huu.",
-    "unsupported": "Njia yako ya sasa ya kuingia hairuhusu ujumbe wa moja kwa moja uliosimbwa."
+    "unsupported": "Njia yako ya sasa ya kuingia hairuhusu ujumbe wa moja kwa moja uliosimbwa.",
+    "searchConversation": "Tafuta kwenye mazungumzo",
+    "searchPlaceholder": "Tafuta ujumbe",
+    "noSearchResults": "Hakuna ujumbe unaolingana.",
+    "visitProfile": "Tembelea wasifu wa {{name}}",
+    "muteUser": "Nyamazisha {{name}}",
+    "muteDialogTitle": "Unyamazishe {{name}}?",
+    "muteDialogDescription": "Hii itaongeza {{name}} kwenye orodha yako ya walionyamazishwa na kuondoa mazungumzo haya kwenye Ujumbe. Unaweza kumwondoa kwenye orodha hiyo baadaye.",
+    "confirmMute": "Nyamazisha mtumiaji",
+    "mutedToastTitle": "Mtumiaji amenyamazishwa",
+    "mutedToastDescription": "{{name}} amenyamazishwa na mazungumzo yameondolewa.",
+    "muteFailed": "Imeshindwa kunyamazisha mtumiaji"
   },
   "auth": {
     "join": "Jiunge",

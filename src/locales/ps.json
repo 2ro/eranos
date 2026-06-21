@@ -105,7 +105,18 @@
     "encryptedSent": "کوډ شوی پیغام",
     "encryptedReceived": "کوډ شوی پیغام",
     "decryptFailed": "د دې پیغام کوډ خلاصول نشي کیدی.",
-    "unsupported": "ستاسو اوسنۍ د ننوتلو طریقه کوډ شوي مستقیم پیغامونه نه ملاتړ کوي."
+    "unsupported": "ستاسو اوسنۍ د ننوتلو طریقه کوډ شوي مستقیم پیغامونه نه ملاتړ کوي.",
+    "searchConversation": "په خبرو اترو کې لټون",
+    "searchPlaceholder": "پیغامونه ولټوئ",
+    "noSearchResults": "برابر پیغامونه ونه موندل شول.",
+    "visitProfile": "د {{name}} پروفایل وګورئ",
+    "muteUser": "{{name}} چوپ کړئ",
+    "muteDialogTitle": "{{name}} چوپ کړئ؟",
+    "muteDialogDescription": "دا به {{name}} ستاسو د چوپ‌لړ کې اضافه کړي او دا خبرې اترې به له پیغامونو لرې کړي. تاسو کولای شئ وروسته یې له چوپ‌لړ څخه بېرته فعال کړئ.",
+    "confirmMute": "کاروونکی چوپ کړئ",
+    "mutedToastTitle": "کاروونکی چوپ شو",
+    "mutedToastDescription": "{{name}} چوپ شو او خبرې اترې لرې شوې.",
+    "muteFailed": "د کاروونکي چوپول ناکام شول"
   },
   "auth": {
     "join": "ګډون",

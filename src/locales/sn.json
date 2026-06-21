@@ -105,7 +105,18 @@
     "encryptedSent": "Meseji yakakodheswa",
     "encryptedReceived": "Meseji yakakodheswa",
     "decryptFailed": "Hazvigoneki kudekodha meseji iyi.",
-    "unsupported": "Nzira yako yazvino yekupinda haitsigire mameseji akavanzika akakodheswa."
+    "unsupported": "Nzira yako yazvino yekupinda haitsigire mameseji akavanzika akakodheswa.",
+    "searchConversation": "Tsvaga munhaurirano",
+    "searchPlaceholder": "Tsvaga mameseji",
+    "noSearchResults": "Hapana mameseji anoenderana.",
+    "visitProfile": "Shanyira profile ya{{name}}",
+    "muteUser": "Nyaradza {{name}}",
+    "muteDialogTitle": "Nyaradza {{name}}?",
+    "muteDialogDescription": "Izvi zvichawedzera {{name}} kurondedzero yako yevakanyaradzwa uye zvobvisa nhaurirano iyi kubva muMameseji. Unogona kuvabvisa pakunyaradzwa gare gare kubva murondedzero yako.",
+    "confirmMute": "Nyaradza mushandisi",
+    "mutedToastTitle": "Mushandisi anyaradzwa",
+    "mutedToastDescription": "{{name}} anyaradzwa uye nhaurirano yabviswa.",
+    "muteFailed": "Kutadza kunyaradza mushandisi"
   },
   "auth": {
     "join": "Joinha",

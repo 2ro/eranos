@@ -105,7 +105,18 @@
     "encryptedSent": "Message chiffré",
     "encryptedReceived": "Message chiffré",
     "decryptFailed": "Impossible de déchiffrer ce message.",
-    "unsupported": "Votre méthode de connexion actuelle ne prend pas en charge les messages directs chiffrés."
+    "unsupported": "Votre méthode de connexion actuelle ne prend pas en charge les messages directs chiffrés.",
+    "searchConversation": "Rechercher dans la conversation",
+    "searchPlaceholder": "Rechercher des messages",
+    "noSearchResults": "Aucun message correspondant.",
+    "visitProfile": "Voir le profil de {{name}}",
+    "muteUser": "Masquer {{name}}",
+    "muteDialogTitle": "Masquer {{name}} ?",
+    "muteDialogDescription": "Cela ajoutera {{name}} à votre liste de comptes masqués et supprimera cette conversation des Messages. Vous pourrez le retirer de cette liste plus tard.",
+    "confirmMute": "Masquer l'utilisateur",
+    "mutedToastTitle": "Utilisateur masqué",
+    "mutedToastDescription": "{{name}} a été masqué et la conversation a été supprimée.",
+    "muteFailed": "Échec du masquage de l'utilisateur"
   },
   "auth": {
     "join": "Rejoindre",
