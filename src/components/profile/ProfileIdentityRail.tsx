@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import {
   Globe,
   HandHeart,
+  MessageSquare,
   Megaphone,
   MoreHorizontal,
   QrCode,
@@ -341,6 +342,7 @@ export function ProfileIdentityHeader({
           avatar row instead. */}
       {!hideActionBar && (
         <ActionBar
+          pubkey={pubkey}
           isOwnProfile={isOwnProfile}
           isFollowing={isFollowing}
           followPending={followPending}
@@ -505,6 +507,7 @@ export function ProfileAvatarBlock({
 // ─── Action bar ──────────────────────────────────────────────────────────────
 
 export function ActionBar({
+  pubkey,
   isOwnProfile,
   isFollowing,
   followPending,
@@ -516,6 +519,7 @@ export function ActionBar({
   onDonate,
   align = 'start',
 }: {
+  pubkey: string;
   isOwnProfile: boolean;
   isFollowing: boolean;
   followPending: boolean;
@@ -545,13 +549,24 @@ export function ActionBar({
             </Button>
           </Link>
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             className="rounded-full size-10"
             title={t('profile.header.shareFollowLink')}
             onClick={onFollowQROpen}
           >
             <QrCode className="size-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full size-10"
+            title={t('nav.messages')}
+            asChild
+          >
+            <Link to={`/messages?to=${pubkey}`}>
+              <MessageSquare className="size-5" />
+            </Link>
           </Button>
           <Button
             variant="ghost"
@@ -606,6 +621,17 @@ export function ActionBar({
               </DropdownMenuContent>
             </DropdownMenu>
           ) : null}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full size-10"
+            title={t('nav.messages')}
+            asChild
+          >
+            <Link to={`/messages?to=${pubkey}`}>
+              <MessageSquare className="size-5" />
+            </Link>
+          </Button>
           <Button
             variant="ghost"
             size="icon"

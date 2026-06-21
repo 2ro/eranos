@@ -1383,6 +1383,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                       onLightbox={(url) => setLightboxImage(url)}
                     />
                     <ActionBar
+                      pubkey={pubkey}
                       align="end"
                       isOwnProfile={isOwnProfile}
                       isFollowing={isFollowing}
