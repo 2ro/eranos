@@ -212,6 +212,63 @@ function mergeConversationPages(data: { pages: DirectMessagesPage[] } | undefine
   return [...byPeer.values()].sort((a, b) => b.latest.createdAt - a.latest.createdAt);
 }
 
+function appendMessage(messages: DirectMessage[] | undefined, message: DirectMessage): DirectMessage[] | undefined {
+  if (!messages) return messages;
+  if (messages.some((existing) => existing.id === message.id)) return messages;
+  return [...messages, message].sort((a, b) => a.createdAt - b.createdAt);
+}
+
+function addSentMessageToPages(
+  data: InfiniteData<DirectMessagesPage, DirectMessagesCursor> | undefined,
+  message: DirectMessage,
+): InfiniteData<DirectMessagesPage, DirectMessagesCursor> | undefined {
+  if (!data || data.pages.length === 0) return data;
+
+  const pages = data.pages.map((page, index) => {
+    if (index !== 0) return page;
+
+    const conversations = [...page.conversations];
+    const existingIndex = conversations.findIndex((conversation) => conversation.peer === message.peer);
+    if (existingIndex === -1) {
+      conversations.unshift({
+        peer: message.peer,
+        events: [message.event],
+        messageCount: 1,
+        latest: message,
+      });
+    } else {
+      const conversation = conversations[existingIndex];
+      const events = conversation.events.some((event) => event.id === message.id)
+        ? conversation.events
+        : [...conversation.events, message.event].sort((a, b) => a.created_at - b.created_at);
+
+      conversations[existingIndex] = {
+        ...conversation,
+        events,
+        messageCount: events.length,
+        latest: message.createdAt >= conversation.latest.createdAt ? message : conversation.latest,
+      };
+    }
+
+    conversations.sort((a, b) => b.latest.createdAt - a.latest.createdAt);
+    return { ...page, conversations };
+  });
+
+  return { ...data, pages };
+}
+
+function directMessageFromPlaintext(event: NostrEvent, peer: string, self: string, content: string): DirectMessage {
+  return {
+    id: event.id,
+    pubkey: event.pubkey,
+    peer,
+    outgoing: event.pubkey === self,
+    createdAt: event.created_at,
+    content,
+    event,
+  };
+}
+
 async function decryptMessage({
   event,
   peer,
@@ -258,6 +315,7 @@ export function useDirectMessageThread(conversation: Conversation | null) {
       conversation?.messageCount,
     ],
     enabled: !!self && !!nip04 && !!conversation,
+    placeholderData: (previousData) => previousData,
     queryFn: async () => {
       if (!self || !nip04 || !conversation) return [];
       const messages: DirectMessage[] = [];
@@ -272,7 +330,8 @@ export function useDirectMessageThread(conversation: Conversation | null) {
 /**
  * Send a NIP-04 encrypted direct message to a peer. Encrypts the plaintext with
  * the signer's `nip04.encrypt`, then publishes a kind-4 event tagging the
- * recipient. Invalidates the DM query so the new message shows up.
+ * recipient. Seeds the DM caches with the signed event so the active thread can
+ * append smoothly without waiting for relays to return the message.
  */
 export function useSendDirectMessage() {
   const { user } = useCurrentUser();
@@ -289,8 +348,35 @@ export function useSendDirectMessage() {
       const content = await user.signer.nip04.encrypt(peer, trimmed);
       return publish({ kind: DM_KIND, content, tags: [['p', peer]] });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['direct-messages', user?.pubkey] });
+    onSuccess: (event, { peer, text }) => {
+      if (!user) return;
+
+      const messagesKey = ['direct-messages', user.pubkey] as const;
+      const existingData = queryClient.getQueryData<InfiniteData<DirectMessagesPage, DirectMessagesCursor>>(messagesKey);
+      const existingConversation = mergeConversationPages(existingData)?.find((conversation) => conversation.peer === peer);
+      const messageCount = existingConversation?.events.some((existing) => existing.id === event.id)
+        ? existingConversation.messageCount
+        : (existingConversation?.messageCount ?? 0) + 1;
+      const message = directMessageFromPlaintext(event, peer, user.pubkey, text.trim());
+      const existingThread = queryClient
+        .getQueriesData<DirectMessage[]>({ queryKey: ['direct-message-thread', user.pubkey, peer] })
+        .find(([, messages]) => messages !== undefined)?.[1];
+
+      queryClient.setQueryData<InfiniteData<DirectMessagesPage, DirectMessagesCursor>>(messagesKey, (data) => (
+        addSentMessageToPages(data, message)
+      ));
+      queryClient.setQueryData<DirectMessage[]>([
+        'direct-message-thread',
+        user.pubkey,
+        peer,
+        event.id,
+        messageCount,
+      ], appendMessage(existingThread ?? [], message));
+      queryClient.setQueriesData<DirectMessage[]>({
+        queryKey: ['direct-message-thread', user.pubkey, peer],
+      }, (messages) => appendMessage(messages, message));
+
+      queryClient.invalidateQueries({ queryKey: messagesKey, refetchType: 'inactive' });
     },
   });
 }
