@@ -1,12 +1,15 @@
 import { useNostr } from '@nostrify/react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { NostrEvent, NostrSigner } from '@nostrify/nostrify';
+import { useMemo } from 'react';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient, type InfiniteData } from '@tanstack/react-query';
+import type { NostrEvent, NostrFilter, NostrSigner } from '@nostrify/nostrify';
 
 import { useCurrentUser } from './useCurrentUser';
 import { useNostrPublish } from './useNostrPublish';
 
 /** NIP-04 encrypted direct message kind. */
 export const DM_KIND = 4;
+
+const PAGE_SIZE = 200;
 
 /** A decrypted (or undecryptable) message in a conversation. */
 export interface DirectMessage {
@@ -31,6 +34,17 @@ export interface Conversation {
   latest: DirectMessage;
 }
 
+interface DirectMessagesPage {
+  conversations: Conversation[];
+  sentUntil: number | null;
+  receivedUntil: number | null;
+}
+
+interface DirectMessagesCursor {
+  sentUntil?: number | null;
+  receivedUntil?: number | null;
+}
+
 /** Extract the first `p` tag value (the recipient) from a kind-4 event. */
 function recipientOf(event: NostrEvent): string | undefined {
   return event.tags.find(([name]) => name === 'p')?.[1];
@@ -43,9 +57,10 @@ export function useHasDmSupport(): boolean {
 }
 
 /**
- * Loads all NIP-04 (kind-4) direct messages for the logged-in user, decrypts
- * them with the signer's `nip04` methods, and groups them into conversations
- * sorted by most-recent activity.
+ * Loads NIP-04 (kind-4) direct messages for the logged-in user in pages,
+ * decrypts only each conversation's latest preview, and groups them into
+ * conversations sorted by most-recent activity. Full threads decrypt lazily in
+ * `useDirectMessageThread` after the user selects a conversation.
  *
  * Messages are read from the app's configured relays (via `useNostr`), so this
  * automatically honors the user's relay settings. NIP-04 leaks metadata and is
@@ -57,71 +72,58 @@ export function useDirectMessages() {
   const { user } = useCurrentUser();
   const self = user?.pubkey;
 
-  return useQuery<Conversation[]>({
+  const query = useInfiniteQuery<
+    DirectMessagesPage,
+    Error,
+    InfiniteData<DirectMessagesPage, DirectMessagesCursor>,
+    readonly unknown[],
+    DirectMessagesCursor
+  >({
     queryKey: ['direct-messages', self],
     enabled: !!self && !!user?.signer.nip04,
-    queryFn: async ({ signal }) => {
-      if (!self || !user?.signer.nip04) return [];
+    initialPageParam: {},
+    queryFn: async ({ signal, pageParam }) => {
+      if (!self || !user?.signer.nip04) {
+        return { conversations: [], sentUntil: null, receivedUntil: null };
+      }
       const nip04 = user.signer.nip04;
 
-      // Both directions of every conversation we're part of: messages we sent
-      // (authors = self) and messages addressed to us (#p = self).
-      //
-      // We stream with `req()` rather than `query()` and wait for *every*
-      // relay to reach EOSE. `query()` resolves on the pool's short EOSE
-      // timeout (the first relay to finish), which silently drops DMs that
-      // only live on slower relays — one cause of "missing conversations".
-      //
-      // Relays return newest-first and cap each REQ at `limit`, so a single
-      // fetch truncates long histories — the oldest conversations (years back)
-      // fall off the end. We page backwards with `until`: after each full page
-      // we lower `until` to the oldest event seen and ask again, stopping once
-      // a page comes back short (nothing older remains). An overall timeout
-      // keeps a stalled relay from hanging the page.
-      const byId = new Map<string, NostrEvent>();
-      const PAGE_SIZE = 500;
-      const MAX_PAGES = 40; // hard ceiling: up to ~20k DMs
+      // Ditto's feed paginates with oldest-timestamp cursors instead of loading
+      // the full history up front. DMs need separate cursors for sent and
+      // received filters so one high-volume direction does not skip the other.
+      const filters: NostrFilter[] = [];
+      if (pageParam.sentUntil !== null) {
+        filters.push({
+          kinds: [DM_KIND],
+          authors: [self],
+          limit: PAGE_SIZE,
+          ...(pageParam.sentUntil === undefined ? {} : { until: pageParam.sentUntil }),
+        });
+      }
+      if (pageParam.receivedUntil !== null) {
+        filters.push({
+          kinds: [DM_KIND],
+          '#p': [self],
+          limit: PAGE_SIZE,
+          ...(pageParam.receivedUntil === undefined ? {} : { until: pageParam.receivedUntil }),
+        });
+      }
 
-      const timeout = AbortSignal.timeout(15000);
+      if (filters.length === 0) {
+        return { conversations: [], sentUntil: null, receivedUntil: null };
+      }
+
+      const timeout = AbortSignal.timeout(8000);
       const controller = new AbortController();
       const onAbort = () => controller.abort();
       signal?.addEventListener('abort', onAbort);
       timeout.addEventListener('abort', onAbort);
 
+      const byId = new Map<string, NostrEvent>();
       try {
-        let until: number | undefined;
-        for (let page = 0; page < MAX_PAGES; page++) {
-          const base = { kinds: [DM_KIND], limit: PAGE_SIZE };
-          const window = until === undefined ? {} : { until };
-          let pageCount = 0;
-          let oldest = Infinity;
-
-          for await (const msg of nostr.req(
-            [
-              { ...base, ...window, authors: [self] },
-              { ...base, ...window, '#p': [self] },
-            ],
-            { signal: controller.signal },
-          )) {
-            if (msg[0] === 'EVENT') {
-              const event = msg[2];
-              // Dedupe by id (a self-sent message can match both filters,
-              // and overlapping `until` windows can re-deliver the boundary).
-              if (!byId.has(event.id)) pageCount++;
-              byId.set(event.id, event);
-              if (event.created_at < oldest) oldest = event.created_at;
-            } else if (msg[0] === 'EOSE') {
-              // The pool emits a single EOSE once all routed relays are done.
-              break;
-            }
-          }
-
-          // A short page means relays had nothing older to give — we're done.
-          // (Two filters at PAGE_SIZE each could yield up to 2*PAGE_SIZE.)
-          if (pageCount < PAGE_SIZE || oldest === Infinity) break;
-          // Step the window back. `until` is inclusive, so subtract 1 to avoid
-          // re-fetching the exact boundary event forever.
-          until = oldest - 1;
+        const events = await nostr.query(filters, { signal: controller.signal });
+        for (const event of events) {
+          byId.set(event.id, event);
         }
       } catch {
         // Abort (unmount/timeout) — fall through with whatever we collected.
@@ -130,9 +132,15 @@ export function useDirectMessages() {
         timeout.removeEventListener('abort', onAbort);
       }
 
+      const pageEvents = [...byId.values()];
+      const sentEvents = pageEvents.filter((event) => event.pubkey === self);
+      const receivedEvents = pageEvents.filter((event) => recipientOf(event) === self);
+      const nextSentUntil = getNextUntil(sentEvents);
+      const nextReceivedUntil = getNextUntil(receivedEvents);
+
       // Group by counterparty pubkey.
       const byPeer = new Map<string, NostrEvent[]>();
-      for (const event of byId.values()) {
+      for (const event of pageEvents) {
         const outgoing = event.pubkey === self;
         const peer = outgoing ? recipientOf(event) : event.pubkey;
         if (!peer) continue;
@@ -157,9 +165,51 @@ export function useDirectMessages() {
 
       // Most-recently-active conversations first.
       conversations.sort((a, b) => b.latest.createdAt - a.latest.createdAt);
-      return conversations;
+      return { conversations, sentUntil: nextSentUntil, receivedUntil: nextReceivedUntil };
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.sentUntil === null && lastPage.receivedUntil === null) return undefined;
+      return { sentUntil: lastPage.sentUntil, receivedUntil: lastPage.receivedUntil };
     },
   });
+
+  const conversations = useMemo(() => mergeConversationPages(query.data), [query.data]);
+
+  return { ...query, data: conversations, pageCount: query.data?.pages.length ?? 0 };
+}
+
+function getNextUntil(events: NostrEvent[]): number | null {
+  if (events.length < PAGE_SIZE) return null;
+  const oldest = Math.min(...events.map((event) => event.created_at));
+  if (!Number.isFinite(oldest)) return null;
+  return oldest - 1;
+}
+
+function mergeConversationPages(data: { pages: DirectMessagesPage[] } | undefined): Conversation[] | undefined {
+  if (!data) return undefined;
+  const byPeer = new Map<string, Conversation>();
+
+  for (const page of data.pages) {
+    for (const conversation of page.conversations) {
+      const existing = byPeer.get(conversation.peer);
+      if (!existing) {
+        byPeer.set(conversation.peer, { ...conversation, events: [...conversation.events] });
+        continue;
+      }
+
+      const seen = new Set(existing.events.map((event) => event.id));
+      for (const event of conversation.events) {
+        if (!seen.has(event.id)) {
+          existing.events.push(event);
+          seen.add(event.id);
+        }
+      }
+      existing.events.sort((a, b) => a.created_at - b.created_at);
+      existing.messageCount = existing.events.length;
+    }
+  }
+
+  return [...byPeer.values()].sort((a, b) => b.latest.createdAt - a.latest.createdAt);
 }
 
 async function decryptMessage({

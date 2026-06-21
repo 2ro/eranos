@@ -2,15 +2,14 @@ import { useSeoMeta } from '@unhead/react';
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Inbox, Loader2, Lock, MessageSquare, Send, ShieldCheck } from 'lucide-react';
+import { useInView } from 'react-intersection-observer';
+import { ArrowLeft, Inbox, Loader2, Lock, MessageSquare, Send } from 'lucide-react';
 
-import { PageHeader } from '@/components/PageHeader';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -224,8 +223,16 @@ export function MessagesPage() {
   const { t } = useTranslation();
   const { user } = useCurrentUser();
   const { config } = useAppContext();
-  const { data: conversations, isLoading } = useDirectMessages();
+  const {
+    data: conversations,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    pageCount,
+  } = useDirectMessages();
   const [selectedPeer, setSelectedPeer] = useState<string | null>(null);
+  const { ref: olderMessagesRef, inView: olderMessagesInView } = useInView({ threshold: 0, rootMargin: '300px' });
 
   useSeoMeta({
     title: `${t('messages.title')} | ${config.appName}`,
@@ -237,6 +244,18 @@ export function MessagesPage() {
     [conversations, selectedPeer],
   );
 
+  useEffect(() => {
+    if (pageCount === 1 && hasNextPage && !isFetchingNextPage) {
+      void fetchNextPage();
+    }
+  }, [pageCount, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    if (olderMessagesInView && hasNextPage && !isFetchingNextPage) {
+      void fetchNextPage();
+    }
+  }, [olderMessagesInView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   if (!user) {
     return <Navigate to="/" replace />;
   }
@@ -244,103 +263,86 @@ export function MessagesPage() {
   const hasDmSupport = !!user.signer.nip04;
 
   return (
-    <main className="min-h-[calc(100dvh-8rem)] bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.12),transparent_32rem)] pb-8">
-      <PageHeader
-        title={t('messages.title')}
-        icon={<MessageSquare className="size-5" />}
-        className="bg-transparent"
-        contentClassName="max-w-6xl mx-auto w-full"
-      />
-
-      <div className="mx-auto w-full max-w-6xl px-4">
-        <div className="mb-4 flex flex-col gap-3 rounded-3xl border bg-card/80 p-5 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('messages.title')}</h2>
-            <p className="mt-1 max-w-2xl text-sm text-muted-foreground sm:text-base">{t('messages.subtitle')}</p>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <ShieldCheck className="size-4 text-primary" />
-            <span>NIP-04</span>
-          </div>
+    <main className="min-h-[calc(100dvh-4rem)] bg-background">
+      {!hasDmSupport ? (
+        <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center border-y px-8 py-12 text-center">
+          <p className="mx-auto max-w-sm text-muted-foreground">
+            {t('messages.unsupported')}
+          </p>
         </div>
-
-        {!hasDmSupport ? (
-          <Card className="border-dashed">
-            <CardContent className="px-8 py-12 text-center">
-              <p className="mx-auto max-w-sm text-muted-foreground">
-                {t('messages.unsupported')}
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid min-h-[640px] overflow-hidden rounded-3xl border bg-background shadow-xl shadow-primary/5 md:h-[calc(100dvh-16rem)] md:min-h-[560px] md:grid-cols-[22rem_1fr]">
-            {/* Conversation list */}
-            <div
-              className={cn(
-                'min-h-0 flex-col border-r bg-muted/40',
-                selected && 'hidden md:flex',
-                !selected && 'flex',
-              )}
-            >
-              <div className="border-b bg-card/80 p-4 backdrop-blur">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <h2 className="text-sm font-semibold">{t('messages.conversations')}</h2>
-                    <p className="text-xs text-muted-foreground">{t('messages.subtitle')}</p>
-                  </div>
-                  <Inbox className="size-5 text-muted-foreground" />
+      ) : (
+        <div className="grid min-h-[calc(100dvh-4rem)] overflow-hidden border-y bg-background md:grid-cols-[22rem_1fr]">
+          {/* Conversation list */}
+          <div
+            className={cn(
+              'min-h-0 flex-col border-r bg-muted/40',
+              selected && 'hidden md:flex',
+              !selected && 'flex',
+            )}
+          >
+            <div className="border-b bg-card/80 p-4 backdrop-blur">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-sm font-semibold">{t('messages.conversations')}</h2>
+                  <p className="text-xs text-muted-foreground">NIP-04</p>
                 </div>
+                <Inbox className="size-5 text-muted-foreground" />
               </div>
-              <ScrollArea className="flex-1">
-                <div className="space-y-2 p-3">
-                  {isLoading ? (
-                    Array.from({ length: 5 }).map((_, i) => (
-                      <div key={i} className="flex items-center gap-3 rounded-2xl p-3">
-                        <Skeleton className="size-11 rounded-full" />
-                        <div className="flex-1 space-y-1.5">
-                          <Skeleton className="h-3.5 w-24" />
-                          <Skeleton className="h-3 w-40" />
-                        </div>
-                      </div>
-                    ))
-                  ) : conversations && conversations.length > 0 ? (
-                    conversations.map((conversation) => (
-                      <ConversationRow
-                        key={conversation.peer}
-                        conversation={conversation}
-                        active={conversation.peer === selectedPeer}
-                        onSelect={() => setSelectedPeer(conversation.peer)}
-                      />
-                    ))
-                  ) : (
-                    <div className="px-4 py-12 text-center">
-                      <p className="mx-auto max-w-xs text-sm text-muted-foreground">
-                        {t('messages.empty')}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
             </div>
-
-            {/* Thread */}
-            <div className={cn('min-w-0', !selected && 'hidden md:block')}>
-              {selected ? (
-                <MessageThread conversation={selected} onBack={() => setSelectedPeer(null)} />
-              ) : (
-                <div className="flex h-full items-center justify-center bg-gradient-to-br from-background via-muted/20 to-primary/5 p-8 text-center">
-                  <div className="max-w-sm space-y-3 rounded-3xl border bg-card/80 p-8 shadow-sm">
-                    <MessageSquare className="mx-auto size-10 text-primary" />
-                    <p className="text-sm text-muted-foreground">
-                      {t('messages.selectPrompt')}
+            <ScrollArea className="flex-1">
+              <div className="space-y-2 p-3">
+                {isLoading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex items-center gap-3 rounded-2xl p-3">
+                      <Skeleton className="size-11 rounded-full" />
+                      <div className="flex-1 space-y-1.5">
+                        <Skeleton className="h-3.5 w-24" />
+                        <Skeleton className="h-3 w-40" />
+                      </div>
+                    </div>
+                  ))
+                ) : conversations && conversations.length > 0 ? (
+                  conversations.map((conversation) => (
+                    <ConversationRow
+                      key={conversation.peer}
+                      conversation={conversation}
+                      active={conversation.peer === selectedPeer}
+                      onSelect={() => setSelectedPeer(conversation.peer)}
+                    />
+                  ))
+                ) : (
+                  <div className="px-4 py-12 text-center">
+                    <p className="mx-auto max-w-xs text-sm text-muted-foreground">
+                      {t('messages.empty')}
                     </p>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+                {hasNextPage && conversations && conversations.length > 0 && (
+                  <div ref={olderMessagesRef} className="flex justify-center py-4">
+                    {isFetchingNextPage && <Loader2 className="size-4 animate-spin text-muted-foreground" />}
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
           </div>
-        )}
-      </div>
+
+          {/* Thread */}
+          <div className={cn('min-w-0', !selected && 'hidden md:block')}>
+            {selected ? (
+              <MessageThread conversation={selected} onBack={() => setSelectedPeer(null)} />
+            ) : (
+              <div className="flex h-full items-center justify-center bg-gradient-to-br from-background via-muted/20 to-primary/5 p-8 text-center">
+                <div className="max-w-sm space-y-3">
+                  <MessageSquare className="mx-auto size-10 text-primary" />
+                  <p className="text-sm text-muted-foreground">
+                    {t('messages.selectPrompt')}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
