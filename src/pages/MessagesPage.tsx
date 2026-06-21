@@ -219,10 +219,18 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
             rows={1}
             className="max-h-32 min-h-10 resize-none border-0 bg-transparent px-2 py-2 text-base shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 md:text-sm"
           />
-          <Button type="submit" size="icon" className="shrink-0 rounded-xl" disabled={isPending || !draft.trim()}>
-            {isPending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+          <button
+            type="submit"
+            className="shrink-0 rounded-full p-2 text-primary transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={isPending || !draft.trim()}
+          >
+            {isPending ? (
+              <Loader2 className="size-6 animate-spin" />
+            ) : (
+              <Send className="size-7 fill-primary stroke-background" />
+            )}
             <span className="sr-only">{t('messages.send')}</span>
-          </Button>
+          </button>
         </div>
       </form>
     </div>
