@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
+import { PolicyMarkdown } from '@/components/PolicyMarkdown';
 import { TranslateButton } from '@/components/TranslateButton';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
@@ -36,12 +37,30 @@ import { useFollowList } from '@/hooks/useFollowActions';
 import { useMuteList } from '@/hooks/useMuteList';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
+import { useVerifierStatement } from '@/hooks/useVerifierStatement';
 import { getDisplayName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { timeAgo } from '@/lib/timeAgo';
 import { cn } from '@/lib/utils';
 
 const DM_TRANSLATION_CONFIRM_KEY = 'agora.dmTranslationConfirmed';
+const DISMISSED_VERIFIER_STATEMENTS_KEY = 'agora.dismissedVerifierStatementBanners';
+
+function readDismissedVerifierStatements(): Set<string> {
+  if (typeof window === 'undefined') return new Set();
+
+  try {
+    const parsed: unknown = JSON.parse(window.localStorage.getItem(DISMISSED_VERIFIER_STATEMENTS_KEY) ?? '[]');
+    if (!Array.isArray(parsed)) return new Set();
+    return new Set(parsed.filter((value): value is string => typeof value === 'string'));
+  } catch {
+    return new Set();
+  }
+}
+
+function writeDismissedVerifierStatements(pubkeys: Set<string>) {
+  window.localStorage.setItem(DISMISSED_VERIFIER_STATEMENTS_KEY, JSON.stringify([...pubkeys]));
+}
 
 /** Small helper bundling a peer's display name + avatar from kind-0 metadata. */
 function usePeerProfile(pubkey: string) {
@@ -151,6 +170,36 @@ function MessageBubble({ message, translatedContent }: { message: DirectMessage;
   );
 }
 
+function VerifierStatementBanner({ statement, onDismiss }: { statement: string; onDismiss: () => void }) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="px-4 pb-3">
+      <section className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 shadow-sm">
+        <div className="mb-2 flex items-start justify-between gap-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-primary">
+            {t('verifier.howWeVerifyTitle')}
+          </h2>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={onDismiss}
+            className="-mr-2 -mt-2 size-8 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+            aria-label={t('common.close')}
+            title={t('common.close')}
+          >
+            <X className="size-4" />
+          </Button>
+        </div>
+        <div className="max-h-40 overflow-y-auto pr-1">
+          <PolicyMarkdown source={statement} />
+        </div>
+      </section>
+    </div>
+  );
+}
+
 /** The active conversation thread plus a send composer. */
 function MessageThread({
   conversation,
@@ -164,6 +213,7 @@ function MessageThread({
   const { t } = useTranslation();
   const { name, picture, profileUrl } = usePeerProfile(conversation.peer);
   const { data: messages, isLoading } = useDirectMessageThread(conversation);
+  const { statement: verifierStatement } = useVerifierStatement(conversation.peer);
   const { mutateAsync: send, isPending } = useSendDirectMessage();
   const { addMute } = useMuteList();
   const { toast } = useToast();
@@ -176,6 +226,7 @@ function MessageThread({
     typeof window !== 'undefined' && window.localStorage.getItem(DM_TRANSLATION_CONFIRM_KEY) === 'true'
   ));
   const [translatedMessages, setTranslatedMessages] = useState<Record<string, string>>({});
+  const [dismissedVerifierStatements, setDismissedVerifierStatements] = useState(readDismissedVerifierStatements);
   const endRef = useRef<HTMLDivElement>(null);
   const translationConfirmResolveRef = useRef<((confirmed: boolean) => void) | null>(null);
   const hasDraft = draft.trim().length > 0;
@@ -192,6 +243,7 @@ function MessageThread({
   const isThreadTranslated = translatableMessages.length > 0 && translatableMessages.every((message) => (
     translatedMessages[message.id] !== undefined
   ));
+  const showVerifierStatement = !!verifierStatement && !dismissedVerifierStatements.has(conversation.peer);
 
   useEffect(() => {
     setDraft('');
@@ -265,6 +317,15 @@ function MessageThread({
     }
     translationConfirmResolveRef.current?.(confirmed);
     translationConfirmResolveRef.current = null;
+  };
+
+  const dismissVerifierStatement = () => {
+    setDismissedVerifierStatements((current) => {
+      const next = new Set(current);
+      next.add(conversation.peer);
+      writeDismissedVerifierStatements(next);
+      return next;
+    });
   };
 
   return (
@@ -347,6 +408,10 @@ function MessageThread({
             )}
           </div>
         </div>
+      )}
+
+      {showVerifierStatement && (
+        <VerifierStatementBanner statement={verifierStatement} onDismiss={dismissVerifierStatement} />
       )}
 
       <ScrollArea className="min-h-0 flex-1 px-4">
