@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
-  Bitcoin,
   Globe,
   HandHeart,
   Megaphone,
@@ -343,7 +342,7 @@ export function ProfileIdentityHeader({
         />
       )}
 
-      {/* Stats: Followers + Following inline; Raised below if applicable. */}
+      {/* Stats: Raised + Followers + Following on a single inline row. */}
       <StatList
         followersCount={followersCount}
         followingCount={followingCount}
@@ -659,75 +658,45 @@ function StatList({
   onTabChange: (id: string) => void;
 }) {
   const { t } = useTranslation();
-  // Secondary stat rows (one per row). Followers / Following live inline
-  // at the top. Campaigns and Pledges are intentionally not surfaced as
-  // counts here — the rail's Campaigns and (when relevant) Pledges
-  // sections below already show the underlying content directly.
-  const rows: Array<{
-    icon?: ReactNode;
-    label: string;
-    value: string;
-    onClick?: () => void;
-    show: boolean;
-  }> = [
-    {
-      icon: <Bitcoin className="size-3.5 text-primary" />,
-      label: t('profile.stats.raised'),
-      value: formatCampaignAmount(totalRaisedSats, btcPrice),
-      onClick: () => onTabChange('campaigns'),
-      show: totalRaisedSats > 0,
-    },
-  ].filter((r) => r.show);
-
-  const hasFollowRow = followersCount > 0 || followingCount > 0;
-  if (!hasFollowRow && rows.length === 0) return null;
+  const hasRaised = totalRaisedSats > 0;
+  const hasStats = hasRaised || followersCount > 0 || followingCount > 0;
+  if (!hasStats) return null;
 
   return (
-    <div className="space-y-2">
-      {/* Followers + Following on a single horizontal row. */}
-      {hasFollowRow && (
-        <div className="flex items-center gap-5 text-sm">
-          {followersCount > 0 && (
-            <button
-              onClick={onFollowersOpen}
-              className="flex items-baseline gap-1.5 hover:opacity-80 transition-opacity"
-              title={t('profile.stats.followersTitle', { count: followersCount })}
-            >
-              <span className="font-bold tabular-nums text-foreground">{formatNumber(followersCount)}</span>
-              <span className="text-muted-foreground">{t('profile.stats.followers')}</span>
-            </button>
-          )}
-          {followingCount > 0 && (
-            <button
-              onClick={onFollowingOpen}
-              className="flex items-baseline gap-1.5 hover:opacity-80 transition-opacity"
-              title={t('profile.stats.followingTitle', { count: followingCount })}
-            >
-              <span className="font-bold tabular-nums text-foreground">{formatNumber(followingCount)}</span>
-              <span className="text-muted-foreground">{t('profile.stats.following')}</span>
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Secondary stat rows. */}
-      {rows.length > 0 && (
-        <div className="rounded-xl border border-border/60 bg-card/40 divide-y divide-border/60">
-          {rows.map((row) => (
-            <button
-              key={row.label}
-              onClick={row.onClick}
-              className="w-full flex items-center justify-between gap-3 px-3 py-2 text-sm hover:bg-secondary/40 transition-colors first:rounded-t-xl last:rounded-b-xl"
-            >
-              <span className="flex items-center gap-2 text-muted-foreground">
-                {row.icon}
-                {row.label}
-              </span>
-              <span className="font-semibold tabular-nums text-foreground">{row.value}</span>
-            </button>
-          ))}
-        </div>
-      )}
+    <div>
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
+        {hasRaised && (
+          <button
+            onClick={() => onTabChange('campaigns')}
+            className="flex items-baseline gap-1.5 hover:opacity-80 transition-opacity"
+          >
+            <span className="font-bold tabular-nums text-orange-500 dark:text-orange-400">
+              {formatCampaignAmount(totalRaisedSats, btcPrice)}
+            </span>
+            <span className="text-muted-foreground">{t('profile.stats.raised')}</span>
+          </button>
+        )}
+        {followersCount > 0 && (
+          <button
+            onClick={onFollowersOpen}
+            className="flex items-baseline gap-1.5 hover:opacity-80 transition-opacity"
+            title={t('profile.stats.followersTitle', { count: followersCount })}
+          >
+            <span className="font-bold tabular-nums text-foreground">{formatNumber(followersCount)}</span>
+            <span className="text-muted-foreground">{t('profile.stats.followers')}</span>
+          </button>
+        )}
+        {followingCount > 0 && (
+          <button
+            onClick={onFollowingOpen}
+            className="flex items-baseline gap-1.5 hover:opacity-80 transition-opacity"
+            title={t('profile.stats.followingTitle', { count: followingCount })}
+          >
+            <span className="font-bold tabular-nums text-foreground">{formatNumber(followingCount)}</span>
+            <span className="text-muted-foreground">{t('profile.stats.following')}</span>
+          </button>
+        )}
+      </div>
     </div>
   );
 }
