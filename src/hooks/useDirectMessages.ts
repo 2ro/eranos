@@ -1,6 +1,6 @@
 import { useNostr } from '@nostrify/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { NostrEvent } from '@nostrify/nostrify';
+import type { NostrEvent, NostrSigner } from '@nostrify/nostrify';
 
 import { useCurrentUser } from './useCurrentUser';
 import { useNostrPublish } from './useNostrPublish';
@@ -23,10 +23,11 @@ export interface DirectMessage {
   event: NostrEvent;
 }
 
-/** A single conversation: the peer pubkey plus its decrypted messages. */
+/** A single conversation summary with enough data to lazily decrypt its thread. */
 export interface Conversation {
   peer: string;
-  messages: DirectMessage[];
+  events: NostrEvent[];
+  messageCount: number;
   latest: DirectMessage;
 }
 
@@ -144,35 +145,74 @@ export function useDirectMessages() {
       for (const [peer, peerEvents] of byPeer) {
         peerEvents.sort((a, b) => a.created_at - b.created_at);
 
-        const messages: DirectMessage[] = [];
-        for (const event of peerEvents) {
-          const outgoing = event.pubkey === self;
-          let content: string | null = null;
-          try {
-            // NIP-04 decrypt takes the *counterparty* pubkey.
-            content = await nip04.decrypt(peer, event.content);
-          } catch {
-            content = null;
-          }
-          messages.push({
-            id: event.id,
-            pubkey: event.pubkey,
-            peer,
-            outgoing,
-            createdAt: event.created_at,
-            content,
-            event,
-          });
-        }
-
-        const latest = messages[messages.length - 1];
-        if (!latest) continue;
-        conversations.push({ peer, messages, latest });
+        const latestEvent = peerEvents[peerEvents.length - 1];
+        if (!latestEvent) continue;
+        conversations.push({
+          peer,
+          events: peerEvents,
+          messageCount: peerEvents.length,
+          latest: await decryptMessage({ event: latestEvent, peer, self, nip04 }),
+        });
       }
 
       // Most-recently-active conversations first.
       conversations.sort((a, b) => b.latest.createdAt - a.latest.createdAt);
       return conversations;
+    },
+  });
+}
+
+async function decryptMessage({
+  event,
+  peer,
+  self,
+  nip04,
+}: {
+  event: NostrEvent;
+  peer: string;
+  self: string;
+  nip04: NonNullable<NostrSigner['nip04']>;
+}): Promise<DirectMessage> {
+  const outgoing = event.pubkey === self;
+  let content: string | null = null;
+  try {
+    // NIP-04 decrypt takes the counterparty pubkey for both directions.
+    content = await nip04.decrypt(peer, event.content);
+  } catch {
+    content = null;
+  }
+
+  return {
+    id: event.id,
+    pubkey: event.pubkey,
+    peer,
+    outgoing,
+    createdAt: event.created_at,
+    content,
+    event,
+  };
+}
+
+/** Decrypts a selected thread on demand instead of blocking the inbox list. */
+export function useDirectMessageThread(conversation: Conversation | null) {
+  const { user } = useCurrentUser();
+  const self = user?.pubkey;
+  const nip04 = user?.signer.nip04;
+
+  return useQuery<DirectMessage[]>({
+    queryKey: [
+      'direct-message-thread',
+      self,
+      conversation?.peer,
+      conversation?.latest.id,
+      conversation?.messageCount,
+    ],
+    enabled: !!self && !!nip04 && !!conversation,
+    queryFn: async () => {
+      if (!self || !nip04 || !conversation) return [];
+      return Promise.all(
+        conversation.events.map((event) => decryptMessage({ event, peer: conversation.peer, self, nip04 })),
+      );
     },
   });
 }

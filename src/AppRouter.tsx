@@ -153,7 +153,6 @@ export function AppRouter() {
         <Route element={<FundraiserLayout narrow />}>
           <Route path="/feed" element={<Index />} />
           <Route path="/my-dashboard" element={<MyDashboardPage />} />
-          <Route path="/messages" element={<MessagesPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/profile" element={<ProfileRedirect />} />
@@ -219,6 +218,7 @@ export function AppRouter() {
           <Route path="/pledges" element={<ActionsPage />} />
           <Route path="/pledges/new" element={<CreateActionPage />} />
           <Route path="/dashboard" element={<EventDashboardPage />} />
+          <Route path="/messages" element={<MessagesPage />} />
           <Route path="/i/*" element={<ExternalContentPage />} />
           {/* About page + Donor / Recipient guides. Full-bleed landing-style
               layouts that render their own internal max-widths. */}
