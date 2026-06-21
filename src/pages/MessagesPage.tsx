@@ -179,8 +179,8 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-background">
-      <div className="flex items-center gap-3 bg-card/80 p-4 backdrop-blur">
+    <div className="flex h-full min-h-0 flex-col bg-gradient-to-b from-muted/30 via-background to-background">
+      <div className="flex items-center gap-3 p-4">
         <Button type="button" variant="ghost" size="icon" className="md:hidden" onClick={onBack}>
           <ArrowLeft className="size-4" />
           <span className="sr-only">{t('messages.conversations')}</span>
@@ -192,7 +192,7 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
         <p className="min-w-0 flex-1 truncate font-semibold">{name}</p>
       </div>
 
-      <ScrollArea className="min-h-0 flex-1 bg-gradient-to-b from-muted/30 via-background to-background px-4">
+      <ScrollArea className="min-h-0 flex-1 px-4">
         <div className="space-y-3 py-5">
           {isLoading ? (
             <div className="space-y-3">
@@ -207,7 +207,7 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
         </div>
       </ScrollArea>
 
-      <form onSubmit={handleSubmit} className="bg-card/90 p-3 backdrop-blur">
+      <form onSubmit={handleSubmit} className="p-3">
         <div className="flex items-end gap-2 rounded-2xl border bg-background p-2 shadow-sm focus-within:ring-2 focus-within:ring-ring">
           <Textarea
             value={draft}
