@@ -1128,6 +1128,7 @@
     "loginGateTitle": "Inicia sesión para convertirte en verificador",
     "loginGateBody": "Debes haber iniciado sesión para publicar una declaración de verificador.",
     "howWeVerifyTitle": "Cómo verificamos",
+    "requestVerification": "Solicitar verificación",
     "withdrawConfirmTitle": "¿Retirar tu declaración de verificador?",
     "withdrawConfirmBody": "Tu declaración «Cómo verificamos» se eliminará de tu perfil. Puedes publicar una nueva en cualquier momento."
   },

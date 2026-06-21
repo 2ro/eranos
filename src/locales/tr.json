@@ -1570,6 +1570,7 @@
     "loginGateTitle": "Doğrulayıcı olmak için giriş yapın",
     "loginGateBody": "Doğrulayıcı beyanı yayımlamak için giriş yapmış olmanız gerekir.",
     "howWeVerifyTitle": "Nasıl doğrularız",
+    "requestVerification": "Doğrulama iste",
     "withdrawConfirmTitle": "Doğrulayıcı beyanınız geri çekilsin mi?",
     "withdrawConfirmBody": "\"Nasıl Doğrularız\" beyanınız profilinizden kaldırılacak. İstediğiniz zaman yenisini yayımlayabilirsiniz."
   },

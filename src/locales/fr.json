@@ -1570,6 +1570,7 @@
     "loginGateTitle": "Connectez-vous pour devenir vérificateur",
     "loginGateBody": "Vous devez être connecté pour publier une déclaration de vérificateur.",
     "howWeVerifyTitle": "Comment nous vérifions",
+    "requestVerification": "Demander une vérification",
     "withdrawConfirmTitle": "Retirer votre déclaration de vérificateur ?",
     "withdrawConfirmBody": "Votre déclaration « Comment nous vérifions » sera retirée de votre profil. Vous pourrez en publier une nouvelle à tout moment."
   },

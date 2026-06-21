@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Loader2, MessageSquare, Trash2 } from 'lucide-react';
 
 import { PolicyMarkdown } from '@/components/PolicyMarkdown';
 import {
@@ -81,7 +82,7 @@ export function ProfileVerifierSection({ pubkey, isOwnProfile = false, className
           <h2 className="text-sm font-semibold uppercase tracking-wide text-primary">
             {t('verifier.howWeVerifyTitle')}
           </h2>
-          {isOwnProfile && (
+          {isOwnProfile ? (
             <Button
               type="button"
               variant="ghost"
@@ -96,6 +97,19 @@ export function ProfileVerifierSection({ pubkey, isOwnProfile = false, className
                 <Trash2 className="size-3.5" />
               )}
               <span className="ml-1.5">{t('verifier.withdraw')}</span>
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="-mt-1 -mr-2 h-8 shrink-0 px-3 text-xs"
+              asChild
+            >
+              <Link to={`/messages?to=${pubkey}`}>
+                <MessageSquare className="mr-1.5 size-3.5" />
+                {t('verifier.requestVerification')}
+              </Link>
             </Button>
           )}
         </div>

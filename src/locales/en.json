@@ -1660,7 +1660,8 @@
     "disclaimer": "Anyone can become a verifier. Your statement is published publicly to Nostr and shown prominently on your profile. It does not grant any special permissions — it simply tells donors how you vet campaigns.",
     "loginGateTitle": "Sign in to become a verifier",
     "loginGateBody": "You need to be signed in to publish a verifier statement.",
-    "howWeVerifyTitle": "How We Verify"
+    "howWeVerifyTitle": "How We Verify",
+    "requestVerification": "Request Verification"
   },
   "mdEditor": {
     "toolbar": {

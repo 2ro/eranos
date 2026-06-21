@@ -1570,6 +1570,7 @@
     "loginGateTitle": "Masuk untuk menjadi verifikator",
     "loginGateBody": "Anda harus masuk untuk memublikasikan pernyataan verifikator.",
     "howWeVerifyTitle": "Cara kami memverifikasi",
+    "requestVerification": "Minta Verifikasi",
     "withdrawConfirmTitle": "Tarik pernyataan verifikator Anda?",
     "withdrawConfirmBody": "Pernyataan \"Cara Kami Memverifikasi\" Anda akan dihapus dari profil Anda. Anda bisa memublikasikan yang baru kapan saja."
   },

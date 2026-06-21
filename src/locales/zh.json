@@ -1128,6 +1128,7 @@
     "loginGateTitle": "登录以成为验证者",
     "loginGateBody": "你需要登录才能发布验证者声明。",
     "howWeVerifyTitle": "我们如何验证",
+    "requestVerification": "请求验证",
     "withdrawConfirmTitle": "撤回你的验证者声明？",
     "withdrawConfirmBody": "你的「我们如何验证」声明将从你的个人资料中移除。你可以随时发布新的声明。"
   },

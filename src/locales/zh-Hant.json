@@ -1128,6 +1128,7 @@
     "loginGateTitle": "登入以成為驗證者",
     "loginGateBody": "你需要登入才能發布驗證者聲明。",
     "howWeVerifyTitle": "我們如何驗證",
+    "requestVerification": "請求驗證",
     "withdrawConfirmTitle": "撤回你的驗證者聲明？",
     "withdrawConfirmBody": "你的「我們如何驗證」聲明將從你的個人資料中移除。你可以隨時發布新的聲明。"
   },

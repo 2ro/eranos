@@ -1570,6 +1570,7 @@
     "loginGateTitle": "Entre para se tornar um verificador",
     "loginGateBody": "Você precisa estar conectado para publicar uma declaração de verificador.",
     "howWeVerifyTitle": "Como verificamos",
+    "requestVerification": "Solicitar verificação",
     "withdrawConfirmTitle": "Retirar sua declaração de verificador?",
     "withdrawConfirmBody": "Sua declaração \"Como verificamos\" será removida do seu perfil. Você pode publicar uma nova a qualquer momento."
   },

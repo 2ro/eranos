@@ -1,6 +1,6 @@
 import { useSeoMeta } from '@unhead/react';
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useInView } from 'react-intersection-observer';
 import { ArrowLeft, ArrowUp, BellOff, Inbox, Loader2, Lock, MessageSquare, Search, UserCheck, X } from 'lucide-react';
@@ -32,6 +32,7 @@ import {
   useSendDirectMessage,
   type Conversation,
   type DirectMessage,
+  type DirectMessageThreadTarget,
 } from '@/hooks/useDirectMessages';
 import { useFollowList } from '@/hooks/useFollowActions';
 import { useMuteList } from '@/hooks/useMuteList';
@@ -45,6 +46,10 @@ import { cn } from '@/lib/utils';
 
 const DM_TRANSLATION_CONFIRM_KEY = 'agora.dmTranslationConfirmed';
 const DISMISSED_VERIFIER_STATEMENTS_KEY = 'agora.dismissedVerifierStatementBanners';
+
+function getValidPubkey(value: string | null): string | null {
+  return value && /^[0-9a-f]{64}$/i.test(value) ? value.toLowerCase() : null;
+}
 
 function readDismissedVerifierStatements(): Set<string> {
   if (typeof window === 'undefined') return new Set();
@@ -206,7 +211,7 @@ function MessageThread({
   onBack,
   onMuted,
 }: {
-  conversation: Conversation;
+  conversation: DirectMessageThreadTarget;
   onBack: () => void;
   onMuted: (peer: string) => void;
 }) {
@@ -520,6 +525,7 @@ function MessageThread({
 
 export function MessagesPage() {
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useCurrentUser();
   const { config } = useAppContext();
   const {
@@ -532,7 +538,8 @@ export function MessagesPage() {
   } = useDirectMessages();
   const { data: followData } = useFollowList();
   const { muteItems } = useMuteList();
-  const [selectedPeer, setSelectedPeer] = useState<string | null>(null);
+  const requestedPeer = getValidPubkey(searchParams.get('to'));
+  const [selectedPeer, setSelectedPeer] = useState<string | null>(() => requestedPeer);
   const [search, setSearch] = useState('');
   const [conversationFilter, setConversationFilter] = useState<'all' | 'friends'>('all');
   const [hiddenMutedPeers, setHiddenMutedPeers] = useState<Set<string>>(() => new Set());
@@ -555,14 +562,41 @@ export function MessagesPage() {
     )),
     [conversationFilter, conversations, followedPubkeys, hiddenMutedPeers, mutedPubkeys],
   );
-  const selected = useMemo(
+  const selectedConversation = useMemo(
     () => visibleConversations?.find((c) => c.peer === selectedPeer) ?? null,
     [visibleConversations, selectedPeer],
   );
+  const selectedThread = useMemo<DirectMessageThreadTarget | null>(() => {
+    if (selectedConversation) return selectedConversation;
+    if (!selectedPeer) return null;
+    return { peer: selectedPeer, events: [], messageCount: 0 };
+  }, [selectedConversation, selectedPeer]);
+
+  useEffect(() => {
+    if (requestedPeer) setSelectedPeer(requestedPeer);
+  }, [requestedPeer]);
+
+  const selectPeer = (peer: string) => {
+    setSelectedPeer(peer);
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.delete('to');
+      return next;
+    }, { replace: true });
+  };
+
+  const clearSelectedPeer = () => {
+    setSelectedPeer(null);
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.delete('to');
+      return next;
+    }, { replace: true });
+  };
 
   const handleMuted = (peer: string) => {
     setHiddenMutedPeers((prev) => new Set(prev).add(peer));
-    setSelectedPeer(null);
+    clearSelectedPeer();
   };
 
   useEffect(() => {
@@ -597,8 +631,8 @@ export function MessagesPage() {
           <div
             className={cn(
               'h-full min-h-0 flex-col bg-muted/40',
-              selected && 'hidden md:flex',
-              !selected && 'flex',
+              selectedThread && 'hidden md:flex',
+              !selectedThread && 'flex',
             )}
           >
             <ScrollArea className="min-h-0 flex-1">
@@ -643,7 +677,7 @@ export function MessagesPage() {
                       conversation={conversation}
                       active={conversation.peer === selectedPeer}
                       searchQuery={search}
-                      onSelect={() => setSelectedPeer(conversation.peer)}
+                      onSelect={() => selectPeer(conversation.peer)}
                     />
                   ))
                 ) : (
@@ -663,9 +697,9 @@ export function MessagesPage() {
           </div>
 
           {/* Thread */}
-          <div className={cn('h-full min-h-0 min-w-0', !selected && 'hidden md:block')}>
-            {selected ? (
-              <MessageThread conversation={selected} onBack={() => setSelectedPeer(null)} onMuted={handleMuted} />
+          <div className={cn('h-full min-h-0 min-w-0', !selectedThread && 'hidden md:block')}>
+            {selectedThread ? (
+              <MessageThread conversation={selectedThread} onBack={clearSelectedPeer} onMuted={handleMuted} />
             ) : (
               <div className="flex h-full items-center justify-center bg-gradient-to-br from-background via-muted/20 to-primary/5 p-8 text-center">
                 <div className="max-w-sm space-y-3">

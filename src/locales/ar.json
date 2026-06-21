@@ -1128,6 +1128,7 @@
     "loginGateTitle": "سجّل الدخول لتصبح مُحقِّقاً",
     "loginGateBody": "يجب أن تكون مسجلاً للدخول لنشر بيان تحقق.",
     "howWeVerifyTitle": "كيف نتحقّق",
+    "requestVerification": "طلب التحقق",
     "withdrawConfirmTitle": "هل تريد سحب بيان التوثيق الخاص بك؟",
     "withdrawConfirmBody": "سيُزال بيان «كيف نتحقّق» من ملفك الشخصي. يمكنك نشر بيان جديد في أي وقت."
   },

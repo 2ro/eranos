@@ -34,6 +34,13 @@ export interface Conversation {
   latest: DirectMessage;
 }
 
+/** Minimal thread target; used for existing conversations and blank outbound threads. */
+export interface DirectMessageThreadTarget {
+  peer: string;
+  events: NostrEvent[];
+  messageCount: number;
+}
+
 interface DirectMessagesPage {
   conversations: Conversation[];
   sentUntil: number | null;
@@ -301,17 +308,18 @@ async function decryptMessage({
 }
 
 /** Decrypts a selected thread on demand instead of blocking the inbox list. */
-export function useDirectMessageThread(conversation: Conversation | null) {
+export function useDirectMessageThread(conversation: DirectMessageThreadTarget | null) {
   const { user } = useCurrentUser();
   const self = user?.pubkey;
   const nip04 = user?.signer.nip04;
+  const latestId = conversation?.events.at(-1)?.id ?? '';
 
   return useQuery<DirectMessage[]>({
     queryKey: [
       'direct-message-thread',
       self,
       conversation?.peer,
-      conversation?.latest.id,
+      latestId,
       conversation?.messageCount,
     ],
     enabled: !!self && !!nip04 && !!conversation,
