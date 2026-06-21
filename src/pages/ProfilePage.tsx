@@ -2,21 +2,19 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
 import { useNostr } from '@nostrify/react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useSeoMeta } from '@unhead/react';
 import { nip19 } from 'nostr-tools';
-import { Zap, ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, X, QrCode, Check, Copy, Loader2, Download, RotateCcw, Mail, ListPlus, Award } from 'lucide-react';
+import { ClipboardCopy, ExternalLink, VolumeX, Flag, Bitcoin, X, QrCode, Check, Copy, Loader2, Download, RotateCcw, Mail } from 'lucide-react';
 
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { ZapDialog } from '@/components/ZapDialog';
 import { ExternalFavicon } from '@/components/ExternalFavicon';
 import { VerifiedNip05Text } from '@/components/Nip05Badge';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -32,14 +30,12 @@ import { useProfileSupplementary } from '@/hooks/useProfileData';
 import { useNip05Resolve } from '@/hooks/useNip05Resolve';
 import { genUserName } from '@/lib/genUserName';
 
-import { canZap } from '@/lib/canZap';
 import { openUrl } from '@/lib/downloadFile';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { EmbeddedNote } from '@/components/EmbeddedNote';
 import { EmbeddedNaddr } from '@/components/EmbeddedNaddr';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import { ReportDialog } from '@/components/ReportDialog';
-import { AddToListDialog } from '@/components/AddToListDialog';
 import { MiniAudioPlayer } from '@/components/MiniAudioPlayer';
 import { isAudioUrl, isImageUrl, isVideoUrl } from '@/lib/mediaTypeDetection';
 import { VideoPlayer } from '@/components/VideoPlayer';
@@ -51,7 +47,6 @@ import { useFeedSettings } from '@/hooks/useFeedSettings';
 
 import { FollowQRDialog } from '@/components/FollowQRDialog';
 import { ProfileRecoveryDialog } from '@/components/ProfileRecoveryDialog';
-import { GiveBadgeDialog } from '@/components/GiveBadgeDialog';
 import { useProfileCampaignStats } from '@/hooks/useProfileCampaignStats';
 import type { ProfileCampaignStats } from '@/hooks/useProfileCampaignStats';
 import { useVerifierStatement } from '@/hooks/useVerifierStatement';
@@ -108,26 +103,18 @@ interface ProfileMoreMenuProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   isOwnProfile?: boolean;
-  authorEvent?: NostrEvent;
 }
 
-function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile, authorEvent }: ProfileMoreMenuProps) {
+function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile }: ProfileMoreMenuProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { user } = useCurrentUser();
   const shareOrigin = useShareOrigin();
-  const navigate = useNavigate();
   const npubEncoded = useMemo(() => nip19.npubEncode(pubkey), [pubkey]);
   const { addMute, removeMute, isMuted } = useMuteList();
   const userMuted = isMuted('pubkey', pubkey);
   const [reportOpen, setReportOpen] = useState(false);
-  const [addToListOpen, setAddToListOpen] = useState(false);
   const [recoveryOpen, setRecoveryOpen] = useState(false);
-  const [giveBadgeOpen, setGiveBadgeOpen] = useState(false);
   const [followQROpen, setFollowQROpen] = useState(false);
-  const zapTriggerRef = useRef<HTMLSpanElement>(null);
-  const author = useAuthor(pubkey);
-  const showZap = !isOwnProfile && authorEvent && canZap(author.data?.metadata);
 
   const close = () => onOpenChange(false);
   const openAfterClose = (setter: (v: boolean) => void) => {
@@ -164,26 +151,16 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
   };
 
   const handleReport = () => openAfterClose(setReportOpen);
-  const handleAddToList = () => openAfterClose(setAddToListOpen);
 
   const handleRecovery = () => openAfterClose(setRecoveryOpen);
-  const handleGiveBadge = () => openAfterClose(setGiveBadgeOpen);
-  const handleWriteLetter = () => {
-    close();
-    navigate(`/letters/compose?to=${npubEncoded}`);
-  };
-  const handleZap = () => {
-    close();
-    setTimeout(() => zapTriggerRef.current?.click(), 150);
-  };
 
   return (
   <>
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md p-0 gap-0 rounded-2xl overflow-hidden [&>button]:hidden">
+      <DialogContent className="max-w-md p-0 gap-0 rounded-2xl overflow-hidden">
         <DialogTitle className="sr-only">{t('profile.moreMenu.title')}</DialogTitle>
 
-        <div className="py-1">
+        <div className="pt-10 pb-2">
           <MenuRow
             icon={<ClipboardCopy className="size-5" />}
             label={t('profile.moreMenu.copyPubkey')}
@@ -194,18 +171,9 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
             label={t('profile.moreMenu.copyLink')}
             onClick={handleCopyLink}
           />
-          <MenuRow
-            icon={<ListPlus className="size-5" />}
-            label={t('profile.moreMenu.addToList')}
-            onClick={handleAddToList}
-          />
-        </div>
 
-        {isOwnProfile && (
-          <>
-            <Separator />
-
-            <div className="py-1">
+          {isOwnProfile ? (
+            <>
               <MenuRow
                 icon={<QrCode className="size-5" />}
                 label={t('profile.moreMenu.shareFollowLink')}
@@ -216,36 +184,9 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
                 label={t('profile.moreMenu.profileRecovery')}
                 onClick={handleRecovery}
               />
-            </div>
-          </>
-        )}
-
-        {!isOwnProfile && (
-          <>
-            <Separator />
-
-            <div className="py-1">
-              {showZap && (
-                <MenuRow
-                  icon={<Zap className="size-5" />}
-                  label={t('profile.moreMenu.zap')}
-                  onClick={handleZap}
-                />
-              )}
-              {user && (
-                <MenuRow
-                  icon={<Award className="size-5" />}
-                  label={t('profile.moreMenu.awardBadge')}
-                  onClick={handleGiveBadge}
-                />
-              )}
-              {user && (
-                <MenuRow
-                  icon={<Mail className="size-5" />}
-                  label={t('profile.moreMenu.writeLetter')}
-                  onClick={handleWriteLetter}
-                />
-              )}
+            </>
+          ) : (
+            <>
               <MenuRow
                 icon={<VolumeX className="size-5" />}
                 label={userMuted ? t('profile.moreMenu.unmute', { name: displayName }) : t('profile.moreMenu.mute', { name: displayName })}
@@ -257,32 +198,13 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
                 onClick={handleReport}
                 destructive
               />
-            </div>
-          </>
-        )}
-
-        <Separator />
-
-        <div className="py-1">
-          <Button
-            variant="ghost"
-            className="w-full h-auto py-3 text-[15px] font-medium text-muted-foreground hover:bg-secondary/60 rounded-none"
-            onClick={close}
-          >
-            {t('profile.moreMenu.close')}
-          </Button>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>
 
     <ReportDialog pubkey={pubkey} open={reportOpen} onOpenChange={setReportOpen} />
-
-    <AddToListDialog
-      pubkey={pubkey}
-      displayName={displayName}
-      open={addToListOpen}
-      onOpenChange={setAddToListOpen}
-    />
 
     {isOwnProfile && (
       <>
@@ -295,21 +217,6 @@ function ProfileMoreMenu({ pubkey, displayName, open, onOpenChange, isOwnProfile
           onOpenChange={setFollowQROpen}
         />
       </>
-    )}
-
-    {!isOwnProfile && (
-      <GiveBadgeDialog
-        open={giveBadgeOpen}
-        onOpenChange={setGiveBadgeOpen}
-        recipientPubkey={pubkey}
-        recipientName={displayName}
-      />
-    )}
-
-    {showZap && authorEvent && (
-      <ZapDialog target={authorEvent}>
-        <span ref={zapTriggerRef} className="hidden" />
-      </ZapDialog>
     )}
   </>
   );
@@ -1339,8 +1246,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     }
   };
 
-  const authorEvent = metadataEvent;
-
   const handleRefresh = useCallback(async () => {
     if (!pubkey) return;
     await queryClient.invalidateQueries({
@@ -1612,7 +1517,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
             open={moreMenuOpen}
             onOpenChange={setMoreMenuOpen}
             isOwnProfile={isOwnProfile}
-            authorEvent={authorEvent}
           />
         )}
 

@@ -560,7 +560,7 @@ export function ActionBar({
             <QrCode className="size-5" />
           </Button>
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             className="rounded-full size-10"
             onClick={onMoreMenuOpen}
@@ -613,7 +613,7 @@ export function ActionBar({
             </DropdownMenu>
           ) : null}
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             className="rounded-full size-10"
             onClick={onMoreMenuOpen}
