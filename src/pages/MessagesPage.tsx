@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEven
 import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useInView } from 'react-intersection-observer';
-import { ArrowLeft, Loader2, Lock, MessageSquare, Search, Send } from 'lucide-react';
+import { ArrowLeft, ArrowUp, Loader2, Lock, MessageSquare, Search } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -146,6 +146,7 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
   const { toast } = useToast();
   const [draft, setDraft] = useState('');
   const endRef = useRef<HTMLDivElement>(null);
+  const hasDraft = draft.trim().length > 0;
 
   useEffect(() => {
     setDraft('');
@@ -207,31 +208,27 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
         </div>
       </ScrollArea>
 
-      <form onSubmit={handleSubmit} className="p-3">
-        <div className="flex items-end gap-2 rounded-2xl bg-muted/40 p-2 shadow-sm focus-within:ring-2 focus-within:ring-ring">
-          <Textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={t('messages.composePlaceholder')}
-            aria-label={t('messages.composePlaceholder')}
-            disabled={isPending}
-            rows={1}
-            className="max-h-32 min-h-10 resize-none border-0 bg-transparent px-2 py-2 text-base shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 md:text-sm"
-          />
+      <form onSubmit={handleSubmit} className="flex items-end gap-2 p-3">
+        <Textarea
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={t('messages.composePlaceholder')}
+          aria-label={t('messages.composePlaceholder')}
+          disabled={isPending}
+          rows={1}
+          className="max-h-32 min-h-12 resize-none rounded-full border-0 bg-muted/40 px-4 py-3 text-base shadow-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 md:text-sm"
+        />
+        {hasDraft && (
           <button
             type="submit"
-            className="shrink-0 rounded-full p-1.5 text-primary transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40"
-            disabled={isPending || !draft.trim()}
+            className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={isPending}
           >
-            {isPending ? (
-              <Loader2 className="size-8 animate-spin" />
-            ) : (
-              <Send className="size-9 fill-primary stroke-background" strokeWidth={1.25} />
-            )}
+            {isPending ? <Loader2 className="size-5 animate-spin" /> : <ArrowUp className="size-6" strokeWidth={2.5} />}
             <span className="sr-only">{t('messages.send')}</span>
           </button>
-        </div>
+        )}
       </form>
     </div>
   );
@@ -308,7 +305,7 @@ export function MessagesPage() {
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder={t('nav.search')}
                     aria-label={t('nav.search')}
-                    className="h-10 rounded-xl border-0 bg-background pl-9 shadow-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="h-10 rounded-full border-0 bg-background pl-9 shadow-none focus-visible:ring-2 focus-visible:ring-ring"
                   />
                 </div>
                 {isLoading ? (
