@@ -582,6 +582,7 @@ export function ActionBar({
       ) : (
         <>
           <FollowToggleButton
+            size="default"
             isFollowing={isFollowing}
             isPending={followPending}
             onClick={onToggleFollow}
