@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useParams, Link } from 'react-router-dom';
@@ -768,8 +767,6 @@ interface ProfileTabContentProps {
   btcPrice: number | undefined;
   campaigns: ParsedCampaign[];
   pledges: Action[];
-  fields: { label: string; value: string }[];
-  fieldsContent: ReactNode;
   onTabChange: (tabId: string) => void;
 }
 
@@ -789,8 +786,6 @@ function ProfileTabContent({
   btcPrice,
   campaigns,
   pledges,
-  fields,
-  fieldsContent,
   onTabChange,
 }: ProfileTabContentProps) {
   if (activeTab === 'overview') {
@@ -803,8 +798,6 @@ function ProfileTabContent({
           campaignStats={profileCampaignStats}
           pledges={pledges}
           btcPrice={btcPrice}
-          fields={fields}
-          fieldsContent={fieldsContent}
           onTabChange={onTabChange}
           // Organizations has its own tab on mobile.
           showOrganizations={false}
@@ -858,7 +851,7 @@ function ProfileTabContent({
 
 // Desktop (lg+) keeps the focused content set; the rail to the
 // left already shows the profile's Overview information (campaigns,
-// orgs, fields), so duplicating it as a tab would be redundant.
+// orgs), so duplicating it as a tab would be redundant.
 // "Groups" and "Pledges" are temporarily hidden.
 const DESKTOP_TAB_LABEL_KEYS = ['activity', 'campaigns'] as const;
 
@@ -1388,10 +1381,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                   btcPrice={btcPrice}
                   campaigns={profileCampaignStats.campaigns}
                   pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
-                  fields={fields}
-                  fieldsContent={fields.map((field, i) => (
-                     <ProfileFieldInline key={i} field={field} />
-                  ))}
                   onTabChange={handleTabChange}
                 />
               )}
@@ -1461,6 +1450,10 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                         : `https://${metadata.website}`;
                       return sanitizeUrl(candidate);
                     })()}
+                    fields={fields}
+                    fieldsContent={fields.map((field, i) => (
+                      <ProfileFieldInline key={i} field={field} />
+                    ))}
                     isFollowing={isFollowing}
                     followPending={followPending}
                     canFollow={!!user}
@@ -1496,11 +1489,7 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                       btcPrice={btcPrice}
                       campaigns={profileCampaignStats.campaigns}
                       pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
-                      fields={fields}
-                      fieldsContent={fields.map((field, i) => (
-                        <ProfileFieldInline key={i} field={field} />
-                      ))}
-                  onTabChange={handleTabChange}
+                      onTabChange={handleTabChange}
                     />
                   </div>
                 </>

@@ -99,7 +99,7 @@ const RAIL_ORG_LIMIT = 4;
  * ProfileIdentityRail — the left rail of the two-column profile.
  *
  * Holds everything that's a *standing fact* about the profile: who they
- * are (avatar, name, bio), what they're raising for (active campaigns),
+ * are (avatar, name, bio, profile fields), what they're raising for (active campaigns),
  * who they organize with (orgs), key counts (followers / following /
  * campaigns / pledges / raised), and the freeform profile fields.
  *
@@ -185,6 +185,8 @@ export function ProfileIdentityRail({
           metadataEvent={metadataEvent}
           displayName={displayName}
           websiteHref={websiteHref}
+          fields={fields}
+          fieldsContent={fieldsContent}
           isFollowing={isFollowing}
           followPending={followPending}
           canFollow={canFollow}
@@ -208,8 +210,6 @@ export function ProfileIdentityRail({
           campaignStats={campaignStats}
           pledges={pledges}
           btcPrice={btcPrice}
-          fields={fields}
-          fieldsContent={fieldsContent}
           onTabChange={onTabChange}
         />
       </div>
@@ -227,6 +227,8 @@ interface ProfileIdentityHeaderProps {
   displayName: string;
   /** Pre-sanitized website URL (`undefined` if none / unsafe). */
   websiteHref: string | undefined;
+  fields: { label: string; value: string }[];
+  fieldsContent: ReactNode;
   isFollowing: boolean;
   followPending: boolean;
   canFollow: boolean;
@@ -253,8 +255,8 @@ interface ProfileIdentityHeaderProps {
 }
 
 /**
- * The fixed identity block: name, NIP-05, website, bio, action bar, and
- * top-level stat row (Followers / Following / Raised).
+ * The fixed identity block: name, NIP-05, website, stats, bio, profile
+ * fields, and action bar.
  *
  * Rendered inside `ProfileIdentityRail` on desktop and directly above the
  * tab bar on mobile. Does NOT include the avatar — that lives outside any
@@ -267,6 +269,8 @@ export function ProfileIdentityHeader({
   metadataEvent,
   displayName,
   websiteHref,
+  fields,
+  fieldsContent,
   isFollowing,
   followPending,
   canFollow,
@@ -325,6 +329,11 @@ export function ProfileIdentityHeader({
             <BioContent tags={metadataEvent?.tags}>{metadata.about}</BioContent>
           </p>
         )}
+        {fields.length > 0 && (
+          <div className="pt-2 space-y-3">
+            {fieldsContent}
+          </div>
+        )}
       </div>
 
       {/* Action bar — wraps onto multiple rows in a 340px-wide rail. On
@@ -347,7 +356,7 @@ export function ProfileIdentityHeader({
   );
 }
 
-// ─── Overview sections (campaigns / latest pledge / orgs / fields) ──────────
+// ─── Overview sections (campaigns / latest pledge / orgs) ───────────────────
 
 interface ProfileOverviewSectionsProps {
   pubkey: string;
@@ -356,8 +365,6 @@ interface ProfileOverviewSectionsProps {
   campaignStats: ProfileCampaignStats;
   pledges: Action[];
   btcPrice: number | undefined;
-  fields: { label: string; value: string }[];
-  fieldsContent: ReactNode;
   onTabChange: (tabId: string) => void;
   /** Render the Organizations grid inline (default true). Set false on
    *  mobile when "Community" is a dedicated tab and orgs should not also
@@ -369,7 +376,7 @@ interface ProfileOverviewSectionsProps {
 /**
  * The collection of secondary rail sections: active campaigns, a fallback
  * "latest pledge" card when there are no campaigns, organizations the
- * profile founded/moderates, and freeform kind-0 profile fields.
+ * profile founded/moderates.
  *
  * On desktop these stack inside the identity rail. On mobile they become
  * the content of the "Overview" tab (with `showOrganizations={false}` so
@@ -382,25 +389,12 @@ export function ProfileOverviewSections({
   campaignStats,
   pledges,
   btcPrice,
-  fields,
-  fieldsContent,
   onTabChange,
   showOrganizations = true,
   className,
 }: ProfileOverviewSectionsProps) {
-  const { t } = useTranslation();
   return (
     <div className={cn('flex flex-col gap-5', className)}>
-      {/* Profile fields (rendered upstream) — placed first so the
-          profile's own freeform metadata (links, addresses, etc.) is
-          the first thing visitors read, ahead of campaigns/orgs. */}
-      {fields.length > 0 && (
-        <section className="space-y-3">
-          <RailSectionHeader icon={null} title={t('profile.sections.profile')} />
-          <div className="space-y-3">{fieldsContent}</div>
-        </section>
-      )}
-
       {/* Active campaigns */}
       <RailCampaignsSection
         campaigns={campaigns}
