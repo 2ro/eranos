@@ -274,7 +274,7 @@ export function MessagesPage() {
   const hasDmSupport = !!user.signer.nip04;
 
   return (
-    <main className="h-[calc(100dvh-4rem)] overflow-hidden bg-background">
+    <main className="h-full overflow-hidden bg-background">
       {!hasDmSupport ? (
         <div className="flex h-full items-center justify-center border-y px-8 py-12 text-center">
           <p className="mx-auto max-w-sm text-muted-foreground">

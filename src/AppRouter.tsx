@@ -121,11 +121,11 @@ function SiteFooter() {
  */
 function FundraiserLayout({ narrow, hideFooter }: { narrow: boolean; hideFooter?: boolean }) {
   return (
-    <div className="min-h-dvh flex flex-col bg-background">
+    <div className={cn('flex flex-col bg-background', hideFooter ? 'h-dvh overflow-hidden' : 'min-h-dvh')}>
       <TopNav />
       <Suspense fallback={<PageSkeleton />}>
         <div
-          className={cn("flex-1 min-w-0 w-full mx-auto", narrow && "max-w-3xl")}
+          className={cn('min-w-0 w-full flex-1 mx-auto', hideFooter && 'min-h-0', narrow && 'max-w-3xl')}
         >
           <Outlet />
         </div>
