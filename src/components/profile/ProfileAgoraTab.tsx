@@ -78,7 +78,7 @@ export function ProfileAgoraTab({
       <ProfileVerifierSection pubkey={pubkey} isOwnProfile={isOwnProfile} className="mb-2" />
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
           {Array.from({ length: 3 }).map((_, i) => (
             <CampaignCardSkeleton key={i} />
           ))}
@@ -108,7 +108,7 @@ export function ProfileAgoraTab({
           <p className="text-sm text-muted-foreground">
             {t('profile.campaigns.count', { count: mergedCampaigns.length })}
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             {mergedCampaigns.map(({ campaign, authored, verified }) => (
               <CampaignCard
                 key={campaign.aTag}
