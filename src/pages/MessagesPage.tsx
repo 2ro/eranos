@@ -180,7 +180,7 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-background">
-      <div className="flex items-center gap-3 border-b bg-card/80 p-4 backdrop-blur">
+      <div className="flex items-center gap-3 bg-card/80 p-4 backdrop-blur">
         <Button type="button" variant="ghost" size="icon" className="md:hidden" onClick={onBack}>
           <ArrowLeft className="size-4" />
           <span className="sr-only">{t('messages.conversations')}</span>
@@ -207,7 +207,7 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
         </div>
       </ScrollArea>
 
-      <form onSubmit={handleSubmit} className="border-t bg-card/90 p-3 backdrop-blur">
+      <form onSubmit={handleSubmit} className="bg-card/90 p-3 backdrop-blur">
         <div className="flex items-end gap-2 rounded-2xl border bg-background p-2 shadow-sm focus-within:ring-2 focus-within:ring-ring">
           <Textarea
             value={draft}
@@ -276,13 +276,13 @@ export function MessagesPage() {
   return (
     <main className="h-full overflow-hidden bg-background">
       {!hasDmSupport ? (
-        <div className="flex h-full items-center justify-center border-y px-8 py-12 text-center">
+        <div className="flex h-full items-center justify-center px-8 py-12 text-center">
           <p className="mx-auto max-w-sm text-muted-foreground">
             {t('messages.unsupported')}
           </p>
         </div>
       ) : (
-        <div className="grid h-full min-h-0 overflow-hidden border-y bg-background md:grid-cols-[22rem_1fr]">
+        <div className="grid h-full min-h-0 overflow-hidden bg-background md:grid-cols-[22rem_1fr]">
           {/* Conversation list */}
           <div
             className={cn(
