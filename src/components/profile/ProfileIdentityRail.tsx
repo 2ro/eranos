@@ -294,7 +294,7 @@ export function ProfileIdentityHeader({
 }: ProfileIdentityHeaderProps) {
   return (
     <div className={cn('flex flex-col gap-5', className)}>
-      {/* Identity: name + NIP-05 + website + bio */}
+      {/* Identity: name + NIP-05 + website + stats + bio */}
       <div className="space-y-1.5">
         <h1 className="text-xl font-bold leading-tight break-words">
           {metadataEvent ? (
@@ -317,6 +317,16 @@ export function ProfileIdentityHeader({
             </a>
           </div>
         )}
+        {/* Stats: Raised + Followers + Following on a single inline row. */}
+        <StatList
+          followersCount={followersCount}
+          followingCount={followingCount}
+          totalRaisedSats={totalRaisedSats}
+          btcPrice={btcPrice}
+          onFollowersOpen={onFollowersOpen}
+          onFollowingOpen={onFollowingOpen}
+          onTabChange={onTabChange}
+        />
         {metadata?.about && (
           <p className="pt-1 text-sm whitespace-pre-wrap break-words text-foreground/90">
             <BioContent tags={metadataEvent?.tags}>{metadata.about}</BioContent>
@@ -341,17 +351,6 @@ export function ProfileIdentityHeader({
           onDonate={onDonate}
         />
       )}
-
-      {/* Stats: Raised + Followers + Following on a single inline row. */}
-      <StatList
-        followersCount={followersCount}
-        followingCount={followingCount}
-        totalRaisedSats={totalRaisedSats}
-        btcPrice={btcPrice}
-        onFollowersOpen={onFollowersOpen}
-        onFollowingOpen={onFollowingOpen}
-        onTabChange={onTabChange}
-      />
     </div>
   );
 }
