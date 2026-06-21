@@ -121,22 +121,24 @@ export function TopNav() {
 
         {/* Right cluster */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Always-visible language switcher so a visitor who can't read the
-              current UI language can find and pick theirs — independent of
-              login state. Switches in place without leaving the page. */}
-          <LanguageSwitcher />
-
           {user ? (
             <DeferredWalletBalancePill />
           ) : (
-            <Link
-              to="/search"
-              className="shrink-0 size-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              aria-label={t('nav.search')}
-              title={t('nav.search')}
-            >
-              <Search className="size-5" />
-            </Link>
+            <>
+              {/* When logged out, surface the language switcher so a visitor
+                  who can't read the current UI language can find and pick
+                  theirs. Logged-in users change language via Settings, so it's
+                  hidden to keep the bar uncluttered. Switches in place. */}
+              <LanguageSwitcher />
+              <Link
+                to="/search"
+                className="shrink-0 size-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label={t('nav.search')}
+                title={t('nav.search')}
+              >
+                <Search className="size-5" />
+              </Link>
+            </>
           )}
 
           {/* LoginArea handles both logged-in (account avatar dropdown) and

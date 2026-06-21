@@ -308,18 +308,21 @@ function Hero() {
               asChild
               className="rounded-full h-12 px-6 text-base border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white hover:border-white/50 [&_svg]:size-[18px]"
             >
-              <Link to="/about">
-                {t('campaigns.home.howItWorks')}
-                <ArrowRight className="ml-2 rtl:rotate-180" />
+              <Link to="/verify">
+                <BadgeCheck className="mr-2" />
+                {t('campaigns.home.verifyCampaigns')}
               </Link>
             </Button>
             <Button
               variant="outline"
               size="lg"
               asChild
-              className="rounded-full h-12 px-6 text-base border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white hover:border-white/50"
+              className="rounded-full h-12 px-6 text-base border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white hover:border-white/50 [&_svg]:size-[18px]"
             >
-              <a href="#campaigns">{t('campaigns.home.exploreCampaigns')}</a>
+              <Link to="/about">
+                {t('campaigns.home.howItWorks')}
+                <ArrowRight className="ml-2 rtl:rotate-180" />
+              </Link>
             </Button>
           </div>
         </div>
