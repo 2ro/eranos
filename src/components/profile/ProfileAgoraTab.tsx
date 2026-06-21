@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { BadgeCheck, Megaphone } from 'lucide-react';
 
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
-import { ProfileOverviewSections } from '@/components/profile/ProfileIdentityRail';
 import { ProfileVerifierSection } from '@/components/profile/ProfileVerifierSection';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -11,7 +10,6 @@ import { StartCampaignLink } from '@/components/StartCampaignLink';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useVerifiedCampaigns } from '@/hooks/useVerifiedCampaigns';
 import type { ProfileCampaignStats } from '@/hooks/useProfileCampaignStats';
-import type { Action } from '@/hooks/useActions';
 import type { ParsedCampaign } from '@/lib/campaign';
 
 interface ProfileAgoraTabProps {
@@ -20,9 +18,6 @@ interface ProfileAgoraTabProps {
   isOwnProfile: boolean;
   profileCampaignStats: ProfileCampaignStats;
   campaigns: ParsedCampaign[];
-  pledges: Action[];
-  btcPrice: number | undefined;
-  onTabChange: (tabId: string) => void;
 }
 
 interface CampaignRelationship {
@@ -45,9 +40,6 @@ export function ProfileAgoraTab({
   isOwnProfile,
   profileCampaignStats,
   campaigns,
-  pledges,
-  btcPrice,
-  onTabChange,
 }: ProfileAgoraTabProps) {
   const { t } = useTranslation();
   const { campaigns: verifiedCampaigns, isLoading: verifiedLoading } = useVerifiedCampaigns(pubkey);
@@ -56,43 +48,34 @@ export function ProfileAgoraTab({
   const authoredLoading = profileCampaignStats.isVerifying && campaigns.length === 0;
 
   const mergedCampaigns = useMemo(() => {
-    const byCoord = new Map<string, CampaignRelationship>();
+    const seenCoords = new Set<string>();
+    const relationshipsByCoord = new Map<string, CampaignRelationship>();
 
     for (const campaign of campaigns) {
       if (moderation.hiddenCoords.has(campaign.aTag)) continue;
-      byCoord.set(campaign.aTag, { campaign, authored: true, verified: false });
+      seenCoords.add(campaign.aTag);
+      relationshipsByCoord.set(campaign.aTag, { campaign, authored: true, verified: false });
     }
 
     for (const campaign of verifiedCampaigns) {
       if (moderation.hiddenCoords.has(campaign.aTag)) continue;
-      const existing = byCoord.get(campaign.aTag);
-      if (existing) {
+      const existing = relationshipsByCoord.get(campaign.aTag);
+      if (seenCoords.has(campaign.aTag) && existing) {
         existing.verified = true;
       } else {
-        byCoord.set(campaign.aTag, { campaign, authored: false, verified: true });
+        seenCoords.add(campaign.aTag);
+        relationshipsByCoord.set(campaign.aTag, { campaign, authored: false, verified: true });
       }
     }
 
-    return [...byCoord.values()].sort((a, b) => b.campaign.createdAt - a.campaign.createdAt);
+    return [...relationshipsByCoord.values()].sort((a, b) => b.campaign.createdAt - a.campaign.createdAt);
   }, [campaigns, verifiedCampaigns, moderation.hiddenCoords]);
 
   const isLoading = (authoredLoading || verifiedLoading) && mergedCampaigns.length === 0;
 
   return (
-    <div className="px-4 sm:px-6 py-6 space-y-6" data-pubkey={pubkey}>
-      <ProfileVerifierSection pubkey={pubkey} isOwnProfile={isOwnProfile} />
-
-      <ProfileOverviewSections
-        pubkey={pubkey}
-        isOwnProfile={isOwnProfile}
-        campaigns={campaigns}
-        campaignStats={profileCampaignStats}
-        pledges={pledges}
-        btcPrice={btcPrice}
-        onTabChange={onTabChange}
-        showOrganizations={false}
-        className="lg:hidden"
-      />
+    <div className="px-4 sm:px-6 py-6 space-y-4" data-pubkey={pubkey}>
+      <ProfileVerifierSection pubkey={pubkey} isOwnProfile={isOwnProfile} className="mb-2" />
 
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">

@@ -765,7 +765,6 @@ interface ProfileTabContentProps {
   btcPrice: number | undefined;
   campaigns: ParsedCampaign[];
   pledges: Action[];
-  onTabChange: (tabId: string) => void;
 }
 
 /**
@@ -783,7 +782,6 @@ function ProfileTabContent({
   btcPrice,
   campaigns,
   pledges,
-  onTabChange,
 }: ProfileTabContentProps) {
   if (activeTab === 'agora' || activeTab === 'overview' || activeTab === 'verified' || activeTab === 'campaigns') {
     return (
@@ -793,9 +791,6 @@ function ProfileTabContent({
         isOwnProfile={isOwnProfile}
         profileCampaignStats={profileCampaignStats}
         campaigns={campaigns}
-        pledges={pledges}
-        btcPrice={btcPrice}
-        onTabChange={onTabChange}
       />
     );
   }
@@ -1351,7 +1346,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                   btcPrice={btcPrice}
                   campaigns={profileCampaignStats.campaigns}
                   pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
-                  onTabChange={handleTabChange}
                 />
               )}
             </section>
@@ -1459,7 +1453,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                       btcPrice={btcPrice}
                       campaigns={profileCampaignStats.campaigns}
                       pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
-                      onTabChange={handleTabChange}
                     />
                   </div>
                 </>
