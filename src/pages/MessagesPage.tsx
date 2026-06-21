@@ -3,11 +3,12 @@ import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEven
 import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useInView } from 'react-intersection-observer';
-import { ArrowLeft, Inbox, Loader2, Lock, MessageSquare, Send } from 'lucide-react';
+import { ArrowLeft, Loader2, Lock, MessageSquare, Search, Send } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
@@ -176,13 +177,10 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
           <AvatarImage src={picture} alt={name} />
           <AvatarFallback>{name.charAt(0)}</AvatarFallback>
         </Avatar>
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold">{name}</p>
-          <p className="truncate text-xs text-muted-foreground">{t('messages.subtitle')}</p>
-        </div>
+        <p className="min-w-0 flex-1 truncate font-semibold">{name}</p>
       </div>
 
-      <ScrollArea className="flex-1 bg-gradient-to-b from-muted/30 via-background to-background px-4">
+      <ScrollArea className="min-h-0 flex-1 bg-gradient-to-b from-muted/30 via-background to-background px-4">
         <div className="space-y-3 py-5">
           {isLoading ? (
             <div className="space-y-3">
@@ -232,6 +230,7 @@ export function MessagesPage() {
     pageCount,
   } = useDirectMessages();
   const [selectedPeer, setSelectedPeer] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
   const { ref: olderMessagesRef, inView: olderMessagesInView } = useInView({ threshold: 0, rootMargin: '300px' });
 
   useSeoMeta({
@@ -243,6 +242,15 @@ export function MessagesPage() {
     () => conversations?.find((c) => c.peer === selectedPeer) ?? null,
     [conversations, selectedPeer],
   );
+
+  const filteredConversations = useMemo(() => {
+    const query = search.trim().toLocaleLowerCase();
+    if (!query) return conversations;
+    return conversations?.filter((conversation) => {
+      const latest = conversation.latest.content?.toLocaleLowerCase() ?? '';
+      return conversation.peer.toLocaleLowerCase().includes(query) || latest.includes(query);
+    });
+  }, [conversations, search]);
 
   useEffect(() => {
     if (pageCount === 1 && hasNextPage && !isFetchingNextPage) {
@@ -263,33 +271,36 @@ export function MessagesPage() {
   const hasDmSupport = !!user.signer.nip04;
 
   return (
-    <main className="min-h-[calc(100dvh-4rem)] bg-background">
+    <main className="h-[calc(100dvh-4rem)] overflow-hidden bg-background">
       {!hasDmSupport ? (
-        <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center border-y px-8 py-12 text-center">
+        <div className="flex h-full items-center justify-center border-y px-8 py-12 text-center">
           <p className="mx-auto max-w-sm text-muted-foreground">
             {t('messages.unsupported')}
           </p>
         </div>
       ) : (
-        <div className="grid min-h-[calc(100dvh-4rem)] overflow-hidden border-y bg-background md:grid-cols-[22rem_1fr]">
+        <div className="grid h-full min-h-0 overflow-hidden border-y bg-background md:grid-cols-[22rem_1fr]">
           {/* Conversation list */}
           <div
             className={cn(
-              'min-h-0 flex-col border-r bg-muted/40',
+              'h-full min-h-0 flex-col border-r bg-muted/40',
               selected && 'hidden md:flex',
               !selected && 'flex',
             )}
           >
-            <div className="border-b bg-card/80 p-4 backdrop-blur">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-sm font-semibold">{t('messages.conversations')}</h2>
-                  <p className="text-xs text-muted-foreground">NIP-04</p>
-                </div>
-                <Inbox className="size-5 text-muted-foreground" />
+            <div className="border-b bg-card/80 p-3 backdrop-blur">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={t('nav.search')}
+                  aria-label={t('nav.search')}
+                  className="h-10 rounded-xl bg-background pl-9"
+                />
               </div>
             </div>
-            <ScrollArea className="flex-1">
+            <ScrollArea className="min-h-0 flex-1">
               <div className="space-y-2 p-3">
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, i) => (
@@ -301,8 +312,8 @@ export function MessagesPage() {
                       </div>
                     </div>
                   ))
-                ) : conversations && conversations.length > 0 ? (
-                  conversations.map((conversation) => (
+                ) : filteredConversations && filteredConversations.length > 0 ? (
+                  filteredConversations.map((conversation) => (
                     <ConversationRow
                       key={conversation.peer}
                       conversation={conversation}
@@ -317,7 +328,7 @@ export function MessagesPage() {
                     </p>
                   </div>
                 )}
-                {hasNextPage && conversations && conversations.length > 0 && (
+                {hasNextPage && conversations && conversations.length > 0 && !search.trim() && (
                   <div ref={olderMessagesRef} className="flex justify-center py-4">
                     {isFetchingNextPage && <Loader2 className="size-4 animate-spin text-muted-foreground" />}
                   </div>
@@ -327,7 +338,7 @@ export function MessagesPage() {
           </div>
 
           {/* Thread */}
-          <div className={cn('min-w-0', !selected && 'hidden md:block')}>
+          <div className={cn('h-full min-h-0 min-w-0', !selected && 'hidden md:block')}>
             {selected ? (
               <MessageThread conversation={selected} onBack={() => setSelectedPeer(null)} />
             ) : (

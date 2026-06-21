@@ -119,7 +119,7 @@ function SiteFooter() {
  * form/prose-style pages, wide (full width) for landing / dashboard / detail
  * pages that render their own internal layout.
  */
-function FundraiserLayout({ narrow }: { narrow: boolean }) {
+function FundraiserLayout({ narrow, hideFooter }: { narrow: boolean; hideFooter?: boolean }) {
   return (
     <div className="min-h-dvh flex flex-col bg-background">
       <TopNav />
@@ -130,7 +130,7 @@ function FundraiserLayout({ narrow }: { narrow: boolean }) {
           <Outlet />
         </div>
       </Suspense>
-      <SiteFooter />
+      {!hideFooter && <SiteFooter />}
     </div>
   );
 }
@@ -200,6 +200,10 @@ export function AppRouter() {
           <Route path="/remoteloginsuccess" element={<RemoteLoginSuccessPage />} />
         </Route>
 
+        <Route element={<FundraiserLayout narrow={false} hideFooter />}>
+          <Route path="/messages" element={<MessagesPage />} />
+        </Route>
+
         {/* Wide layout — no max-width on the center column. Used by landing /
             list / detail pages that render their own internal width
             constraints. */}
@@ -218,7 +222,6 @@ export function AppRouter() {
           <Route path="/pledges" element={<ActionsPage />} />
           <Route path="/pledges/new" element={<CreateActionPage />} />
           <Route path="/dashboard" element={<EventDashboardPage />} />
-          <Route path="/messages" element={<MessagesPage />} />
           <Route path="/i/*" element={<ExternalContentPage />} />
           {/* About page + Donor / Recipient guides. Full-bleed landing-style
               layouts that render their own internal max-widths. */}
