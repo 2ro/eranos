@@ -260,9 +260,11 @@ export function useDirectMessageThread(conversation: Conversation | null) {
     enabled: !!self && !!nip04 && !!conversation,
     queryFn: async () => {
       if (!self || !nip04 || !conversation) return [];
-      return Promise.all(
-        conversation.events.map((event) => decryptMessage({ event, peer: conversation.peer, self, nip04 })),
-      );
+      const messages: DirectMessage[] = [];
+      for (const event of conversation.events) {
+        messages.push(await decryptMessage({ event, peer: conversation.peer, self, nip04 }));
+      }
+      return messages;
     },
   });
 }
