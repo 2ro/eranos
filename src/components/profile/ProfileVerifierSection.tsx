@@ -101,13 +101,13 @@ export function ProfileVerifierSection({ pubkey, isOwnProfile = false, className
           ) : (
             <Button
               type="button"
-              variant="secondary"
+              variant="ghost"
               size="sm"
-              className="-mt-1 -mr-2 h-8 shrink-0 px-3 text-xs"
+              className="-mt-1 -mr-2 h-7 shrink-0 rounded-full border border-primary/20 bg-background/70 px-2.5 text-xs font-medium text-primary shadow-sm hover:bg-primary/10 hover:text-primary"
               asChild
             >
               <Link to={`/messages?to=${pubkey}`}>
-                <MessageSquare className="mr-1.5 size-3.5" />
+                <MessageSquare className="mr-1.5 size-3" />
                 {t('verifier.requestVerification')}
               </Link>
             </Button>
