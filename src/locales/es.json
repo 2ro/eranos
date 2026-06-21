@@ -119,7 +119,10 @@
     "muteFailed": "No se pudo silenciar al usuario",
     "showFriendsOnly": "Mostrar mensajes de personas que sigues",
     "showAllConversations": "Mostrar todas las conversaciones",
-    "friendsEmpty": "No hay mensajes de personas que sigues."
+    "friendsEmpty": "No hay mensajes de personas que sigues.",
+    "translateDialogTitle": "¿Traducir mensajes privados?",
+    "translateDialogDescription": "Los mensajes recibidos se enviarán al servicio de traducción que configuraste. Los mensajes enviados no se traducirán. Agora recordará esta elección en este dispositivo.",
+    "confirmTranslate": "Traducir mensajes"
   },
   "auth": {
     "join": "Unirse",

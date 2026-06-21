@@ -119,7 +119,10 @@
     "muteFailed": "Kutadza kunyaradza mushandisi",
     "showFriendsOnly": "Ratidza mameseji kubva kuvanhu vaunotevera",
     "showAllConversations": "Ratidza nhaurirano dzese",
-    "friendsEmpty": "Hapana mameseji kubva kuvanhu vaunotevera."
+    "friendsEmpty": "Hapana mameseji kubva kuvanhu vaunotevera.",
+    "translateDialogTitle": "Dudzira mameseji epachivande?",
+    "translateDialogDescription": "Mameseji agamuchirwa achaendeswa kusevhisi yako yekushandura yawakagadzirisa. Mameseji atumirwa haazodudzirwi. Agora icharangarira sarudzo iyi pachigadzirwa ichi.",
+    "confirmTranslate": "Dudzira mameseji"
   },
   "auth": {
     "join": "Joinha",

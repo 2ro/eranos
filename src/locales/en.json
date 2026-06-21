@@ -120,7 +120,10 @@
     "muteFailed": "Failed to mute user",
     "showFriendsOnly": "Show messages from people you follow",
     "showAllConversations": "Show all conversations",
-    "friendsEmpty": "No messages from people you follow."
+    "friendsEmpty": "No messages from people you follow.",
+    "translateDialogTitle": "Translate private messages?",
+    "translateDialogDescription": "Received messages will be sent to your configured translation service. Sent messages will not be translated. Agora will remember this choice on this device.",
+    "confirmTranslate": "Translate messages"
   },
   "auth": {
     "join": "Join",

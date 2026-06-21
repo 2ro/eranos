@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
+import { TranslateButton } from '@/components/TranslateButton';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -39,6 +40,8 @@ import { getDisplayName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { timeAgo } from '@/lib/timeAgo';
 import { cn } from '@/lib/utils';
+
+const DM_TRANSLATION_CONFIRM_KEY = 'agora.dmTranslationConfirmed';
 
 /** Small helper bundling a peer's display name + avatar from kind-0 metadata. */
 function usePeerProfile(pubkey: string) {
@@ -113,8 +116,10 @@ function ConversationRow({
 }
 
 /** A single message bubble in the thread (right column). */
-function MessageBubble({ message }: { message: DirectMessage }) {
+function MessageBubble({ message, translatedContent }: { message: DirectMessage; translatedContent?: string }) {
   const { t } = useTranslation();
+  const displayContent = translatedContent ?? message.content;
+
   return (
     <div className={cn('flex', message.outgoing ? 'justify-end' : 'justify-start')}>
       <div
@@ -125,8 +130,8 @@ function MessageBubble({ message }: { message: DirectMessage }) {
             : 'rounded-bl-md border bg-card text-foreground',
         )}
       >
-        {message.content !== null ? (
-          <p className="whitespace-pre-wrap break-words">{message.content}</p>
+        {displayContent !== null ? (
+          <p className="whitespace-pre-wrap break-words">{displayContent}</p>
         ) : (
           <p className="flex items-center gap-1.5 italic opacity-80">
             <Lock className="size-3.5" />
@@ -166,17 +171,36 @@ function MessageThread({
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [muteConfirmOpen, setMuteConfirmOpen] = useState(false);
+  const [translationConfirmOpen, setTranslationConfirmOpen] = useState(false);
+  const [translationConfirmed, setTranslationConfirmed] = useState(() => (
+    typeof window !== 'undefined' && window.localStorage.getItem(DM_TRANSLATION_CONFIRM_KEY) === 'true'
+  ));
+  const [translatedMessages, setTranslatedMessages] = useState<Record<string, string>>({});
   const endRef = useRef<HTMLDivElement>(null);
+  const translationConfirmResolveRef = useRef<((confirmed: boolean) => void) | null>(null);
   const hasDraft = draft.trim().length > 0;
   const normalizedThreadSearch = searchQuery.trim().toLocaleLowerCase();
   const visibleMessages = normalizedThreadSearch
     ? messages?.filter((message) => message.content?.toLocaleLowerCase().includes(normalizedThreadSearch))
     : messages;
+  const translatableMessages = useMemo(
+    () => messages?.filter((message): message is DirectMessage & { content: string } => (
+      !message.outgoing && !!message.content?.trim()
+    )) ?? [],
+    [messages],
+  );
+  const isThreadTranslated = translatableMessages.length > 0 && translatableMessages.every((message) => (
+    translatedMessages[message.id] !== undefined
+  ));
 
   useEffect(() => {
     setDraft('');
     setSearchOpen(false);
     setSearchQuery('');
+    setTranslatedMessages({});
+    setTranslationConfirmOpen(false);
+    translationConfirmResolveRef.current?.(false);
+    translationConfirmResolveRef.current = null;
   }, [conversation.peer]);
 
   useEffect(() => {
@@ -224,6 +248,25 @@ function MessageThread({
     }
   };
 
+  const requestTranslationConfirmation = () => {
+    if (translationConfirmed) return true;
+
+    return new Promise<boolean>((resolve) => {
+      translationConfirmResolveRef.current = resolve;
+      setTranslationConfirmOpen(true);
+    });
+  };
+
+  const completeTranslationConfirmation = (confirmed: boolean) => {
+    setTranslationConfirmOpen(false);
+    if (confirmed) {
+      setTranslationConfirmed(true);
+      window.localStorage.setItem(DM_TRANSLATION_CONFIRM_KEY, 'true');
+    }
+    translationConfirmResolveRef.current?.(confirmed);
+    translationConfirmResolveRef.current = null;
+  };
+
   return (
     <div className="flex h-full min-h-0 flex-col bg-gradient-to-b from-muted/30 via-background to-background">
       <div className="flex items-center gap-3 p-4">
@@ -238,6 +281,25 @@ function MessageThread({
           </Avatar>
         </Link>
         <p className="min-w-0 flex-1 truncate font-semibold">{name}</p>
+        <TranslateButton
+          text={translatableMessages.map((message) => message.content).join('\n\n')}
+          texts={translatableMessages.map((message) => message.content)}
+          isTranslated={isThreadTranslated}
+          onBeforeTranslate={requestTranslationConfirmation}
+          onTranslated={(_, translatedTexts) => {
+            setTranslatedMessages((current) => {
+              const next = { ...current };
+              translatableMessages.forEach((message, index) => {
+                const translated = translatedTexts[index];
+                if (translated) next[message.id] = translated;
+              });
+              return next;
+            });
+          }}
+          onReset={() => setTranslatedMessages({})}
+          iconOnly
+          className="size-10 shrink-0 rounded-full p-0"
+        />
         <Button
           type="button"
           variant="ghost"
@@ -297,7 +359,13 @@ function MessageThread({
             </div>
           ) : (
             visibleMessages && visibleMessages.length > 0 ? (
-              visibleMessages.map((message) => <MessageBubble key={message.id} message={message} />)
+              visibleMessages.map((message) => (
+                <MessageBubble
+                  key={message.id}
+                  message={message}
+                  translatedContent={message.outgoing ? undefined : translatedMessages[message.id]}
+                />
+              ))
             ) : normalizedThreadSearch ? (
               <p className="px-4 py-10 text-center text-sm text-muted-foreground">{t('messages.noSearchResults')}</p>
             ) : null
@@ -349,6 +417,34 @@ function MessageThread({
             >
               {addMute.isPending ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
               {t('messages.confirmMute')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={translationConfirmOpen}
+        onOpenChange={(open) => {
+          if (open) {
+            setTranslationConfirmOpen(true);
+          } else {
+            completeTranslationConfirmation(false);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('messages.translateDialogTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('messages.translateDialogDescription')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => completeTranslationConfirmation(false)}>
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={() => completeTranslationConfirmation(true)}>
+              {t('messages.confirmTranslate')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

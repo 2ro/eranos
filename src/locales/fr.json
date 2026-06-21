@@ -119,7 +119,10 @@
     "muteFailed": "Échec du masquage de l'utilisateur",
     "showFriendsOnly": "Afficher les messages des personnes que vous suivez",
     "showAllConversations": "Afficher toutes les conversations",
-    "friendsEmpty": "Aucun message des personnes que vous suivez."
+    "friendsEmpty": "Aucun message des personnes que vous suivez.",
+    "translateDialogTitle": "Traduire les messages privés ?",
+    "translateDialogDescription": "Les messages reçus seront envoyés au service de traduction configuré. Les messages envoyés ne seront pas traduits. Agora mémorisera ce choix sur cet appareil.",
+    "confirmTranslate": "Traduire les messages"
   },
   "auth": {
     "join": "Rejoindre",

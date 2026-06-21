@@ -119,7 +119,10 @@
     "muteFailed": "屏蔽用户失败",
     "showFriendsOnly": "显示我关注的人的消息",
     "showAllConversations": "显示所有对话",
-    "friendsEmpty": "没有来自您关注的人的消息。"
+    "friendsEmpty": "没有来自您关注的人的消息。",
+    "translateDialogTitle": "要翻译私信吗？",
+    "translateDialogDescription": "收到的消息将发送到你配置的翻译服务。已发送的消息不会被翻译。Agora 会在此设备上记住此选择。",
+    "confirmTranslate": "翻译消息"
   },
   "auth": {
     "join": "加入",

@@ -119,7 +119,10 @@
     "muteFailed": "Imeshindwa kunyamazisha mtumiaji",
     "showFriendsOnly": "Onyesha ujumbe kutoka kwa watu unaowafuata",
     "showAllConversations": "Onyesha mazungumzo yote",
-    "friendsEmpty": "Hakuna ujumbe kutoka kwa watu unaowafuata."
+    "friendsEmpty": "Hakuna ujumbe kutoka kwa watu unaowafuata.",
+    "translateDialogTitle": "Tafsiri ujumbe wa faragha?",
+    "translateDialogDescription": "Ujumbe uliopokelewa utatumwa kwa huduma yako ya tafsiri uliyosanidi. Ujumbe uliotumwa hautatafsiriwa. Agora itakumbuka chaguo hili kwenye kifaa hiki.",
+    "confirmTranslate": "Tafsiri ujumbe"
   },
   "auth": {
     "join": "Jiunge",

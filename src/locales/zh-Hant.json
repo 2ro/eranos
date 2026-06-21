@@ -119,7 +119,10 @@
     "muteFailed": "封鎖使用者失敗",
     "showFriendsOnly": "顯示我追蹤的人的訊息",
     "showAllConversations": "顯示所有對話",
-    "friendsEmpty": "沒有來自您追蹤的人的訊息。"
+    "friendsEmpty": "沒有來自您追蹤的人的訊息。",
+    "translateDialogTitle": "要翻譯私人訊息嗎？",
+    "translateDialogDescription": "收到的訊息將會傳送至你設定的翻譯服務。已傳送的訊息不會被翻譯。Agora 會在此裝置上記住這個選擇。",
+    "confirmTranslate": "翻譯訊息"
   },
   "auth": {
     "join": "加入",

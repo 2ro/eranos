@@ -31,6 +31,8 @@ interface TranslateButtonProps {
   texts?: string[];
   /** Called with translated text on success. */
   onTranslated: (translated: string, translatedTexts: string[]) => void;
+  /** Optional guard invoked before user-generated content is sent to the translation service. */
+  onBeforeTranslate?: () => boolean | Promise<boolean>;
   /** Called when the user wants to show the original content again. */
   onReset: () => void;
   /** Whether translated content is currently visible. */
@@ -46,6 +48,7 @@ export function TranslateButton({
   text,
   texts,
   onTranslated,
+  onBeforeTranslate,
   onReset,
   isTranslated,
   responsiveLabel,
@@ -68,6 +71,9 @@ export function TranslateButton({
 
     const translateUrl = config.translateWorkerUrl.trim();
     if (!translateUrl) return;
+
+    const allowed = onBeforeTranslate ? await onBeforeTranslate() : true;
+    if (!allowed) return;
 
     setLoading(true);
     setError(false);

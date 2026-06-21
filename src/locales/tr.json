@@ -119,7 +119,10 @@
     "muteFailed": "Kullanıcı sessize alınamadı",
     "showFriendsOnly": "Takip ettiğiniz kişilerden gelen mesajları göster",
     "showAllConversations": "Tüm sohbetleri göster",
-    "friendsEmpty": "Takip ettiğiniz kişilerden mesaj yok."
+    "friendsEmpty": "Takip ettiğiniz kişilerden mesaj yok.",
+    "translateDialogTitle": "Özel mesajlar çevrilsin mi?",
+    "translateDialogDescription": "Alınan mesajlar yapılandırdığınız çeviri hizmetine gönderilecek. Gönderilen mesajlar çevrilmeyecek. Agora bu tercihi bu cihazda hatırlayacak.",
+    "confirmTranslate": "Mesajları çevir"
   },
   "auth": {
     "join": "Katıl",

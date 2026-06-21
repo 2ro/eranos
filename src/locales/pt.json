@@ -119,7 +119,10 @@
     "muteFailed": "Falha ao silenciar usuário",
     "showFriendsOnly": "Mostrar mensagens de pessoas que você segue",
     "showAllConversations": "Mostrar todas as conversas",
-    "friendsEmpty": "Não há mensagens de pessoas que você segue."
+    "friendsEmpty": "Não há mensagens de pessoas que você segue.",
+    "translateDialogTitle": "Traduzir mensagens privadas?",
+    "translateDialogDescription": "As mensagens recebidas serão enviadas ao serviço de tradução configurado. As mensagens enviadas não serão traduzidas. O Agora lembrará esta escolha neste dispositivo.",
+    "confirmTranslate": "Traduzir mensagens"
   },
   "auth": {
     "join": "Entrar",
