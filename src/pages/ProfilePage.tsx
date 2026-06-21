@@ -1459,7 +1459,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                   onTabChange={(id) => handleTabChange(id)}
                   onDonate={openDonateForCampaign}
                   canFollow={!!user}
-                  authorEvent={authorEvent}
                 />
               </aside>
             )}
@@ -1534,7 +1533,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                       onToggleFollow={handleToggleFollow}
                       onMoreMenuOpen={() => setMoreMenuOpen(true)}
                       onFollowQROpen={() => setFollowQROpen(true)}
-                      authorEvent={authorEvent}
                       onchainCampaigns={profileCampaignStats.campaigns.filter((c) => !!c.wallets?.onchain)}
                       onDonate={openDonateForCampaign}
                     />
@@ -1573,7 +1571,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                     onFollowersOpen={() => setFollowersModalOpen(true)}
                     onFollowingOpen={() => setFollowingModalOpen(true)}
                     onTabChange={handleTabChange}
-                    authorEvent={authorEvent}
                   />
 
                   {/* Tab bar — sticky to the top of the page scroll once

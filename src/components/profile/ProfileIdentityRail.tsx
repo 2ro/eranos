@@ -28,7 +28,6 @@ import { EmojifiedText } from '@/components/CustomEmoji';
 import { FollowToggleButton } from '@/components/FollowButton';
 import { Nip05Badge } from '@/components/Nip05Badge';
 import { PledgeCard } from '@/components/PledgeCard';
-import { ProfileReactionButton } from '@/components/ProfileReactionButton';
 import { OrganizationsAllDialog } from '@/components/profile/OrganizationsAllDialog';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useProfileOrganizations, type ProfileOrganization } from '@/hooks/useProfileOrganizations';
@@ -91,8 +90,6 @@ interface ProfileIdentityRailProps {
   onDonate: (campaign: ParsedCampaign) => void;
   /** Whether the viewer can take any action (logged in). Disables follow when null. */
   canFollow: boolean;
-  /** Latest kind-0 event used by ProfileReactionButton; falls back to metadataEvent. */
-  authorEvent: NostrEvent | undefined;
 }
 
 const RAIL_CAMPAIGN_LIMIT = 2;
@@ -143,7 +140,6 @@ export function ProfileIdentityRail({
   onTabChange,
   onDonate,
   canFollow,
-  authorEvent,
 }: ProfileIdentityRailProps) {
   if (isAuthorLoading) {
     return (
@@ -204,7 +200,6 @@ export function ProfileIdentityRail({
           onFollowersOpen={onFollowersOpen}
           onFollowingOpen={onFollowingOpen}
           onTabChange={onTabChange}
-          authorEvent={authorEvent}
         />
         <ProfileOverviewSections
           pubkey={pubkey}
@@ -247,7 +242,6 @@ interface ProfileIdentityHeaderProps {
   onFollowersOpen: () => void;
   onFollowingOpen: () => void;
   onTabChange: (tabId: string) => void;
-  authorEvent: NostrEvent | undefined;
   className?: string;
   /**
    * Suppress the internal action bar (Edit Profile / QR / more, or
@@ -288,7 +282,6 @@ export function ProfileIdentityHeader({
   onFollowersOpen,
   onFollowingOpen,
   onTabChange,
-  authorEvent,
   className,
   hideActionBar = false,
 }: ProfileIdentityHeaderProps) {
@@ -346,7 +339,6 @@ export function ProfileIdentityHeader({
           onToggleFollow={onToggleFollow}
           onMoreMenuOpen={onMoreMenuOpen}
           onFollowQROpen={onFollowQROpen}
-          authorEvent={authorEvent}
           onchainCampaigns={onchainCampaigns}
           onDonate={onDonate}
         />
@@ -526,7 +518,6 @@ export function ActionBar({
   onToggleFollow,
   onMoreMenuOpen,
   onFollowQROpen,
-  authorEvent,
   onchainCampaigns,
   onDonate,
   align = 'start',
@@ -538,7 +529,6 @@ export function ActionBar({
   onToggleFollow: () => void;
   onMoreMenuOpen: () => void;
   onFollowQROpen: () => void;
-  authorEvent: NostrEvent | undefined;
   onchainCampaigns: ParsedCampaign[];
   onDonate: (campaign: ParsedCampaign) => void;
   /**
@@ -622,7 +612,6 @@ export function ActionBar({
               </DropdownMenuContent>
             </DropdownMenu>
           ) : null}
-          {authorEvent && <ProfileReactionButton profileEvent={authorEvent} />}
           <Button
             variant="outline"
             size="icon"
