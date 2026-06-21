@@ -208,7 +208,7 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
       </ScrollArea>
 
       <form onSubmit={handleSubmit} className="p-3">
-        <div className="flex items-end gap-2 rounded-2xl border bg-background p-2 shadow-sm focus-within:ring-2 focus-within:ring-ring">
+        <div className="flex items-end gap-2 rounded-2xl bg-muted/40 p-2 shadow-sm focus-within:ring-2 focus-within:ring-ring">
           <Textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
@@ -225,9 +225,9 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
             disabled={isPending || !draft.trim()}
           >
             {isPending ? (
-              <Loader2 className="size-6 animate-spin" />
+              <Loader2 className="size-7 animate-spin" />
             ) : (
-              <Send className="size-7 fill-primary stroke-background" />
+              <Send className="size-8 fill-primary stroke-white" />
             )}
             <span className="sr-only">{t('messages.send')}</span>
           </button>
@@ -294,7 +294,7 @@ export function MessagesPage() {
           {/* Conversation list */}
           <div
             className={cn(
-              'h-full min-h-0 flex-col border-r bg-muted/40',
+              'h-full min-h-0 flex-col bg-muted/40',
               selected && 'hidden md:flex',
               !selected && 'flex',
             )}
@@ -308,7 +308,7 @@ export function MessagesPage() {
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder={t('nav.search')}
                     aria-label={t('nav.search')}
-                    className="h-10 rounded-xl bg-background pl-9"
+                    className="h-10 rounded-xl border-0 bg-background pl-9 shadow-none focus-visible:ring-2 focus-visible:ring-ring"
                   />
                 </div>
                 {isLoading ? (
