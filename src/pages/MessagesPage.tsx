@@ -221,13 +221,13 @@ function MessageThread({ conversation, onBack }: { conversation: Conversation; o
           />
           <button
             type="submit"
-            className="shrink-0 rounded-full p-2 text-primary transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40"
+            className="shrink-0 rounded-full p-1.5 text-primary transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40"
             disabled={isPending || !draft.trim()}
           >
             {isPending ? (
-              <Loader2 className="size-7 animate-spin" />
+              <Loader2 className="size-8 animate-spin" />
             ) : (
-              <Send className="size-8 fill-primary stroke-white" />
+              <Send className="size-9 fill-primary stroke-background" strokeWidth={1.25} />
             )}
             <span className="sr-only">{t('messages.send')}</span>
           </button>
