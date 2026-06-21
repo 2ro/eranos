@@ -379,7 +379,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
             type="button"
             onClick={() => setStep(step === 'connect' ? 'login' : 'welcome')}
             aria-label={t('auth.back')}
-            className="absolute left-4 top-5 size-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="absolute left-2 top-2 size-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <ArrowLeft className="size-5 rtl:rotate-180" />
           </button>
