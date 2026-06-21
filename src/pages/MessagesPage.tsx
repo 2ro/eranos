@@ -42,10 +42,12 @@ function usePeerProfile(pubkey: string) {
 function ConversationRow({
   conversation,
   active,
+  searchQuery,
   onSelect,
 }: {
   conversation: Conversation;
   active: boolean;
+  searchQuery: string;
   onSelect: () => void;
 }) {
   const { t } = useTranslation();
@@ -55,6 +57,16 @@ function ConversationRow({
   const preview =
     latest.content ??
     (latest.outgoing ? t('messages.encryptedSent') : t('messages.encryptedReceived'));
+  const normalizedSearch = searchQuery.trim().toLocaleLowerCase();
+
+  if (
+    normalizedSearch &&
+    !name.toLocaleLowerCase().includes(normalizedSearch) &&
+    !conversation.peer.toLocaleLowerCase().includes(normalizedSearch) &&
+    !preview.toLocaleLowerCase().includes(normalizedSearch)
+  ) {
+    return null;
+  }
 
   return (
     <button
@@ -243,15 +255,6 @@ export function MessagesPage() {
     [conversations, selectedPeer],
   );
 
-  const filteredConversations = useMemo(() => {
-    const query = search.trim().toLocaleLowerCase();
-    if (!query) return conversations;
-    return conversations?.filter((conversation) => {
-      const latest = conversation.latest.content?.toLocaleLowerCase() ?? '';
-      return conversation.peer.toLocaleLowerCase().includes(query) || latest.includes(query);
-    });
-  }, [conversations, search]);
-
   useEffect(() => {
     if (pageCount === 1 && hasNextPage && !isFetchingNextPage) {
       void fetchNextPage();
@@ -288,20 +291,18 @@ export function MessagesPage() {
               !selected && 'flex',
             )}
           >
-            <div className="border-b bg-card/80 p-3 backdrop-blur">
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder={t('nav.search')}
-                  aria-label={t('nav.search')}
-                  className="h-10 rounded-xl bg-background pl-9"
-                />
-              </div>
-            </div>
             <ScrollArea className="min-h-0 flex-1">
               <div className="space-y-2 p-3">
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder={t('nav.search')}
+                    aria-label={t('nav.search')}
+                    className="h-10 rounded-xl bg-background pl-9"
+                  />
+                </div>
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="flex items-center gap-3 rounded-2xl p-3">
@@ -312,12 +313,13 @@ export function MessagesPage() {
                       </div>
                     </div>
                   ))
-                ) : filteredConversations && filteredConversations.length > 0 ? (
-                  filteredConversations.map((conversation) => (
+                ) : conversations && conversations.length > 0 ? (
+                  conversations.map((conversation) => (
                     <ConversationRow
                       key={conversation.peer}
                       conversation={conversation}
                       active={conversation.peer === selectedPeer}
+                      searchQuery={search}
                       onSelect={() => setSelectedPeer(conversation.peer)}
                     />
                   ))
