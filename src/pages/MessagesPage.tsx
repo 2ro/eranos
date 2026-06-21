@@ -6,7 +6,6 @@ import { useInView } from 'react-intersection-observer';
 import { ArrowLeft, ArrowUp, Loader2, Lock, MessageSquare, Search } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -94,11 +93,6 @@ function ConversationRow({
           {preview}
         </p>
       </div>
-      {conversation.messageCount > 1 && (
-        <Badge variant="secondary" className="hidden shrink-0 rounded-full px-2 text-[10px] text-muted-foreground sm:inline-flex">
-          {conversation.messageCount}
-        </Badge>
-      )}
     </button>
   );
 }
