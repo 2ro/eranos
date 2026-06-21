@@ -116,7 +116,10 @@
     "confirmMute": "屏蔽用户",
     "mutedToastTitle": "用户已屏蔽",
     "mutedToastDescription": "已屏蔽 {{name}}，并移除了该对话。",
-    "muteFailed": "屏蔽用户失败"
+    "muteFailed": "屏蔽用户失败",
+    "showFriendsOnly": "显示我关注的人的消息",
+    "showAllConversations": "显示所有对话",
+    "friendsEmpty": "没有来自您关注的人的消息。"
   },
   "auth": {
     "join": "加入",

@@ -116,7 +116,10 @@
     "confirmMute": "封鎖使用者",
     "mutedToastTitle": "使用者已封鎖",
     "mutedToastDescription": "已封鎖 {{name}}，並移除了該對話。",
-    "muteFailed": "封鎖使用者失敗"
+    "muteFailed": "封鎖使用者失敗",
+    "showFriendsOnly": "顯示我追蹤的人的訊息",
+    "showAllConversations": "顯示所有對話",
+    "friendsEmpty": "沒有來自您追蹤的人的訊息。"
   },
   "auth": {
     "join": "加入",

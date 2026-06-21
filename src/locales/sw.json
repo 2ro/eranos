@@ -116,7 +116,10 @@
     "confirmMute": "Nyamazisha mtumiaji",
     "mutedToastTitle": "Mtumiaji amenyamazishwa",
     "mutedToastDescription": "{{name}} amenyamazishwa na mazungumzo yameondolewa.",
-    "muteFailed": "Imeshindwa kunyamazisha mtumiaji"
+    "muteFailed": "Imeshindwa kunyamazisha mtumiaji",
+    "showFriendsOnly": "Onyesha ujumbe kutoka kwa watu unaowafuata",
+    "showAllConversations": "Onyesha mazungumzo yote",
+    "friendsEmpty": "Hakuna ujumbe kutoka kwa watu unaowafuata."
   },
   "auth": {
     "join": "Jiunge",

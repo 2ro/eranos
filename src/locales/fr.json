@@ -116,7 +116,10 @@
     "confirmMute": "Masquer l'utilisateur",
     "mutedToastTitle": "Utilisateur masqué",
     "mutedToastDescription": "{{name}} a été masqué et la conversation a été supprimée.",
-    "muteFailed": "Échec du masquage de l'utilisateur"
+    "muteFailed": "Échec du masquage de l'utilisateur",
+    "showFriendsOnly": "Afficher les messages des personnes que vous suivez",
+    "showAllConversations": "Afficher toutes les conversations",
+    "friendsEmpty": "Aucun message des personnes que vous suivez."
   },
   "auth": {
     "join": "Rejoindre",

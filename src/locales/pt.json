@@ -116,7 +116,10 @@
     "confirmMute": "Silenciar usuário",
     "mutedToastTitle": "Usuário silenciado",
     "mutedToastDescription": "{{name}} foi silenciado e a conversa foi removida.",
-    "muteFailed": "Falha ao silenciar usuário"
+    "muteFailed": "Falha ao silenciar usuário",
+    "showFriendsOnly": "Mostrar mensagens de pessoas que você segue",
+    "showAllConversations": "Mostrar todas as conversas",
+    "friendsEmpty": "Não há mensagens de pessoas que você segue."
   },
   "auth": {
     "join": "Entrar",

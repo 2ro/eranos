@@ -116,7 +116,10 @@
     "confirmMute": "كتم المستخدم",
     "mutedToastTitle": "تم كتم المستخدم",
     "mutedToastDescription": "تم كتم {{name}} وإزالة المحادثة.",
-    "muteFailed": "فشل كتم المستخدم"
+    "muteFailed": "فشل كتم المستخدم",
+    "showFriendsOnly": "عرض الرسائل من الأشخاص الذين تتابعهم",
+    "showAllConversations": "عرض كل المحادثات",
+    "friendsEmpty": "لا توجد رسائل من الأشخاص الذين تتابعهم."
   },
   "auth": {
     "join": "انضمام",

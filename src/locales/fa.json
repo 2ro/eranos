@@ -116,7 +116,10 @@
     "confirmMute": "بی‌صدا کردن کاربر",
     "mutedToastTitle": "کاربر بی‌صدا شد",
     "mutedToastDescription": "{{name}} بی‌صدا شد و گفتگو حذف شد.",
-    "muteFailed": "بی‌صدا کردن کاربر ناموفق بود"
+    "muteFailed": "بی‌صدا کردن کاربر ناموفق بود",
+    "showFriendsOnly": "نمایش پیام‌های افرادی که دنبال می‌کنید",
+    "showAllConversations": "نمایش همه گفتگوها",
+    "friendsEmpty": "پیامی از افرادی که دنبال می‌کنید وجود ندارد."
   },
   "auth": {
     "join": "پیوستن",

@@ -116,7 +116,10 @@
     "confirmMute": "کاروونکی چوپ کړئ",
     "mutedToastTitle": "کاروونکی چوپ شو",
     "mutedToastDescription": "{{name}} چوپ شو او خبرې اترې لرې شوې.",
-    "muteFailed": "د کاروونکي چوپول ناکام شول"
+    "muteFailed": "د کاروونکي چوپول ناکام شول",
+    "showFriendsOnly": "د هغو خلکو پیغامونه وښایئ چې تاسو یې تعقیبوئ",
+    "showAllConversations": "ټولې خبرې اترې وښایئ",
+    "friendsEmpty": "د هغو خلکو څخه پیغامونه نشته چې تاسو یې تعقیبوئ."
   },
   "auth": {
     "join": "ګډون",

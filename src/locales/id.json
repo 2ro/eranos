@@ -116,7 +116,10 @@
     "confirmMute": "Bisukan pengguna",
     "mutedToastTitle": "Pengguna dibisukan",
     "mutedToastDescription": "{{name}} dibisukan dan percakapan dihapus.",
-    "muteFailed": "Gagal membisukan pengguna"
+    "muteFailed": "Gagal membisukan pengguna",
+    "showFriendsOnly": "Tampilkan pesan dari orang yang Anda ikuti",
+    "showAllConversations": "Tampilkan semua percakapan",
+    "friendsEmpty": "Tidak ada pesan dari orang yang Anda ikuti."
   },
   "auth": {
     "join": "Gabung",

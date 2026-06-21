@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEven
 import { Link, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useInView } from 'react-intersection-observer';
-import { ArrowLeft, ArrowUp, BellOff, Loader2, Lock, MessageSquare, Search, X } from 'lucide-react';
+import { ArrowLeft, ArrowUp, BellOff, Inbox, Loader2, Lock, MessageSquare, Search, UserCheck, X } from 'lucide-react';
 
 import {
   AlertDialog,
@@ -31,6 +31,7 @@ import {
   type Conversation,
   type DirectMessage,
 } from '@/hooks/useDirectMessages';
+import { useFollowList } from '@/hooks/useFollowActions';
 import { useMuteList } from '@/hooks/useMuteList';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useToast } from '@/hooks/useToast';
@@ -368,9 +369,11 @@ export function MessagesPage() {
     isFetchingNextPage,
     pageCount,
   } = useDirectMessages();
+  const { data: followData } = useFollowList();
   const { muteItems } = useMuteList();
   const [selectedPeer, setSelectedPeer] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [conversationFilter, setConversationFilter] = useState<'all' | 'friends'>('all');
   const [hiddenMutedPeers, setHiddenMutedPeers] = useState<Set<string>>(() => new Set());
   const { ref: olderMessagesRef, inView: olderMessagesInView } = useInView({ threshold: 0, rootMargin: '300px' });
 
@@ -383,11 +386,13 @@ export function MessagesPage() {
     () => new Set(muteItems.filter((item) => item.type === 'pubkey').map((item) => item.value)),
     [muteItems],
   );
+  const followedPubkeys = useMemo(() => new Set(followData?.pubkeys ?? []), [followData?.pubkeys]);
   const visibleConversations = useMemo(
     () => conversations?.filter((conversation) => (
       !hiddenMutedPeers.has(conversation.peer) && !mutedPubkeys.has(conversation.peer)
+      && (conversationFilter === 'all' || followedPubkeys.has(conversation.peer))
     )),
-    [conversations, hiddenMutedPeers, mutedPubkeys],
+    [conversationFilter, conversations, followedPubkeys, hiddenMutedPeers, mutedPubkeys],
   );
   const selected = useMemo(
     () => visibleConversations?.find((c) => c.peer === selectedPeer) ?? null,
@@ -437,15 +442,28 @@ export function MessagesPage() {
           >
             <ScrollArea className="min-h-0 flex-1">
               <div className="space-y-2 p-3">
-                <div className="relative">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder={t('nav.search')}
-                    aria-label={t('nav.search')}
-                    className="h-10 rounded-full border-0 bg-background pl-9 shadow-none focus-visible:ring-2 focus-visible:ring-ring"
-                  />
+                <div className="flex items-center gap-2">
+                  <div className="relative min-w-0 flex-1">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder={t('nav.search')}
+                      aria-label={t('nav.search')}
+                      className="h-10 rounded-full border-0 bg-background pl-9 shadow-none focus-visible:ring-2 focus-visible:ring-ring"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="size-10 shrink-0 rounded-full bg-background"
+                    onClick={() => setConversationFilter((filter) => (filter === 'all' ? 'friends' : 'all'))}
+                    aria-label={conversationFilter === 'all' ? t('messages.showFriendsOnly') : t('messages.showAllConversations')}
+                    title={conversationFilter === 'all' ? t('messages.showFriendsOnly') : t('messages.showAllConversations')}
+                  >
+                    {conversationFilter === 'all' ? <Inbox className="size-4" /> : <UserCheck className="size-4" />}
+                  </Button>
                 </div>
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, i) => (
@@ -470,7 +488,7 @@ export function MessagesPage() {
                 ) : (
                   <div className="px-4 py-12 text-center">
                     <p className="mx-auto max-w-xs text-sm text-muted-foreground">
-                      {t('messages.empty')}
+                      {conversationFilter === 'friends' ? t('messages.friendsEmpty') : t('messages.empty')}
                     </p>
                   </div>
                 )}

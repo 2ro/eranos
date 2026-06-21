@@ -116,7 +116,10 @@
     "confirmMute": "បិទសំឡេងអ្នកប្រើ",
     "mutedToastTitle": "បានបិទសំឡេងអ្នកប្រើ",
     "mutedToastDescription": "បានបិទសំឡេង {{name}} ហើយបានលុបការសន្ទនា។",
-    "muteFailed": "បិទសំឡេងអ្នកប្រើមិនបានទេ"
+    "muteFailed": "បិទសំឡេងអ្នកប្រើមិនបានទេ",
+    "showFriendsOnly": "បង្ហាញសារពីមនុស្សដែលអ្នកតាមដាន",
+    "showAllConversations": "បង្ហាញការសន្ទនាទាំងអស់",
+    "friendsEmpty": "គ្មានសារពីមនុស្សដែលអ្នកតាមដានទេ។"
   },
   "auth": {
     "join": "ចូលរួម",

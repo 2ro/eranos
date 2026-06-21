@@ -116,7 +116,10 @@
     "confirmMute": "Kullanıcıyı sessize al",
     "mutedToastTitle": "Kullanıcı sessize alındı",
     "mutedToastDescription": "{{name}} sessize alındı ve sohbet kaldırıldı.",
-    "muteFailed": "Kullanıcı sessize alınamadı"
+    "muteFailed": "Kullanıcı sessize alınamadı",
+    "showFriendsOnly": "Takip ettiğiniz kişilerden gelen mesajları göster",
+    "showAllConversations": "Tüm sohbetleri göster",
+    "friendsEmpty": "Takip ettiğiniz kişilerden mesaj yok."
   },
   "auth": {
     "join": "Katıl",

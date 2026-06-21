@@ -116,7 +116,10 @@
     "confirmMute": "Nyaradza mushandisi",
     "mutedToastTitle": "Mushandisi anyaradzwa",
     "mutedToastDescription": "{{name}} anyaradzwa uye nhaurirano yabviswa.",
-    "muteFailed": "Kutadza kunyaradza mushandisi"
+    "muteFailed": "Kutadza kunyaradza mushandisi",
+    "showFriendsOnly": "Ratidza mameseji kubva kuvanhu vaunotevera",
+    "showAllConversations": "Ratidza nhaurirano dzese",
+    "friendsEmpty": "Hapana mameseji kubva kuvanhu vaunotevera."
   },
   "auth": {
     "join": "Joinha",
