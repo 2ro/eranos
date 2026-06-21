@@ -572,7 +572,7 @@ const NsecLoginForm: React.FC<NsecLoginFormProps> = ({
         placeholder={t('auth.nsecPlaceholder')}
         autoComplete="off"
         className={cn(
-          'flex-1',
+          'flex-1 h-12',
           loginError && 'border-destructive focus-visible:ring-destructive',
         )}
       />
@@ -587,7 +587,7 @@ const NsecLoginForm: React.FC<NsecLoginFormProps> = ({
         type="button"
         variant="outline"
         size="icon"
-        className="shrink-0"
+        className="shrink-0 size-12"
         aria-label={t('auth.uploadKeyFile')}
         title={t('auth.uploadKeyFile')}
         onClick={() => fileInputRef.current?.click()}
