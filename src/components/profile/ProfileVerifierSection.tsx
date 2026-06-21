@@ -103,7 +103,7 @@ export function ProfileVerifierSection({ pubkey, isOwnProfile = false, className
               type="button"
               variant="ghost"
               size="sm"
-              className="-mt-1 -mr-2 h-7 shrink-0 rounded-full border border-primary/20 bg-background/70 px-2.5 text-xs font-medium text-primary shadow-sm hover:bg-primary/10 hover:text-primary"
+              className="-mt-1 -mr-2 h-7 shrink-0 rounded-full bg-background/70 px-2.5 text-xs font-medium text-primary hover:bg-primary/10 hover:text-primary"
               asChild
             >
               <Link to={`/messages?to=${pubkey}`}>
