@@ -110,7 +110,7 @@ const RAIL_ORG_LIMIT = 4;
  *
  * The rail does NOT own the tab bar or the tab content — those live in
  * the right column. Click handlers like `onTabChange` exist so rail rows
- * can switch tabs (e.g. "See all campaigns →" jumps to the Campaigns tab).
+ * can switch tabs (e.g. "See all campaigns →" jumps to the Agora tab).
  */
 export function ProfileIdentityRail({
   pubkey,
@@ -400,7 +400,7 @@ export function ProfileOverviewSections({
         campaigns={campaigns}
         isOwnProfile={isOwnProfile}
         isLoading={campaignStats.isVerifying && campaigns.length === 0}
-        onSeeAll={() => onTabChange('campaigns')}
+        onSeeAll={() => onTabChange('agora')}
       />
 
       {/* Latest pledge — surfaced as a fallback when this profile has
@@ -650,7 +650,7 @@ function StatList({
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
         {hasRaised && (
           <button
-            onClick={() => onTabChange('campaigns')}
+            onClick={() => onTabChange('agora')}
             className="flex items-baseline gap-1.5 hover:opacity-80 transition-opacity"
           >
             <span className="font-bold tabular-nums text-orange-500 dark:text-orange-400">

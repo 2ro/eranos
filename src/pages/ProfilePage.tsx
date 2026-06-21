@@ -58,14 +58,12 @@ import {
   ProfileAvatarBlock,
   ProfileIdentityHeader,
   ActionBar,
-  ProfileOverviewSections,
   ProfileOrganizationsSection,
 } from '@/components/profile/ProfileIdentityRail';
-import { ProfileCampaignsTab } from '@/components/profile/ProfileCampaignsTab';
 import { ProfilePledgesTab } from '@/components/profile/ProfilePledgesTab';
 import { ProfileActivityTab } from '@/components/profile/ProfileActivityTab';
 import { ProfileTabs } from '@/components/profile/ProfileTabs';
-import { ProfileVerifiedTab } from '@/components/profile/ProfileVerifiedTab';
+import { ProfileAgoraTab } from '@/components/profile/ProfileAgoraTab';
 import type { ParsedCampaign } from '@/lib/campaign';
 import type { AddrCoords } from '@/hooks/useEvent';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -772,9 +770,8 @@ interface ProfileTabContentProps {
 
 /**
  * Single source of truth for tab body rendering — used by both the
- * desktop and mobile layouts. Desktop only ever passes one of
- * `activity` / `campaigns` / `pledges`; mobile additionally passes
- * `overview` and `community`.
+ * desktop and mobile layouts. The Agora tab owns the old Overview,
+ * Verified, and Campaigns concepts; Activity remains separate.
  */
 function ProfileTabContent({
   activeTab,
@@ -788,21 +785,18 @@ function ProfileTabContent({
   pledges,
   onTabChange,
 }: ProfileTabContentProps) {
-  if (activeTab === 'overview') {
+  if (activeTab === 'agora' || activeTab === 'overview' || activeTab === 'verified' || activeTab === 'campaigns') {
     return (
-      <div className="pt-5">
-        <ProfileOverviewSections
-          pubkey={pubkey}
-          isOwnProfile={isOwnProfile}
-          campaigns={campaigns}
-          campaignStats={profileCampaignStats}
-          pledges={pledges}
-          btcPrice={btcPrice}
-          onTabChange={onTabChange}
-          // Organizations has its own tab on mobile.
-          showOrganizations={false}
-        />
-      </div>
+      <ProfileAgoraTab
+        pubkey={pubkey}
+        displayName={displayName}
+        isOwnProfile={isOwnProfile}
+        profileCampaignStats={profileCampaignStats}
+        campaigns={campaigns}
+        pledges={pledges}
+        btcPrice={btcPrice}
+        onTabChange={onTabChange}
+      />
     );
   }
 
@@ -811,22 +805,6 @@ function ProfileTabContent({
       <div className="pt-5">
         <ProfileOrganizationsSection pubkey={pubkey} />
       </div>
-    );
-  }
-
-  if (activeTab === 'verified') {
-    return <ProfileVerifiedTab pubkey={pubkey} displayName={displayName} isOwnProfile={isOwnProfile} />;
-  }
-
-  if (activeTab === 'campaigns') {
-    return (
-      <ProfileCampaignsTab
-        pubkey={pubkey}
-        displayName={displayName}
-        isOwnProfile={isOwnProfile}
-        campaigns={profileCampaignStats.campaigns}
-        isLoading={profileCampaignStats.isVerifying && profileCampaignStats.campaigns.length === 0}
-      />
     );
   }
 
@@ -849,19 +827,14 @@ function ProfileTabContent({
 
 // ----- Main Component -----
 
-// Desktop (lg+) keeps the focused content set; the rail to the
-// left already shows the profile's Overview information (campaigns,
-// orgs), so duplicating it as a tab would be redundant.
-// "Groups" and "Pledges" are temporarily hidden.
-const DESKTOP_TAB_LABEL_KEYS = ['activity', 'campaigns'] as const;
-
-// Below lg the left rail is unavailable, so its content becomes the
-// default "Overview" tab. Order matters — "Overview" is the default on
-// first mount. "Groups" and "Pledges" are temporarily hidden.
-const MOBILE_TAB_LABEL_KEYS = ['overview', 'activity', 'campaigns'] as const;
+// Profile keeps Activity separate and folds the old Overview, Verified,
+// and Campaigns tabs into one Agora surface. Groups and Pledges are
+// temporarily hidden.
+const PROFILE_TAB_LABEL_KEYS = ['agora', 'activity'] as const;
 
 // Map from label key → internal tab id.
 const CORE_TAB_IDS: Record<string, string> = {
+  'agora': 'agora',
   'overview': 'overview',
   'verified': 'verified',
   'activity': 'activity',
@@ -870,8 +843,8 @@ const CORE_TAB_IDS: Record<string, string> = {
   'pledges': 'pledges',
 };
 
-const KNOWN_TAB_IDS = new Set(['overview', 'verified', 'activity', 'campaigns', 'community', 'pledges']);
-const DESKTOP_TAB_IDS = new Set(['verified', 'activity', 'campaigns']);
+const KNOWN_TAB_IDS = new Set(['agora', 'overview', 'verified', 'activity', 'campaigns', 'community', 'pledges']);
+const DESKTOP_TAB_IDS = new Set(['agora', 'activity']);
 
 /**
  * Read the viewport at first render to pick the initial active tab.
@@ -882,7 +855,7 @@ const DESKTOP_TAB_IDS = new Set(['verified', 'activity', 'campaigns']);
  */
 function getInitialActiveTab(): string {
   if (typeof window === 'undefined' || !window.matchMedia) return 'activity';
-  return window.matchMedia('(min-width: 1024px)').matches ? 'activity' : 'overview';
+  return window.matchMedia('(min-width: 1024px)').matches ? 'activity' : 'agora';
 }
 
 export function ProfilePage() {
@@ -1082,8 +1055,8 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
 }
 
   // Is the profile being viewed a verifier (has a kind 14672 statement)?
-  // When so, a "Verified" tab is shown and becomes the default on first
-  // load. The flag is async, so the default switch happens in an effect.
+  // When so, Agora becomes the default on first load. The flag is async,
+  // so the default switch happens in an effect.
   const { isVerifier } = useVerifierStatement(pubkey);
 
   // True once the user has explicitly picked a tab, so the verifier
@@ -1094,10 +1067,10 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     setActiveTab(tabId);
   }, []);
 
-  // Default verifier profiles to the "Verified" tab on first load.
+  // Default verifier profiles to the Agora tab on first load.
   useEffect(() => {
     if (isVerifier && !tabManuallySelected.current) {
-      setActiveTab('verified');
+      setActiveTab('agora');
     }
   }, [isVerifier]);
 
@@ -1107,36 +1080,33 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
     tabManuallySelected.current = false;
   }, [pubkey]);
 
-  // Two tab lists — mobile (Overview + Community visible) and desktop
-  // (only the three content tabs; the rail covers Overview / Community
-  // visually). Both `ProfileTabs` instances feed the same `activeTab`,
-  // so cross-breakpoint navigation (e.g. clicking "See all" in the
-  // mobile Overview tab) Just Works.
-  // Verifier profiles get a "Verified" tab, surfaced first (and made the
-  // default in the effect above) so visitors immediately see the campaigns
-  // the organization has vouched for. Non-verifiers never see the tab.
+  // Two tab lists are kept for layout symmetry, but both now expose the
+  // same content set: Agora and Activity. The rail still covers desktop
+  // identity details while Agora contains those sections on mobile.
   const desktopTabs = useMemo(() => {
-    const keys = isVerifier
-      ? (['verified', ...DESKTOP_TAB_LABEL_KEYS] as const)
-      : DESKTOP_TAB_LABEL_KEYS;
-    return keys.map((key) => ({ id: CORE_TAB_IDS[key], label: t(`profile.tabs.${key}`) }));
-  }, [t, isVerifier]);
+    return PROFILE_TAB_LABEL_KEYS.map((key) => ({
+      id: CORE_TAB_IDS[key],
+      label: key === 'agora' ? t('search.tabs.agora') : t(`profile.tabs.${key}`),
+    }));
+  }, [t]);
   const mobileTabs = useMemo(() => {
-    const keys = isVerifier
-      ? (['verified', ...MOBILE_TAB_LABEL_KEYS] as const)
-      : MOBILE_TAB_LABEL_KEYS;
-    return keys.map((key) => ({ id: CORE_TAB_IDS[key], label: t(`profile.tabs.${key}`) }));
-  }, [t, isVerifier]);
+    return PROFILE_TAB_LABEL_KEYS.map((key) => ({
+      id: CORE_TAB_IDS[key],
+      label: key === 'agora' ? t('search.tabs.agora') : t(`profile.tabs.${key}`),
+    }));
+  }, [t]);
 
   // Keep the active tab in sync if it ever falls out of the recognized
-  // set. The desktop case also redirects mobile-only tabs (`overview`,
-  // `community`) back to `activity` so a user resizing from mobile to
-  // desktop while on Overview doesn't end up looking at an empty
-  // content column (the rail already shows what they were viewing).
+  // set. Legacy Agora-adjacent tab ids collapse into the new unified tab;
+  // desktop still redirects mobile-only community content to Activity.
   useEffect(() => {
     const isKnown = KNOWN_TAB_IDS.has(activeTab);
     if (!isKnown) {
       setActiveTab(getInitialActiveTab());
+      return;
+    }
+    if (activeTab === 'overview' || activeTab === 'verified' || activeTab === 'campaigns') {
+      setActiveTab('agora');
       return;
     }
     if (typeof window === 'undefined' || !window.matchMedia) return;
