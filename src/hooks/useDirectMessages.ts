@@ -47,11 +47,20 @@ interface DirectMessagesPage {
   sentUntil: number | null;
   receivedUntil: number | null;
   backfillComplete: boolean;
+  relayCursors?: RelayCursors;
 }
+
+interface RelayDirectionCursor {
+  sentUntil?: number | null;
+  receivedUntil?: number | null;
+}
+
+type RelayCursors = Record<string, RelayDirectionCursor>;
 
 interface DirectMessagesCursor {
   sentUntil?: number | null;
   receivedUntil?: number | null;
+  relayCursors?: RelayCursors;
 }
 
 /** Extract the first `p` tag value (the recipient) from a kind-4 event. */
@@ -85,11 +94,13 @@ async function directMessagesPageFromEvents({
   self,
   nip04,
   backfillComplete,
+  relayCursors,
 }: {
   events: NostrEvent[];
   self: string;
   nip04: NonNullable<NostrSigner['nip04']>;
   backfillComplete: boolean;
+  relayCursors?: RelayCursors;
 }): Promise<DirectMessagesPage> {
   const sentEvents = events.filter((event) => event.pubkey === self);
   const receivedEvents = events.filter((event) => recipientOf(event) === self);
@@ -121,7 +132,38 @@ async function directMessagesPageFromEvents({
   }
 
   conversations.sort((a, b) => b.latest.createdAt - a.latest.createdAt);
-  return { conversations, sentUntil: nextSentUntil, receivedUntil: nextReceivedUntil, backfillComplete };
+  return { conversations, sentUntil: nextSentUntil, receivedUntil: nextReceivedUntil, backfillComplete, relayCursors };
+}
+
+function hasNextRelayPage(relayCursors: RelayCursors | undefined): boolean {
+  if (!relayCursors) return false;
+  return Object.values(relayCursors).some((cursor) => cursor.sentUntil !== null || cursor.receivedUntil !== null);
+}
+
+function getRelayCursor(events: NostrEvent[], self: string): RelayDirectionCursor {
+  return {
+    sentUntil: getNextUntil(events.filter((event) => event.pubkey === self)),
+    receivedUntil: getNextUntil(events.filter((event) => recipientOf(event) === self)),
+  };
+}
+
+async function queryRelayDmPage({
+  nostr,
+  url,
+  self,
+  cursor,
+  signal,
+}: {
+  nostr: ReturnType<typeof useNostr>['nostr'];
+  url: string;
+  self: string;
+  cursor: DirectMessagesCursor;
+  signal: AbortSignal;
+}): Promise<{ url: string; events: NostrEvent[]; cursor: RelayDirectionCursor }> {
+  const filters = buildDirectMessageFilters(self, cursor);
+  if (filters.length === 0) return { url, events: [], cursor: { sentUntil: null, receivedUntil: null } };
+  const events = await nostr.relay(url).query(filters, { signal });
+  return { url, events, cursor: getRelayCursor(events, self) };
 }
 
 function mergeDirectMessagesPage(base: DirectMessagesPage, incoming: DirectMessagesPage): DirectMessagesPage {
@@ -153,6 +195,7 @@ function mergeDirectMessagesPage(base: DirectMessagesPage, incoming: DirectMessa
     sentUntil: incoming.sentUntil,
     receivedUntil: incoming.receivedUntil,
     backfillComplete: incoming.backfillComplete,
+    relayCursors: { ...(base.relayCursors ?? {}), ...(incoming.relayCursors ?? {}) },
   };
 }
 
@@ -200,15 +243,9 @@ export function useDirectMessages() {
     initialPageParam: {},
     queryFn: async ({ signal, pageParam }) => {
       if (!self || !user?.signer.nip04) {
-        return { conversations: [], sentUntil: null, receivedUntil: null, backfillComplete: true };
+        return { conversations: [], sentUntil: null, receivedUntil: null, backfillComplete: true, relayCursors: {} };
       }
       const nip04 = user.signer.nip04;
-
-      const filters = buildDirectMessageFilters(self, pageParam);
-
-      if (filters.length === 0) {
-        return { conversations: [], sentUntil: null, receivedUntil: null, backfillComplete: true };
-      }
 
       const timeout = AbortSignal.timeout(8000);
       const controller = new AbortController();
@@ -217,9 +254,14 @@ export function useDirectMessages() {
       timeout.addEventListener('abort', onAbort);
 
       const byId = new Map<string, NostrEvent>();
+      const relayCursors: RelayCursors = {};
       try {
-        const isInitialPage = pageParam.sentUntil === undefined && pageParam.receivedUntil === undefined;
+        const isInitialPage = !pageParam.relayCursors && pageParam.sentUntil === undefined && pageParam.receivedUntil === undefined;
         if (isInitialPage || readRelays.length === 0) {
+          const filters = buildDirectMessageFilters(self, pageParam);
+          if (filters.length === 0) {
+            return { conversations: [], sentUntil: null, receivedUntil: null, backfillComplete: true, relayCursors: {} };
+          }
           // Fast path: use the pooled query and let the provider's short
           // eoseTimeout render the inbox immediately. Page 0 is backfilled by
           // the effect below before older-page pagination is enabled.
@@ -228,22 +270,27 @@ export function useDirectMessages() {
             byId.set(event.id, event);
           }
         } else {
-          // Query each read relay individually and merge. Going through the
-          // shared pool resolves on the first relay's EOSE (+ a short
-          // eoseTimeout), which silently drops DMs held only by slower relays.
-          // Per-relay queries each resolve on their own EOSE, so every relay
-          // contributes its full set before we merge (deduped by event id).
+          // Older pages use relay-specific cursors established by page-0
+          // backfill. A single global timestamp cursor can skip ranges on dense
+          // relays when a sparse relay returns much older events.
           const perRelay = await Promise.allSettled(
-            readRelays.map((url) =>
-              nostr.relay(url).query(filters, { signal: controller.signal }),
-            ),
+            readRelays.map((url) => {
+              const cursor = pageParam.relayCursors?.[url] ?? { sentUntil: null, receivedUntil: null };
+              return queryRelayDmPage({ nostr, url, self, cursor, signal: controller.signal });
+            }),
           );
-          for (const result of perRelay) {
-            if (result.status !== 'fulfilled') continue;
-            for (const event of result.value) {
+          perRelay.forEach((result, index) => {
+            const url = readRelays[index];
+            if (!url) return;
+            if (result.status !== 'fulfilled') {
+              relayCursors[url] = pageParam.relayCursors?.[url] ?? { sentUntil: undefined, receivedUntil: undefined };
+              return;
+            }
+            relayCursors[result.value.url] = result.value.cursor;
+            for (const event of result.value.events) {
               byId.set(event.id, event);
             }
-          }
+          });
         }
       } catch {
         // Abort (unmount/timeout) — fall through with whatever we collected.
@@ -252,80 +299,93 @@ export function useDirectMessages() {
         timeout.removeEventListener('abort', onAbort);
       }
 
-      const isInitialPage = pageParam.sentUntil === undefined && pageParam.receivedUntil === undefined;
+      const isInitialPage = !pageParam.relayCursors && pageParam.sentUntil === undefined && pageParam.receivedUntil === undefined;
       return directMessagesPageFromEvents({
         events: [...byId.values()],
         self,
         nip04,
         backfillComplete: !isInitialPage || readRelays.length === 0,
+        relayCursors: Object.keys(relayCursors).length > 0 ? relayCursors : undefined,
       });
     },
     getNextPageParam: (lastPage) => {
       if (!lastPage.backfillComplete) return undefined;
+      if (hasNextRelayPage(lastPage.relayCursors)) return { relayCursors: lastPage.relayCursors };
       if (lastPage.sentUntil === null && lastPage.receivedUntil === null) return undefined;
       return { sentUntil: lastPage.sentUntil, receivedUntil: lastPage.receivedUntil };
     },
   });
 
+  const firstPageBackfillComplete = query.data?.pages[0]?.backfillComplete;
+  const hasFirstPage = !!query.data?.pages[0];
+
   useEffect(() => {
     if (!self || !user?.signer.nip04 || readRelays.length === 0) return;
-    const firstPage = query.data?.pages[0];
+    const firstPage = queryClient.getQueryData<InfiniteData<DirectMessagesPage, DirectMessagesCursor>>(queryKey)?.pages[0];
     if (!firstPage || firstPage.backfillComplete) return;
 
     const nip04 = user.signer.nip04;
-    const filters = buildDirectMessageFilters(self, {});
     const controller = new AbortController();
-    const timeout = AbortSignal.timeout(12_000);
+    const timeout = AbortSignal.timeout(30_000);
+    let cancelled = false;
     const onAbort = () => controller.abort();
     timeout.addEventListener('abort', onAbort);
 
     void (async () => {
-      const byId = new Map<string, NostrEvent>();
-      try {
-        const perRelay = await Promise.allSettled(
-          readRelays.map((url) =>
-            nostr.relay(url).query(filters, { signal: controller.signal }),
-          ),
-        );
-        for (const result of perRelay) {
-          if (result.status !== 'fulfilled') continue;
-          for (const event of result.value) {
-            byId.set(event.id, event);
-          }
-        }
+      const finalRelayCursors: RelayCursors = {};
+      const tasks = readRelays.map(async (url) => {
+        try {
+          const result = await queryRelayDmPage({ nostr, url, self, cursor: {}, signal: controller.signal });
+          finalRelayCursors[url] = result.cursor;
+          const incoming = await directMessagesPageFromEvents({
+            events: result.events,
+            self,
+            nip04,
+            backfillComplete: false,
+            relayCursors: { [url]: result.cursor },
+          });
 
-        const incoming = await directMessagesPageFromEvents({
-          events: [...byId.values()],
-          self,
-          nip04,
-          backfillComplete: true,
-        });
-
-        queryClient.setQueryData<InfiniteData<DirectMessagesPage, DirectMessagesCursor>>(queryKey, (data) => {
-          if (!data?.pages[0] || data.pages[0].backfillComplete) return data;
-          const pages = [...data.pages];
-          pages[0] = mergeDirectMessagesPage(pages[0], incoming);
-          return { ...data, pages };
-        });
-      } catch {
-        if (!controller.signal.aborted) {
+          if (controller.signal.aborted) return;
           queryClient.setQueryData<InfiniteData<DirectMessagesPage, DirectMessagesCursor>>(queryKey, (data) => {
             if (!data?.pages[0] || data.pages[0].backfillComplete) return data;
             const pages = [...data.pages];
-            pages[0] = { ...pages[0], backfillComplete: true };
+            pages[0] = mergeDirectMessagesPage(pages[0], incoming);
             return { ...data, pages };
           });
+        } catch {
+          // Do not mark a failed/timed-out relay as exhausted. Undefined means
+          // the next pagination pass can retry from the top for this relay;
+          // event-id dedupe keeps those retries harmless if some events already
+          // arrived through the pooled fast path or another relay.
+          finalRelayCursors[url] = { sentUntil: undefined, receivedUntil: undefined };
         }
-      } finally {
-        timeout.removeEventListener('abort', onAbort);
+      });
+
+      await Promise.allSettled(tasks);
+      if (!cancelled) {
+        for (const url of readRelays) {
+          finalRelayCursors[url] ??= { sentUntil: undefined, receivedUntil: undefined };
+        }
+        queryClient.setQueryData<InfiniteData<DirectMessagesPage, DirectMessagesCursor>>(queryKey, (data) => {
+          if (!data?.pages[0] || data.pages[0].backfillComplete) return data;
+          const pages = [...data.pages];
+          pages[0] = {
+            ...pages[0],
+            backfillComplete: true,
+            relayCursors: { ...(pages[0].relayCursors ?? {}), ...finalRelayCursors },
+          };
+          return { ...data, pages };
+        });
       }
+      timeout.removeEventListener('abort', onAbort);
     })();
 
     return () => {
+      cancelled = true;
       timeout.removeEventListener('abort', onAbort);
       controller.abort();
     };
-  }, [nostr, query.data?.pages, queryClient, queryKey, readRelays, self, user?.signer.nip04]);
+  }, [nostr, hasFirstPage, firstPageBackfillComplete, queryClient, queryKey, readRelays, self, user?.signer.nip04]);
 
   const conversations = useMemo(() => mergeConversationPages(query.data), [query.data]);
 
