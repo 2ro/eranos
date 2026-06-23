@@ -488,7 +488,7 @@ export function ProfileAvatarBlock({
           anchor the bubble's bottom there and let it grow upward into the
           banner. */}
       {status?.text && (
-        <div className="absolute bottom-full mb-1 left-[calc(8rem+8px)] z-10 max-w-[200px] animate-in fade-in slide-in-from-left-1 duration-300">
+        <div className="absolute top-9 left-[calc(8rem+8px)] z-10 max-w-[200px] animate-in fade-in slide-in-from-left-1 duration-300">
           <div className="relative bg-background/90 backdrop-blur-sm border border-border rounded-xl px-3 py-1.5 shadow-lg">
             <p className="text-xs text-foreground italic truncate">
               {status.url ? (
