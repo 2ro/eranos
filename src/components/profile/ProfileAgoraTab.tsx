@@ -4,7 +4,6 @@ import { BadgeCheck, Megaphone } from 'lucide-react';
 
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
 import { ProfileVerifierSection } from '@/components/profile/ProfileVerifierSection';
-import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { StartCampaignLink } from '@/components/StartCampaignLink';
 import { useCampaignModeration } from '@/hooks/useCampaignModeration';
@@ -109,35 +108,15 @@ export function ProfileAgoraTab({
             {t('profile.campaigns.count', { count: mergedCampaigns.length })}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-            {mergedCampaigns.map(({ campaign, authored, verified }) => (
+            {mergedCampaigns.map(({ campaign }) => (
               <CampaignCard
                 key={campaign.aTag}
                 campaign={campaign}
-                footerBadge={<CampaignRelationshipBadges authored={authored} verified={verified} />}
               />
             ))}
           </div>
         </div>
       )}
     </div>
-  );
-}
-
-function CampaignRelationshipBadges({ authored, verified }: { authored: boolean; verified: boolean }) {
-  const { t } = useTranslation();
-
-  return (
-    <>
-      {authored && (
-        <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
-          {t('profile.badges.founder')}
-        </Badge>
-      )}
-      {verified && (
-        <Badge variant="outline" className="px-1.5 py-0 text-[10px]">
-          {t('campaignsDetail.verifiedLabel')}
-        </Badge>
-      )}
-    </>
   );
 }

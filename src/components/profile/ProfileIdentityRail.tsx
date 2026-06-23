@@ -481,9 +481,14 @@ export function ProfileAvatarBlock({
         </Avatar>
       </button>
 
-      {/* NIP-38 thought bubble — floats to the right of the avatar over the banner area. */}
+      {/* NIP-38 thought bubble — sits to the right of the avatar with its
+          tail anchored to the bottom edge of the banner, so it stays clear
+          of the follow/donate action buttons below the banner. The avatar
+          block's top (top: 0) aligns with the banner's bottom edge, so we
+          anchor the bubble's bottom there and let it grow upward into the
+          banner. */}
       {status?.text && (
-        <div className="absolute top-2 left-[calc(8rem+8px)] z-10 max-w-[200px] animate-in fade-in slide-in-from-left-1 duration-300">
+        <div className="absolute bottom-full mb-1 left-[calc(8rem+8px)] z-10 max-w-[200px] animate-in fade-in slide-in-from-left-1 duration-300">
           <div className="relative bg-background/90 backdrop-blur-sm border border-border rounded-xl px-3 py-1.5 shadow-lg">
             <p className="text-xs text-foreground italic truncate">
               {status.url ? (
@@ -679,7 +684,7 @@ function StatList({
             onClick={() => onTabChange('agora')}
             className="flex items-baseline gap-1.5 hover:opacity-80 transition-opacity"
           >
-            <span className="font-bold tabular-nums text-orange-500 dark:text-orange-400">
+            <span className="font-bold tabular-nums text-primary">
               {formatCampaignAmount(totalRaisedSats, btcPrice)}
             </span>
             <span className="text-muted-foreground">{t('profile.stats.raised')}</span>
