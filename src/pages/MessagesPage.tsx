@@ -290,10 +290,14 @@ function MessageThread({
   };
 
   const handleMute = async () => {
+    // Hide the conversation immediately so the row disappears the moment the
+    // user confirms — addMute does a relay round-trip (fetch fresh kind 10000
+    // + publish) and awaiting that first leaves the muted thread on screen for
+    // a few seconds. The relay-backed mute list still reconciles on reload.
+    setMuteConfirmOpen(false);
+    onMuted(conversation.peer);
     try {
       await addMute.mutateAsync({ type: 'pubkey', value: conversation.peer });
-      setMuteConfirmOpen(false);
-      onMuted(conversation.peer);
       toast({
         title: t('messages.mutedToastTitle'),
         description: t('messages.mutedToastDescription', { name }),
