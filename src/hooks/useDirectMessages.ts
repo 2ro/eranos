@@ -5,6 +5,7 @@ import type { NostrEvent, NostrFilter, NostrSigner } from '@nostrify/nostrify';
 
 import { useCurrentUser } from './useCurrentUser';
 import { useNostrPublish } from './useNostrPublish';
+import { useAppContext } from './useAppContext';
 
 /** NIP-04 encrypted direct message kind. */
 export const DM_KIND = 4;
@@ -69,15 +70,26 @@ export function useHasDmSupport(): boolean {
  * conversations sorted by most-recent activity. Full threads decrypt lazily in
  * `useDirectMessageThread` after the user selects a conversation.
  *
- * Messages are read from the app's configured relays (via `useNostr`), so this
- * automatically honors the user's relay settings. NIP-04 leaks metadata and is
- * deprecated in favor of NIP-44/NIP-17; this exists for interop with clients
- * that still send kind-4 DMs.
+ * Messages are read from the app's configured relays. Rather than going
+ * through the shared pool (whose `eoseTimeout` resolves a query as soon as the
+ * *first* relay sends EOSE — which dropped conversations held only by slower
+ * relays and produced a different, incomplete count on every refresh), this
+ * fans the query out to each read relay individually and merges the results.
+ * Each per-relay `query()` resolves on that relay's own EOSE, so every relay
+ * gets to deliver its events (bounded by an overall 8s cap). NIP-04 leaks
+ * metadata and is deprecated in favor of NIP-44/NIP-17; this exists for interop
+ * with clients that still send kind-4 DMs.
  */
 export function useDirectMessages() {
   const { nostr } = useNostr();
   const { user } = useCurrentUser();
+  const { config } = useAppContext();
   const self = user?.pubkey;
+
+  const readRelays = useMemo(
+    () => config.relayMetadata.relays.filter((r) => r.read).map((r) => r.url),
+    [config.relayMetadata.relays],
+  );
 
   const query = useInfiniteQuery<
     DirectMessagesPage,
@@ -86,7 +98,7 @@ export function useDirectMessages() {
     readonly unknown[],
     DirectMessagesCursor
   >({
-    queryKey: ['direct-messages', self],
+    queryKey: ['direct-messages', self, readRelays],
     enabled: !!self && !!user?.signer.nip04,
     initialPageParam: {},
     queryFn: async ({ signal, pageParam }) => {
@@ -128,9 +140,29 @@ export function useDirectMessages() {
 
       const byId = new Map<string, NostrEvent>();
       try {
-        const events = await nostr.query(filters, { signal: controller.signal });
-        for (const event of events) {
-          byId.set(event.id, event);
+        if (readRelays.length > 0) {
+          // Query each read relay individually and merge. Going through the
+          // shared pool resolves on the first relay's EOSE (+ a short
+          // eoseTimeout), which silently drops DMs held only by slower relays.
+          // Per-relay queries each resolve on their own EOSE, so every relay
+          // contributes its full set before we merge (deduped by event id).
+          const perRelay = await Promise.allSettled(
+            readRelays.map((url) =>
+              nostr.relay(url).query(filters, { signal: controller.signal }),
+            ),
+          );
+          for (const result of perRelay) {
+            if (result.status !== 'fulfilled') continue;
+            for (const event of result.value) {
+              byId.set(event.id, event);
+            }
+          }
+        } else {
+          // No read relays configured — fall back to the default pool.
+          const events = await nostr.query(filters, { signal: controller.signal });
+          for (const event of events) {
+            byId.set(event.id, event);
+          }
         }
       } catch {
         // Abort (unmount/timeout) — fall through with whatever we collected.
@@ -359,8 +391,14 @@ export function useSendDirectMessage() {
     onSuccess: (event, { peer, text }) => {
       if (!user) return;
 
-      const messagesKey = ['direct-messages', user.pubkey] as const;
-      const existingData = queryClient.getQueryData<InfiniteData<DirectMessagesPage, DirectMessagesCursor>>(messagesKey);
+      // The inbox query key carries a trailing relay-list segment
+      // (['direct-messages', pubkey, readRelays]), so match by prefix rather
+      // than an exact key — otherwise the optimistic append silently misses.
+      const messagesKeyPrefix = ['direct-messages', user.pubkey] as const;
+      const existingEntry = queryClient
+        .getQueriesData<InfiniteData<DirectMessagesPage, DirectMessagesCursor>>({ queryKey: messagesKeyPrefix })
+        .find(([, data]) => data !== undefined);
+      const existingData = existingEntry?.[1];
       const existingConversation = mergeConversationPages(existingData)?.find((conversation) => conversation.peer === peer);
       const messageCount = existingConversation?.events.some((existing) => existing.id === event.id)
         ? existingConversation.messageCount
@@ -370,8 +408,8 @@ export function useSendDirectMessage() {
         .getQueriesData<DirectMessage[]>({ queryKey: ['direct-message-thread', user.pubkey, peer] })
         .find(([, messages]) => messages !== undefined)?.[1];
 
-      queryClient.setQueryData<InfiniteData<DirectMessagesPage, DirectMessagesCursor>>(messagesKey, (data) => (
-        addSentMessageToPages(data, message)
+      queryClient.setQueriesData<InfiniteData<DirectMessagesPage, DirectMessagesCursor>>({ queryKey: messagesKeyPrefix }, (data) => (
+        data ? addSentMessageToPages(data, message) : data
       ));
       queryClient.setQueryData<DirectMessage[]>([
         'direct-message-thread',
@@ -384,7 +422,7 @@ export function useSendDirectMessage() {
         queryKey: ['direct-message-thread', user.pubkey, peer],
       }, (messages) => appendMessage(messages, message));
 
-      queryClient.invalidateQueries({ queryKey: messagesKey, refetchType: 'inactive' });
+      queryClient.invalidateQueries({ queryKey: messagesKeyPrefix, refetchType: 'inactive' });
     },
   });
 }
