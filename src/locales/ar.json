@@ -122,7 +122,15 @@
     "friendsEmpty": "لا توجد رسائل من الأشخاص الذين تتابعهم.",
     "translateDialogTitle": "هل تريد ترجمة الرسائل الخاصة؟",
     "translateDialogDescription": "سيتم إرسال الرسائل المستلمة إلى خدمة الترجمة التي قمت بتكوينها. لن تتم ترجمة الرسائل المرسلة. سيتذكر Agora هذا الاختيار على هذا الجهاز.",
-    "confirmTranslate": "ترجمة الرسائل"
+    "confirmTranslate": "ترجمة الرسائل",
+    "newMessage": "رسالة جديدة",
+    "newMessageTitle": "رسالة جديدة",
+    "recipientLabel": "إلى",
+    "recipientPlaceholder": "ابحث بالاسم أو NIP-05 أو npub…",
+    "recipientHint": "ابحث عن شخص لبدء محادثة جديدة.",
+    "recipientSearching": "جارٍ البحث…",
+    "noRecipientResults": "لم يُعثر على أشخاص. جرّب اسمًا أو NIP-05 أو npub مختلفًا.",
+    "recipientFollowed": "أنت تتابع هذا الشخص"
   },
   "auth": {
     "join": "انضمام",

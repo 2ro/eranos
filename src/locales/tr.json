@@ -122,7 +122,15 @@
     "friendsEmpty": "Takip ettiğiniz kişilerden mesaj yok.",
     "translateDialogTitle": "Özel mesajlar çevrilsin mi?",
     "translateDialogDescription": "Alınan mesajlar yapılandırdığınız çeviri hizmetine gönderilecek. Gönderilen mesajlar çevrilmeyecek. Agora bu tercihi bu cihazda hatırlayacak.",
-    "confirmTranslate": "Mesajları çevir"
+    "confirmTranslate": "Mesajları çevir",
+    "newMessage": "Yeni mesaj",
+    "newMessageTitle": "Yeni mesaj",
+    "recipientLabel": "Kime",
+    "recipientPlaceholder": "İsim, NIP-05 veya npub ile ara…",
+    "recipientHint": "Yeni bir sohbet başlatmak için birini arayın.",
+    "recipientSearching": "Aranıyor…",
+    "noRecipientResults": "Kimse bulunamadı. Farklı bir isim, NIP-05 veya npub deneyin.",
+    "recipientFollowed": "Bu kişiyi takip ediyorsunuz"
   },
   "auth": {
     "join": "Katıl",

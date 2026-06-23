@@ -122,7 +122,15 @@
     "friendsEmpty": "没有来自您关注的人的消息。",
     "translateDialogTitle": "要翻译私信吗？",
     "translateDialogDescription": "收到的消息将发送到你配置的翻译服务。已发送的消息不会被翻译。Agora 会在此设备上记住此选择。",
-    "confirmTranslate": "翻译消息"
+    "confirmTranslate": "翻译消息",
+    "newMessage": "新消息",
+    "newMessageTitle": "新消息",
+    "recipientLabel": "收件人",
+    "recipientPlaceholder": "按名称、NIP-05 或 npub 搜索…",
+    "recipientHint": "搜索某人以开始新的对话。",
+    "recipientSearching": "正在搜索…",
+    "noRecipientResults": "未找到任何人。请尝试其他名称、NIP-05 或 npub。",
+    "recipientFollowed": "你关注了此人"
   },
   "auth": {
     "join": "加入",

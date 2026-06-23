@@ -123,7 +123,15 @@
     "friendsEmpty": "No messages from people you follow.",
     "translateDialogTitle": "Translate private messages?",
     "translateDialogDescription": "Received messages will be sent to your configured translation service. Sent messages will not be translated. Agora will remember this choice on this device.",
-    "confirmTranslate": "Translate messages"
+    "confirmTranslate": "Translate messages",
+    "newMessage": "New message",
+    "newMessageTitle": "New message",
+    "recipientLabel": "To",
+    "recipientPlaceholder": "Search by name, NIP-05, or npub…",
+    "recipientHint": "Search for someone to start a new conversation.",
+    "recipientSearching": "Searching…",
+    "noRecipientResults": "No people found. Try a different name, NIP-05, or npub.",
+    "recipientFollowed": "You follow this person"
   },
   "auth": {
     "join": "Join",

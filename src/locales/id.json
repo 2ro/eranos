@@ -122,7 +122,15 @@
     "friendsEmpty": "Tidak ada pesan dari orang yang Anda ikuti.",
     "translateDialogTitle": "Terjemahkan pesan pribadi?",
     "translateDialogDescription": "Pesan yang diterima akan dikirim ke layanan terjemahan yang Anda konfigurasi. Pesan terkirim tidak akan diterjemahkan. Agora akan mengingat pilihan ini di perangkat ini.",
-    "confirmTranslate": "Terjemahkan pesan"
+    "confirmTranslate": "Terjemahkan pesan",
+    "newMessage": "Pesan baru",
+    "newMessageTitle": "Pesan baru",
+    "recipientLabel": "Kepada",
+    "recipientPlaceholder": "Cari berdasarkan nama, NIP-05, atau npub…",
+    "recipientHint": "Cari seseorang untuk memulai percakapan baru.",
+    "recipientSearching": "Mencari…",
+    "noRecipientResults": "Tidak ada orang ditemukan. Coba nama, NIP-05, atau npub yang berbeda.",
+    "recipientFollowed": "Anda mengikuti orang ini"
   },
   "auth": {
     "join": "Gabung",

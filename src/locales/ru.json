@@ -122,7 +122,15 @@
     "friendsEmpty": "Нет сообщений от людей, на которых вы подписаны.",
     "translateDialogTitle": "Переводить личные сообщения?",
     "translateDialogDescription": "Полученные сообщения будут отправляться в настроенный вами сервис перевода. Отправленные сообщения переводиться не будут. Agora запомнит этот выбор на этом устройстве.",
-    "confirmTranslate": "Переводить сообщения"
+    "confirmTranslate": "Переводить сообщения",
+    "newMessage": "Новое сообщение",
+    "newMessageTitle": "Новое сообщение",
+    "recipientLabel": "Кому",
+    "recipientPlaceholder": "Поиск по имени, NIP-05 или npub…",
+    "recipientHint": "Найдите кого-нибудь, чтобы начать новую беседу.",
+    "recipientSearching": "Поиск…",
+    "noRecipientResults": "Никто не найден. Попробуйте другое имя, NIP-05 или npub.",
+    "recipientFollowed": "Вы подписаны на этого человека"
   },
   "auth": {
     "join": "Присоединиться",

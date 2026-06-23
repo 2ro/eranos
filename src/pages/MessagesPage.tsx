@@ -3,7 +3,8 @@ import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEven
 import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useInView } from 'react-intersection-observer';
-import { ArrowLeft, ArrowUp, BellOff, Inbox, Loader2, Lock, MessageSquare, Search, UserCheck, X } from 'lucide-react';
+import { ArrowLeft, ArrowUp, BellOff, Inbox, Loader2, Lock, MessageSquare, PenSquare, Search, UserCheck, X } from 'lucide-react';
+import { nip19 } from 'nostr-tools';
 
 import {
   AlertDialog,
@@ -37,6 +38,7 @@ import {
 import { useFollowList } from '@/hooks/useFollowActions';
 import { useMuteList } from '@/hooks/useMuteList';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
+import { useSearchProfiles, type SearchProfile } from '@/hooks/useSearchProfiles';
 import { useToast } from '@/hooks/useToast';
 import { useVerifierStatement } from '@/hooks/useVerifierStatement';
 import { getDisplayName } from '@/lib/genUserName';
@@ -523,6 +525,164 @@ function MessageThread({
   );
 }
 
+/** A single recipient suggestion row inside the new-message pane. */
+function RecipientSuggestion({
+  profile,
+  active,
+  followed,
+  onSelect,
+}: {
+  profile: SearchProfile;
+  active: boolean;
+  followed: boolean;
+  onSelect: () => void;
+}) {
+  const { t } = useTranslation();
+  const name = getDisplayName(profile.metadata, profile.pubkey);
+  const picture = sanitizeUrl(profile.metadata.picture);
+  const handle = profile.metadata.nip05 ?? nip19.npubEncode(profile.pubkey);
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      data-active={active}
+      className={cn(
+        'flex w-full items-center gap-3 rounded-2xl border border-transparent p-3 text-left transition-all',
+        'hover:border-border hover:bg-background/85 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        active && 'border-primary/20 bg-primary/10 shadow-sm',
+      )}
+    >
+      <Avatar className="size-11 shrink-0 ring-2 ring-background">
+        <AvatarImage src={picture} alt={name} />
+        <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+      </Avatar>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <p className="truncate text-sm font-medium">{name}</p>
+          {followed && (
+            <UserCheck className="size-3.5 shrink-0 text-primary" aria-label={t('messages.recipientFollowed')} />
+          )}
+        </div>
+        <p className="truncate text-xs text-muted-foreground">{handle}</p>
+      </div>
+    </button>
+  );
+}
+
+/**
+ * The "start a new chat" pane. Renders in the right column in place of the
+ * empty-state prompt. A "To:" field drives debounced profile autocomplete
+ * (npub / nprofile / NIP-05 / name) and the suggestions render inline below
+ * the field — no modal, no popover. Selecting a person opens a fresh thread.
+ */
+function NewMessagePane({
+  onSelectRecipient,
+  onCancel,
+}: {
+  onSelectRecipient: (pubkey: string) => void;
+  onCancel: () => void;
+}) {
+  const { t } = useTranslation();
+  const [query, setQuery] = useState('');
+  const [activeIndex, setActiveIndex] = useState(0);
+  const { data: profiles, isFetching, followedPubkeys } = useSearchProfiles(query);
+  const trimmed = query.trim();
+  const results = useMemo(() => profiles ?? [], [profiles]);
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [results]);
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (results.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex((i) => (i + 1) % results.length);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex((i) => (i - 1 + results.length) % results.length);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const chosen = results[activeIndex];
+      if (chosen) onSelectRecipient(chosen.pubkey);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      onCancel();
+    }
+  };
+
+  return (
+    <div className="flex h-full min-h-0 flex-col bg-gradient-to-b from-muted/30 via-background to-background">
+      <div className="flex items-center gap-3 p-4">
+        <Button type="button" variant="ghost" size="icon" className="md:hidden" onClick={onCancel}>
+          <ArrowLeft className="size-4" />
+          <span className="sr-only">{t('messages.conversations')}</span>
+        </Button>
+        <p className="min-w-0 flex-1 truncate font-semibold">{t('messages.newMessageTitle')}</p>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="hidden shrink-0 md:inline-flex"
+          onClick={onCancel}
+          aria-label={t('common.cancel')}
+        >
+          <X className="size-4" />
+        </Button>
+      </div>
+
+      <div className="px-4 pb-3">
+        <label htmlFor="dm-recipient" className="mb-1.5 block text-xs font-medium text-muted-foreground">
+          {t('messages.recipientLabel')}
+        </label>
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            id="dm-recipient"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={t('messages.recipientPlaceholder')}
+            aria-label={t('messages.recipientLabel')}
+            className="h-11 rounded-full border-0 bg-muted/40 pl-9 pr-9 text-base shadow-sm focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
+            autoComplete="off"
+            autoFocus
+          />
+          {isFetching && (
+            <Loader2 className="absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+          )}
+        </div>
+      </div>
+
+      <ScrollArea className="min-h-0 flex-1 px-4">
+        <div className="space-y-1.5 pb-5">
+          {results.length > 0 ? (
+            results.map((profile, index) => (
+              <RecipientSuggestion
+                key={profile.pubkey}
+                profile={profile}
+                active={index === activeIndex}
+                followed={followedPubkeys.has(profile.pubkey)}
+                onSelect={() => onSelectRecipient(profile.pubkey)}
+              />
+            ))
+          ) : (
+            <div className="flex flex-col items-center gap-3 px-6 py-12 text-center">
+              <PenSquare className="size-9 text-primary" />
+              <p className="mx-auto max-w-xs text-sm text-muted-foreground">
+                {trimmed
+                  ? (isFetching ? t('messages.recipientSearching') : t('messages.noRecipientResults'))
+                  : t('messages.recipientHint')}
+              </p>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
+
 export function MessagesPage() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -540,6 +700,7 @@ export function MessagesPage() {
   const { muteItems } = useMuteList();
   const requestedPeer = getValidPubkey(searchParams.get('to'));
   const [selectedPeer, setSelectedPeer] = useState<string | null>(() => requestedPeer);
+  const [composing, setComposing] = useState(false);
   const [search, setSearch] = useState('');
   const [conversationFilter, setConversationFilter] = useState<'all' | 'friends'>('all');
   const [hiddenMutedPeers, setHiddenMutedPeers] = useState<Set<string>>(() => new Set());
@@ -578,6 +739,7 @@ export function MessagesPage() {
 
   const selectPeer = (peer: string) => {
     setSelectedPeer(peer);
+    setComposing(false);
     setSearchParams((current) => {
       const next = new URLSearchParams(current);
       next.delete('to');
@@ -587,6 +749,7 @@ export function MessagesPage() {
 
   const clearSelectedPeer = () => {
     setSelectedPeer(null);
+    setComposing(false);
     setSearchParams((current) => {
       const next = new URLSearchParams(current);
       next.delete('to');
@@ -631,8 +794,8 @@ export function MessagesPage() {
           <div
             className={cn(
               'h-full min-h-0 flex-col bg-muted/40',
-              selectedThread && 'hidden md:flex',
-              !selectedThread && 'flex',
+              (selectedThread || composing) && 'hidden md:flex',
+              !(selectedThread || composing) && 'flex',
             )}
           >
             <ScrollArea className="min-h-0 flex-1">
@@ -658,6 +821,20 @@ export function MessagesPage() {
                     title={conversationFilter === 'all' ? t('messages.showFriendsOnly') : t('messages.showAllConversations')}
                   >
                     {conversationFilter === 'all' ? <Inbox className="size-4" /> : <UserCheck className="size-4" />}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="icon"
+                    className="size-10 shrink-0 rounded-full"
+                    onClick={() => {
+                      setSelectedPeer(null);
+                      setComposing(true);
+                    }}
+                    aria-label={t('messages.newMessage')}
+                    title={t('messages.newMessage')}
+                  >
+                    <PenSquare className="size-4" />
                   </Button>
                 </div>
                 {isLoading ? (
@@ -697,9 +874,14 @@ export function MessagesPage() {
           </div>
 
           {/* Thread */}
-          <div className={cn('h-full min-h-0 min-w-0', !selectedThread && 'hidden md:block')}>
+          <div className={cn('h-full min-h-0 min-w-0', !(selectedThread || composing) && 'hidden md:block')}>
             {selectedThread ? (
               <MessageThread conversation={selectedThread} onBack={clearSelectedPeer} onMuted={handleMuted} />
+            ) : composing ? (
+              <NewMessagePane
+                onSelectRecipient={selectPeer}
+                onCancel={() => setComposing(false)}
+              />
             ) : (
               <div className="flex h-full items-center justify-center bg-gradient-to-br from-background via-muted/20 to-primary/5 p-8 text-center">
                 <div className="max-w-sm space-y-3">
@@ -707,6 +889,18 @@ export function MessagesPage() {
                   <p className="text-sm text-muted-foreground">
                     {t('messages.selectPrompt')}
                   </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="rounded-full"
+                    onClick={() => {
+                      setSelectedPeer(null);
+                      setComposing(true);
+                    }}
+                  >
+                    <PenSquare className="mr-2 size-4" />
+                    {t('messages.newMessage')}
+                  </Button>
                 </div>
               </div>
             )}

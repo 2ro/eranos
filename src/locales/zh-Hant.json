@@ -122,7 +122,15 @@
     "friendsEmpty": "沒有來自您追蹤的人的訊息。",
     "translateDialogTitle": "要翻譯私人訊息嗎？",
     "translateDialogDescription": "收到的訊息將會傳送至你設定的翻譯服務。已傳送的訊息不會被翻譯。Agora 會在此裝置上記住這個選擇。",
-    "confirmTranslate": "翻譯訊息"
+    "confirmTranslate": "翻譯訊息",
+    "newMessage": "新訊息",
+    "newMessageTitle": "新訊息",
+    "recipientLabel": "收件人",
+    "recipientPlaceholder": "按名稱、NIP-05 或 npub 搜尋…",
+    "recipientHint": "搜尋某人以開始新的對話。",
+    "recipientSearching": "正在搜尋…",
+    "noRecipientResults": "找不到任何人。請嘗試其他名稱、NIP-05 或 npub。",
+    "recipientFollowed": "你追蹤了此人"
   },
   "auth": {
     "join": "加入",

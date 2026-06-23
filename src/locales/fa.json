@@ -122,7 +122,15 @@
     "friendsEmpty": "پیامی از افرادی که دنبال می‌کنید وجود ندارد.",
     "translateDialogTitle": "پیام‌های خصوصی ترجمه شوند؟",
     "translateDialogDescription": "پیام‌های دریافتی به سرویس ترجمه تنظیم‌شده شما ارسال می‌شوند. پیام‌های ارسالی ترجمه نخواهند شد. Agora این انتخاب را در این دستگاه به خاطر می‌سپارد.",
-    "confirmTranslate": "ترجمه پیام‌ها"
+    "confirmTranslate": "ترجمه پیام‌ها",
+    "newMessage": "پیام جدید",
+    "newMessageTitle": "پیام جدید",
+    "recipientLabel": "به",
+    "recipientPlaceholder": "جستجو بر اساس نام، NIP-05 یا npub…",
+    "recipientHint": "برای شروع یک گفتگوی جدید، کسی را جستجو کنید.",
+    "recipientSearching": "در حال جستجو…",
+    "noRecipientResults": "کسی یافت نشد. نام، NIP-05 یا npub دیگری را امتحان کنید.",
+    "recipientFollowed": "شما این فرد را دنبال می‌کنید"
   },
   "auth": {
     "join": "پیوستن",

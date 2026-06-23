@@ -122,7 +122,15 @@
     "friendsEmpty": "Hakuna ujumbe kutoka kwa watu unaowafuata.",
     "translateDialogTitle": "Tafsiri ujumbe wa faragha?",
     "translateDialogDescription": "Ujumbe uliopokelewa utatumwa kwa huduma yako ya tafsiri uliyosanidi. Ujumbe uliotumwa hautatafsiriwa. Agora itakumbuka chaguo hili kwenye kifaa hiki.",
-    "confirmTranslate": "Tafsiri ujumbe"
+    "confirmTranslate": "Tafsiri ujumbe",
+    "newMessage": "Ujumbe mpya",
+    "newMessageTitle": "Ujumbe mpya",
+    "recipientLabel": "Kwa",
+    "recipientPlaceholder": "Tafuta kwa jina, NIP-05, au npub…",
+    "recipientHint": "Tafuta mtu ili kuanza mazungumzo mapya.",
+    "recipientSearching": "Inatafuta…",
+    "noRecipientResults": "Hakuna watu waliopatikana. Jaribu jina, NIP-05, au npub tofauti.",
+    "recipientFollowed": "Unamfuata mtu huyu"
   },
   "auth": {
     "join": "Jiunge",

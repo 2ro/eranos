@@ -122,7 +122,15 @@
     "friendsEmpty": "Hapana mameseji kubva kuvanhu vaunotevera.",
     "translateDialogTitle": "Dudzira mameseji epachivande?",
     "translateDialogDescription": "Mameseji agamuchirwa achaendeswa kusevhisi yako yekushandura yawakagadzirisa. Mameseji atumirwa haazodudzirwi. Agora icharangarira sarudzo iyi pachigadzirwa ichi.",
-    "confirmTranslate": "Dudzira mameseji"
+    "confirmTranslate": "Dudzira mameseji",
+    "newMessage": "Meseji itsva",
+    "newMessageTitle": "Meseji itsva",
+    "recipientLabel": "Kuna",
+    "recipientPlaceholder": "Tsvaga nezita, NIP-05, kana npub…",
+    "recipientHint": "Tsvaga munhu kuti utange nhaurirano itsva.",
+    "recipientSearching": "Kutsvaga…",
+    "noRecipientResults": "Hapana vanhu vawanikwa. Edza rimwe zita, NIP-05, kana npub.",
+    "recipientFollowed": "Unotevera munhu uyu"
   },
   "auth": {
     "join": "Joinha",

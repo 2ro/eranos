@@ -122,7 +122,15 @@
     "friendsEmpty": "जिन लोगों को आप फ़ॉलो करते हैं उनसे कोई संदेश नहीं।",
     "translateDialogTitle": "निजी संदेशों का अनुवाद करें?",
     "translateDialogDescription": "प्राप्त संदेश आपकी कॉन्फ़िगर की गई अनुवाद सेवा को भेजे जाएंगे। भेजे गए संदेशों का अनुवाद नहीं किया जाएगा। Agora इस डिवाइस पर यह विकल्प याद रखेगा।",
-    "confirmTranslate": "संदेशों का अनुवाद करें"
+    "confirmTranslate": "संदेशों का अनुवाद करें",
+    "newMessage": "नया संदेश",
+    "newMessageTitle": "नया संदेश",
+    "recipientLabel": "को",
+    "recipientPlaceholder": "नाम, NIP-05, या npub से खोजें…",
+    "recipientHint": "नई बातचीत शुरू करने के लिए किसी को खोजें।",
+    "recipientSearching": "खोज रहे हैं…",
+    "noRecipientResults": "कोई व्यक्ति नहीं मिला। कोई दूसरा नाम, NIP-05, या npub आज़माएं।",
+    "recipientFollowed": "आप इस व्यक्ति को फ़ॉलो करते हैं"
   },
   "auth": {
     "join": "जुड़ें",

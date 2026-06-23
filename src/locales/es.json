@@ -122,7 +122,15 @@
     "friendsEmpty": "No hay mensajes de personas que sigues.",
     "translateDialogTitle": "¿Traducir mensajes privados?",
     "translateDialogDescription": "Los mensajes recibidos se enviarán al servicio de traducción que configuraste. Los mensajes enviados no se traducirán. Agora recordará esta elección en este dispositivo.",
-    "confirmTranslate": "Traducir mensajes"
+    "confirmTranslate": "Traducir mensajes",
+    "newMessage": "Mensaje nuevo",
+    "newMessageTitle": "Mensaje nuevo",
+    "recipientLabel": "Para",
+    "recipientPlaceholder": "Busca por nombre, NIP-05 o npub…",
+    "recipientHint": "Busca a alguien para iniciar una nueva conversación.",
+    "recipientSearching": "Buscando…",
+    "noRecipientResults": "No se encontraron personas. Prueba con otro nombre, NIP-05 o npub.",
+    "recipientFollowed": "Sigues a esta persona"
   },
   "auth": {
     "join": "Unirse",

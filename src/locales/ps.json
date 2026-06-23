@@ -122,7 +122,15 @@
     "friendsEmpty": "د هغو خلکو څخه پیغامونه نشته چې تاسو یې تعقیبوئ.",
     "translateDialogTitle": "شخصي پیغامونه وژباړل شي؟",
     "translateDialogDescription": "ترلاسه شوي پیغامونه به ستاسو ټاکل شوي ژباړې خدمت ته واستول شي. لېږل شوي پیغامونه به نه ژباړل کېږي. Agora به دا انتخاب په دې وسیله کې په یاد وساتي.",
-    "confirmTranslate": "پیغامونه وژباړئ"
+    "confirmTranslate": "پیغامونه وژباړئ",
+    "newMessage": "نوی پیغام",
+    "newMessageTitle": "نوی پیغام",
+    "recipientLabel": "ته",
+    "recipientPlaceholder": "د نوم، NIP-05 یا npub له مخې لټون وکړئ…",
+    "recipientHint": "د نوې خبرې اترې پیلولو لپاره څوک ولټوئ.",
+    "recipientSearching": "په لټون کې…",
+    "noRecipientResults": "هیڅ خلک ونه موندل شول. بل نوم، NIP-05 یا npub هڅه وکړئ.",
+    "recipientFollowed": "تاسو دا کس تعقیبوئ"
   },
   "auth": {
     "join": "ګډون",

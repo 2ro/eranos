@@ -122,7 +122,15 @@
     "friendsEmpty": "Não há mensagens de pessoas que você segue.",
     "translateDialogTitle": "Traduzir mensagens privadas?",
     "translateDialogDescription": "As mensagens recebidas serão enviadas ao serviço de tradução configurado. As mensagens enviadas não serão traduzidas. O Agora lembrará esta escolha neste dispositivo.",
-    "confirmTranslate": "Traduzir mensagens"
+    "confirmTranslate": "Traduzir mensagens",
+    "newMessage": "Nova mensagem",
+    "newMessageTitle": "Nova mensagem",
+    "recipientLabel": "Para",
+    "recipientPlaceholder": "Pesquisar por nome, NIP-05 ou npub…",
+    "recipientHint": "Pesquise alguém para iniciar uma nova conversa.",
+    "recipientSearching": "Pesquisando…",
+    "noRecipientResults": "Nenhuma pessoa encontrada. Tente um nome, NIP-05 ou npub diferente.",
+    "recipientFollowed": "Você segue esta pessoa"
   },
   "auth": {
     "join": "Entrar",
