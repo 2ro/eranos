@@ -79,7 +79,6 @@ function GuideBlockRenderer({ block }: { block: GuideBlock }) {
 const DONOR_HERO_IMAGES: readonly string[] = [
   '/hero/wlc-1.webp',
   '/hero/wlc-2.webp',
-  '/hero/wlc-3.webp',
 ];
 
 export default DonorGuidePage;

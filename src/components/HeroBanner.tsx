@@ -15,7 +15,6 @@ import { cn } from '@/lib/utils';
 const DEFAULT_BANNER_IMAGES: readonly string[] = [
   '/hero/wlc-1.webp',
   '/hero/wlc-2.webp',
-  '/hero/wlc-3.webp',
 ];
 
 interface HeroBannerProps {
