@@ -97,12 +97,24 @@ export function useCampaignDonations(
      * option's default was introduced to stop.
      */
     refetchInterval?: number | false;
+    /**
+     * Skip the kind 8333 receipt fetch and the per-receipt `/tx`
+     * verification fan-out — i.e. everything that powers the donor
+     * list, donor count, and per-tx breakdown. Only the single Esplora
+     * `/address` balance lookup that drives the headline `totalSats`
+     * (the progress bar) runs.
+     *
+     * Card grids only render the raised total, never the donor list, so
+     * they pass `receipts: false` to avoid an N-receipt `/tx` storm per
+     * card. The detail page leaves this `true` to populate its donor UI.
+     */
+    receipts?: boolean;
   } = {},
 ): {
   data: CampaignDonationStats;
   isLoading: boolean;
 } {
-  const { enabled = true, refetchInterval = false } = options;
+  const { enabled = true, refetchInterval = false, receipts: fetchReceipts = true } = options;
   const { nostr } = useNostr();
   const { config } = useAppContext();
   const { esploraApis } = config;
@@ -146,7 +158,7 @@ export function useCampaignDonations(
       );
       return events;
     },
-    enabled: enabled && !!aTag && hasOnchain,
+    enabled: enabled && fetchReceipts && !!aTag && hasOnchain,
     staleTime: 15_000,
   });
 
@@ -174,7 +186,7 @@ export function useCampaignDonations(
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         verifyOnchainZap(event, esploraApis, walletValue, signal),
       staleTime: 60_000,
-      enabled: enabled && !!walletValue && hasOnchain,
+      enabled: enabled && fetchReceipts && !!walletValue && hasOnchain,
     })),
   });
 
@@ -205,8 +217,8 @@ export function useCampaignDonations(
     hasOnchain &&
     (!enabled ||
       addressQuery.isLoading ||
-      receiptsQuery.isLoading ||
-      verifications.some((v) => v.isLoading));
+      (fetchReceipts &&
+        (receiptsQuery.isLoading || verifications.some((v) => v.isLoading))));
 
   return {
     data: {

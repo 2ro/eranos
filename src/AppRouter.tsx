@@ -10,6 +10,7 @@ import { VersionCheck } from "./components/VersionCheck";
 import { MinimizedAudioBar } from "./components/MinimizedAudioBar";
 import { AudioNavigationGuard } from "./components/AudioNavigationGuard";
 import { TorStatusBanner } from "./components/TorStatusBanner";
+import { VenezuelaReliefPopup } from "./components/VenezuelaReliefPopup";
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useProfileUrl } from "./hooks/useProfileUrl";
 import { cn } from "@/lib/utils";
@@ -64,6 +65,7 @@ const WalletRecoveryPage = lazy(() => import("./pages/WalletRecoveryPage").then(
 const WalletSettingsPage = lazy(() => import("./pages/WalletSettingsPage").then(m => ({ default: m.WalletSettingsPage })));
 const LegacyWalletRecoveryPage = lazy(() => import("./pages/LegacyWalletRecoveryPage").then(m => ({ default: m.LegacyWalletRecoveryPage })));
 const RemoteLoginSuccessPage = lazy(() => import("./pages/RemoteLoginSuccessPage").then(m => ({ default: m.RemoteLoginSuccessPage })));
+const VenezuelaReliefPage = lazy(() => import("./pages/VenezuelaReliefPage").then(m => ({ default: m.VenezuelaReliefPage })));
 
 /** Redirects /profile to the user's canonical profile URL (nip05 or npub). */
 function ProfileRedirect() {
@@ -146,6 +148,11 @@ export function AppRouter() {
       {/* App-wide Tor status banner. Must live inside BrowserRouter — it
           renders a <Link> to the Tor settings, which needs Router context. */}
       <TorStatusBanner />
+      {/* Site-wide Venezuela earthquake relief appeal — shows once per
+          browser session on a fresh load of any route. Lives inside
+          BrowserRouter because it renders <Link>s to the relief page and
+          campaign browse. Remove when the relief response winds down. */}
+      <VenezuelaReliefPopup />
       <OnboardingGate>
         <Routes>
         {/* Narrow layout — `max-w-3xl` center column. The default for
@@ -239,6 +246,11 @@ export function AppRouter() {
               before the "activist" → "recipient" copy change. Redirect so
               external links and bookmarks still resolve. */}
           <Route path="/about/activists" element={<Navigate to="/about/recipients" replace />} />
+          {/* Dedicated, shareable Venezuela earthquake relief page. Wide
+              layout so its hero spans the viewport like /about. Must be
+              declared above `/:nip19`, which would otherwise swallow this
+              single-segment path. */}
+          <Route path="/venezuela-relief" element={<VenezuelaReliefPage />} />
           {/* NIP-19 route for npub1, note1, naddr1, nevent1, nprofile1.
               Goes through the wide layout because the dispatch may resolve to
               a profile, campaign, action, or community page — all of which

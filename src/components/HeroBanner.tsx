@@ -38,6 +38,14 @@ interface Layer {
   id: number;
   /** URL of the image rendered on this layer. */
   url: string;
+  /**
+   * Whether this layer has been flipped to its visible opacity. A new
+   * layer mounts with `entered: false` (opacity 0) and is flipped to
+   * `true` on the next animation frame so the CSS opacity transition
+   * actually fires — without this two-step the browser paints the layer
+   * straight at its final opacity and the crossfade looks instant.
+   */
+  entered: boolean;
 }
 
 const FADE_MS = 1500;
@@ -61,7 +69,7 @@ export function HeroBanner({
   const [index, setIndex] = useState(0);
   const idRef = useRef(0);
   const [layers, setLayers] = useState<Layer[]>(() =>
-    images.length > 0 ? [{ id: 0, url: images[0] }] : [],
+    images.length > 0 ? [{ id: 0, url: images[0], entered: true }] : [],
   );
 
   // Honor the user's reduced-motion preference. We freeze the rotation
@@ -90,17 +98,34 @@ export function HeroBanner({
     return () => window.clearInterval(id);
   }, [images, intervalMs]);
 
-  // Whenever the active index changes, push a new layer on top. Old
-  // layers are reaped after the crossfade completes.
+  // Whenever the active index changes, push a new layer on top. The
+  // layer mounts hidden (`entered: false`) and is flipped visible on the
+  // next animation frame so the opacity transition animates instead of
+  // snapping. Old layers are reaped after the crossfade completes.
   useEffect(() => {
     if (images.length === 0) return;
     const url = images[index % images.length];
     const id = ++idRef.current;
-    setLayers((prev) => [...prev, { id, url }]);
+    setLayers((prev) => [...prev, { id, url, entered: false }]);
+
+    const raf = window.requestAnimationFrame(() => {
+      // Second frame guarantees the browser has painted the layer at
+      // opacity 0 before we transition it to 1.
+      window.requestAnimationFrame(() => {
+        setLayers((prev) =>
+          prev.map((l) => (l.id === id ? { ...l, entered: true } : l)),
+        );
+      });
+    });
+
     const timeout = window.setTimeout(() => {
       setLayers((prev) => prev.filter((l) => l.id === id));
     }, FADE_MS + 50);
-    return () => window.clearTimeout(timeout);
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.clearTimeout(timeout);
+    };
   }, [index, images]);
 
   // Preload the next image during idle time so the next crossfade
@@ -119,14 +144,13 @@ export function HeroBanner({
       className={cn('absolute inset-0 overflow-hidden', className)}
       aria-hidden="true"
     >
-      {layers.map((layer, i) => {
-        const isTop = i === layers.length - 1;
+      {layers.map((layer) => {
         return (
           <div
             key={layer.id}
             className="absolute inset-0"
             style={{
-              opacity: isTop ? 1 : 0,
+              opacity: layer.entered ? 1 : 0,
               transition: `opacity ${FADE_MS}ms ease-in-out`,
             }}
           >
