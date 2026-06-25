@@ -1386,7 +1386,8 @@
         "seoDescription": "Kuzey Venezuela'yı şiddetli bir deprem vurdu. Agora üzerinden doğrudan sahadaki yardım kampanyalarına Bitcoin bağışlayın. Platform yok, emanetçi yok, izin gerekmiyor.",
         "pageEyebrow": "Acil çağrı",
         "pageHow": "Bağışınız nasıl yardımcı olur",
-        "pageHowBody": "Agora emanetsizdir: Bitcoin'iniz cüzdanınızdan doğrudan bir yardım kampanyasının adresine gider. Hiçbir platform pay almaz, hiçbir emanetçi parayı tutmaz ve vermek ya da almak için kimsenin iznine ihtiyaç yoktur. Aşağıdaki her kampanya, sahada depreme yanıt veren insanlar tarafından yürütülüyor."
+        "pageHowBody": "Agora emanetsizdir: Bitcoin'iniz cüzdanınızdan doğrudan bir yardım kampanyasının adresine gider. Hiçbir platform pay almaz, hiçbir emanetçi parayı tutmaz ve vermek ya da almak için kimsenin iznine ihtiyaç yoktur. Aşağıdaki her kampanya, sahada depreme yanıt veren insanlar tarafından yürütülüyor.",
+        "goalOf": "{{amount}} hedefinden"
       },
       "whyDifferent": {
         "eyebrow": "Neden {{appName}}",

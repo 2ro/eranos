@@ -1386,7 +1386,8 @@
         "seoDescription": "Tetemeko kubwa la ardhi limeikumba kaskazini mwa Venezuela. Changia Bitcoin moja kwa moja kwa kampeni za misaada zilizoko eneo la tukio kwenye Agora. Hakuna jukwaa, hakuna mtunzaji, hakuna ruhusa inayohitajika.",
         "pageEyebrow": "Wito wa dharura",
         "pageHow": "Jinsi mchango wako unavyosaidia",
-        "pageHowBody": "Agora haitunzi fedha: Bitcoin yako huenda moja kwa moja kutoka kwenye pochi yako hadi anwani ya kampeni ya misaada. Hakuna jukwaa linalochukua sehemu, hakuna mtunzaji anayeshikilia fedha, na hakuna mtu anayehitaji ruhusa kutoa au kupokea. Kila kampeni iliyo hapa chini inaendeshwa na watu wanaokabiliana na tetemeko hili eneo la tukio."
+        "pageHowBody": "Agora haitunzi fedha: Bitcoin yako huenda moja kwa moja kutoka kwenye pochi yako hadi anwani ya kampeni ya misaada. Hakuna jukwaa linalochukua sehemu, hakuna mtunzaji anayeshikilia fedha, na hakuna mtu anayehitaji ruhusa kutoa au kupokea. Kila kampeni iliyo hapa chini inaendeshwa na watu wanaokabiliana na tetemeko hili eneo la tukio.",
+        "goalOf": "kati ya lengo la {{amount}}"
       },
       "whyDifferent": {
         "eyebrow": "Kwa nini {{appName}}",

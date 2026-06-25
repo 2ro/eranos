@@ -14,8 +14,28 @@
 /** Public route for the dedicated relief page (shareable). */
 export const VENEZUELA_RELIEF_PATH = '/venezuela-relief';
 
-/** Deep-link to the Venezuela-filtered campaign browse for donors. */
-export const VENEZUELA_DONATE_PATH = '/campaigns?country=VE';
+/**
+ * The specific relief campaign baked into the appeal — `terremoto-venezuela`
+ * (kind 33863). The hero, popup, and page resolve this `(pubkey, identifier)`
+ * coordinate to surface the campaign's live raised/goal progress, turning
+ * each surface into an info + donation hybrid. The donate CTA
+ * ({@link VENEZUELA_DONATE_PATH}) deep-links to this same campaign's naddr.
+ */
+export const VENEZUELA_RELIEF_CAMPAIGN_PUBKEY =
+  '7a303d62d6c9d2f0cabe2ca713a392f3ec4b1fab815ea60b79fe15aca274c71c';
+
+/** The relief campaign's `d` tag (slug). */
+export const VENEZUELA_RELIEF_CAMPAIGN_IDENTIFIER = 'terremoto-venezuela';
+
+/**
+ * Deep-link straight to the specific Venezuela earthquake relief campaign
+ * (`terremoto-venezuela`, kind 33863). Baked in as the donate CTA target
+ * for the hero, popup, and dedicated page so donors land on the campaign's
+ * detail page rather than a filtered browse. NIP-19 identifiers route at
+ * the URL root (`/:nip19`), handled by `NIP19Page`.
+ */
+export const VENEZUELA_DONATE_PATH =
+  '/naddr1qvzqqqyygupzq73s843ddjwj7r9tut98zw3e9ulvfv06hq275c9hnls44j38f3cuqqfhgetjwfjk6mm5dukhvetwv4a82etvvykrc9yj';
 
 /**
  * Ordered set of news photographs from the Venezuela earthquake that

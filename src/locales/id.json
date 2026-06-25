@@ -1386,7 +1386,8 @@
         "seoDescription": "Gempa bumi dahsyat telah mengguncang Venezuela bagian utara. Donasikan Bitcoin langsung ke kampanye bantuan di lapangan melalui Agora. Tanpa platform, tanpa kustodian, tanpa perlu izin.",
         "pageEyebrow": "Seruan darurat",
         "pageHow": "Bagaimana donasi Anda membantu",
-        "pageHowBody": "Agora bersifat non-kustodial: Bitcoin Anda langsung mengalir dari dompet Anda ke alamat kampanye bantuan. Tidak ada platform yang mengambil potongan, tidak ada kustodian yang menahan dana, dan tidak ada yang perlu izin untuk memberi atau menerima. Setiap kampanye di bawah ini dijalankan oleh orang-orang yang merespons gempa di lapangan."
+        "pageHowBody": "Agora bersifat non-kustodial: Bitcoin Anda langsung mengalir dari dompet Anda ke alamat kampanye bantuan. Tidak ada platform yang mengambil potongan, tidak ada kustodian yang menahan dana, dan tidak ada yang perlu izin untuk memberi atau menerima. Setiap kampanye di bawah ini dijalankan oleh orang-orang yang merespons gempa di lapangan.",
+        "goalOf": "dari target {{amount}}"
       },
       "whyDifferent": {
         "eyebrow": "Mengapa {{appName}}",

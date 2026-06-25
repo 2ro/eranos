@@ -1382,7 +1382,8 @@
         "seoDescription": "Un puissant séisme a frappé le nord du Venezuela. Faites un don en Bitcoin directement aux campagnes de secours sur le terrain via Agora. Aucune plateforme, aucun dépositaire, aucune permission requise.",
         "pageEyebrow": "Appel d'urgence",
         "pageHow": "Comment votre don aide",
-        "pageHowBody": "Agora est non dépositaire : votre Bitcoin va directement de votre portefeuille à l'adresse d'une campagne de secours. Aucune plateforme ne prélève de commission, aucun dépositaire ne détient les fonds et personne n'a besoin de permission pour donner ou recevoir. Chaque campagne ci-dessous est menée par des personnes qui répondent au séisme sur le terrain."
+        "pageHowBody": "Agora est non dépositaire : votre Bitcoin va directement de votre portefeuille à l'adresse d'une campagne de secours. Aucune plateforme ne prélève de commission, aucun dépositaire ne détient les fonds et personne n'a besoin de permission pour donner ou recevoir. Chaque campagne ci-dessous est menée par des personnes qui répondent au séisme sur le terrain.",
+        "goalOf": "sur un objectif de {{amount}}"
       },
       "whyDifferent": {
         "eyebrow": "Pourquoi {{appName}}",

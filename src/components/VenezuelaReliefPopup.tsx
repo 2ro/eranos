@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { VenezuelaReliefGoal } from '@/components/VenezuelaReliefGoal';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
 import { shareOrCopy } from '@/lib/share';
@@ -122,6 +123,9 @@ export function VenezuelaReliefPopup() {
           <DialogDescription className="text-sm leading-relaxed text-foreground/80">
             {t('campaigns.home.venezuelaRelief.popupBody')}
           </DialogDescription>
+
+          {/* Live fundraising progress — the info half of the hybrid. */}
+          <VenezuelaReliefGoal variant="card" className="mt-4" />
 
           <DialogFooter className="mt-5 sm:flex-row sm:justify-start sm:gap-2">
             <Button asChild className="rounded-full font-semibold [&_svg]:size-[18px]">

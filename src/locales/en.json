@@ -1476,7 +1476,8 @@
         "seoDescription": "A powerful earthquake has struck northern Venezuela. Donate Bitcoin directly to on-the-ground relief campaigns on Agora. No platform, no custodian, no permission required.",
         "pageEyebrow": "Emergency appeal",
         "pageHow": "How your donation helps",
-        "pageHowBody": "Agora is non-custodial: your Bitcoin goes straight from your wallet to a relief campaign's address. No platform takes a cut, no custodian holds the funds, and no one needs permission to give or receive. Every campaign below is run by people responding to the quake on the ground."
+        "pageHowBody": "Agora is non-custodial: your Bitcoin goes straight from your wallet to a relief campaign's address. No platform takes a cut, no custodian holds the funds, and no one needs permission to give or receive. Every campaign below is run by people responding to the quake on the ground.",
+        "goalOf": "of {{amount}} goal"
       },
       "whyDifferent": {
         "eyebrow": "Why {{appName}}",

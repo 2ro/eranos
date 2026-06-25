@@ -1382,7 +1382,8 @@
         "seoDescription": "Um forte terremoto atingiu o norte da Venezuela. Doe Bitcoin diretamente para as campanhas de ajuda no local através do Agora. Sem plataforma, sem custodiante, sem necessidade de permissão.",
         "pageEyebrow": "Apelo de emergência",
         "pageHow": "Como sua doação ajuda",
-        "pageHowBody": "O Agora é não custodial: seu Bitcoin vai direto da sua carteira para o endereço de uma campanha de ajuda. Nenhuma plataforma fica com uma parte, nenhum custodiante segura os fundos e ninguém precisa de permissão para doar ou receber. Cada campanha abaixo é conduzida por pessoas que respondem ao terremoto no local."
+        "pageHowBody": "O Agora é não custodial: seu Bitcoin vai direto da sua carteira para o endereço de uma campanha de ajuda. Nenhuma plataforma fica com uma parte, nenhum custodiante segura os fundos e ninguém precisa de permissão para doar ou receber. Cada campanha abaixo é conduzida por pessoas que respondem ao terremoto no local.",
+        "goalOf": "de {{amount}} da meta"
       },
       "whyDifferent": {
         "eyebrow": "Por que o {{appName}}",

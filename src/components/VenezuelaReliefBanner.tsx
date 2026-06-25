@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
-import { HeartHandshake, PlusCircle, Share2 } from 'lucide-react';
+import { HeartHandshake, Share2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { HeroBanner } from '@/components/HeroBanner';
-import { StartCampaignLink } from '@/components/StartCampaignLink';
+import { VenezuelaReliefGoal } from '@/components/VenezuelaReliefGoal';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
 import { shareOrCopy } from '@/lib/share';
@@ -40,11 +40,9 @@ const VENEZUELA_RELIEF_BANNER_IMAGES = VENEZUELA_RELIEF_IMAGES;
  *  - A large display headline ("Venezuela needs you") with the final
  *    word painted inside a solid brand-orange highlighter block — the
  *    same idiom as the home hero's "unstoppable".
- *  - Two unmistakable calls to action: **Donate to relief** deep-links
- *    to the Venezuela-filtered campaign browse (`/campaigns?country=VE`)
- *    so donors land straight on fundable relief campaigns; **Raise funds
- *    for Venezuela** routes organizers through `StartCampaignLink`
- *    (auth-gated) to publish a new fundraiser.
+ *  - A primary call to action — **Donate to relief** — deep-links
+ *    straight to the baked-in relief campaign (its naddr) so donors land
+ *    on the campaign's detail page, plus a **Share** action.
  *
  * Not dismissible by design — while the appeal is active it stays put
  * for every visitor (product decision). When the response winds down,
@@ -162,6 +160,10 @@ export function VenezuelaReliefBanner({ className }: { className?: string }) {
             {t('campaigns.home.venezuelaRelief.body')}
           </p>
 
+          {/* Live fundraising progress for the baked-in relief campaign —
+              the info half of this info + donation hybrid. */}
+          <VenezuelaReliefGoal variant="overlay" className="mt-7" />
+
           <div className="mt-7 flex flex-col sm:flex-row flex-wrap gap-3">
             {/* Primary CTA — donate to Venezuela-filtered relief campaigns */}
             <Button
@@ -175,20 +177,7 @@ export function VenezuelaReliefBanner({ className }: { className?: string }) {
               </Link>
             </Button>
 
-            {/* Secondary CTA — start a relief fundraiser (auth-gated) */}
-            <Button
-              variant="outline"
-              size="lg"
-              asChild
-              className="rounded-full h-12 px-6 text-base border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white hover:border-white/60 [&_svg]:size-[18px]"
-            >
-              <StartCampaignLink>
-                <PlusCircle className="mr-2" />
-                {t('campaigns.home.venezuelaRelief.startCampaign')}
-              </StartCampaignLink>
-            </Button>
-
-            {/* Share: native share sheet or copy link to the relief page */}
+            {/* Secondary CTA — share: native share sheet or copy link */}
             <Button
               variant="outline"
               size="lg"

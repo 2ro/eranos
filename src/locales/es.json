@@ -940,7 +940,8 @@
         "seoDescription": "Un fuerte terremoto ha sacudido el norte de Venezuela. Dona Bitcoin directamente a las campañas de ayuda sobre el terreno en Agora. Sin plataforma, sin custodio, sin permiso requerido.",
         "pageEyebrow": "Llamado de emergencia",
         "pageHow": "Cómo ayuda tu donación",
-        "pageHowBody": "Agora no custodia los fondos: tu Bitcoin va directo desde tu monedero a la dirección de una campaña de ayuda. Ninguna plataforma se lleva una comisión, ningún custodio retiene los fondos y nadie necesita permiso para dar o recibir. Cada campaña a continuación está gestionada por personas que responden al terremoto sobre el terreno."
+        "pageHowBody": "Agora no custodia los fondos: tu Bitcoin va directo desde tu monedero a la dirección de una campaña de ayuda. Ninguna plataforma se lleva una comisión, ningún custodio retiene los fondos y nadie necesita permiso para dar o recibir. Cada campaña a continuación está gestionada por personas que responden al terremoto sobre el terreno.",
+        "goalOf": "de {{amount}} objetivo"
       },
       "whyDifferent": {
         "eyebrow": "Por qué {{appName}}",

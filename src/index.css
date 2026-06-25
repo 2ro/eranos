@@ -799,3 +799,37 @@
   .hero-arc-flow { animation: none; stroke-dasharray: none; }
   .hero-node-pulse { animation: none; opacity: 0.7; }
 }
+
+/* Transient highlight flash for the Venezuela relief donate panel /
+   section, triggered by the page's "Donate to relief" CTA. A pulsing
+   ring drawn with box-shadow (not `ring`) so it shows even when the
+   target clips its overflow, and an offset gap so it reads as a frame. */
+.relief-donate-flash {
+  animation: relief-donate-flash 2s ease-out;
+  border-radius: 1rem;
+}
+
+@keyframes relief-donate-flash {
+  0%, 70% {
+    box-shadow:
+      0 0 0 3px hsl(var(--background)),
+      0 0 0 7px hsl(var(--primary) / 0.75),
+      0 0 22px 7px hsl(var(--primary) / 0.45);
+  }
+  100% {
+    box-shadow:
+      0 0 0 3px hsl(var(--background) / 0),
+      0 0 0 7px hsl(var(--primary) / 0),
+      0 0 22px 7px hsl(var(--primary) / 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No pulse — hold a steady ring for the lifetime of the class. */
+  .relief-donate-flash {
+    animation: none;
+    box-shadow:
+      0 0 0 3px hsl(var(--background)),
+      0 0 0 7px hsl(var(--primary) / 0.75);
+  }
+}
