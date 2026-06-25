@@ -806,6 +806,13 @@
     "payWithAgoraWallet": "الدفع عبر Agora",
     "openExternalWallet": "فتح محفظة خارجية"
   },
+  "noBitcoin": {
+    "trigger": "ليس لديك بيتكوين؟",
+    "title": "لا تملك بيتكوين بعد؟",
+    "description": "اشترِ بيتكوين عبر Cash App، ثم أرسله إلى هذه الحملة.",
+    "getItOn": "احصل عليه من",
+    "getCashApp": "الحصول على Cash App"
+  },
   "campaignVerification": {
     "verifiedBy": "موثّق من قبل",
     "verifiedLabel": "موثَّقة",

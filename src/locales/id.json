@@ -1248,6 +1248,13 @@
     "payWithAgoraWallet": "Bayar dengan Agora",
     "openExternalWallet": "Buka dompet eksternal"
   },
+  "noBitcoin": {
+    "trigger": "Tidak punya Bitcoin?",
+    "title": "Belum punya Bitcoin?",
+    "description": "Beli Bitcoin di Cash App, lalu kirimkan ke kampanye ini.",
+    "getItOn": "Dapatkan di",
+    "getCashApp": "Dapatkan Cash App"
+  },
   "campaignVerification": {
     "verifiedBy": "Diverifikasi oleh",
     "verifiedLabel": "Terverifikasi",

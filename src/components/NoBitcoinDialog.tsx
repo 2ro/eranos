@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { openUrl } from '@/lib/downloadFile';
 import {
   Dialog,
@@ -21,20 +23,20 @@ interface NoBitcoinDialogProps {
  * just points at a mainstream on-ramp the donor controls.
  */
 export function NoBitcoinDialog({ open, onOpenChange }: NoBitcoinDialogProps) {
+  const { t } = useTranslation();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm rounded-2xl">
         <DialogHeader>
-          <DialogTitle>No Bitcoin yet?</DialogTitle>
-          <DialogDescription>
-            Buy Bitcoin in Cash App, then send it to this campaign.
-          </DialogDescription>
+          <DialogTitle>{t('noBitcoin.title')}</DialogTitle>
+          <DialogDescription>{t('noBitcoin.description')}</DialogDescription>
         </DialogHeader>
 
         <button
           type="button"
           onClick={() => void openUrl('https://cash.app')}
-          aria-label="Get Cash App"
+          aria-label={t('noBitcoin.getCashApp')}
           className="group flex w-full items-center gap-4 rounded-2xl bg-black px-5 py-4 text-left text-white shadow-sm transition-transform hover:scale-[1.02] active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00D632] focus-visible:ring-offset-2"
         >
           <img
@@ -46,7 +48,7 @@ export function NoBitcoinDialog({ open, onOpenChange }: NoBitcoinDialogProps) {
           />
           <span className="flex flex-col">
             <span className="text-xs font-medium uppercase tracking-wide text-white/70">
-              Get it on
+              {t('noBitcoin.getItOn')}
             </span>
             <span className="text-xl font-semibold leading-tight">Cash App</span>
           </span>

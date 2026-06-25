@@ -806,6 +806,13 @@
     "payWithAgoraWallet": "Pagar con Agora",
     "openExternalWallet": "Abrir cartera externa"
   },
+  "noBitcoin": {
+    "trigger": "¿No tienes Bitcoin?",
+    "title": "¿Aún no tienes Bitcoin?",
+    "description": "Compra Bitcoin en Cash App y luego envíalo a esta campaña.",
+    "getItOn": "Disponible en",
+    "getCashApp": "Obtener Cash App"
+  },
   "campaignVerification": {
     "verifiedBy": "Verificado por",
     "verifiedLabel": "Verificada",

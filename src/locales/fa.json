@@ -806,6 +806,13 @@
     "payWithAgoraWallet": "پرداخت با Agora",
     "openExternalWallet": "باز کردن کیف پول خارجی"
   },
+  "noBitcoin": {
+    "trigger": "بیت‌کوین ندارید؟",
+    "title": "هنوز بیت‌کوین ندارید؟",
+    "description": "بیت‌کوین را در Cash App بخرید، سپس آن را به این کارزار ارسال کنید.",
+    "getItOn": "دریافت از",
+    "getCashApp": "دریافت Cash App"
+  },
   "campaignVerification": {
     "verifiedBy": "تأییدشده توسط",
     "verifiedLabel": "تأییدشده",

@@ -806,6 +806,13 @@
     "payWithAgoraWallet": "د Agora له لارې تادیه وکړئ",
     "openExternalWallet": "بهرنۍ بټوه پرانیزئ"
   },
+  "noBitcoin": {
+    "trigger": "Bitcoin نه لرئ؟",
+    "title": "تر اوسه Bitcoin نه لرئ؟",
+    "description": "په Cash App کې Bitcoin واخلئ، بیا یې دې کمپاین ته ولېږئ.",
+    "getItOn": "ترلاسه یې کړئ په",
+    "getCashApp": "Cash App ترلاسه کړئ"
+  },
   "campaignVerification": {
     "verifiedBy": "تصدیق شوی د",
     "verifiedLabel": "تصدیق شوی",

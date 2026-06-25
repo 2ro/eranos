@@ -1248,6 +1248,13 @@
     "payWithAgoraWallet": "Pagar com Agora",
     "openExternalWallet": "Abrir carteira externa"
   },
+  "noBitcoin": {
+    "trigger": "Não tem Bitcoin?",
+    "title": "Ainda não tem Bitcoin?",
+    "description": "Compre Bitcoin no Cash App e depois envie para esta campanha.",
+    "getItOn": "Baixe no",
+    "getCashApp": "Obter Cash App"
+  },
   "campaignVerification": {
     "verifiedBy": "Verificado por",
     "verifiedLabel": "Verificada",

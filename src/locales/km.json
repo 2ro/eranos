@@ -806,6 +806,13 @@
     "payWithAgoraWallet": "បង់ដោយ Agora",
     "openExternalWallet": "បើកកាបូបខាងក្រៅ"
   },
+  "noBitcoin": {
+    "trigger": "មិនមាន Bitcoin មែនទេ?",
+    "title": "មិនទាន់មាន Bitcoin?",
+    "description": "ទិញ Bitcoin នៅក្នុង Cash App បន្ទាប់មកផ្ញើវាទៅយុទ្ធនាការនេះ។",
+    "getItOn": "ទាញយកនៅលើ",
+    "getCashApp": "ទាញយក Cash App"
+  },
   "campaignVerification": {
     "verifiedBy": "បានផ្ទៀងផ្ទាត់ដោយ",
     "verifiedLabel": "បានផ្ទៀងផ្ទាត់",

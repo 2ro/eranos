@@ -1248,6 +1248,13 @@
     "payWithAgoraWallet": "Agora से भुगतान करें",
     "openExternalWallet": "बाहरी वॉलेट खोलें"
   },
+  "noBitcoin": {
+    "trigger": "Bitcoin नहीं है?",
+    "title": "अभी तक Bitcoin नहीं है?",
+    "description": "Cash App में Bitcoin खरीदें, फिर इसे इस अभियान को भेजें।",
+    "getItOn": "इसे पाएं",
+    "getCashApp": "Cash App प्राप्त करें"
+  },
   "campaignVerification": {
     "verifiedBy": "द्वारा सत्यापित",
     "verifiedLabel": "सत्यापित",

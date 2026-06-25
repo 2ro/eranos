@@ -1212,7 +1212,7 @@ function DonateColumn({
             onClick={() => setNoBitcoinOpen(true)}
             className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm transition-colors"
           >
-            Don't have Bitcoin?
+            {t('noBitcoin.trigger')}
           </button>
         </div>
       </CardContent>

@@ -1248,6 +1248,13 @@
     "payWithAgoraWallet": "Оплатить через Agora",
     "openExternalWallet": "Открыть внешний кошелёк"
   },
+  "noBitcoin": {
+    "trigger": "Нет биткоина?",
+    "title": "Ещё нет биткоина?",
+    "description": "Купите биткоин в Cash App, затем отправьте его этой кампании.",
+    "getItOn": "Загрузите в",
+    "getCashApp": "Установить Cash App"
+  },
   "campaignVerification": {
     "verifiedBy": "Проверено",
     "verifiedLabel": "Проверено",

@@ -1337,6 +1337,13 @@
     "openInWallet": "Open in wallet",
     "payWithAgoraWallet": "Pay with Agora"
   },
+  "noBitcoin": {
+    "trigger": "Don't have Bitcoin?",
+    "title": "No Bitcoin yet?",
+    "description": "Buy Bitcoin in Cash App, then send it to this campaign.",
+    "getItOn": "Get it on",
+    "getCashApp": "Get Cash App"
+  },
   "campaignVerification": {
     "verifiedBy": "Verified by",
     "verifiedLabel": "Verified",

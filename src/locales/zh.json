@@ -806,6 +806,13 @@
     "payWithAgoraWallet": "使用 Agora 支付",
     "openExternalWallet": "打开外部钱包"
   },
+  "noBitcoin": {
+    "trigger": "没有比特币？",
+    "title": "还没有比特币？",
+    "description": "在 Cash App 中购买比特币，然后将其发送到此活动。",
+    "getItOn": "下载于",
+    "getCashApp": "获取 Cash App"
+  },
   "campaignVerification": {
     "verifiedBy": "验证者",
     "verifiedLabel": "已验证",

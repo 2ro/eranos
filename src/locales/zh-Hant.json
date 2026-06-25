@@ -806,6 +806,13 @@
     "payWithAgoraWallet": "使用 Agora 支付",
     "openExternalWallet": "開啟外部錢包"
   },
+  "noBitcoin": {
+    "trigger": "沒有比特幣？",
+    "title": "還沒有比特幣？",
+    "description": "在 Cash App 中購買比特幣，然後將其傳送到此活動。",
+    "getItOn": "下載於",
+    "getCashApp": "取得 Cash App"
+  },
   "campaignVerification": {
     "verifiedBy": "驗證者",
     "verifiedLabel": "已驗證",

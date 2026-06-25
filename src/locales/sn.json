@@ -806,6 +806,13 @@
     "payWithAgoraWallet": "Bhadhara neAgora",
     "openExternalWallet": "Vhura chikwama chekunze"
   },
+  "noBitcoin": {
+    "trigger": "Hauna Bitcoin here?",
+    "title": "Hausati uine Bitcoin?",
+    "description": "Tenga Bitcoin muCash App, wozoituma kumushandirapamwe uyu.",
+    "getItOn": "Itore pa",
+    "getCashApp": "Tora Cash App"
+  },
   "campaignVerification": {
     "verifiedBy": "Yasimbiswa na",
     "verifiedLabel": "Yasimbiswa",

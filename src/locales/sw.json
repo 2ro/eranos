@@ -1248,6 +1248,13 @@
     "payWithAgoraWallet": "Lipa kwa Agora",
     "openExternalWallet": "Fungua pochi ya nje"
   },
+  "noBitcoin": {
+    "trigger": "Huna Bitcoin?",
+    "title": "Bado huna Bitcoin?",
+    "description": "Nunua Bitcoin katika Cash App, kisha uitume kwa kampeni hii.",
+    "getItOn": "Ipate kwenye",
+    "getCashApp": "Pata Cash App"
+  },
   "campaignVerification": {
     "verifiedBy": "Imethibitishwa na",
     "verifiedLabel": "Imethibitishwa",
