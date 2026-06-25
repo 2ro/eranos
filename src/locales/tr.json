@@ -1373,6 +1373,13 @@
       "searchAriaLabel": "Kampanyaları ara",
       "noMatch": "“{{query}}” ile eşleşen kampanya yok",
       "noMatchHint": "Farklı bir arama terimi deneyin ya da aramayı temizleyin.",
+      "venezuelaRelief": {
+        "title": "Venezuela <0>size</0> ihtiyaç duyuyor",
+        "body": "Kuzey Venezuela'yı şiddetli bir deprem vurdu; en ağır darbeyi Caracas ve La Guaira aldı. Oradaki aileler bu acıyı tek başlarına atlatamaz. Bağışınız doğrudan sahadaki yardım kampanyalarına ulaşır ve şefkatinizi bugün barınağa, gıdaya ve umuda dönüştürür.",
+        "donate": "Yardıma bağış yap",
+        "startCampaign": "Venezuela için fon toplayın",
+        "credit": "Fotoğraf: Caracas'ta çöken bir binanın yakınında kucaklaşan halk. (AFP via Getty Images)"
+      },
       "whyDifferent": {
         "eyebrow": "Neden {{appName}}",
         "title": "Farklı inşa edildi.",

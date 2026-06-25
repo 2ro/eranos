@@ -927,6 +927,13 @@
       "yourCampaignsDesc": "Mishandirapamwe yako iri panetwork yeNostr uye mipiro inoshanda kuburikidza nemurawu wemushandirapamwe. Tarisa mishandirapamwe yose pa/campaigns; boka re{{appName}} rinosarudza yakananga papeji rekutanga.",
       "empty": "Hapana mishandirapamwe parizvino",
       "emptyHint": "Iva wekutanga kutanga kuunganidza mari pa{{appName}}. Taura nyaya yako, sarudza vanobatsirwa, uchipa rwumwe rwekugovera.",
+      "venezuelaRelief": {
+        "title": "Venezuela <0>inokuda</0>",
+        "body": "Kudengenyeka kwenyika kune simba kwakarova kuchamhembe kweVenezuela, kuchikuvadza Caracas neLa Guaira zvakanyanya. Mhuri dziri ikoko hadzigoni kupfuura mudambudziko iri dzega. Chipo chako chinonanga kumishandirapamwe yekubatsira iri panzvimbo, ichishandura tsitsi dzako kuva pekugara, chikafu, netariro nhasi.",
+        "donate": "Ipa kubatsira",
+        "startCampaign": "Unganidza mari yeVenezuela",
+        "credit": "Mufananidzo: vagari vachimbundirana pedyo nechivako chakawira muCaracas. (AFP via Getty Images)"
+      },
       "whyDifferent": {
         "eyebrow": "Sei {{appName}}",
         "title": "Yakavakwa zvakasiyana.",

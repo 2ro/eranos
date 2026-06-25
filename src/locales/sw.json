@@ -1373,6 +1373,13 @@
       "searchAriaLabel": "Tafuta kampeni",
       "noMatch": "Hakuna kampeni zinazolingana na “{{query}}”",
       "noMatchHint": "Jaribu neno tofauti la utafutaji, au futa utafutaji.",
+      "venezuelaRelief": {
+        "title": "Venezuela <0>inakuhitaji</0>",
+        "body": "Tetemeko kubwa la ardhi limeikumba kaskazini mwa Venezuela, likiathiri vibaya zaidi maeneo ya Caracas na La Guaira. Familia zilizoko huko haziwezi kupita katika dhiki hii peke yao. Mchango wako unawafikia moja kwa moja wahanga kupitia kampeni za misaada zilizoko eneo la tukio, ukigeuza huruma yako kuwa makao, chakula, na matumaini leo.",
+        "donate": "Changia misaada",
+        "startCampaign": "Changisha fedha kwa ajili ya Venezuela",
+        "credit": "Picha: wakazi wakikumbatiana karibu na jengo lililoporomoka mjini Caracas. (AFP via Getty Images)"
+      },
       "whyDifferent": {
         "eyebrow": "Kwa nini {{appName}}",
         "title": "Imejengwa tofauti.",

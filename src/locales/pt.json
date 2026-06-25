@@ -1369,6 +1369,13 @@
       "yourCampaignsDesc": "Suas campanhas estão no ar no Nostr e as doações funcionam através do link da campanha. Navegue por todas as campanhas em /campaigns; a equipe do {{appName}} apresenta uma seleção curada na página inicial.",
       "empty": "Nenhuma campanha ainda",
       "emptyHint": "Seja o primeiro a iniciar uma arrecadação no {{appName}}. Conte sua história, escolha seus beneficiários e compartilhe o link.",
+      "venezuelaRelief": {
+        "title": "A Venezuela precisa de <0>você</0>",
+        "body": "Um forte terremoto atingiu o norte da Venezuela, castigando com mais força Caracas e La Guaira. As famílias de lá não conseguem superar isso sozinhas. Sua doação vai diretamente para as campanhas de ajuda no local, transformando hoje a sua compaixão em abrigo, comida e esperança.",
+        "donate": "Doar para a ajuda",
+        "startCampaign": "Arrecadar fundos para a Venezuela",
+        "credit": "Foto: moradores se abraçam perto de um prédio desabado em Caracas. (AFP via Getty Images)"
+      },
       "whyDifferent": {
         "eyebrow": "Por que o {{appName}}",
         "title": "Construído diferente.",

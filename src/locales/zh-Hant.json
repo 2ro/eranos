@@ -931,6 +931,13 @@
       "searchAriaLabel": "搜尋活動",
       "noMatch": "沒有活動符合「{{query}}」",
       "noMatchHint": "請嘗試不同的搜尋字詞,或清除搜尋。",
+      "venezuelaRelief": {
+        "title": "委內瑞拉需要<0>你</0>",
+        "body": "一場強烈地震襲擊了 Venezuela 北部，其中 Caracas 與 La Guaira 受創最重。當地的家庭無法獨自撐過這場災難。你的捐款將直接送達當地的救援活動，讓你的關懷在今天就化為遮風避雨的住所、溫飽的食物，以及繼續走下去的希望。",
+        "donate": "捐助救援",
+        "startCampaign": "為委內瑞拉募款",
+        "credit": "照片:居民在 Caracas 一棟倒塌建築附近相擁。(AFP via Getty Images)"
+      },
       "whyDifferent": {
         "eyebrow": "為什麼選擇 {{appName}}",
         "title": "生來不同。",

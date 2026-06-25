@@ -1373,6 +1373,13 @@
       "searchAriaLabel": "Cari kampanye",
       "noMatch": "Tidak ada kampanye yang cocok dengan “{{query}}”",
       "noMatchHint": "Coba kata pencarian lain, atau bersihkan pencarian.",
+      "venezuelaRelief": {
+        "title": "Venezuela membutuhkan <0>Anda</0>",
+        "body": "Gempa bumi dahsyat telah mengguncang Venezuela bagian utara, dengan dampak terparah di Caracas dan La Guaira. Keluarga-keluarga di sana tidak bisa melewati cobaan ini sendirian. Donasi Anda langsung mengalir ke kampanye bantuan di lapangan, mengubah belas kasih Anda menjadi tempat berlindung, makanan, dan harapan hari ini.",
+        "donate": "Donasi untuk bantuan",
+        "startCampaign": "Galang dana untuk Venezuela",
+        "credit": "Foto dari Caracas, Venezuela. (AP; AFP via Getty Images)"
+      },
       "whyDifferent": {
         "eyebrow": "Mengapa {{appName}}",
         "title": "Dibangun berbeda.",

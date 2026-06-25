@@ -927,6 +927,13 @@
       "yourCampaignsDesc": "你的活动已在 Nostr 上线,通过活动链接即可接收捐款。在 /campaigns 浏览所有活动;{{appName}} 团队会在首页展示精选活动。",
       "empty": "暂无活动",
       "emptyHint": "成为在 {{appName}} 发起众筹的第一人。讲述你的故事、选择受益人、并分享链接。",
+      "venezuelaRelief": {
+        "title": "委内瑞拉需要<0>你</0>",
+        "body": "一场强烈地震袭击了委内瑞拉北部,Caracas 与 La Guaira 受灾最为严重。那里的家庭无法独自挺过这一切。你的捐款将直接送达灾区一线的救援活动,把你的善意化作今天的栖身之所、食物与希望。",
+        "donate": "为救援捐款",
+        "startCampaign": "为委内瑞拉筹款",
+        "credit": "图片:居民在 Caracas 一栋倒塌建筑附近相拥。(AFP via Getty Images)"
+      },
       "whyDifferent": {
         "eyebrow": "为什么选 {{appName}}",
         "title": "我们与众不同。",

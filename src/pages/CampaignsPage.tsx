@@ -19,6 +19,7 @@ import { CampaignListsStrip } from '@/components/campaign-lists/CampaignListsStr
 import { HeroLightningMap } from '@/components/HeroLightningMap';
 import { StartCampaignLink } from '@/components/StartCampaignLink';
 import { AppDownloadNudge } from '@/components/AppDownloadNudge';
+import { VenezuelaReliefBanner } from '@/components/VenezuelaReliefBanner';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignList } from '@/hooks/useCampaignLists';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -129,6 +130,7 @@ export function CampaignsPage() {
 
   return (
     <main className="min-h-screen">
+      <VenezuelaReliefBanner />
       <Hero />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12" id="campaigns">

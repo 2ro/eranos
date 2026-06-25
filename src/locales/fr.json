@@ -1369,6 +1369,13 @@
       "yourCampaignsDesc": "Vos campagnes sont en ligne sur Nostr et les dons fonctionnent via le lien de la campagne. Parcourez toutes les campagnes sur /campaigns ; l'équipe de {{appName}} met en avant une sélection sur la page d'accueil.",
       "empty": "Aucune campagne pour l'instant",
       "emptyHint": "Soyez le premier à démarrer une collecte de fonds sur {{appName}}. Racontez votre histoire, choisissez vos bénéficiaires et partagez le lien.",
+      "venezuelaRelief": {
+        "title": "Le Venezuela a besoin de <0>vous</0>",
+        "body": "Un puissant séisme a frappé le nord du Venezuela, touchant le plus durement Caracas et La Guaira. Là-bas, les familles ne peuvent pas surmonter cette épreuve seules. Votre don va directement aux campagnes de secours sur le terrain et transforme votre compassion en abri, en nourriture et en espoir, dès aujourd'hui.",
+        "donate": "Faire un don aux secours",
+        "startCampaign": "Récolter des fonds pour le Venezuela",
+        "credit": "Photos de Caracas, au Venezuela. (AP ; AFP via Getty Images)"
+      },
       "whyDifferent": {
         "eyebrow": "Pourquoi {{appName}}",
         "title": "Conçu différemment.",

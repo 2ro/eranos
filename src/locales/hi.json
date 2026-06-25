@@ -1373,6 +1373,13 @@
       "searchAriaLabel": "कैंपेन खोजें",
       "noMatch": "“{{query}}” से मेल खाने वाला कोई कैंपेन नहीं",
       "noMatchHint": "अलग खोज शब्द आज़माएँ, या खोज साफ़ करें।",
+      "venezuelaRelief": {
+        "title": "Venezuela को <0>आपकी</0> ज़रूरत है",
+        "body": "उत्तरी Venezuela में एक भीषण भूकंप आया है, जिसने Caracas और La Guaira को सबसे ज़्यादा तबाह किया है। वहाँ के परिवार इस मुश्किल वक़्त से अकेले नहीं उबर सकते। आपका दान सीधे ज़मीन पर चल रहे राहत अभियानों तक पहुँचता है, और आज ही आपकी करुणा को आसरा, भोजन और उम्मीद में बदल देता है।",
+        "donate": "राहत के लिए दान करें",
+        "startCampaign": "Venezuela के लिए धन जुटाएँ",
+        "credit": "Caracas, Venezuela की तस्वीरें। (AP; AFP via Getty Images)"
+      },
       "whyDifferent": {
         "eyebrow": "क्यों {{appName}}",
         "title": "अलग ढंग से बना।",
