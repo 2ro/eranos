@@ -1,5 +1,32 @@
 # Changelog
 
+## [2.9.0] - 2026-06-25
+
+A big one. Private messaging arrives with a fast, searchable inbox you can reply to in your own language. Campaign organizers can now get verified by trusted reviewers through a guided sign-up, and verified badges appear right on campaigns. There's a new Venezuela earthquake relief appeal that takes you straight to donations, plus optional Tor routing on Android, separate Public and Private wallets, faster donation scanning, and refreshed profiles, settings, and login.
+
+### Added
+
+- Private direct messages: a dedicated inbox you can search by name, start new chats with inline recipient lookup, page back through old conversations, and read incoming messages translated into your language.
+- Get verified: a guided sign-up for trusted reviewers to set up a verifier profile, publish a public "how we verify" statement, and vouch for campaigns. Verified badges now show on campaign pages, and a short tutorial walks you through it.
+- A Venezuela earthquake relief appeal — a home-page banner, a one-time popup, and a shareable page that bakes in the relief campaign so you can read its story and donate without leaving.
+- Optional Tor routing on Android for added privacy.
+- Separate Public and Private wallets, keeping your spending and your private silent-payment funds cleanly apart.
+- A "Don't have Bitcoin?" prompt on campaign pages that points first-time donors to Cash App.
+- An always-visible language switcher in the top navigation, and a corporate sponsorship page.
+
+### Changed
+
+- Redesigned profiles with cleaner stats, a merged campaigns view, and a themed raised total.
+- Redesigned Settings into an Apple-style grouped layout.
+- Reworked the login and onboarding flow, including a new welcome screen built around the Agora brand.
+- Silent-payment donations now scan faster and keep working in the background, with a progress bar on the private wallet.
+- The home page now shows every featured campaign instead of capping the list.
+
+### Fixed
+
+- The audio, music, and podcast pages no longer crash.
+- Backfilled and corrected translations across all sixteen languages.
+
 ## [2.8.9] - 2026-06-02
 
 Adds an in-app prompt to grab the Android app from Zapstore, makes it easier to start or explore campaigns right from the home page, and irons out a batch of language and display fixes.

@@ -14,7 +14,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "2.8.9"
+        versionName "2.9.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         // The arti-mobile AAR bundles large native Rust libraries for every
         // ABI (~45 MB total). Restrict to the ABIs we actually ship/test:
