@@ -24,6 +24,7 @@ import {
 } from '@/components/CampaignWalletDonatePanel';
 import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
 import { Lightbox } from '@/components/ImageGallery';
+import { NoBitcoinDialog } from '@/components/NoBitcoinDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -1080,6 +1081,7 @@ function DonateColumn({
   const { user } = useCurrentUser();
   const hdAccess = useHdWalletAccess();
   const [sendOpen, setSendOpen] = useState(false);
+  const [noBitcoinOpen, setNoBitcoinOpen] = useState(false);
   const isSilentPayment = !campaign.wallets.onchain;
 
   // The in-app "Pay with Agora" button opens HDSendBitcoinDialog
@@ -1199,6 +1201,20 @@ function DonateColumn({
             </Button>
           </div>
         }
+
+        {/* For donors who don't already hold Bitcoin: a low-emphasis text
+            link (no button chrome) that opens an instructional dialog
+            pointing at a mainstream on-ramp. Kept visually quiet so it
+            never competes with the primary on-chain CTA above. */}
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => setNoBitcoinOpen(true)}
+            className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm transition-colors"
+          >
+            Don't have Bitcoin?
+          </button>
+        </div>
       </CardContent>
       {canPayInApp && campaign.wallets.onchain && (
         <HDSendBitcoinDialog
@@ -1219,6 +1235,7 @@ function DonateColumn({
           }
         />
       )}
+      <NoBitcoinDialog open={noBitcoinOpen} onOpenChange={setNoBitcoinOpen} />
     </Card>
   );
 }
