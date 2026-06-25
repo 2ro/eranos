@@ -1466,7 +1466,17 @@
         "body": "A powerful earthquake has struck northern Venezuela, hitting Caracas and La Guaira hardest. Families there can't get through this alone. Your donation goes straight to relief campaigns on the ground, turning your compassion into shelter, food, and hope today.",
         "donate": "Donate to relief",
         "startCampaign": "Raise funds for Venezuela",
-        "credit": "Photos from Caracas, Venezuela. (AP; AFP via Getty Images)"
+        "credit": "Photos from Caracas, Venezuela. (AP; AFP via Getty Images)",
+        "share": "Share",
+        "shareTitle": "Venezuela earthquake relief on Agora",
+        "linkCopied": "Link copied to clipboard",
+        "learnMore": "Learn more",
+        "popupBody": "A powerful earthquake has struck northern Venezuela, hitting Caracas and La Guaira hardest. Your donation goes straight to relief campaigns on the ground, turning compassion into shelter, food, and hope today.",
+        "seoTitle": "Venezuela Earthquake Relief",
+        "seoDescription": "A powerful earthquake has struck northern Venezuela. Donate Bitcoin directly to on-the-ground relief campaigns on Agora. No platform, no custodian, no permission required.",
+        "pageEyebrow": "Emergency appeal",
+        "pageHow": "How your donation helps",
+        "pageHowBody": "Agora is non-custodial: your Bitcoin goes straight from your wallet to a relief campaign's address. No platform takes a cut, no custodian holds the funds, and no one needs permission to give or receive. Every campaign below is run by people responding to the quake on the ground."
       },
       "whyDifferent": {
         "eyebrow": "Why {{appName}}",

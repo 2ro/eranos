@@ -1372,7 +1372,17 @@
         "body": "Un puissant séisme a frappé le nord du Venezuela, touchant le plus durement Caracas et La Guaira. Là-bas, les familles ne peuvent pas surmonter cette épreuve seules. Votre don va directement aux campagnes de secours sur le terrain et transforme votre compassion en abri, en nourriture et en espoir, dès aujourd'hui.",
         "donate": "Faire un don aux secours",
         "startCampaign": "Récolter des fonds pour le Venezuela",
-        "credit": "Photos de Caracas, au Venezuela. (AP ; AFP via Getty Images)"
+        "credit": "Photos de Caracas, au Venezuela. (AP ; AFP via Getty Images)",
+        "share": "Partager",
+        "shareTitle": "Aide au séisme au Venezuela sur Agora",
+        "linkCopied": "Lien copié dans le presse-papiers",
+        "learnMore": "En savoir plus",
+        "popupBody": "Un puissant séisme a frappé le nord du Venezuela, touchant le plus durement Caracas et La Guaira. Votre don va directement aux campagnes de secours sur le terrain et transforme la compassion en abri, en nourriture et en espoir, dès aujourd'hui.",
+        "seoTitle": "Aide au séisme au Venezuela",
+        "seoDescription": "Un puissant séisme a frappé le nord du Venezuela. Faites un don en Bitcoin directement aux campagnes de secours sur le terrain via Agora. Aucune plateforme, aucun dépositaire, aucune permission requise.",
+        "pageEyebrow": "Appel d'urgence",
+        "pageHow": "Comment votre don aide",
+        "pageHowBody": "Agora est non dépositaire : votre Bitcoin va directement de votre portefeuille à l'adresse d'une campagne de secours. Aucune plateforme ne prélève de commission, aucun dépositaire ne détient les fonds et personne n'a besoin de permission pour donner ou recevoir. Chaque campagne ci-dessous est menée par des personnes qui répondent au séisme sur le terrain."
       },
       "whyDifferent": {
         "eyebrow": "Pourquoi {{appName}}",

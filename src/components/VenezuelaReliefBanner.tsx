@@ -1,24 +1,30 @@
 import { Link } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
-import { HeartHandshake, PlusCircle } from 'lucide-react';
+import { HeartHandshake, PlusCircle, Share2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { HeroBanner } from '@/components/HeroBanner';
 import { StartCampaignLink } from '@/components/StartCampaignLink';
+import { useShareOrigin } from '@/hooks/useShareOrigin';
+import { useToast } from '@/hooks/useToast';
+import { shareOrCopy } from '@/lib/share';
+import {
+  VENEZUELA_DONATE_PATH,
+  VENEZUELA_RELIEF_IMAGES,
+  VENEZUELA_RELIEF_PATH,
+} from '@/lib/venezuelaRelief';
 import { cn } from '@/lib/utils';
 
 /**
  * Ordered set of news photographs from the Venezuela earthquake that
- * rotate behind the relief banner. They live in `/public/hero/` and use
- * the shared {@link HeroBanner} crossfade + slow-pan treatment, the same
+ * rotate behind the relief banner. Sourced from the shared
+ * {@link VENEZUELA_RELIEF_IMAGES} constant so the hero, popup, and
+ * dedicated page stay in sync. They live in `/public/hero/` and use the
+ * shared {@link HeroBanner} crossfade + slow-pan treatment, the same
  * animation as the site's other page heroes. Photo attributions are
  * surfaced generically in the `credit` copy beneath the banner.
  */
-const VENEZUELA_RELIEF_IMAGES: readonly string[] = [
-  '/hero/ve-quake-1.jpg', // residents embrace near a collapsed building (AFP/Getty)
-  '/hero/ve-quake-2.jpg', // community + rescue workers search the rubble (AP)
-  '/hero/ve-quake-3.jpg', // severe building damage in Caracas (AFP/Getty)
-];
+const VENEZUELA_RELIEF_BANNER_IMAGES = VENEZUELA_RELIEF_IMAGES;
 
 /**
  * Full-bleed emergency relief banner pinned to the very top of the
@@ -49,6 +55,18 @@ const VENEZUELA_RELIEF_IMAGES: readonly string[] = [
  */
 export function VenezuelaReliefBanner({ className }: { className?: string }) {
   const { t } = useTranslation();
+  const shareOrigin = useShareOrigin();
+  const { toast } = useToast();
+
+  const handleShare = async () => {
+    const result = await shareOrCopy(
+      `${shareOrigin}${VENEZUELA_RELIEF_PATH}`,
+      t('campaigns.home.venezuelaRelief.shareTitle'),
+    );
+    if (result === 'copied') {
+      toast({ title: t('campaigns.home.venezuelaRelief.linkCopied') });
+    }
+  };
 
   return (
     <section
@@ -62,7 +80,7 @@ export function VenezuelaReliefBanner({ className }: { className?: string }) {
       {/* Layer 1 — full-bleed crossfading photo gallery. A long
           interval gives a slow, contemplative pacing; HeroBanner's
           built-in 1.5s crossfade + slow pan handles the dissolve. */}
-      <HeroBanner images={VENEZUELA_RELIEF_IMAGES} intervalMs={9000} />
+      <HeroBanner images={VENEZUELA_RELIEF_BANNER_IMAGES} intervalMs={9000} />
 
       {/* Layer 2 — readability gradient. Lighter than a typical hero
           overlay so the photograph stays the focus: a gentle vertical
@@ -123,13 +141,15 @@ export function VenezuelaReliefBanner({ className }: { className?: string }) {
               i18nKey="campaigns.home.venezuelaRelief.title"
               components={[
                 // Index 0: the emphasised word, painted inside a solid
-                // brand-orange highlighter block that hugs the text — the
+                // brand-orange highlighter block that hugs the text, the
                 // same idiom as the home hero's "unstoppable". `text-indent`
                 // compensates for Bebas Neue's italic skew so the orange
-                // sits flush against the first letter.
+                // sits flush against the first letter. `leading-[0.95]`
+                // keeps the block hugging the cap height (matching the
+                // home hero) instead of ballooning to the line box.
                 <span
                   key="hl"
-                  className="inline-block w-fit ps-0 pe-3 bg-primary text-white align-baseline"
+                  className="inline-block w-fit ps-0 pe-3 bg-primary text-white leading-[0.95] align-baseline"
                   style={{ textIndent: '-0.06em' }}
                 />,
               ]}
@@ -149,7 +169,7 @@ export function VenezuelaReliefBanner({ className }: { className?: string }) {
               asChild
               className="rounded-full text-white font-semibold text-base h-12 px-7 [&_svg]:size-[18px] motion-safe:transition-colors"
             >
-              <Link to="/campaigns?country=VE">
+              <Link to={VENEZUELA_DONATE_PATH}>
                 <HeartHandshake className="mr-2" />
                 {t('campaigns.home.venezuelaRelief.donate')}
               </Link>
@@ -167,12 +187,31 @@ export function VenezuelaReliefBanner({ className }: { className?: string }) {
                 {t('campaigns.home.venezuelaRelief.startCampaign')}
               </StartCampaignLink>
             </Button>
+
+            {/* Share: native share sheet or copy link to the relief page */}
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={handleShare}
+              className="rounded-full h-12 px-6 text-base border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white hover:border-white/60 [&_svg]:size-[18px]"
+            >
+              <Share2 className="mr-2" />
+              {t('campaigns.home.venezuelaRelief.share')}
+            </Button>
           </div>
 
           {/* Photo credit — accuracy + attribution */}
           <p className="text-xs text-white/50 pt-1">
             {t('campaigns.home.venezuelaRelief.credit')}
           </p>
+
+          {/* Quiet link to the dedicated, shareable relief page */}
+          <Link
+            to={VENEZUELA_RELIEF_PATH}
+            className="mt-2 inline-block text-sm font-medium text-white/80 underline underline-offset-4 hover:text-white motion-safe:transition-colors"
+          >
+            {t('campaigns.home.venezuelaRelief.learnMore')}
+          </Link>
         </div>
       </div>
     </section>
