@@ -1,6 +1,5 @@
 import { useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { HandHeart, ShieldCheck } from 'lucide-react';
 
@@ -164,7 +163,6 @@ interface CampaignCardProps {
  * `<Link>` to the campaign's naddr-based detail route.
  */
 export function CampaignCard({ campaign, variant = 'compact', className, footerBadge, showModerationMenu = true }: CampaignCardProps) {
-  const { t } = useTranslation();
   const { translatedEvent, translateAction } = useEventTranslation(campaign.event, {
     iconOnly: true,
     buttonClassName: 'size-8 rounded-full p-0 text-muted-foreground hover:text-primary hover:bg-primary/10',
@@ -180,8 +178,14 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
   // already there by the time the user sees it.
   const cardRef = useRef<HTMLAnchorElement>(null);
   const inView = useInView(cardRef);
+  // Cards only show the raised total (the progress bar), never the donor
+  // list — so we skip the kind 8333 receipt fetch and the per-receipt
+  // `/tx` verification fan-out. Only the single Esplora `/address` balance
+  // lookup runs, which keeps a ~200-card grid from firing an N-receipt
+  // `/tx` storm per card.
   const { data: stats, isLoading: donationsLoading } = useCampaignDonations(campaign, {
     enabled: inView,
+    receipts: false,
   });
   const { data: btcPrice } = useBtcPrice();
 
@@ -328,11 +332,6 @@ export function CampaignCard({ campaign, variant = 'compact', className, footerB
           <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
             <div className="flex min-w-0 items-center gap-2">
               <AuthorByline pubkey={campaign.pubkey} insideLink />
-              {!isSilentPayment && stats && stats.donorCount > 0 && (
-                <span className="shrink-0 text-muted-foreground/80">
-                  · {t('common.donors', { count: stats.donorCount })}
-                </span>
-              )}
             </div>
             {(footerBadge || translateAction) && (
               <div className="flex shrink-0 items-center gap-1.5">
