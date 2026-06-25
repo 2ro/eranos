@@ -35,8 +35,6 @@
     "showLess": "لږ وښایاست",
     "readMore": "نور ولولئ",
     "byAuthor": "د <0>{{name}}</0> لخوا",
-    "donors_one": "{{count}} بسپنه ورکوونکی",
-    "donors_other": "{{count}} بسپنه ورکوونکي",
     "clearSearch": "لټون پاکول",
     "searching": "لټون کېږي…",
     "searchResultsCount_one": "{{count}} پایله",

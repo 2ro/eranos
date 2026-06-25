@@ -35,8 +35,6 @@
     "showLess": "Ratidza zvishoma",
     "readMore": "Verenga zvimwe",
     "byAuthor": "na <0>{{name}}</0>",
-    "donors_one": "mupi {{count}}",
-    "donors_other": "vapi {{count}}",
     "clearSearch": "Bvisa kutsvaga",
     "searching": "Kutsvaga…",
     "searchResultsCount_one": "{{count}} chakawanikwa",

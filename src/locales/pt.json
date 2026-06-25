@@ -35,8 +35,6 @@
     "showLess": "Mostrar menos",
     "readMore": "Ler mais",
     "byAuthor": "por <0>{{name}}</0>",
-    "donors_one": "{{count}} doador",
-    "donors_other": "{{count}} doadores",
     "clearSearch": "Limpar pesquisa",
     "searching": "Pesquisando…",
     "searchResultsCount_one": "{{count}} resultado",

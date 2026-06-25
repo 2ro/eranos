@@ -35,8 +35,6 @@
     "showLess": "نمایش کمتر",
     "readMore": "بیشتر بخوانید",
     "byAuthor": "توسط <0>{{name}}</0>",
-    "donors_one": "{{count}} اهداکننده",
-    "donors_other": "{{count}} اهداکننده",
     "clearSearch": "پاک کردن جستجو",
     "searching": "در حال جستجو…",
     "searchResultsCount_one": "{{count}} نتیجه",

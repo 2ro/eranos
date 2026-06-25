@@ -35,8 +35,6 @@
     "showLess": "Свернуть",
     "readMore": "Читать дальше",
     "byAuthor": "от <0>{{name}}</0>",
-    "donors_one": "{{count}} донор",
-    "donors_other": "{{count}} доноров",
     "clearSearch": "Очистить поиск",
     "searching": "Поиск…",
     "searchResultsCount_one": "{{count}} результат",

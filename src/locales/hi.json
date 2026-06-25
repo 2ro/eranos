@@ -35,8 +35,6 @@
     "showLess": "कम दिखाएँ",
     "readMore": "और पढ़ें",
     "byAuthor": "<0>{{name}}</0> द्वारा",
-    "donors_one": "{{count}} दानदाता",
-    "donors_other": "{{count}} दानदाता",
     "clearSearch": "खोज साफ़ करें",
     "searching": "खोज हो रही है…",
     "searchResultsCount_one": "{{count}} परिणाम",

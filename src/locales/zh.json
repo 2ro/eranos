@@ -35,8 +35,6 @@
     "showLess": "收起",
     "readMore": "阅读更多",
     "byAuthor": "由 <0>{{name}}</0>",
-    "donors_one": "{{count}} 位捐赠者",
-    "donors_other": "{{count}} 位捐赠者",
     "clearSearch": "清除搜索",
     "searching": "搜索中…",
     "searchResultsCount_one": "{{count}} 个结果",

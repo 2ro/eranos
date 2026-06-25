@@ -35,8 +35,6 @@
     "showLess": "បង្ហាញតិចជាងមុន",
     "readMore": "អានបន្ថែម",
     "byAuthor": "ដោយ <0>{{name}}</0>",
-    "donors_one": "អ្នកបរិច្ចាគ {{count}} នាក់",
-    "donors_other": "អ្នកបរិច្ចាគ {{count}} នាក់",
     "clearSearch": "សម្អាតការស្វែងរក",
     "searching": "កំពុងស្វែងរក…",
     "searchResultsCount_one": "លទ្ធផល {{count}}",

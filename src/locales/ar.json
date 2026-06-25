@@ -35,8 +35,6 @@
     "showLess": "عرض أقل",
     "readMore": "قراءة المزيد",
     "byAuthor": "بواسطة <0>{{name}}</0>",
-    "donors_one": "{{count}} متبرع",
-    "donors_other": "{{count}} متبرعون",
     "sortAriaLabel": "ترتيب الفرز",
     "sortDefault": "افتراضي",
     "sortTop": "الأبرز",

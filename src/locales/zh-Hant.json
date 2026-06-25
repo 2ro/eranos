@@ -35,8 +35,6 @@
     "showLess": "收起",
     "readMore": "閱讀更多",
     "byAuthor": "由 <0>{{name}}</0>",
-    "donors_one": "{{count}} 位捐贈者",
-    "donors_other": "{{count}} 位捐贈者",
     "clearSearch": "清除搜尋",
     "searching": "搜尋中…",
     "searchResultsCount_one": "{{count}} 個結果",

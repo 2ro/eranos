@@ -35,8 +35,6 @@
     "showLess": "Onyesha kidogo",
     "readMore": "Soma zaidi",
     "byAuthor": "na <0>{{name}}</0>",
-    "donors_one": "mfadhili {{count}}",
-    "donors_other": "wafadhili {{count}}",
     "clearSearch": "Futa utafutaji",
     "searching": "Inatafuta…",
     "searchResultsCount_one": "tokeo {{count}}",
