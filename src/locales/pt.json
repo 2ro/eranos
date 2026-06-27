@@ -1371,7 +1371,6 @@
         "title": "A Venezuela precisa de <0>você</0>",
         "body": "Um forte terremoto atingiu o norte da Venezuela, castigando com mais força Caracas e La Guaira. As famílias de lá não conseguem superar isso sozinhas. Sua doação vai diretamente para as campanhas de ajuda no local, transformando hoje a sua compaixão em abrigo, comida e esperança.",
         "donate": "Doar para a ajuda",
-        "startCampaign": "Arrecadar fundos para a Venezuela",
         "credit": "Fotos de Caracas, Venezuela. (AP; AFP via Getty Images)",
         "share": "Compartilhar",
         "shareTitle": "Ajuda às vítimas do terremoto na Venezuela no Agora",
@@ -1383,7 +1382,9 @@
         "pageEyebrow": "Apelo de emergência",
         "pageHow": "Como sua doação ajuda",
         "pageHowBody": "O Agora é não custodial: seu Bitcoin vai direto da sua carteira para o endereço de uma campanha de ajuda. Nenhuma plataforma fica com uma parte, nenhum custodiante segura os fundos e ninguém precisa de permissão para doar ou receber. Cada campanha abaixo é conduzida por pessoas que respondem ao terremoto no local.",
-        "goalOf": "de {{amount}} da meta"
+        "showcaseTitle": "Campanhas de ajuda",
+        "campaignCount_one": "{{count}} campanha de ajuda",
+        "campaignCount_other": "{{count}} campanhas de ajuda"
       },
       "whyDifferent": {
         "eyebrow": "Por que o {{appName}}",

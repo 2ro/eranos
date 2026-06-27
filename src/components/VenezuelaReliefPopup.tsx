@@ -17,7 +17,6 @@ import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
 import { shareOrCopy } from '@/lib/share';
 import {
-  VENEZUELA_DONATE_PATH,
   VENEZUELA_RELIEF_IMAGES,
   VENEZUELA_RELIEF_PATH,
   VENEZUELA_RELIEF_POPUP_SEEN_KEY,
@@ -129,7 +128,7 @@ export function VenezuelaReliefPopup() {
 
           <DialogFooter className="mt-5 sm:flex-row sm:justify-start sm:gap-2">
             <Button asChild className="rounded-full font-semibold [&_svg]:size-[18px]">
-              <Link to={VENEZUELA_DONATE_PATH} onClick={() => setOpen(false)}>
+              <Link to={VENEZUELA_RELIEF_PATH} onClick={() => setOpen(false)}>
                 <HeartHandshake className="mr-2" />
                 {t('campaigns.home.venezuelaRelief.donate')}
               </Link>

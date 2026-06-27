@@ -1375,7 +1375,6 @@
         "title": "Venezuela <0>inakuhitaji</0>",
         "body": "Tetemeko kubwa la ardhi limeikumba kaskazini mwa Venezuela, likiathiri vibaya zaidi maeneo ya Caracas na La Guaira. Familia zilizoko huko haziwezi kupita katika dhiki hii peke yao. Mchango wako unawafikia moja kwa moja wahanga kupitia kampeni za misaada zilizoko eneo la tukio, ukigeuza huruma yako kuwa makao, chakula, na matumaini leo.",
         "donate": "Changia misaada",
-        "startCampaign": "Changisha fedha kwa ajili ya Venezuela",
         "credit": "Picha: wakazi wakikumbatiana karibu na jengo lililoporomoka mjini Caracas. (AFP via Getty Images)",
         "share": "Shiriki",
         "shareTitle": "Misaada ya tetemeko la ardhi la Venezuela kwenye Agora",
@@ -1387,7 +1386,9 @@
         "pageEyebrow": "Wito wa dharura",
         "pageHow": "Jinsi mchango wako unavyosaidia",
         "pageHowBody": "Agora haitunzi fedha: Bitcoin yako huenda moja kwa moja kutoka kwenye pochi yako hadi anwani ya kampeni ya misaada. Hakuna jukwaa linalochukua sehemu, hakuna mtunzaji anayeshikilia fedha, na hakuna mtu anayehitaji ruhusa kutoa au kupokea. Kila kampeni iliyo hapa chini inaendeshwa na watu wanaokabiliana na tetemeko hili eneo la tukio.",
-        "goalOf": "kati ya lengo la {{amount}}"
+        "showcaseTitle": "Kampeni za misaada",
+        "campaignCount_one": "Kampeni {{count}} ya misaada",
+        "campaignCount_other": "Kampeni {{count}} za misaada"
       },
       "whyDifferent": {
         "eyebrow": "Kwa nini {{appName}}",

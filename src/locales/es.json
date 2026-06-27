@@ -929,7 +929,6 @@
         "title": "Venezuela <0>te</0> necesita",
         "body": "Un fuerte terremoto ha sacudido el norte de Venezuela, golpeando con mayor dureza a Caracas y La Guaira. Las familias de allí no pueden salir adelante solas. Tu donación va directa a las campañas de ayuda sobre el terreno, transformando hoy mismo tu compasión en refugio, alimento y esperanza.",
         "donate": "Donar a la ayuda",
-        "startCampaign": "Recauda fondos para Venezuela",
         "credit": "Fotos de Caracas, Venezuela. (AP; AFP vía Getty Images)",
         "share": "Compartir",
         "shareTitle": "Ayuda para el terremoto de Venezuela en Agora",
@@ -941,7 +940,9 @@
         "pageEyebrow": "Llamado de emergencia",
         "pageHow": "Cómo ayuda tu donación",
         "pageHowBody": "Agora no custodia los fondos: tu Bitcoin va directo desde tu monedero a la dirección de una campaña de ayuda. Ninguna plataforma se lleva una comisión, ningún custodio retiene los fondos y nadie necesita permiso para dar o recibir. Cada campaña a continuación está gestionada por personas que responden al terremoto sobre el terreno.",
-        "goalOf": "de {{amount}} objetivo"
+        "showcaseTitle": "Campañas de ayuda",
+        "campaignCount_one": "{{count}} campaña de ayuda",
+        "campaignCount_other": "{{count}} campañas de ayuda"
       },
       "whyDifferent": {
         "eyebrow": "Por qué {{appName}}",

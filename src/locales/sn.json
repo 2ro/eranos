@@ -929,7 +929,6 @@
         "title": "Venezuela <0>inokuda</0>",
         "body": "Kudengenyeka kwenyika kune simba kwakarova kuchamhembe kweVenezuela, kuchikuvadza Caracas neLa Guaira zvakanyanya. Mhuri dziri ikoko hadzigoni kupfuura mudambudziko iri dzega. Chipo chako chinonanga kumishandirapamwe yekubatsira iri panzvimbo, ichishandura tsitsi dzako kuva pekugara, chikafu, netariro nhasi.",
         "donate": "Ipa kubatsira",
-        "startCampaign": "Unganidza mari yeVenezuela",
         "credit": "Mufananidzo: vagari vachimbundirana pedyo nechivako chakawira muCaracas. (AFP via Getty Images)",
         "share": "Govera",
         "shareTitle": "Rubatsiro rwekudengenyeka kweVenezuela paAgora",
@@ -940,8 +939,10 @@
         "seoDescription": "Kudengenyeka kwenyika kune simba kwakarova kuchamhembe kweVenezuela. Ipa Bitcoin yakananga kumishandirapamwe yekubatsira iri panzvimbo paAgora. Hapana puratifomu, hapana muchengeti, hapana mvumo inodiwa.",
         "pageEyebrow": "Chikumbiro chekukurumidza",
         "pageHow": "Kuti chipo chako chinobatsira sei",
-         "pageHowBody": "Agora haichengeti mari: Bitcoin yako inonanga kubva muwallet yako kuenda kukero yemushandirapamwe wekubatsira. Hapana puratifomu inotora chikamu, hapana muchengeti anobata mari, uye hapana anoda mvumo yokupa kana kugamuchira. Mushandirapamwe wose uri pasi apa unotungamirirwa nevanhu vari kupindura kudengenyeka iri panzvimbo.",
-        "goalOf": "kubva pa{{amount}} chinangwa"
+          "pageHowBody": "Agora haichengeti mari: Bitcoin yako inonanga kubva muwallet yako kuenda kukero yemushandirapamwe wekubatsira. Hapana puratifomu inotora chikamu, hapana muchengeti anobata mari, uye hapana anoda mvumo yokupa kana kugamuchira. Mushandirapamwe wose uri pasi apa unotungamirirwa nevanhu vari kupindura kudengenyeka iri panzvimbo.",
+        "showcaseTitle": "Mishandirapamwe yekubatsira",
+        "campaignCount_one": "{{count}} mushandirapamwe wekubatsira",
+        "campaignCount_other": "Mishandirapamwe yekubatsira {{count}}"
       },
       "whyDifferent": {
         "eyebrow": "Sei {{appName}}",

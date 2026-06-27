@@ -929,7 +929,6 @@
         "title": "委内瑞拉需要<0>你</0>",
         "body": "一场强烈地震袭击了委内瑞拉北部,Caracas 与 La Guaira 受灾最为严重。那里的家庭无法独自挺过这一切。你的捐款将直接送达灾区一线的救援活动,把你的善意化作今天的栖身之所、食物与希望。",
         "donate": "为救援捐款",
-        "startCampaign": "为委内瑞拉筹款",
         "credit": "图片:居民在 Caracas 一栋倒塌建筑附近相拥。(AFP via Getty Images)",
         "share": "分享",
         "shareTitle": "在 Agora 上支援委内瑞拉地震救援",
@@ -941,7 +940,9 @@
         "pageEyebrow": "紧急呼吁",
         "pageHow": "你的捐款如何帮助灾区",
          "pageHowBody": "Agora 是非托管的:你的 Bitcoin 从你的钱包直接送达救援活动的地址。没有平台抽成,没有托管方掌控资金,无论是给予还是接收都无需任何许可。下方的每一个活动都由在灾区一线响应地震的人们运作。",
-        "goalOf": "目标 {{amount}}"
+        "showcaseTitle": "救援活动",
+        "campaignCount_one": "{{count}} 个救援活动",
+        "campaignCount_other": "{{count}} 个救援活动"
       },
       "whyDifferent": {
         "eyebrow": "为什么选 {{appName}}",

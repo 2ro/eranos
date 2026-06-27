@@ -1375,7 +1375,6 @@
         "title": "Venezuela membutuhkan <0>Anda</0>",
         "body": "Gempa bumi dahsyat telah mengguncang Venezuela bagian utara, dengan dampak terparah di Caracas dan La Guaira. Keluarga-keluarga di sana tidak bisa melewati cobaan ini sendirian. Donasi Anda langsung mengalir ke kampanye bantuan di lapangan, mengubah belas kasih Anda menjadi tempat berlindung, makanan, dan harapan hari ini.",
         "donate": "Donasi untuk bantuan",
-        "startCampaign": "Galang dana untuk Venezuela",
         "credit": "Foto dari Caracas, Venezuela. (AP; AFP via Getty Images)",
         "share": "Bagikan",
         "shareTitle": "Bantuan gempa Venezuela di Agora",
@@ -1387,7 +1386,9 @@
         "pageEyebrow": "Seruan darurat",
         "pageHow": "Bagaimana donasi Anda membantu",
         "pageHowBody": "Agora bersifat non-kustodial: Bitcoin Anda langsung mengalir dari dompet Anda ke alamat kampanye bantuan. Tidak ada platform yang mengambil potongan, tidak ada kustodian yang menahan dana, dan tidak ada yang perlu izin untuk memberi atau menerima. Setiap kampanye di bawah ini dijalankan oleh orang-orang yang merespons gempa di lapangan.",
-        "goalOf": "dari target {{amount}}"
+        "showcaseTitle": "Kampanye bantuan",
+        "campaignCount_one": "{{count}} kampanye bantuan",
+        "campaignCount_other": "{{count}} kampanye bantuan"
       },
       "whyDifferent": {
         "eyebrow": "Mengapa {{appName}}",

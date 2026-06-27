@@ -69,8 +69,17 @@ export function parseCampaignEvents(
 interface UseCampaignsOptions {
   /** Optional ISO 3166-1 alpha-2 country filter (`i` tag). */
   countryCode?: string;
+  /**
+   * Optional category `t`-tag filter. When set, only campaigns carrying at
+   * least one of these slugs are returned (relay-side set membership via
+   * the indexed `#t` filter). Combined with {@link countryCode} as a
+   * logical AND at the relay.
+   */
+  categories?: string[];
   /** Maximum number of events to fetch from relays. Default: 60. */
   limit?: number;
+  /** Only return campaigns created at or after this Unix timestamp (seconds). */
+  since?: number;
   /** Authors to fetch from, e.g. for a profile's campaigns. */
   authors?: string[];
   /** Disable the query while dependent state is unresolved. */
@@ -111,7 +120,9 @@ export function useCampaigns(options: UseCampaignsOptions = {}) {
   const { nostr } = useNostr();
   const {
     countryCode,
+    categories,
     limit = 60,
+    since,
     authors,
     coordinates,
     enabled = true,
@@ -120,16 +131,21 @@ export function useCampaigns(options: UseCampaignsOptions = {}) {
   // Stable cache key for the coordinates option; sort so order doesn't
   // change the query identity.
   const coordinatesKey = coordinates ? [...coordinates].sort().join(',') : undefined;
+  // Stable cache key for the categories option, order-independent.
+  const categoriesKey = categories ? [...categories].sort().join(',') : undefined;
 
   return useQuery({
     queryKey: [
       'campaigns',
-      { countryCode, limit, authors, coordinatesKey },
+      { countryCode, categoriesKey, limit, since, authors, coordinatesKey },
     ],
     enabled,
     queryFn: async (c) => {
       // Sentinel: empty allowlist = empty result. Skip the relay entirely.
       if (coordinates && coordinates.length === 0) return [] as ParsedCampaign[];
+
+      const categoryFilter =
+        categories && categories.length > 0 ? categories : undefined;
 
       // Build the relay filter(s). When `coordinates` is set, we fan out into
       // one filter per author so we can use the indexed `#d` filter cheaply;
@@ -154,11 +170,15 @@ export function useCampaigns(options: UseCampaignsOptions = {}) {
         filters = Array.from(byAuthor, ([author, dTags]) => {
           const f: NostrFilter = { kinds: [CAMPAIGN_KIND], authors: [author], '#d': dTags };
           if (countryCode) f['#i'] = [createCountryIdentifier(countryCode)];
+          if (categoryFilter) f['#t'] = categoryFilter;
+          if (since !== undefined) f.since = since;
           return f;
         });
       } else {
         const filter: NostrFilter = { kinds: [CAMPAIGN_KIND], limit };
         if (countryCode) filter['#i'] = [createCountryIdentifier(countryCode)];
+        if (categoryFilter) filter['#t'] = categoryFilter;
+        if (since !== undefined) filter.since = since;
         if (authors && authors.length > 0) filter.authors = authors;
         filters = [filter];
       }

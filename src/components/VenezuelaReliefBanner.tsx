@@ -5,11 +5,11 @@ import { HeartHandshake, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { HeroBanner } from '@/components/HeroBanner';
 import { VenezuelaReliefGoal } from '@/components/VenezuelaReliefGoal';
+import { VenezuelaReliefShowcase } from '@/components/VenezuelaReliefShowcase';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
 import { shareOrCopy } from '@/lib/share';
 import {
-  VENEZUELA_DONATE_PATH,
   VENEZUELA_RELIEF_IMAGES,
   VENEZUELA_RELIEF_PATH,
 } from '@/lib/venezuelaRelief';
@@ -40,9 +40,13 @@ const VENEZUELA_RELIEF_BANNER_IMAGES = VENEZUELA_RELIEF_IMAGES;
  *  - A large display headline ("Venezuela needs you") with the final
  *    word painted inside a solid brand-orange highlighter block — the
  *    same idiom as the home hero's "unstoppable".
- *  - A primary call to action — **Donate to relief** — deep-links
- *    straight to the baked-in relief campaign (its naddr) so donors land
- *    on the campaign's detail page, plus a **Share** action.
+ *  - A primary call to action — **Donate to relief** — links to the
+ *    dedicated relief page ({@link VENEZUELA_RELIEF_PATH}), which showcases
+ *    every Venezuela campaign tagged for relief, plus a **Share** action.
+ *
+ * Beneath the hero sits a live showcase rail
+ * ({@link VenezuelaReliefShowcase}) of those same matching campaigns, so
+ * donors can pick a specific effort without leaving the home page.
  *
  * Not dismissible by design — while the appeal is active it stays put
  * for every visitor (product decision). When the response winds down,
@@ -123,12 +127,12 @@ export function VenezuelaReliefBanner({ className }: { className?: string }) {
         }}
       />
 
-      {/* Layer 3 — content. Fills ~85% of the initial viewport so it
-          reads as the headline of the day rather than a sibling band,
-          with a sensible minimum on very short / very tall screens.
+      {/* Layer 3 — content. Sized so the headline + CTAs read as the
+          page's hero while still leaving the showcase rail below partly
+          in view above the fold (no full-viewport gap to scroll past).
           `dvh` so mobile browser chrome (collapsing address bar) doesn't
           jump the height. */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-20 sm:py-28 h-[85dvh] min-h-[520px] max-h-[1200px] flex flex-col justify-center">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-20 sm:py-28 min-h-[560px] sm:min-h-[680px] flex flex-col justify-center">
         <div className="max-w-3xl">
           <h2
             id="venezuela-relief-title"
@@ -165,13 +169,14 @@ export function VenezuelaReliefBanner({ className }: { className?: string }) {
           <VenezuelaReliefGoal variant="overlay" className="mt-7" />
 
           <div className="mt-7 flex flex-col sm:flex-row flex-wrap gap-3">
-            {/* Primary CTA — donate to Venezuela-filtered relief campaigns */}
+            {/* Primary CTA — the dedicated relief page showcasing every
+                Venezuela campaign tagged for relief. */}
             <Button
               size="lg"
               asChild
               className="rounded-full text-white font-semibold text-base h-12 px-7 [&_svg]:size-[18px] motion-safe:transition-colors"
             >
-              <Link to={VENEZUELA_DONATE_PATH}>
+              <Link to={VENEZUELA_RELIEF_PATH}>
                 <HeartHandshake className="mr-2" />
                 {t('campaigns.home.venezuelaRelief.donate')}
               </Link>
@@ -201,6 +206,17 @@ export function VenezuelaReliefBanner({ className }: { className?: string }) {
           >
             {t('campaigns.home.venezuelaRelief.learnMore')}
           </Link>
+        </div>
+      </div>
+
+      {/* Showcase rail — every matching relief campaign, pulled in live so
+          donors can pick a specific effort straight from the home page.
+          Sits on a translucent panel anchored to the bottom of the hero so
+          it reads as part of the appeal, over the photo gallery. Renders
+          nothing until campaigns resolve. */}
+      <div className="relative border-t border-white/10 bg-black/40 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+          <VenezuelaReliefShowcase variant="overlay" />
         </div>
       </div>
     </section>

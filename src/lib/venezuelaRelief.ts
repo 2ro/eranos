@@ -4,38 +4,68 @@
  * Centralised here so the home-page hero ({@link VenezuelaReliefBanner}),
  * the session popup ({@link VenezuelaReliefPopup}), and the dedicated
  * shareable page ({@link VenezuelaReliefPage}) all reference the same
- * route, photo gallery, and deep-link, keeping copy and links in sync.
+ * route, photo gallery, and campaign filter, keeping copy and links in
+ * sync.
+ *
+ * Rather than baking in a single campaign, the appeal now showcases
+ * *every* Venezuela-located campaign tagged for relief (see
+ * {@link VENEZUELA_RELIEF_COUNTRY} + {@link VENEZUELA_RELIEF_CATEGORIES}),
+ * resolved live via `useVenezuelaReliefCampaigns`. The donate CTA on every
+ * surface points at the dedicated relief page, which shows the full
+ * showcase.
  *
  * When the relief response winds down, removing the popup mount in
- * `App.tsx`, the `<VenezuelaReliefBanner />` line in `CampaignsPage`, and
- * the `/venezuela-relief` route in `AppRouter` retires the whole appeal.
+ * `AppRouter.tsx`, the `<VenezuelaReliefBanner />` line in `CampaignsPage`,
+ * and the `/venezuela-relief` route in `AppRouter` retires the whole appeal.
  */
 
 /** Public route for the dedicated relief page (shareable). */
 export const VENEZUELA_RELIEF_PATH = '/venezuela-relief';
 
 /**
- * The specific relief campaign baked into the appeal — `terremoto-venezuela`
- * (kind 33863). The hero, popup, and page resolve this `(pubkey, identifier)`
- * coordinate to surface the campaign's live raised/goal progress, turning
- * each surface into an info + donation hybrid. The donate CTA
- * ({@link VENEZUELA_DONATE_PATH}) deep-links to this same campaign's naddr.
+ * ISO 3166-1 alpha-2 country code the appeal is scoped to. Campaigns are
+ * matched on their NIP-73 `i` tag (`iso3166:VE`); see
+ * {@link createCountryIdentifier}.
  */
-export const VENEZUELA_RELIEF_CAMPAIGN_PUBKEY =
-  '7a303d62d6c9d2f0cabe2ca713a392f3ec4b1fab815ea60b79fe15aca274c71c';
-
-/** The relief campaign's `d` tag (slug). */
-export const VENEZUELA_RELIEF_CAMPAIGN_IDENTIFIER = 'terremoto-venezuela';
+export const VENEZUELA_RELIEF_COUNTRY = 'VE';
 
 /**
- * Deep-link straight to the specific Venezuela earthquake relief campaign
- * (`terremoto-venezuela`, kind 33863). Baked in as the donate CTA target
- * for the hero, popup, and dedicated page so donors land on the campaign's
- * detail page rather than a filtered browse. NIP-19 identifiers route at
- * the URL root (`/:nip19`), handled by `NIP19Page`.
+ * Campaign category `t`-tag slugs that qualify a Venezuela campaign for
+ * the relief showcase. A campaign needs *either* tag (logical OR) — the
+ * relay-indexed `#t` filter is a set-membership match. These slugs come
+ * from the curated picker in {@link CAMPAIGN_CATEGORIES}.
  */
-export const VENEZUELA_DONATE_PATH =
-  '/naddr1qvzqqqyygupzq73s843ddjwj7r9tut98zw3e9ulvfv06hq275c9hnls44j38f3cuqqfhgetjwfjk6mm5dukhvetwv4a82etvvykrc9yj';
+export const VENEZUELA_RELIEF_CATEGORIES: readonly string[] = [
+  'humanitarian-aid',
+  'emergency-relief',
+];
+
+/**
+ * Unix timestamp (seconds) of the Venezuela earthquake. The showcase only
+ * surfaces campaigns *created at or after* this moment — pre-existing
+ * Venezuela humanitarian/relief campaigns aren't part of *this* quake
+ * response and would dilute the appeal. Set to 2026-06-25T00:00:00Z, the
+ * day the response began.
+ */
+export const VENEZUELA_EARTHQUAKE_TIMESTAMP = Math.floor(
+  Date.UTC(2026, 5, 25) / 1000,
+);
+
+/**
+ * Addressable coordinates (`33863:<pubkey>:<d>`) that are always included
+ * in the relief showcase, regardless of whether they match the
+ * country/category/date filter above.
+ *
+ * The flagship `terremoto-venezuela` campaign ("EARTHQUAKE STUDENT RESCUE
+ * BRIGADES") is tagged `emergency-relief` but was published without an
+ * `iso3166:VE` country `i` tag, so the geo filter drops it. Pin it here so
+ * the canonical relief effort always leads the showcase. Coordinates are
+ * de-duplicated against the live query results, so a campaign that *also*
+ * matches the filter won't appear twice.
+ */
+export const VENEZUELA_RELIEF_PINNED_COORDINATES: readonly string[] = [
+  '33863:7a303d62d6c9d2f0cabe2ca713a392f3ec4b1fab815ea60b79fe15aca274c71c:terremoto-venezuela',
+];
 
 /**
  * Ordered set of news photographs from the Venezuela earthquake that
