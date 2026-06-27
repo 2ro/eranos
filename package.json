@@ -1,7 +1,7 @@
 {
   "name": "agora",
   "private": true,
-  "version": "2.9.0",
+  "version": "2.9.1",
   "type": "module",
   "scripts": {
     "dev": "npm i --silent && vite",

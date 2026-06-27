@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.9.1] - 2026-06-27
+
+The Venezuela earthquake relief appeal now rallies behind every campaign on the ground, not just one. The home banner and relief page showcase a live, swipeable carousel of all Venezuelan relief efforts, with a running total of everything raised so far — so you can pick exactly who to help.
+
+### Changed
+
+- The Venezuela relief appeal now showcases every Venezuelan relief campaign in a live, auto-scrolling carousel you can swipe through, with a combined raised total across all of them, instead of featuring a single campaign.
+
 ## [2.9.0] - 2026-06-25
 
 A big one. Private messaging arrives with a fast, searchable inbox you can reply to in your own language. Campaign organizers can now get verified by trusted reviewers through a guided sign-up, and verified badges appear right on campaigns. There's a new Venezuela earthquake relief appeal that takes you straight to donations, plus optional Tor routing on Android, separate Public and Private wallets, faster donation scanning, and refreshed profiles, settings, and login.
