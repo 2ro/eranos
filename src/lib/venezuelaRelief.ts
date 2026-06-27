@@ -23,6 +23,15 @@
 export const VENEZUELA_RELIEF_PATH = '/venezuela-relief';
 
 /**
+ * Absolute URL for the dedicated relief page. Used where an in-app
+ * client-side `<Link>` misbehaves (e.g. the session popup, where the
+ * Radix dialog's click handling swallowed the SPA navigation) — a plain
+ * absolute `href` does a full, reliable navigation to the canonical
+ * production page.
+ */
+export const VENEZUELA_RELIEF_URL = 'https://agora.spot/venezuela-relief';
+
+/**
  * ISO 3166-1 alpha-2 country code the appeal is scoped to. Campaigns are
  * matched on their NIP-73 `i` tag (`iso3166:VE`); see
  * {@link createCountryIdentifier}.

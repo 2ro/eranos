@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { HeartHandshake, Share2 } from 'lucide-react';
 
@@ -19,6 +18,7 @@ import { shareOrCopy } from '@/lib/share';
 import {
   VENEZUELA_RELIEF_IMAGES,
   VENEZUELA_RELIEF_PATH,
+  VENEZUELA_RELIEF_URL,
   VENEZUELA_RELIEF_POPUP_SEEN_KEY,
 } from '@/lib/venezuelaRelief';
 
@@ -128,10 +128,10 @@ export function VenezuelaReliefPopup() {
 
           <DialogFooter className="mt-5 sm:flex-row sm:justify-start sm:gap-2">
             <Button asChild className="rounded-full font-semibold [&_svg]:size-[18px]">
-              <Link to={VENEZUELA_RELIEF_PATH} onClick={() => setOpen(false)}>
+              <a href={VENEZUELA_RELIEF_URL} onClick={() => setOpen(false)}>
                 <HeartHandshake className="mr-2" />
                 {t('campaigns.home.venezuelaRelief.donate')}
-              </Link>
+              </a>
             </Button>
             <Button
               variant="outline"
@@ -143,13 +143,13 @@ export function VenezuelaReliefPopup() {
             </Button>
           </DialogFooter>
 
-          <Link
-            to={VENEZUELA_RELIEF_PATH}
+          <a
+            href={VENEZUELA_RELIEF_URL}
             onClick={() => setOpen(false)}
             className="mt-3 inline-block text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80"
           >
             {t('campaigns.home.venezuelaRelief.learnMore')}
-          </Link>
+          </a>
         </div>
       </DialogContent>
     </Dialog>
