@@ -48,11 +48,12 @@ TMPDIR=$(mktemp -d)
 LOGO_WHITE_SVG="$TMPDIR/logo_white.svg"
 LOGO_WHITE="$TMPDIR/logo_white.png"
 
-# Recolor the SVG fill to white before rasterizing. logo.svg declares the
-# glyph with fill="black", so recolor both the attribute form and any hex.
+# Recolor the SVG fill to white before rasterizing. The phoenix logo.svg
+# declares fill="#fcd414"; older sources used black/purple, kept for safety.
 sed -e 's/fill="black"/fill="#ffffff"/g' \
     -e 's/#000000/#ffffff/g' \
-    -e 's/#7c52e0/#ffffff/g' "$SOURCE_SVG" > "$LOGO_WHITE_SVG"
+    -e 's/#7c52e0/#ffffff/g' \
+    -e 's/#fcd414/#ffffff/g' "$SOURCE_SVG" > "$LOGO_WHITE_SVG"
 
 echo "Rendering white SVG (preserving aspect ratio)..."
 
@@ -132,6 +133,9 @@ make_legacy_square 72  android/app/src/main/res/mipmap-hdpi/ic_launcher.png
 make_legacy_square 96  android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
 make_legacy_square 144 android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
 make_legacy_square 192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+# Web logo.png (AppDownloadNudge) uses the same round brand-mark style.
+make_legacy_round 512 public/logo.png
 
 make_legacy_round 48  android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
 make_legacy_round 72  android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png

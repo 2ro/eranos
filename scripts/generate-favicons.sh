@@ -55,16 +55,17 @@ COLORED_SVG="$TMPDIR/logo_colored.svg"
 RAW_PNG="$TMPDIR/raw.png"
 MASTER_PNG="$TMPDIR/master.png"
 
-# Recolor the SVG's black fill to the brand color, on transparent background.
+# The phoenix logo.svg carries its own brand yellow (#fcd414); the sed only
+# recolors legacy black-fill sources, so it's a no-op for the phoenix.
 sed 's/fill="black"/fill="'"$LOGO_COLOR"'"/g' "$SOURCE_SVG" > "$COLORED_SVG"
 
-# The SVG's viewBox is 720x880 (taller than wide). Render at its native
-# aspect ratio first so we don't squish the logo horizontally.
+# The SVG's viewBox is 1446x1246 (wider than tall). Render at its native
+# aspect ratio first so we don't squish the logo vertically.
 MASTER_BOX=512        # final square canvas size
-MASTER_H=$MASTER_BOX  # render the longer side at full size
-MASTER_W=$(( MASTER_BOX * 720 / 880 ))  # preserve 720:880 aspect
+MASTER_W=$MASTER_BOX  # render the longer side at full size
+MASTER_H=$(( MASTER_BOX * 1246 / 1446 ))  # preserve 1446:1246 aspect
 
-echo "Rendering ${MASTER_W}x${MASTER_H} from $SOURCE_SVG (preserving 720:880 aspect)..."
+echo "Rendering ${MASTER_W}x${MASTER_H} from $SOURCE_SVG (preserving 1446:1246 aspect)..."
 if [ "$SVG_RENDERER" = "inkscape" ]; then
     inkscape --export-type=png --export-filename="$RAW_PNG" \
         -w "$MASTER_W" -h "$MASTER_H" --export-background-opacity=0 \
