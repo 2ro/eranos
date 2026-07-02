@@ -1008,7 +1008,7 @@ function SearchInput({
 /** Agora tab — isolated component so useStreamPosts only subscribes when active.
  *  Pins kinds to [33863 Campaigns, 36639 Pledges, 34550 Groups/Communities] —
  *  the non-kind-1 Agora content stream — and narrows to events whose NIP-89
- *  `client` tag is the running app name (e.g. "Agora"). Kind 1 posts and the
+ *  `client` tag is the running app name (e.g. "Eranos"). Kind 1 posts and the
  *  unconstrained Nostr firehose live on the Nostr tab instead. */
 function AgoraSearchTab({
   searchQuery,

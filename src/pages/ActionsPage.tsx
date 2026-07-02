@@ -16,7 +16,6 @@ import { useActions, type Action } from '@/hooks/useActions';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { usePledgeModeration } from '@/hooks/usePledgeModeration';
 import { getGeoDisplayName } from '@/lib/countries';
 import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
@@ -49,7 +48,6 @@ export default function ActionsPage() {
   const { t } = useTranslation();
   const { config } = useAppContext();
   const { user } = useCurrentUser();
-  const { data: btcPrice } = useBtcPrice();
   const navigate = useNavigate();
 
   // Mirror the section's `?country=` so the create-pledge href can
@@ -138,7 +136,6 @@ export default function ActionsPage() {
               visible={DEFAULT_VISIBLE}
               showAll={showAllMine}
               onToggle={() => setShowAllMine(!showAllMine)}
-              btcPrice={btcPrice}
             />
           </section>
         )}
@@ -177,7 +174,6 @@ export default function ActionsPage() {
                 <PledgeCard
                   key={`${action.pubkey}:${action.id}`}
                   action={action}
-                  btcPrice={btcPrice}
                   showAuthor
                   showTranslate
                   topRight={
@@ -327,8 +323,8 @@ function ActionsHero({ actionCount, canCreate, onCreateAction }: ActionsHeroProp
               'bg-gradient-to-br from-white/14 via-amber-100/10 to-rose-100/10 hover:from-white/20 hover:via-amber-100/14 hover:to-rose-100/14',
               'backdrop-blur-xl backdrop-saturate-150',
               'border border-white/25 hover:border-white/35',
-              'shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08),0_10px_28px_-12px_hsl(24_85%_45%/0.4)]',
-              'hover:shadow-[inset_0_0_0_1px_rgb(255_255_255/0.12),0_12px_32px_-10px_hsl(24_85%_45%/0.5)]',
+              'shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08),0_10px_28px_-12px_hsl(40_85%_45%/0.4)]',
+              'hover:shadow-[inset_0_0_0_1px_rgb(255_255_255/0.12),0_12px_32px_-10px_hsl(40_85%_45%/0.5)]',
               'motion-safe:transition-colors motion-safe:duration-200',
               'disabled:opacity-60 disabled:cursor-not-allowed',
             )}
@@ -353,14 +349,12 @@ function ActionSection({
   visible,
   showAll,
   onToggle,
-  btcPrice,
 }: {
   items: Action[];
   total: number;
   visible: number;
   showAll: boolean;
   onToggle: () => void;
-  btcPrice: number | undefined;
 }) {
   const { t } = useTranslation();
   return (
@@ -370,7 +364,6 @@ function ActionSection({
           <PledgeCard
             key={`${action.pubkey}:${action.id}`}
             action={action}
-            btcPrice={btcPrice}
             showAuthor
             showTranslate
             topRight={

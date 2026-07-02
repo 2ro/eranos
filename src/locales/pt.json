@@ -77,7 +77,6 @@
     "language": "Idioma",
     "dashboard": "Painel",
     "myDashboard": "Meu painel",
-    "wallet": "Carteira",
     "notifications": "Notificações",
     "messages": "Mensagens",
     "profile": "Perfil",
@@ -119,7 +118,7 @@
     "showAllConversations": "Mostrar todas as conversas",
     "friendsEmpty": "Não há mensagens de pessoas que você segue.",
     "translateDialogTitle": "Traduzir mensagens privadas?",
-    "translateDialogDescription": "As mensagens recebidas serão enviadas ao serviço de tradução configurado. As mensagens enviadas não serão traduzidas. O Agora lembrará esta escolha neste dispositivo.",
+    "translateDialogDescription": "As mensagens recebidas serão enviadas ao serviço de tradução configurado. As mensagens enviadas não serão traduzidas. O Eranos lembrará esta escolha neste dispositivo.",
     "confirmTranslate": "Traduzir mensagens",
     "newMessage": "Nova mensagem",
     "newMessageTitle": "Nova mensagem",
@@ -199,7 +198,7 @@
     "secure": {
       "title": "Salve sua chave",
       "subtitle": "Baixe o arquivo e guarde em um lugar seguro. Um gerenciador de senhas funciona bem.",
-      "couplingNote": "Sua conta e sua carteira compartilham esta chave. Ela assina suas publicações no Nostr e abre sua carteira Bitcoin no Agora.",
+      "couplingNote": "Sua conta e sua carteira compartilham esta chave. Ela assina suas publicações no Nostr e abre sua carteira Bitcoin no Eranos.",
       "permanenceHeadline": "Não há como recuperar esta chave se você perdê-la.",
       "permanenceBody": "Sem redefinição, sem suporte, sem recuperação por e-mail. Salve-a antes de continuar.",
       "button": "Baixar e continuar",
@@ -278,19 +277,19 @@
       "global": "Global"
     },
     "empty": {
-      "homeAgora": "Momento tranquilo no Agora. Novas campanhas, promessas, doações e publicações aparecerão aqui conforme acontecerem.",
-      "homeFollowingLoggedIn": "Seu feed de seguidos está vazio. Siga algumas pessoas para ver o que estão fazendo, ou mude para Agora ou Global.",
+      "homeAgora": "Momento tranquilo no Eranos. Novas campanhas, promessas, doações e publicações aparecerão aqui conforme acontecerem.",
+      "homeFollowingLoggedIn": "Seu feed de seguidos está vazio. Siga algumas pessoas para ver o que estão fazendo, ou mude para Eranos ou Global.",
       "homeFollowingLoggedOut": "Faça login para ver publicações das pessoas que você segue.",
       "homeOther": "Nada para mostrar. Verifique suas conexões de relays ou tente novamente em instantes.",
       "follows": "Seu feed está vazio. Siga algumas pessoas para ver suas publicações aqui.",
       "global": "Nenhuma publicação encontrada. Verifique suas conexões de relays ou volte em breve.",
-      "browseAgora": "Navegar pelo feed Agora",
+      "browseAgora": "Navegar pelo feed Eranos",
       "browseGlobal": "Navegar pelo feed Global",
       "discoverPeople": "Descobrir pessoas para seguir",
       "logIn": "Entrar"
     },
     "modeSwitcher": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "allNostr": "Global",
       "following": "Seguindo",
       "ariaLabel": "Modo do feed: {{label}}. Clique para alterar.",
@@ -307,7 +306,6 @@
       "repost": "Repostar",
       "undoRepost": "Desfazer repost",
       "react": "Reagir",
-      "zap": "Zap",
       "share": "Compartilhar",
       "more": "Mais",
       "linkCopied": "Link copiado para a área de transferência"
@@ -416,12 +414,6 @@
     "reacted": "reagiu",
     "reposted": "repostou",
     "voted": "votou",
-    "zap": {
-      "donatedTo": "Doou para",
-      "donatedAmountTo": "Doou {{amount}} para",
-      "sat_one": "{{formattedCount}} sat",
-      "sat_other": "{{formattedCount}} sats"
-    },
     "stream": {
       "untitled": "Transmissão sem título",
       "live": "AO VIVO",
@@ -492,7 +484,6 @@
       "nsiteDeployed": "publicou um",
       "nsiteRedeployed": "republicou um",
       "nsiteNoun": "nsite",
-      "zapped": "zapeou",
       "pledgeCreated": "criou uma",
       "pledgeUpdated": "atualizou uma",
       "pledgeNoun": "promessa",
@@ -662,60 +653,12 @@
         "body": "Os fundos chegam ao beneficiário diretamente. Ele mantém a custódia, mantém o controle. Mova, troque ou gaste; os guias abaixo explicam como fazer isso de forma privada e segura."
       }
     },
-    "twoWays": {
-      "eyebrow": "Bitcoin · Um QR, duas opções",
-      "title": "Duas formas de receber.",
-      "lede": "Ambas as opções são Bitcoin. A diferença é o que você troca por privacidade. Quando um beneficiário cria uma campanha, escolhe quais opções aceitar. Se ambas, a página de doação mostra um único QR code que funciona em qualquer carteira.",
-      "public": {
-        "kicker": "Pagamentos Bitcoin Públicos",
-        "tagline": "Universal · Rápido · Transparente",
-        "title": "Funciona com toda carteira na terra.",
-        "description": "Doações chegam em um endereço Bitcoin comum que o beneficiário controla. Qualquer pessoa com qualquer carteira Bitcoin pode enviar. Sem novo aplicativo, sem nova conta, sem curva de aprendizado.",
-        "bullet1": "Funciona em todas as carteiras Bitcoin: Cash App, Coinbase, Strike, hardware",
-        "bullet2": "Liquidação mais rápida: apenas confirmações Bitcoin",
-        "bullet3": "Verificável on-chain: qualquer um pode ver o que um beneficiário recebeu",
-        "tradeoffTitle": "Trade-off: público on-chain.",
-        "tradeoffIntro": "Cada doação é pública na blockchain do Bitcoin e no Nostr. O {{appName}} é recomendado apenas para campanhas abertas. Se você ou seus doadores precisam de privacidade extrema, inclusive contra atores estatais, leia o <0>Guia do Doador</0> e o <1>Guia do Beneficiário</1> antes de participar."
-      },
-      "silent": {
-        "kicker": "Pagamentos Bitcoin Silenciosos",
-        "tagline": "Inrastreáveis · Diretos · BIP-352",
-        "title": "Inrastreáveis, on-chain, diretos.",
-        "description": "Doações são enviadas como pagamentos silenciosos BIP-352. Cada uma chega em uma nova saída Bitcoin inrastreável que um observador olhando para a blockchain não consegue conectar à campanha.",
-        "bullet1": "O rastro de doação não pode ser reconstruído on-chain",
-        "bullet2": "Protege beneficiários que enfrentam adversários sérios",
-        "bullet3": "Mantido em um saldo privado separado, nunca misturado com fundos públicos",
-        "tradeoffTitle": "Trade-off: pagamentos silenciosos são recentes.",
-        "tradeoffIntro": "A forma mais privada de receber Bitcoin on-chain, mas o ecossistema é jovem e instável hoje:",
-        "tradeoffBullet1": "Poucas carteiras o suportam.",
-        "tradeoffBullet2": "O recebimento é lento.",
-        "tradeoffBullet3": "Sem notificações push.",
-        "tradeoffBullet4": "Carteiras ainda têm bugs.",
-        "tradeoffBullet5": "Contagem de doações não é pública."
-      },
-      "noCustody": {
-        "title": "Sem custódia. Sem intermediário.",
-        "body": "O {{appName}} nunca detém fundos. Doações movem-se de carteira para carteira no Bitcoin. Não há servidor entre doador e beneficiário em nenhuma das opções. Se o {{appName}} desaparecesse amanhã, toda campanha continuaria funcionando.",
-        "gofundme": {
-          "heading": "Diferente do GoFundMe",
-          "body": "Nenhuma plataforma pode congelar suas doações, exigir reembolsos ou encerrar sua campanha por divergências de política."
-        },
-        "givesendgo": {
-          "heading": "Diferente do GiveSendGo",
-          "body": "Nenhum processador de pagamento fica no meio, então nem Stripe, nem Visa, nem banco pode te cortar no meio da campanha."
-        },
-        "otherBitcoin": {
-          "heading": "Diferente de outras plataformas 'Bitcoin'",
-          "body": "Sem nó Lightning central, custodiante ou LSP para falhar ou ficar offline. Os fundos são liquidados diretamente on-chain para uma carteira que você controla."
-        }
-      }
-    },
     "faq": {
       "eyebrow": "Perguntas",
       "title": "Perguntas frequentes.",
       "chapter1": {
         "label": "Começando",
-        "description": "O que é o Agora, quem o construiu e quanto custa."
+        "description": "O que é o Eranos, quem o construiu e quanto custa."
       },
       "chapter2": {
         "label": "Doações em Bitcoin",
@@ -723,7 +666,7 @@
       },
       "chapter3": {
         "label": "Sobre o Nostr",
-        "description": "O protocolo aberto sobre o qual o Agora é construído, e como sua conta funciona."
+        "description": "O protocolo aberto sobre o qual o Eranos é construído, e como sua conta funciona."
       }
     },
     "guides": {
@@ -737,7 +680,6 @@
         "description": "Envie Bitcoin diretamente para beneficiários e movimentos em qualquer lugar do mundo, sem pedir permissão a um processador de pagamento.",
         "bullet1": "Use qualquer carteira Bitcoin que você já tem.",
         "bullet2": "Doações chegam diretamente ao beneficiário. Sem custodiante, sem intermediário.",
-        "bullet3": "Para privacidade, use uma carteira que suporte pagamentos silenciosos.",
         "cta": "Ler o Guia do Doador"
       },
       "recipient": {
@@ -746,8 +688,6 @@
         "title": "Seja financiado sem permissão.",
         "description": "Receba apoio direto de pessoas que acreditam na sua causa. Sem conta bancária, sem formulário de solicitação, sem empresa no meio.",
         "bullet1": "Comece a receber doações assim que se cadastrar.",
-        "bullet2": "Escolha quais tipos de pagamento aceitar: público, pagamentos silenciosos ou ambos.",
-        "bullet3": "Para saque privado, envie primeiro para uma carteira de pagamentos silenciosos, depois encaminhe para qualquer lugar.",
         "cta": "Ler o Guia do Beneficiário"
       },
       "stillStuck": "Ainda travado?",
@@ -924,7 +864,6 @@
       "noSubmissionsHint": "Seja o primeiro a responder com provas, evidências ou trabalho concluído.",
       "funded": "financiado",
       "ofPledged": "de {{amount}} prometidos",
-      "trustNote": "Esta promessa é baseada em confiança. O progresso do financiamento soma zaps e recibos de doação em submissões de nível superior.",
       "share": "Compartilhar",
       "storyHeading": "A promessa",
       "storyEmpty": "O autor ainda não escreveu detalhes para esta promessa."
@@ -1086,32 +1025,6 @@
     "headingEdit": "Editar campanha",
     "title": "Título",
     "titlePlaceholder": "Salvar a Última Livraria",
-    "wallet": "Carteira Bitcoin",
-    "myWalletLabel": "Carteira de {{name}}",
-    "myWalletDefault": "Minha carteira",
-    "walletHeroNote": "As doações vão direto para a sua própria carteira Agora.\nSem intermediários.",
-    "walletHeroReassurance": "Você guarda a chave, então você guarda os fundos. Saque a qualquer momento na aba da carteira.",
-    "walletChoose": "Escolher uma carteira",
-    "walletCustom": "Personalizada",
-    "walletUseCustom": "Usar uma carteira personalizada",
-    "walletUseMine": "Usar minha carteira Agora",
-    "acceptHeading": "Quais doações você vai aceitar?",
-    "acceptUnavailable": "Não disponível com este login.",
-    "acceptAllTitle": "Qualquer doação",
-    "acceptPublicTitle": "Somente doações públicas",
-    "acceptPrivateTitle": "Somente doações privadas",
-    "acceptAllHint": "Receber doações tanto públicas quanto privadas.",
-    "acceptPublicHint": "Os doadores enviam para um endereço Bitcoin comum. Essas doações ficam visíveis para qualquer pessoa.",
-    "acceptPrivateHint": "Os doadores enviam de forma privada, então a identidade deles fica oculta do público.",
-    "customWalletIntro": "Preencha as doações que você quiser aceitar: um endereço público, um código privado, ou ambos. Pelo menos um é obrigatório.",
-    "customOnchainMeaning": "Público. Qualquer pessoa pode ver essas doações.",
-    "customSpMeaning": "Privado. A identidade do doador fica oculta.",
-    "bitcoinAddress": "Endereço Bitcoin",
-    "bitcoinAddressPlaceholder": "bc1q… ou bc1p…",
-    "silentPaymentCode": "Código de pagamento silencioso",
-    "silentPaymentCodePlaceholder": "sp1…",
-    "onchainInvalid": "Endereço Bitcoin mainnet não reconhecido (bc1q… / bc1p…).",
-    "spInvalid": "Código de pagamento silencioso BIP-352 não reconhecido (sp1…).",
     "country": "País",
     "countryPlaceholder": "Search countries",
     "tags": "Tags",
@@ -1139,7 +1052,6 @@
     "storyPlaceholder": "Compartilhe o contexto, quem se beneficia e como os fundos serão usados.",
     "goal": "Meta",
     "goalPlaceholder": "25.000",
-    "goalNote": "Dólares americanos inteiros. Doadores pagam em Bitcoin; clientes estimam o equivalente em USD na hora da visualização.",
     "submitCreate": "Lançar campanha",
     "submitEdit": "Atualizar campanha",
     "publishing": "Publicando…",
@@ -1158,24 +1070,14 @@
     "errorTitleRequired": "O título é obrigatório.",
     "errorTitleInvalid": "O título deve incluir letras ou números para que uma URL de campanha possa ser criada.",
     "errorSlugInvalid": "O identificador deve ser composto de letras minúsculas, números e hifens.",
-    "errorHdUnavailable": "A carteira integrada não está disponível para este login.",
-    "errorSpUnavailable": "O endereço de pagamento silencioso não está disponível para este login.",
-    "errorOnchainInvalid": "O endereço on-chain não é um endereço bech32(m) mainnet reconhecido (bc1q… / bc1p…).",
-    "errorSpInvalid": "O código de pagamento silencioso não é um código BIP-352 reconhecido (sp1…).",
-    "errorWalletRequired": "Forneça pelo menos um endpoint de carteira — um endereço Bitcoin mainnet (bc1q… / bc1p…) ou um código de pagamento silencioso (sp1…).",
     "errorGoalInvalid": "A meta deve ser um valor inteiro positivo em dólares.",
     "errorEditLatestMissing": "Não foi possível encontrar a versão mais recente desta campanha para atualizar.",
     "errorSlugCollision": "Você já tem uma campanha com o identificador \"{{slug}}\". Escolha outro.",
     "errorBannerInvalid": "O banner deve ser uma URL https:// válida.",
-    "errorHdDeriveFailed": "Não foi possível derivar um novo endereço on-chain da sua carteira.",
-    "errorHdDeriveInvalid": "O endereço de carteira derivado falhou na validação. Por favor, adicione um endereço personalizado.",
-    "errorWalletRequiredFallback": "Endpoint de carteira é obrigatório.",
     "errorPublishedInvalid": "O evento publicado falhou na validação. Por favor, atualize e tente novamente.",
     "wizard": {
       "titleStepTitle": "Dê um nome à sua campanha",
       "titleStepSubtitle": "Um nome curto e claro que os doadores reconhecerão.",
-      "walletStepTitle": "Para onde vão as doações?",
-      "walletStepSubtitle": "Escolha sua carteira Agora ou cole seu próprio endereço.",
       "bannerStepTitle": "Adicione um banner",
       "bannerStepSubtitle": "Uma imagem marcante representa a campanha em cada card.",
       "storyStepTitle": "Conte sua história",
@@ -1215,43 +1117,15 @@
     "like_one": "<0>{{formattedCount}}</0> Curtida",
     "like_other": "<0>{{formattedCount}}</0> Curtidas",
     "tabComments": "Comentários e doações",
-    "tabLedger": "Livro-razão",
-    "ledger": {
-      "publicAddress": "Endereço público",
-      "viewOnMempool": "Ver no mempool.space",
-      "openOnMempool": "Abrir transação no mempool.space",
-      "received": "Recebido",
-      "sent": "Enviado",
-      "unconfirmed": "Não confirmado",
-      "block": "Bloco {{height}}",
-      "btcUnit": "BTC",
-      "empty": "Ainda não há atividade on-chain para este endereço.",
-      "error": "Não foi possível carregar a atividade on-chain. Tente novamente em instantes.",
-      "loadMore": "Carregar mais",
-      "loadingMore": "Carregando…"
-    },
     "noCommentsTitle": "Nenhum comentário ainda",
     "noCommentsHint": "Seja o primeiro a deixar uma mensagem de apoio.",
     "deleteDialogTitle": "Excluir esta campanha?",
     "deleteDialogBody": "Isso publica uma solicitação de exclusão NIP-09. Relays bem-comportados retirarão a campanha dos feeds e links diretos. Recibos de doações passadas permanecem on-chain de qualquer forma. Esta ação não pode ser desfeita — para continuar aceitando doações, edite a campanha.",
     "storyHeading": "A história",
-    "donate": "Doar",
     "share": "Compartilhar",
     "target": "Meta: {{amount}}",
     "raised": "arrecadados",
-    "ofGoal": "da meta de {{amount}}",
-    "donationCount_one": "{{count}} doação",
-    "donationCount_other": "{{count}} doações",
-    "openInWallet": "Abrir na carteira",
-    "payWithAgoraWallet": "Pagar com Agora",
-    "openExternalWallet": "Abrir carteira externa"
-  },
-  "noBitcoin": {
-    "trigger": "Não tem Bitcoin?",
-    "title": "Ainda não tem Bitcoin?",
-    "description": "Compre Bitcoin no Cash App e depois envie para esta campanha.",
-    "getItOn": "Baixe no",
-    "getCashApp": "Obter Cash App"
+    "ofGoal": "da meta de {{amount}}"
   },
   "campaignVerification": {
     "verifiedBy": "Verificado por",
@@ -1367,25 +1241,6 @@
       "yourCampaignsDesc": "Suas campanhas estão no ar no Nostr e as doações funcionam através do link da campanha. Navegue por todas as campanhas em /campaigns; a equipe do {{appName}} apresenta uma seleção curada na página inicial.",
       "empty": "Nenhuma campanha ainda",
       "emptyHint": "Seja o primeiro a iniciar uma arrecadação no {{appName}}. Conte sua história, escolha seus beneficiários e compartilhe o link.",
-      "venezuelaRelief": {
-        "title": "A Venezuela precisa de <0>você</0>",
-        "body": "Um forte terremoto atingiu o norte da Venezuela, castigando com mais força Caracas e La Guaira. As famílias de lá não conseguem superar isso sozinhas. Sua doação vai diretamente para as campanhas de ajuda no local, transformando hoje a sua compaixão em abrigo, comida e esperança.",
-        "donate": "Doar para a ajuda",
-        "credit": "Fotos de Caracas, Venezuela. (AP; AFP via Getty Images)",
-        "share": "Compartilhar",
-        "shareTitle": "Ajuda às vítimas do terremoto na Venezuela no Agora",
-        "linkCopied": "Link copiado para a área de transferência",
-        "learnMore": "Saiba mais",
-        "popupBody": "Um forte terremoto atingiu o norte da Venezuela, castigando com mais força Caracas e La Guaira. Sua doação vai diretamente para as campanhas de ajuda no local, transformando hoje a sua compaixão em abrigo, comida e esperança.",
-        "seoTitle": "Ajuda ao terremoto na Venezuela",
-        "seoDescription": "Um forte terremoto atingiu o norte da Venezuela. Doe Bitcoin diretamente para as campanhas de ajuda no local através do Agora. Sem plataforma, sem custodiante, sem necessidade de permissão.",
-        "pageEyebrow": "Apelo de emergência",
-        "pageHow": "Como sua doação ajuda",
-        "pageHowBody": "O Agora é não custodial: seu Bitcoin vai direto da sua carteira para o endereço de uma campanha de ajuda. Nenhuma plataforma fica com uma parte, nenhum custodiante segura os fundos e ninguém precisa de permissão para doar ou receber. Cada campanha abaixo é conduzida por pessoas que respondem ao terremoto no local.",
-        "showcaseTitle": "Campanhas de ajuda",
-        "campaignCount_one": "{{count}} campanha de ajuda",
-        "campaignCount_other": "{{count}} campanhas de ajuda"
-      },
       "whyDifferent": {
         "eyebrow": "Por que o {{appName}}",
         "title": "Construído diferente.",
@@ -1404,14 +1259,6 @@
           "bullet2": "Liquida on-chain em uma carteira que você possui",
           "bullet3": "Funciona mesmo se o {{appName}} desaparecer"
         },
-        "block3": {
-          "heading": "Público ou privado. Sua escolha.",
-          "body": "Beneficiários escolhem a opção de recebimento que combina com seu modelo de ameaça. Doadores veem um único QR; a carteira escolhe o protocolo certo.",
-          "publicLabel": "Público",
-          "publicSummary": "Funciona em toda carteira Bitcoin. Rápido e verificável on-chain.",
-          "privateLabel": "Privado",
-          "privateSummary": "Pagamentos silenciosos BIP-352. Doações chegam em saídas inrastreáveis."
-        },
         "readMore": "Ler a análise completa"
       },
       "searchPlaceholder": "Pesquisar campanhas…",
@@ -1423,7 +1270,7 @@
     "all": {
       "title": "Campanhas",
       "seoTitle": "Todas as campanhas",
-      "description": "Navegue por todas as campanhas publicadas no Agora.",
+      "description": "Navegue por todas as campanhas publicadas no Eranos.",
       "sectionTagline": "Campanhas em destaque primeiro, depois o restante da rede. Pesquise ou ordene para refinar.",
       "heroKicker": "Campanhas",
       "heroHeading": "Cada causa,",
@@ -1591,7 +1438,6 @@
       "title": "Avançado",
       "subtitle": "Conexões de carteira, configuração de sistema e outras opções avançadas para usuários experientes.",
       "intro": "Conexões de carteira, configuração de sistema e outras opções avançadas.",
-      "wallet": "Carteira",
       "torHeading": "Tor",
       "torToggle": "Rotear tráfego pelo Tor",
       "torToggleDesc": "Conecta-se a relays e carrega mídia pela rede Tor para maior privacidade. Espere desempenho mais lento e uma breve espera enquanto o Tor se conecta.",
@@ -1599,10 +1445,6 @@
       "torStatusLabel": "Status:",
       "torExitIp": "IP de saída do Tor:",
       "torCheckAgain": "Verificar novamente"
-    },
-    "wallet": {
-      "title": "Carteira",
-      "subtitle": "Gerencie conexões de carteira e pagamentos"
     }
   },
   "language": {
@@ -1707,7 +1549,7 @@
     "loginGateTitle": "Entre com o perfil da sua organização",
     "loginGateBody": "Entre com o perfil Nostr da sua organização, ou crie um, para começar. Depois de entrar, você pode publicar sua declaração de verificação aqui.",
     "tutorial": {
-      "eyebrow": "Agora você é um verificador",
+      "eyebrow": "Eranos você é um verificador",
       "title": "Como verificar uma campanha",
       "lede": "Sua declaração está no ar. Veja como avalizar uma campanha em que você confia — bastam dois toques a partir de qualquer cartão de campanha.",
       "steps": {
@@ -1754,360 +1596,6 @@
     "adminRequired": "Acesso de administrador necessário",
     "adminRequiredDesc": "Apenas administradores da plataforma podem nomear ou remover organizadores."
   },
-  "wallet": {
-    "seoTitle": "Carteira",
-    "seoDescription": "Carteira Bitcoin hierárquica determinística derivada do seu nsec Nostr.",
-    "loggedOut": {
-      "title": "Carteira Bitcoin",
-      "description": "Uma carteira hierárquica derivada da sua identidade Nostr. Endereço novo a cada recebimento, histórico completo de transações, sem reúso de endereço.",
-      "requiresNsec": "Requer login com nsec (sua chave privada Nostr)."
-    },
-    "unsupported": {
-      "title": "Carteira indisponível",
-      "extension": "Sua extensão de navegador mantém sua chave secreta isolada, então não conseguimos derivar chaves filhas para sua carteira.",
-      "bunker": "Seu assinador remoto (bunker NIP-46) mantém sua chave secreta do lado do bunker, então não conseguimos derivar chaves filhas para sua carteira.",
-      "other": "Seu tipo de login não expõe a chave secreta necessária para derivar sua carteira.",
-      "instructions": "Saia e entre novamente com seu nsec para usar a carteira."
-    },
-    "scanFailed": "Falha ao escanear a carteira",
-    "retry": "Tentar novamente",
-    "refreshBalance": "Atualizar saldo",
-    "refreshBalanceTitle": "Clique para atualizar o saldo",
-    "amountPending": "{{amount}} pendente",
-    "pending": "pendente",
-    "send": "Enviar",
-    "transactions": "Transações",
-    "receiveDialog": {
-      "title": "Receber Bitcoin",
-      "description": "Compartilhe um endereço para receber bitcoin.",
-      "addressIndex": "Endereço n.º {{index}}",
-      "scanForNew": "Verificar novos pagamentos"
-    },
-    "tx": {
-      "pending": "Pendente",
-      "today": "Hoje",
-      "yesterday": "Ontem",
-      "daysAgo_one": "há {{count}}d",
-      "daysAgo_other": "há {{count}}d",
-      "received": "Recebido",
-      "sent": "Enviado",
-      "silentBadge": "silencioso",
-      "silentDetectedTitle": "Detectado via escaneamento de pagamento silencioso BIP-352"
-    },
-    "openMenu": "Menu da carteira",
-    "sendPublic": "Enviar",
-    "sendPrivate": "Enviar em privado",
-    "tabs": {
-      "public": "Pública",
-      "private": "Privada"
-    }
-  },
-  "walletSettings": {
-    "backup": {
-      "label": "Fazer backup da carteira"
-    },
-    "legacy": {
-      "label": "Recuperação de carteira antiga"
-    }
-  },
-  "walletLegacy": {
-    "seoTitle": "Recuperação de carteira antiga",
-    "seoDescription": "Recupere fundos de gerações anteriores da carteira do Agora.",
-    "title": "Recuperação de carteira antiga",
-    "subtitle": "Escolha a carteira anterior que você usou e varra o saldo dela para sua carteira atual.",
-    "loggedOut": "Entre com sua identidade Nostr para verificar fundos nas suas carteiras antigas.",
-    "scanning": "Escaneando a carteira beta V2 em busca de fundos…",
-    "v2Detected": {
-      "title": "Fundos encontrados na Carteira Beta V2 de Pré-lançamento",
-      "body": "Encontramos <0>{{amount}}</0> em endereços da sua carteira beta V2 antiga. Abra a varredura V2 abaixo para movê-los para sua carteira atual."
-    },
-    "options": {
-      "v2Beta": {
-        "label": "Carteira Beta V2 de Pré-lançamento",
-        "description": "Varra fundos da carteira BIP-86 com nsec-como-semente que existia antes da derivação BIP-39."
-      },
-      "v1Breeze": {
-        "label": "Carteira V1 Breeze",
-        "description": "Varra o saldo on-chain da custódia Lightning legada."
-      },
-      "doubleTweak": {
-        "label": "Correção de SP de duplo ajuste",
-        "description": "Recupere pagamentos silenciosos perdidos por um bug de envio anterior e varra-os de volta para sua carteira."
-      }
-    },
-    "footnote": "Cada opção é uma varredura única e de via única para sua carteira atual. A carteira antiga em si não é restaurada — apenas os fundos que ela continha são recuperados."
-  },
-  "walletRecovery": {
-    "seoTitle": "Recuperar carteira antiga",
-    "seoDescription": "Recupere fundos de uma carteira Lightning anterior e transfira-os para seu endereço Bitcoin derivado do Nostr.",
-    "title": "Recuperar carteira antiga",
-    "heading": "Recupere sua carteira antiga",
-    "subheading": "Se você anteriormente mantinha fundos na carteira Lightning, pode varrê-los para seu endereço Bitcoin derivado do Nostr. Sua carteira antiga não é restaurada — esta é uma transferência única e de via única.",
-    "backToWallet": "Voltar para carteira",
-    "loggedOut": {
-      "title": "Entre para recuperar",
-      "description": "Entre com a identidade Nostr que possuía a carteira Lightning antiga para que os fundos possam ser varridos para seu endereço Bitcoin."
-    },
-    "destination": {
-      "title": "Os fundos serão enviados para",
-      "description": "Seu endereço Taproot derivado do Nostr."
-    },
-    "phrase": {
-      "title": "Frase de recuperação",
-      "description": "Cole a frase de recuperação de 12 palavras da sua carteira antiga.",
-      "checkingRelays": "Verificando seus relays por um backup criptografado…",
-      "backupFoundTitle": "Backup encontrado em seus relays",
-      "backupFoundDesc": "Encontramos um backup criptografado da frase de recuperação da sua carteira antiga publicado a partir desta conta.",
-      "decryptAndUse": "Descriptografar e usar",
-      "placeholder": "palavra1 palavra2 palavra3 …",
-      "warning": "Só cole uma frase de recuperação em que você confia. Qualquer pessoa com esta frase pode gastar os fundos. Após a conclusão da varredura, exclua-a de qualquer lugar onde você a copiou.",
-      "sweepButton": "Varrer fundos para meu endereço Bitcoin"
-    },
-    "sweeping": {
-      "working": "Trabalhando…",
-      "dontClose": "Não feche esta aba. Isso pode levar até um minuto enquanto a carteira antiga sincroniza e a transação é transmitida."
-    },
-    "success": {
-      "title": "Recuperação concluída",
-      "sent": "Enviados {{sats}} sats para seu endereço Bitcoin.",
-      "viewTransaction": "Ver transação"
-    },
-    "error": {
-      "title": "Recuperação falhou",
-      "tryAgain": "Tentar novamente"
-    },
-    "errors": {
-      "noNip44": "Seu assinador não suporta descriptografia NIP-44, que é necessária para ler o backup do relay. Cole sua frase de recuperação de 12 palavras manualmente.",
-      "decryptFailed": "Não foi possível descriptografar o backup do relay. Cole sua frase de recuperação de 12 palavras manualmente.",
-      "decryptGeneric": "Falha ao descriptografar o backup do relay.",
-      "invalidWordCount": "A frase de recuperação deve ter 12 ou 24 palavras.",
-      "noBalance": "Sua carteira antiga não tem saldo gastável. Não há nada para recuperar.",
-      "sweepGeneric": "Recuperação falhou. Por favor, tente novamente."
-    },
-    "progress": {
-      "loadingSdk": "Carregando SDK da carteira…",
-      "connecting": "Conectando à sua carteira antiga…",
-      "checkingBalance": "Verificando saldo…",
-      "preparingTransfer": "Preparando transferência de {{sats}} sats…",
-      "broadcasting": "Transmitindo transação…"
-    },
-    "toast": {
-      "backupLoadedTitle": "Backup carregado",
-      "backupLoadedDesc": "Frase de recuperação descriptografada dos seus relays."
-    }
-  },
-  "walletBackup": {
-    "heading": "Frase semente da carteira",
-    "dialogDescription": "Você pode acessar sua carteira Agora em qualquer carteira Bitcoin importando este backup de 24 palavras.",
-    "hidden": "Toque para exibir sua frase semente de 24 palavras.",
-    "revealAria": "Revelar frase semente",
-    "hideAria": "Ocultar frase semente",
-    "warning": "Qualquer pessoa com estas palavras pode gastar seu Bitcoin. Nunca as compartilhe, nunca as digite em um site e nunca as armazene em texto simples fora de um gerenciador de senhas."
-  },
-  "walletMigrate": {
-    "seoTitle": "Migrar carteira antiga",
-    "seoDescription": "Transfira fundos da sua carteira antiga do Agora (nsec como semente) para a nova carteira BIP-39.",
-    "title": "Migrar carteira antiga",
-    "heading": "Migre para sua nova carteira",
-    "subheading": "A carteira Bitcoin do Agora agora usa uma frase semente BIP-39 para poder ser importada em qualquer aplicativo de carteira. Os fundos nos seus endereços antigos continuam seguros — esta página os transfere para sua nova carteira em uma única transação.",
-    "backToWallet": "Voltar para a carteira",
-    "loading": "Verificando sua carteira antiga…",
-    "warning": "Isto constrói uma única transação de transferência que consome todos os UTXOs da sua carteira antiga e envia o total (menos uma pequena taxa de rede) para o primeiro endereço de recebimento da sua nova carteira. Depois de transmitida, a movimentação é definitiva e não pode ser desfeita.",
-    "startButton": "Transferir para a nova carteira",
-    "loggedOut": {
-      "title": "Entre para migrar",
-      "description": "Entre com a identidade Nostr que possui a carteira antiga para que os fundos possam ser transferidos para seu novo endereço."
-    },
-    "unsupported": {
-      "title": "Carteira indisponível",
-      "description": "A migração funciona apenas para logins por nsec, porque as chaves da carteira antiga eram derivadas diretamente da sua nsec. Logins por extensão de navegador e por assinador remoto não conseguem executar esta migração."
-    },
-    "noBlockbook": {
-      "title": "Blockbook não configurado",
-      "description": "A migração precisa de uma URL de indexador Blockbook para escanear seus endereços antigos e transmitir a transação de transferência."
-    },
-    "noFunds": {
-      "title": "Nada para migrar",
-      "description": "Sua carteira antiga não tem saldo disponível. Tudo já está na sua nova carteira."
-    },
-    "detected": {
-      "title": "Fundos na sua carteira antiga",
-      "description": "Esses fundos serão movidos para sua nova carteira em uma única transação.",
-      "bip86": "On-chain",
-      "sp": "Pagamentos silenciosos",
-      "total": "Total"
-    },
-    "destination": {
-      "title": "Destino",
-      "description": "O primeiro endereço de recebimento da sua nova carteira."
-    },
-    "progress": {
-      "building": "Construindo a transação…",
-      "signing": "Assinando as entradas…",
-      "broadcasting": "Transmitindo a transação…",
-      "dontClose": "Não feche esta aba enquanto a transferência estiver em andamento."
-    },
-    "success": {
-      "title": "Migração concluída",
-      "sent": "Enviados {{sats}} sats para sua nova carteira ({{fee}} sats de taxa).",
-      "viewTx": "Ver transação"
-    },
-    "error": {
-      "title": "A migração falhou",
-      "tryAgain": "Tentar novamente"
-    },
-    "errors": {
-      "noV1Account": "Não foi possível acessar as chaves da carteira antiga.",
-      "noDestination": "Sua nova carteira ainda não tem endereço de recebimento. Aguarde a página da carteira carregar e tente novamente.",
-      "noBlockbook": "O indexador Blockbook não está configurado. A migração não pode escanear seus endereços antigos.",
-      "noFunds": "Nenhum fundo disponível encontrado nos endereços antigos.",
-      "sweepGeneric": "A migração falhou. Por favor, tente novamente."
-    },
-    "toast": {
-      "successTitle": "Migração concluída",
-      "successDesc": "{{sats}} sats movidos para sua nova carteira."
-    }
-  },
-  "walletConnect": {
-    "status": "Status",
-    "ready": "Pronta",
-    "notFound": "Não encontrada",
-    "none": "Nenhuma",
-    "add": "Adicionar",
-    "active": "Ativa",
-    "connectionLabel": "Conexão NWC",
-    "defaultWalletName": "Carteira Lightning",
-    "setActiveTitle": "Definir como ativa",
-    "removeTitle": "Remover carteira",
-    "helpText": "Instale uma extensão de navegador WebLN ou conecte uma carteira NWC para enviar zaps.",
-    "webln": {
-      "name": "WebLN",
-      "description": "Extensão de navegador"
-    },
-    "nwc": {
-      "name": "Nostr Wallet Connect",
-      "description": "Conexão de carteira remota",
-      "connectedCount_one": "{{count}} carteira conectada",
-      "connectedCount_other": "{{count}} carteiras conectadas"
-    },
-    "empty": {
-      "title": "Nenhuma carteira conectada",
-      "description": "Adicione uma conexão NWC para habilitar zaps instantâneos."
-    },
-    "dialog": {
-      "title": "Conectar carteira NWC",
-      "description": "Cole uma string de conexão da sua carteira compatível com NWC.",
-      "aliasPlaceholder": "Nome da carteira (opcional)",
-      "connect": "Conectar",
-      "connecting": "Conectando..."
-    },
-    "toast": {
-      "uriRequiredTitle": "URI de conexão necessária",
-      "uriRequiredDesc": "Por favor, insira uma URI de conexão NWC válida.",
-      "activeChangedTitle": "Carteira ativa alterada",
-      "activeChangedDesc": "A carteira selecionada agora está ativa para zaps."
-    }
-  },
-  "walletSend": {
-    "title": "Enviar Bitcoin",
-    "send": "Enviar Bitcoin",
-    "max": "MAX",
-    "tapAgainToConfirm": "Toque novamente para confirmar",
-    "satPerVB": "{{rate}} sat/vB",
-    "notEnoughBitcoin": "Bitcoin insuficiente",
-    "recipient": {
-      "placeholder": "bc1…, sp1…",
-      "scan": "Escanear código QR",
-      "sendToOnchain": "Enviar para endereço Bitcoin",
-      "sendToSilentPayment": "Enviar para endereço de pagamento silencioso",
-      "bitcoinAddress": "Endereço Bitcoin",
-      "silentPayment": "Endereço de pagamento silencioso",
-      "toLabel": "Para",
-      "clear": "Limpar destinatário",
-      "choosePaymentMethod": "Escolha um método de pagamento para continuar"
-    },
-    "feeSpeed": {
-      "fastest": "~10 min",
-      "halfHour": "~30 min",
-      "hour": "~1 hora",
-      "economy": "~1 dia",
-      "custom": "Personalizada"
-    },
-    "fee": {
-      "loading": "carregando…",
-      "unavailable": "indisponível",
-      "loadFailed": "Não foi possível carregar as taxas.",
-      "retry": "Tentar novamente",
-      "orCustom": "Ou insira uma taxa personalizada abaixo.",
-      "loadingTiers": "Carregando taxas…",
-      "customPlaceholder": "ex. 5",
-      "customAriaLabel": "Taxa personalizada em sat/vB"
-    },
-    "progress": {
-      "building": "Construindo transação…",
-      "signing": "Assinando…",
-      "broadcasting": "Transmitindo…",
-      "sending": "Enviando…"
-    },
-    "errors": {
-      "unavailable": "Carteira HD não está disponível para este tipo de login.",
-      "enterRecipient": "Digite um endereço Bitcoin ou endereço de pagamento silencioso sp1….",
-      "noSpendable": "Sem Bitcoin gastável nesta carteira.",
-      "feesNotLoaded": "Taxas não carregadas.",
-      "feesNotLoadedYet": "As taxas ainda não foram carregadas.",
-      "feeRateTooLow": "Insira uma taxa de pelo menos 1 sat/vB.",
-      "enterAmount": "Digite um valor.",
-      "insufficient": "Bitcoin insuficiente para este valor + taxa de rede.",
-      "waitingPrice": "Aguardando preço do BTC…",
-      "noneYet": "Você ainda não tem nenhum Bitcoin."
-    },
-    "toast": {
-      "failedTitle": "Transação falhou"
-    },
-    "broadcastError": {
-      "feeTooLowTitle": "Taxa de rede muito baixa",
-      "feeTooLowBodyWithMin": "A rede Bitcoin está rejeitando essa taxa. O mínimo agora é de cerca de {{min}} sat/vB.",
-      "feeTooLowBody": "A rede Bitcoin está rejeitando essa taxa. Escolha um nível mais rápido ou aumente sua taxa personalizada.",
-      "rbfTitle": "A substituição precisa de uma taxa maior",
-      "rbfBody": "A transação de substituição precisa pagar mais do que a original. Aumente a taxa e tente novamente.",
-      "mempoolFullTitle": "A rede Bitcoin está congestionada",
-      "mempoolFullBody": "O mempool está cheio e sua taxa não é competitiva. Aumente a taxa para ser processada.",
-      "networkTitle": "Não foi possível acessar a rede Bitcoin",
-      "networkBody": "Verifique sua conexão e tente novamente.",
-      "mempoolConflictTitle": "Transação conflitante",
-      "mempoolConflictBody": "Uma das entradas já foi gasta ou está sendo gasta por outra transação.",
-      "tooLongChainTitle": "Muitas transações não confirmadas",
-      "tooLongChainBody": "Você tem uma longa cadeia de transações não confirmadas. Aguarde uma delas ser confirmada e tente novamente.",
-      "badInputsTitle": "A transação foi rejeitada",
-      "badInputsBody": "A rede rejeitou esta transação. Ajuste o valor ou o destinatário e tente novamente.",
-      "absurdlyHighFeeTitle": "A taxa está extraordinariamente alta",
-      "absurdlyHighFeeBody": "A taxa estimada está suspeitamente alta. Recarregue as taxas e tente novamente.",
-      "unknownTitle": "Transação falhou",
-      "useHigherFee": "Usar uma taxa maior",
-      "tryAgain": "Tentar novamente",
-      "atMaxFeeTier": "Você já está no nível mais rápido."
-    },
-    "scanError": {
-      "title": "Não foi possível ler esse código QR",
-      "description": "Era esperado um endereço Bitcoin, um endereço de pagamento silencioso (sp1…) ou uma URI bitcoin:."
-    },
-    "success": {
-      "title": "Bitcoin enviado",
-      "satsAmount": "{{sats}} sats",
-      "viewTransaction": "Ver transação",
-      "done": "Concluído"
-    },
-    "titlePublic": "Enviar Bitcoin",
-    "titlePrivate": "Enviar em privado",
-    "reuse": {
-      "checking": "Verificando endereço…",
-      "sendAnyway": "Enviar mesmo assim",
-      "acknowledge": "Entendo o risco — enviar mesmo assim",
-      "historyWarning": "Este endereço já foi usado on-chain. Enviar seus fundos privados para aqui os vincula ao histórico de transações existente e anula a privacidade dos seus pagamentos silenciosos. Use um endereço de pagamento silencioso (sp1…), ou envie mesmo assim.",
-      "ownPublicWarning": "Este é um endereço da sua própria carteira pública. Enviar seus fundos privados para ele mescla as duas carteiras e as vincula. Use um endereço de pagamento silencioso (sp1…), ou envie mesmo assim."
-    },
-    "ownSilentPaymentBlocked": "Este é o seu próprio endereço de pagamento silencioso. Você não pode enviar da sua carteira pública para a sua carteira privada — fazer isso mescla seus fundos privados de pagamento silencioso com moedas já expostas no registro público, vinculando sua carteira privada a uma identidade conhecida e destruindo sua privacidade. Envie para um endereço diferente."
-  },
   "qrScanner": {
     "title": "Escanear código QR",
     "close": "Fechar",
@@ -2125,72 +1613,6 @@
       "overconstrained": "A câmera deste dispositivo não suporta as configurações solicitadas.",
       "didntStart": "A câmera não iniciou. Outro aplicativo pode estar usando-a, ou seu navegador pode ter bloqueado o scanner."
     }
-  },
-  "bitcoinPublic": {
-    "lead": "O dinheiro que você envia é público e pode ser rastreado até você.",
-    "learnMore": "Saiba mais",
-    "body": "Bitcoin é um livro-razão público. As transações que você envia podem ser rastreadas até você para sempre, mesmo após serem trocadas por várias pessoas. Envie apenas para aqueles que você deseja apoiar publicamente.",
-    "bodyWithCashOut": "Bitcoin é um livro-razão público. As transações que você envia podem ser rastreadas até você para sempre, mesmo após serem trocadas por várias pessoas. Envie apenas para aqueles que você deseja apoiar publicamente, ou saque em uma exchange.",
-    "iUnderstand": "Entendo que esta transação é pública."
-  },
-  "spScan": {
-    "title": "Verificar novos pagamentos",
-    "subtitle": "Escaneie a blockchain em busca de pagamentos privados",
-    "descriptionHelp": "Mais informações",
-    "description": "Percorre o indexador BIP-352 configurado bloco a bloco para detectar pagamentos silenciosos recebidos.",
-    "since": "Desde",
-    "preset": {
-      "lastHour": "Última hora",
-      "last3h": "Últimas 3 horas",
-      "last24h": "Últimas 24 horas",
-      "lastWeek": "Última semana",
-      "lastMonth": "Último mês",
-      "custom": "Personalizado…"
-    },
-    "customHours": "Horas",
-    "customHoursPlaceholder": "ex. 12",
-    "advanced": "Avançado",
-    "connectingIndexer": "Conectando ao indexador…",
-    "upToDate": "Você já está atualizado.",
-    "fromBlock": "Do bloco",
-    "indexerTip": "Topo do indexador",
-    "lastFullyScanned": "Último escaneamento completo",
-    "never": "nunca",
-    "includeSpent": "Incluir já gastos",
-    "includeSpentDesc": "Também detecta pagamentos silenciosos que já foram gastos. Use ao reconstruir o histórico de recebimento após um escaneamento perdido ou reset.",
-    "blockProgress": "Bloco {{current}} / {{to}}",
-    "matches_one": "{{count}} correspondência",
-    "matches_other": "{{count}} correspondências",
-    "scannedRange": "Blocos escaneados {{from}} → {{to}}.",
-    "foundOutputs_one": "Encontrada {{count}} nova saída.",
-    "foundOutputs_other": "Encontradas {{count}} novas saídas.",
-    "noNewPayments": "Nenhum pagamento novo.",
-    "startScan": "Iniciar escaneamento",
-    "resolveFailed": {
-      "title": "Não foi possível consultar o bloco inicial",
-      "description": "mempool.space está inacessível no momento. Informe um bloco inicial em Avançado → Do bloco para escanear mesmo assim."
-    },
-    "reconcile": {
-      "title": "Reconciliar UTXOs gastos",
-      "description": "Verifica cada UTXO de pagamento silencioso armazenado contra o Blockbook e remove os que foram gastos. Use se o saldo estiver maior do que deveria após um envio.",
-      "checking": "Verificando {{checked}} / {{total}}…",
-      "checked_one": "Verificado {{count}} UTXO · podados {{pruned}}.",
-      "checked_other": "Verificados {{count}} UTXOs · podados {{pruned}}.",
-      "reconciling": "Reconciliando…",
-      "reconcileNow": "Reconciliar agora"
-    },
-    "autoScan": {
-      "label": "Escanear automaticamente",
-      "description": "Continue verificando novos pagamentos privados em segundo plano, mesmo quando você sair desta página."
-    }
-  },
-  "spAutoScan": {
-    "scanning": "Escaneando… bloco {{current}} / {{to}}",
-    "caughtUp": "Atualizado",
-    "neverScanned": "Ainda não escaneado",
-    "lastScanned": "Escaneado até o bloco {{height}}",
-    "paused": "O escaneamento automático está desativado",
-    "manualLink": "Opções de escaneamento"
   },
   "notifications": {
     "seoTitle": "Notificações",
@@ -2213,8 +1635,6 @@
     "actions": {
       "reactedToYour": "reagiu ao seu {{noun}}",
       "repostedYour": "repostou seu {{noun}}",
-      "zappedYou": "te zapeou",
-      "zappedYouWithAmount": "te zapeou {{sats}} sats",
       "repliedToYourNote": "respondeu à sua nota",
       "mentionedYou": "te mencionou",
       "repliedToYourComment": "respondeu ao seu comentário",
@@ -2256,14 +1676,11 @@
       "emojiPack": "pacote de emojis",
       "podcastEpisode": "episódio de podcast",
       "podcastTrailer": "trailer de podcast",
-      "zapstoreAsset": "ativo Zapstore",
-      "zapstoreRelease": "lançamento Zapstore",
       "stream": "transmissão",
       "status": "status",
       "repository": "repositório",
       "customNip": "NIP personalizado",
       "calendarEvent": "evento de calendário",
-      "zapstoreApp": "aplicativo Zapstore",
       "playlist": "playlist",
       "divine": "divino",
       "community": "comunidade",
@@ -2316,10 +1733,6 @@
         "label": "Reposts",
         "description": "Quando alguém reposta suas notas"
       },
-      "zaps": {
-        "label": "Zaps",
-        "description": "Quando alguém te envia um zap Lightning ou on-chain"
-      },
       "mentions": {
         "label": "Menções",
         "description": "Quando alguém te menciona em uma nota"
@@ -2353,7 +1766,7 @@
     "inputPlaceholder": "Pesquisar",
     "filtersAria": "Filtros de pesquisa",
     "tabs": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "nostr": "Nostr",
       "accounts": "Usuários"
     },
@@ -2430,8 +1843,8 @@
       "postsPrompt": "Digite uma consulta de pesquisa para encontrar conteúdo Nostr.",
       "accounts": "Nenhum usuário encontrado correspondendo à sua pesquisa.",
       "followsPrompt": "Pesquise pessoas por nome ou endereço NIP-05.",
-      "agora": "Nenhuma campanha, promessa ou grupo Agora correspondendo à sua pesquisa.",
-      "agoraPrompt": "Pesquise campanhas, promessas e grupos Agora, ou navegue pelos mais recentes.",
+      "agora": "Nenhuma campanha, promessa ou grupo Eranos correspondendo à sua pesquisa.",
+      "agoraPrompt": "Pesquise campanhas, promessas e grupos Eranos, ou navegue pelos mais recentes.",
       "activeFilters": "Filtros ativos:",
       "clearAll": "Limpar todos os filtros"
     }
@@ -2455,7 +1868,6 @@
       "editProfile": "Editar",
       "shareFollowLink": "Compartilhar link de seguir",
       "moreOptions": "Mais opções",
-      "donate": "Doar",
       "campaignGoal": "Meta US$ {{amount}}"
     },
     "stats": {
@@ -2498,7 +1910,6 @@
       "addToList": "Adicionar à lista",
       "shareFollowLink": "Compartilhar link de seguir",
       "profileRecovery": "Recuperação de perfil",
-      "zap": "Zap",
       "awardBadge": "Conceder selo",
       "writeLetter": "Escrever uma carta",
       "mute": "Silenciar @{{name}}",
@@ -2580,8 +1991,6 @@
       "heading": "Campos do perfil",
       "website": "Site",
       "websitePlaceholder": "https://seusite.com",
-      "lightning": "Lightning",
-      "lightningPlaceholder": "voce@walletofsatoshi.com",
       "labelPlaceholder": "Rótulo",
       "tickerPlaceholder": "Ticker",
       "addressPlaceholder": "Endereço",
@@ -2611,11 +2020,6 @@
         "defaultLabel": "Email",
         "description": "Endereço de e-mail de contato",
         "valuePlaceholder": "voce@example.com"
-      },
-      "wallet": {
-        "label": "Carteira",
-        "description": "Endereço de carteira de criptomoeda",
-        "valuePlaceholder": "Endereço"
       },
       "link": {
         "label": "Link",
@@ -2685,10 +2089,10 @@
   "faq": {
     "categories": {
       "getting-started": {
-        "label": "Sobre o Agora"
+        "label": "Sobre o Eranos"
       },
       "payments": {
-        "label": "Doações em Bitcoin no Agora"
+        "label": "Doações em Bitcoin no Eranos"
       },
       "about-nostr": {
         "label": "Sobre o Nostr"
@@ -2717,51 +2121,6 @@
           "O {{appName}} é construído pela [Soapbox](https://soapbox.pub), uma equipe de código aberto que constrói ferramentas para o ecossistema Nostr, em colaboração com o [World Liberty Congress](https://worldlibertycongress.org/)."
         ]
       },
-      "send-bitcoin-onchain": {
-        "question": "Como funciona o envio de Bitcoin?",
-        "answer": [
-          "Quando um beneficiário cria uma campanha, ele escolhe quais tipos de pagamento aceitar: **públicos**, **privados** ou **ambos**.",
-          "Doações **públicas** são Bitcoin real on-chain. Elas são liquidadas na blockchain pública, funcionam em todas as carteiras Bitcoin e são visíveis para qualquer um.",
-          "Doações **privadas** usam **pagamentos silenciosos** (BIP-352). Elas também são liquidadas on-chain, mas a transação não pode ser conectada ao código de doação do beneficiário — então ficam fora das listas e totais públicos de doadores. O doador precisa de uma carteira que suporte pagamentos silenciosos — recomendamos [Ditto Wallet](https://ditto.pub) ou [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
-          "Quando uma campanha aceita **ambos**, o {{appName}} mostra um único QR code que codifica ambos os endpoints. Carteiras de pagamentos silenciosos leem como privado; outras carteiras recaem para o endereço público. Doadores não precisam escolher — sua carteira seleciona o caminho certo automaticamente.",
-          "De qualquer forma, o pagamento vai direto para o beneficiário. O {{appName}} nunca toca nos fundos."
-        ]
-      },
-      "connect-wallet": {
-        "question": "O que é a carteira no {{appName}}?",
-        "answer": [
-          "Sua carteira {{appName}} é uma carteira Bitcoin de **auto-custódia**, construída a partir da sua chave Nostr. O {{appName}} nunca detém seus fundos — a carteira roda no seu navegador e assina transações localmente com uma chave que somente você controla. Ela pode receber Bitcoin de duas maneiras — como um endereço público que qualquer carteira Bitcoin pode pagar, e como um código de pagamentos silenciosos que carteiras capazes podem pagar com privacidade. Não há nada para se cadastrar; ela existe no momento em que você tem uma conta.",
-          "A carteira tem duas abas: **Pública** (seu endereço Bitcoin comum) e **Privada** (pagamentos silenciosos). Os dois saldos são mantidos estritamente separados e nunca podem ser gastos juntos — esse isolamento é o que mantém as doações privadas inrastreáveis on-chain. Quando você cria uma campanha, escolhe se aceita pagamentos públicos, privados ou ambos. Para gastar o que recebe, veja o **Guia do Beneficiário**.",
-          "Você também pode exportar a frase semente de 24 palavras da sua carteira e importá-la em qualquer carteira Bitcoin padrão — veja \"Posso exportar minha carteira {{appName}} para outra carteira Bitcoin?\" abaixo."
-        ]
-      },
-      "export-wallet": {
-        "question": "Posso exportar minha carteira {{appName}} para outra carteira Bitcoin?",
-        "answer": [
-          "Sim. Sua carteira {{appName}} é totalmente de auto-custódia. O {{appName}} nunca detém seu Bitcoin e nunca vê suas chaves — a carteira roda inteiramente no seu navegador, assinando transações localmente com uma chave derivada da sua chave secreta Nostr (nsec).",
-          "Abra a carteira pelo menu, toque no menu de três pontos no canto superior direito e escolha **Fazer backup da carteira**. Você verá uma frase semente BIP-39 de 24 palavras. Anote em um lugar seguro (ou salve em um gerenciador de senhas) — **qualquer pessoa com essas palavras pode gastar seu Bitcoin.**",
-          "Você pode importar essas 24 palavras em qualquer carteira Bitcoin padrão: **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, um **Trezor** ou um **Ledger**. O {{appName}} usa os caminhos de derivação padrão BIP-86 (Taproot) e BIP-352 (pagamentos silenciosos), então nenhuma configuração especial é necessária.",
-          "Após importar, a outra carteira mostra o mesmo saldo e histórico que sua carteira {{appName}} — é a mesma carteira, apenas duas visões dela.",
-          "A exportação da frase semente só está disponível quando você entra com uma nsec. Logins via extensão de navegador e via assinador remoto (bunker) mantêm sua chave secreta isolada, então o {{appName}} não consegue derivar a semente nesses modos."
-        ]
-      },
-      "donations-are-public-general": {
-        "question": "As doações no {{appName}} são públicas?",
-        "answer": [
-          "Depende de qual tipo de pagamento o beneficiário aceita.",
-          "**Doações públicas** são registradas na blockchain do Bitcoin e no Nostr. Qualquer um pode ver os valores, horários e endereços.",
-          "**Doações privadas** usam pagamentos silenciosos. Não são publicamente conectáveis ao código de doação do beneficiário, não aparecem nas listas de doadores e não contam para os totais públicos.",
-          "Quando uma campanha aceita ambos, a carteira do doador decide qual caminho usar — carteiras capazes de pagamentos silenciosos pagam com privacidade, outras pagam o endereço público. Leia o **Guia do Doador** e o **Guia do Beneficiário** para o quadro completo."
-        ]
-      },
-      "why-donations-pending": {
-        "question": "Por que algumas doações aparecem como \"pendentes\"?",
-        "answer": [
-          "Uma doação **pendente** é Bitcoin real que já foi enviado — está apenas aguardando confirmação pela rede. A carteira do doador transmitiu a transação, mas ela ainda não foi incluída em um bloco.",
-          "O Bitcoin produz um novo bloco a cada 10 minutos, aproximadamente, e os mineradores escolhem as transações com base na taxa que o doador pagou. A maioria das doações confirma em até uma hora; as com taxa mais baixa podem demorar mais quando a rede está congestionada. O {{appName}} verifica o status de confirmação automaticamente, então o rótulo **pendente** desaparece sozinho assim que um bloco é minerado.",
-          "Os fundos estão a caminho — o beneficiário verá a doação ser contabilizada no total da campanha assim que ela for confirmada. Não há nada que o beneficiário ou o {{appName}} possam fazer para acelerar; apenas a carteira do doador pode aumentar a taxa."
-        ]
-      },
       "censorship-resistance": {
         "question": "O que significa \"resistente à censura\" aqui?",
         "answer": [
@@ -2775,22 +2134,6 @@
           "Bitcoin é o trilho de pagamento mais amplamente suportado e mais resistente à censura do mundo. Todas as carteiras Bitcoin podem enviá-lo.",
           "No {{appName}}, beneficiários escolhem como receber: **público** (um endereço Bitcoin comum) para alcance máximo, **privado** (pagamentos silenciosos) para doações inrastreáveis, ou **ambos** para que a carteira de cada doador escolha o caminho certo automaticamente. Doadores que têm apenas um aplicativo Bitcoin de consumo ainda podem contribuir; doadores com uma carteira de pagamentos silenciosos obtêm privacidade por padrão.",
           "O trade-off é que transações Bitcoin públicas são visíveis na blockchain e pagam uma taxa de minerador. Os guias do Doador e do Beneficiário explicam como lidar com ambos."
-        ]
-      },
-      "why-not-silent-payments": {
-        "question": "O {{appName}} suporta pagamentos silenciosos?",
-        "answer": [
-          "Sim — dos dois lados. A carteira Bitcoin embutida do {{appName}} suporta BIP-352, então quando você envia Bitcoin a partir da sua carteira do {{appName}} pode pagar qualquer endereço de pagamento silencioso (`sp1…`) diretamente. E quando um beneficiário cria uma campanha, pode aceitar pagamentos silenciosos junto com, ou em vez de, pagamentos Bitcoin públicos.",
-          "Doações em pagamentos silenciosos ainda são liquidadas on-chain, mas a transação não pode ser conectada ao código de doação do beneficiário — então não aparecem em listas ou totais públicos de doadores.",
-          "Enviar um pagamento silencioso de fora do {{appName}} requer uma carteira que suporte BIP-352. A maioria dos aplicativos de consumo ainda não, mas [Ditto Wallet](https://ditto.pub) e [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) suportam.",
-          "Quando uma campanha aceita ambos os tipos de pagamento, o {{appName}} os codifica em um único QR code. Carteiras capazes de pagamentos silenciosos pagam com privacidade; todos os outros pagam o endereço público. Nenhum doador é excluído, e nenhum beneficiário é forçado a escolher entre alcance e privacidade."
-        ]
-      },
-      "why-not-lightning": {
-        "question": "Por que o {{appName}} não usa Lightning?",
-        "answer": [
-          "Lightning requer uma carteira Lightning. As mais fáceis (Wallet of Satoshi, Strike, Breez) são **custodiais** — uma empresa detém os fundos e pode ser desligada, geo-bloqueada ou pressionada a congelar contas. Lightning não-custodial é tecnicamente exigente e não confiável para iniciantes.",
-          "Queremos que o {{appName}} funcione para alguém cuja única experiência com Bitcoin é um aplicativo de consumo comum como Cash App, Coinbase, Strike, Venmo ou PayPal. Bitcoin on-chain funciona com todas as carteiras do planeta."
         ]
       },
       "why-not-rotating-addresses": {
@@ -2836,19 +2179,6 @@
           "Para um guia completo, veja [Gerenciando suas chaves Nostr](https://soapbox.pub/blog/managing-nostr-keys)."
         ]
       },
-      "send-bitcoin-lightning": {
-        "question": "Como funciona o envio de Bitcoin via Lightning?",
-        "answer": [
-          "Se um destinatário tem um endereço Lightning em seu perfil, você pode enviar para ele. Lightning é liquidado em segundos e as taxas são minúsculas.",
-          "Envios Lightning não usam o endereço de doação do {{appName}} — vão direto para qualquer carteira Lightning que o destinatário configurou ele mesmo. O próprio fluxo de doações do {{appName}} é apenas on-chain."
-        ]
-      },
-      "what-are-zaps": {
-        "question": "O que são zaps?",
-        "answer": [
-          "Zaps são pequenas gorjetas Lightning no Nostr, separadas do fluxo de doações on-chain do {{appName}}."
-        ]
-      },
       "fyp": {
         "question": "Como o feed funciona?",
         "answer": [
@@ -2889,74 +2219,7 @@
   },
   "guides": {
     "shared": {
-      "tldrEyebrow": "A versão curta",
-      "paymentBadge": {
-        "public": "Pagamentos Públicos",
-        "silent": "Pagamentos Silenciosos"
-      },
-      "paymentComparison": {
-        "donorHeader": "Quando você doa",
-        "recipientHeader": "Quando você cria",
-        "donorRows": {
-          "whatYouSee": {
-            "label": "O que você vê",
-            "public": "Um endereço Bitcoin comum que você pode pagar de qualquer lugar.",
-            "silent": "O mesmo QR. Sua carteira escolhe o endpoint de pagamento silencioso se suporta BIP-352."
-          },
-          "walletSupport": {
-            "label": "Suporte de carteiras",
-            "public": "Todas as carteiras Bitcoin. Cash App, Coinbase, Strike, hardware, qualquer coisa.",
-            "silent": "Poucas carteiras hoje. A maioria recai para uma transação Bitcoin comum."
-          },
-          "privacy": {
-            "label": "Privacidade da doação",
-            "public": "Público on-chain. Seu endereço de envio fica permanentemente vinculado à campanha.",
-            "silent": "O lado de recebimento é inrastreável on-chain. O rastro da sua carteira de envio ainda é público."
-          },
-          "settlement": {
-            "label": "Liquidação",
-            "public": "Confirmações Bitcoin normais.",
-            "silent": "Mesmas confirmações on-chain, mas o beneficiário tem que escanear a carteira para encontrá-la."
-          }
-        },
-        "recipientRows": {
-          "whatDonorsSee": {
-            "label": "O que os doadores veem",
-            "public": "Um endereço Bitcoin comum. Funciona com todas as carteiras do planeta.",
-            "silent": "Um endpoint BIP-352. As carteiras dos doadores precisam de suporte a pagamentos silenciosos; caso contrário, a doação recai para uma transação Bitcoin comum."
-          },
-          "receivingSpeed": {
-            "label": "Velocidade de recebimento",
-            "public": "Estilo push. Doações aparecem imediatamente na página da campanha.",
-            "silent": "Escaneamento manual. Sua carteira tem que percorrer a blockchain procurando por elas. Minutos a horas, dependendo da carteira."
-          },
-          "pushNotifications": {
-            "label": "Notificações push",
-            "public": "Sim. Você vê novas doações no momento em que chegam.",
-            "silent": "Não. Abra a carteira e dispare um escaneamento para descobri-las."
-          },
-          "donorList": {
-            "label": "Lista de doadores / totais da campanha",
-            "public": "Público para sempre. Valores e endereços de envio são visíveis para qualquer um.",
-            "silent": "Privado. A página da campanha não pode mostrar contagens ou totais de doações silenciosas."
-          },
-          "ecosystem": {
-            "label": "Maturidade do ecossistema",
-            "public": "Maduro. Ferramentas estabelecidas.",
-            "silent": "De ponta. As carteiras ainda têm bugs; espere pagamentos perdidos que aparecem em um escaneamento posterior."
-          },
-          "bestFor": {
-            "label": "Melhor para",
-            "public": "Arrecadações abertas onde prova social e visibilidade ajudam.",
-            "silent": "Campanhas onde a privacidade do doador ou beneficiário importa mais do que o total visível."
-          },
-          "watchOutFor": {
-            "label": "Atenção a",
-            "public": "Registro público permanente de cada doador.",
-            "silent": "UX instável hoje. Algumas doações não aparecem até que o beneficiário escaneie."
-          }
-        }
-      }
+      "tldrEyebrow": "A versão curta"
     },
     "donor": {
       "tldr": {
@@ -2974,18 +2237,11 @@
             "title": "Abra a campanha",
             "body": "Você vê um único QR code. Se a campanha aceita ambas as opções, ele codifica ambos os endpoints; sua carteira escolhe o certo."
           },
-          "payFromAnyWallet": {
-            "title": "Pague de qualquer carteira",
-            "body": "Cash App, Coinbase, Strike, uma carteira de hardware, qualquer coisa. Pague o valor mais a taxa de rede."
-          },
           "arrivesDirectly": {
             "title": "Chega diretamente",
             "body": "Os fundos são liquidados direto para o beneficiário. O {{appName}} não os detém ou roteia, e o endereço é derivado da chave secreta Nostr do beneficiário."
           }
         }
-      },
-      "comparison": {
-        "footnote": "Campanhas podem aceitar apenas Público, apenas Silencioso, ou ambos. Se ambos, o QR code carrega ambos os endpoints. Sua carteira escolhe o que pode usar."
       },
       "publicVisible": {
         "title": "Doações públicas são visíveis on-chain para sempre",
@@ -2995,10 +2251,6 @@
         "heading": "Doando com privacidade",
         "intro": "Estes passos importam mais para doações **Públicas**, onde cada transação fica permanentemente vinculada a um único endereço. Doações **Silenciosas** já ocultam o lado de recebimento, então o risco é menor. Análise direcionada da sua carteira de envio ainda é possível de qualquer forma, então se seu risco é alto, vale a pena seguir estes passos. Escolha um, ou empilhe-os.",
         "options": {
-          "silentWallet": {
-            "name": "Use uma carteira de pagamentos silenciosos",
-            "purpose": "Pague com uma carteira Bitcoin que suporte BIP-352. Se a campanha aceita pagamentos silenciosos, sua carteira usa esse endpoint automaticamente."
-          },
           "nonKyc": {
             "name": "Compre Bitcoin sem KYC",
             "purpose": "Compre Bitcoin peer-to-peer para que não fique vinculado ao seu documento de identidade desde o início. Ponto de partida mais forte para privacidade."
@@ -3006,23 +2258,12 @@
           "coinjoin": {
             "name": "Coinjoin primeiro",
             "purpose": "Misture seu Bitcoin com moedas de outras pessoas para que a saída não possa ser rastreada à sua compra com KYC. Útil quando a campanha só aceita público."
-          },
-          "freshWallet": {
-            "name": "Use uma carteira nova",
-            "purpose": "Doe de uma carteira que nunca tocou em sua identidade principal ou em uma exchange com KYC."
           }
         }
       },
       "consumerApps": {
         "title": "Aplicativos de consumo não podem te tornar anônimo",
         "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance e PayPal todos verificam sua identidade. Não importa como você envie a doação, cada transação permanece vinculada à sua identidade real. Use uma carteira não-custodial que você controla."
-      },
-      "silentToday": {
-        "heading": "Uma nota sobre pagamentos silenciosos hoje",
-        "paragraphs": [
-          "Pagamentos silenciosos são a forma mais privada de receber Bitcoin on-chain, mas o ecossistema é jovem. A maioria das carteiras populares ainda não consegue enviar para um endpoint de pagamento silencioso, então quando uma carteira não pode, a doação recai para uma transação Bitcoin comum para o endereço público da campanha (se a campanha aceita ambos).",
-          "Para beneficiários, doações silenciosas também chegam sem notificações push e só aparecem após o beneficiário escanear sua carteira, o que pode levar minutos a horas. Nada disso afeta a segurança dos seus fundos; apenas molda a experiência."
-        ]
       }
     },
     "recipient": {
@@ -3052,20 +2293,6 @@
           "Doações em pagamentos silenciosos não fazem parte desse registro. São invisíveis para observadores externos e não aparecem nos totais públicos da campanha; novos doadores só veem o que você publica sobre o progresso da campanha."
         ]
       },
-      "comparison": {
-        "footnote": "Você não pode alterar as opções de pagamento aceitas de uma campanha após criá-la. Se mudar de ideia, crie uma nova campanha."
-      },
-      "silentToday": {
-        "heading": "Uma nota sobre pagamentos silenciosos hoje",
-        "paragraphs": [
-          "Pagamentos silenciosos são a forma mais privada de receber Bitcoin on-chain, mas o ecossistema é jovem. A maioria das carteiras populares ainda não consegue enviar para um endpoint de pagamento silencioso, então quando a carteira de um doador não pode, a doação recai para uma transação Bitcoin comum para seu endereço público (se você aceita ambos).",
-          "Doações em pagamentos silenciosos também chegam sem notificações push e só aparecem após você escanear sua carteira, o que pode levar minutos a horas. Nada disso afeta a segurança dos seus fundos; apenas molda a experiência do dia a dia."
-        ]
-      },
-      "twoWallets": {
-        "title": "Mantenha seus saldos Público e Privado separados",
-        "body": "Sua carteira {{appName}} mostra duas abas: **Pública** (seu endereço Bitcoin comum) e **Privada** (pagamentos silenciosos). Elas são mantidas estritamente separadas, e os dois saldos nunca podem ser gastos na mesma transação — esse isolamento é o que mantém suas doações privadas inrastreáveis. Quando você saca a partir da aba **Privada**, envie para um endereço de pagamentos silenciosos (**sp1…**), que permanece privado. Se em vez disso você enviar fundos privados para um endereço on-chain comum, o {{appName}} o verifica: se o endereço já foi usado antes, ou pertence à sua própria carteira pública, ele avisa você e exige que toque em **Enviar mesmo assim**, porque fazer isso vincula seus fundos privados ao histórico público desse endereço. Enviar para um endereço **sp1…** nunca dispara o aviso."
-      },
       "movePromptly": {
         "heading": "Mova as doações prontamente",
         "steps": {
@@ -3083,14 +2310,6 @@
         "heading": "Sacando com privacidade",
         "intro": "Gastar on-chain cria um rastro a menos que você o quebre primeiro. Saque a partir da aba **Privada** para manter as doações de pagamentos silenciosos inrastreáveis — envie primeiro para uma carteira de pagamentos silenciosos (um endereço **sp1…**), depois gaste em seguida; o salto quebra o vínculo entre sua campanha e o que vem depois. Não envie fundos privados para um endereço reutilizado ou público, o que os vincula novamente. As outras opções abaixo também funcionam e têm seus próprios trade-offs.",
         "options": {
-          "silentHop": {
-            "name": "Salto para carteira de pagamentos silenciosos",
-            "purpose": "Mova suas doações para uma carteira de pagamentos silenciosos ([Ditto Wallet](https://ditto.pub), [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)). A partir daí, seus gastos posteriores não estão vinculados à campanha."
-          },
-          "lightningSwap": {
-            "name": "Troca Lightning",
-            "purpose": "Troca atômica de Bitcoin on-chain para Lightning. Pagamentos Lightning não tocam a blockchain pública."
-          },
           "coinjoin": {
             "name": "Coinjoin",
             "purpose": "Misture seu Bitcoin com moedas de outros usuários para que a saída não possa ser vinculada de volta à entrada."
@@ -3110,68 +2329,5 @@
         "body": "Misturadores custodiais podem roubar suas moedas, registrar quem enviou o que ou acabar sendo armadilhas das autoridades. Use um salto para pagamentos silenciosos ou um coinjoin não-custodial em vez disso."
       }
     }
-  },
-  "walletDoubleTweak": {
-    "seoTitle": "Correção de SP de duplo ajuste",
-    "seoDescription": "Recupere pagamentos silenciosos perdidos on-chain por um bug de envio anterior e varra-os para sua carteira.",
-    "title": "Correção de SP de duplo ajuste",
-    "heading": "Recupere pagamentos silenciosos perdidos",
-    "subheading": "Uma versão anterior do Agora codificou algumas saídas de pagamento silencioso para a chave errada, então elas nunca apareceram na sua carteira. Esta ferramenta reescaneia a blockchain em busca dessas saídas e varre quaisquer que encontre para sua carteira.",
-    "back": "Voltar",
-    "loggedOut": "Entre com a identidade Nostr que recebeu os pagamentos silenciosos para que eles possam ser recuperados.",
-    "unsupported": {
-      "title": "Carteira indisponível",
-      "description": "A recuperação precisa de uma carteira que possa assinar localmente. Entre com sua nsec para continuar."
-    },
-    "noIndexer": {
-      "title": "Nenhum indexador de pagamento silencioso configurado",
-      "description": "Uma URL de indexador BIP-352 é necessária para escanear em busca de pagamentos perdidos. Defina uma nas configurações da carteira e tente novamente."
-    },
-    "scan": {
-      "title": "Escanear em busca de pagamentos perdidos",
-      "description": "Escolha a altura do bloco a partir da qual começar o escaneamento. A recuperação verifica cada bloco a partir daí até o topo da blockchain.",
-      "fromHeightLabel": "Altura do bloco inicial",
-      "tipHint": "Topo atual da blockchain: {{tip}}",
-      "start": "Escanear",
-      "cancel": "Cancelar escaneamento",
-      "progress": "Escaneando o bloco {{current}} de {{to}} — {{found}} encontrados",
-      "tipMissing": "Resolvendo o topo da blockchain…"
-    },
-    "noFunds": {
-      "title": "Nada para recuperar",
-      "description": "Nenhum pagamento silencioso perdido foi encontrado no intervalo escaneado. Tente uma altura inicial anterior se você esperava fundos."
-    },
-    "found": {
-      "title": "Pagamentos perdidos encontrados",
-      "description": "Essas saídas podem ser varridas de volta para sua carteira.",
-      "count": "Saídas",
-      "recoverable": "Recuperável"
-    },
-    "destination": {
-      "title": "Os fundos serão enviados para",
-      "description": "Um novo endereço de recebimento na sua carteira atual."
-    },
-    "sweepButton": "Recuperar fundos",
-    "sweeping": "Recuperando seus fundos…",
-    "dontClose": "Não feche esta página até a recuperação terminar.",
-    "success": {
-      "title": "Recuperação concluída",
-      "sent": "{{sats}} sats recuperados para sua carteira.",
-      "viewTx": "Ver transação"
-    },
-    "error": {
-      "title": "Recuperação falhou",
-      "tryAgain": "Tentar novamente"
-    },
-    "errors": {
-      "noDestination": "Nenhum endereço de destino disponível. Abra sua carteira primeiro.",
-      "noBlockbook": "Nenhum servidor Blockbook configurado. Defina um nas configurações da carteira.",
-      "sweepGeneric": "Não foi possível concluir a varredura de recuperação."
-    },
-    "toast": {
-      "successTitle": "Fundos recuperados",
-      "successDesc": "{{sats}} sats varridos para sua carteira."
-    },
-    "footnote": "Esta é uma varredura de via única para sua carteira atual. Apenas os pagamentos silenciosos afetados são tocados; nada mais muda."
   }
 }

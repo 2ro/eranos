@@ -77,7 +77,6 @@
     "language": "语言",
     "dashboard": "仪表板",
     "myDashboard": "我的仪表板",
-    "wallet": "钱包",
     "notifications": "通知",
     "messages": "私信",
     "profile": "个人资料",
@@ -119,7 +118,7 @@
     "showAllConversations": "显示所有对话",
     "friendsEmpty": "没有来自您关注的人的消息。",
     "translateDialogTitle": "要翻译私信吗？",
-    "translateDialogDescription": "收到的消息将发送到你配置的翻译服务。已发送的消息不会被翻译。Agora 会在此设备上记住此选择。",
+    "translateDialogDescription": "收到的消息将发送到你配置的翻译服务。已发送的消息不会被翻译。Eranos 会在此设备上记住此选择。",
     "confirmTranslate": "翻译消息",
     "newMessage": "新消息",
     "newMessageTitle": "新消息",
@@ -199,7 +198,7 @@
     "secure": {
       "title": "保存你的密钥",
       "subtitle": "下载文件并妥善保存。密码管理器是一个不错的选择。",
-      "couplingNote": "你的账户和钱包共用这把密钥。它既为你的 Nostr 帖子签名，也用于打开你在 Agora 上的 Bitcoin 钱包。",
+      "couplingNote": "你的账户和钱包共用这把密钥。它既为你的 Nostr 帖子签名，也用于打开你在 Eranos 上的 Bitcoin 钱包。",
       "permanenceHeadline": "一旦丢失，这把密钥就无法找回。",
       "permanenceBody": "没有重置、没有客服热线，也无法通过邮箱恢复。请先保存好，再继续。",
       "button": "下载并继续",
@@ -278,19 +277,19 @@
       "global": "全球"
     },
     "empty": {
-      "homeAgora": "Agora 暂时安静。新的活动、承诺、捐赠和帖子将在发生时显示在这里。",
-      "homeFollowingLoggedIn": "你的关注 Feed 为空。关注一些人来看看他们在做什么，或切换到 Agora 或全球。",
+      "homeAgora": "Eranos 暂时安静。新的活动、承诺、捐赠和帖子将在发生时显示在这里。",
+      "homeFollowingLoggedIn": "你的关注 Feed 为空。关注一些人来看看他们在做什么，或切换到 Eranos 或全球。",
       "homeFollowingLoggedOut": "登录以查看你关注的人的帖子。",
       "homeOther": "暂无内容。请检查你的中继连接，或稍后再试。",
       "follows": "你的 Feed 为空。关注一些人，以便在此处看到他们的帖子。",
       "global": "未找到帖子。请检查你的中继连接，或稍后再来。",
-      "browseAgora": "浏览 Agora Feed",
+      "browseAgora": "浏览 Eranos Feed",
       "browseGlobal": "浏览全球 Feed",
       "discoverPeople": "发现可关注的人",
       "logIn": "登录"
     },
     "modeSwitcher": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "allNostr": "全球",
       "following": "关注中",
       "ariaLabel": "Feed 模式：{{label}}。点击更改。",
@@ -307,7 +306,6 @@
       "repost": "转发",
       "undoRepost": "撤销转发",
       "react": "反应",
-      "zap": "Zap",
       "share": "分享",
       "more": "更多",
       "linkCopied": "链接已复制到剪贴板"
@@ -482,7 +480,6 @@
       "noSubmissionsHint": "成为第一个以证据、佐证或已完成工作回应的人。",
       "funded": "已资助",
       "ofPledged": "目标 {{amount}}",
-      "trustNote": "此悬赏基于信任。资助进度汇总顶级提交上的 zaps 和捐赠收据。",
       "share": "分享",
       "storyHeading": "悬赏",
       "storyEmpty": "发起人尚未为此悬赏撰写详情。"
@@ -644,32 +641,6 @@
     "headingEdit": "编辑活动",
     "title": "标题",
     "titlePlaceholder": "拯救最后一家书店",
-    "wallet": "比特币钱包",
-    "myWalletLabel": "{{name}} 的钱包",
-    "myWalletDefault": "我的钱包",
-    "walletHeroNote": "捐款将直接进入你自己的 Agora 钱包。\n没有中间人。",
-    "walletHeroReassurance": "你掌握密钥，就掌握资金。随时可在钱包标签页提现。",
-    "walletChoose": "选择钱包",
-    "walletCustom": "自定义",
-    "walletUseCustom": "改用自定义钱包",
-    "walletUseMine": "使用我的 Agora 钱包",
-    "acceptHeading": "你愿意接受哪些捐款？",
-    "acceptUnavailable": "此登录方式无法使用。",
-    "acceptAllTitle": "任何捐款",
-    "acceptPublicTitle": "仅接受公开捐款",
-    "acceptPrivateTitle": "仅接受私密捐款",
-    "acceptAllHint": "公开和私密捐款都接受。",
-    "acceptPublicHint": "捐赠者将款项发送到一个普通的 Bitcoin 地址。这些捐款任何人都能看到。",
-    "acceptPrivateHint": "捐赠者以私密方式捐款，因此他们的身份不会对外公开。",
-    "customWalletIntro": "填写您愿意接受的任意捐赠方式：公开地址、私密代码，或两者皆可。至少需要填写一项。",
-    "customOnchainMeaning": "公开。任何人都能看到这些捐赠。",
-    "customSpMeaning": "私密。捐赠者的身份将保持隐藏。",
-    "bitcoinAddress": "比特币地址",
-    "bitcoinAddressPlaceholder": "bc1q… 或 bc1p…",
-    "silentPaymentCode": "静默支付代码",
-    "silentPaymentCodePlaceholder": "sp1…",
-    "onchainInvalid": "不是已识别的主网比特币地址（bc1q… / bc1p…）。",
-    "spInvalid": "不是已识别的 BIP-352 静默支付代码（sp1…）。",
     "country": "国家",
     "countryPlaceholder": "搜索国家/地区",
     "tags": "标签",
@@ -697,7 +668,6 @@
     "storyPlaceholder": "分享背景、受益对象，以及资金的使用方式。",
     "goal": "目标",
     "goalPlaceholder": "25,000",
-    "goalNote": "整数美元。捐赠者以比特币支付；客户端在查看时估算美元等值。",
     "submitCreate": "发起活动",
     "submitEdit": "更新活动",
     "publishing": "发布中……",
@@ -716,24 +686,14 @@
     "errorTitleRequired": "标题为必填项。",
     "errorTitleInvalid": "标题必须包含字母或数字，才能创建活动 URL。",
     "errorSlugInvalid": "标识符必须是小写字母、数字和连字符。",
-    "errorHdUnavailable": "此登录方式不支持内置钱包。",
-    "errorSpUnavailable": "此登录方式不支持静默支付地址。",
-    "errorOnchainInvalid": "链上地址不是已识别的主网 bech32(m) 地址（bc1q… / bc1p…）。",
-    "errorSpInvalid": "静默支付代码不是已识别的 BIP-352 代码（sp1…）。",
-    "errorWalletRequired": "至少提供一个钱包端点 — 一个比特币主网地址（bc1q… / bc1p…）或一个静默支付代码（sp1…）。",
     "errorGoalInvalid": "目标必须是正整数美元金额。",
     "errorEditLatestMissing": "找不到此活动的最新版本以更新。",
     "errorSlugCollision": "你已有一个标识符为「{{slug}}」的活动。请选择其他。",
     "errorBannerInvalid": "横幅必须是有效的 https:// URL。",
-    "errorHdDeriveFailed": "无法从你的钱包派生新的链上地址。",
-    "errorHdDeriveInvalid": "派生的钱包地址未通过验证。请改为添加自定义地址。",
-    "errorWalletRequiredFallback": "需要钱包端点。",
     "errorPublishedInvalid": "已发布的事件未通过验证。请刷新并重试。",
     "wizard": {
       "titleStepTitle": "为你的活动起个名字",
       "titleStepSubtitle": "一个简短清晰、捐赠者易于辨识的名称。",
-      "walletStepTitle": "捐款流向何处？",
-      "walletStepSubtitle": "选择你的 Agora 钱包，或粘贴你自己的地址。",
       "bannerStepTitle": "添加横幅",
       "bannerStepSubtitle": "一张醒目的图片，让活动在每张卡片上脱颖而出。",
       "storyStepTitle": "讲述你的故事",
@@ -773,43 +733,15 @@
     "like_one": "<0>{{formattedCount}}</0> 点赞",
     "like_other": "<0>{{formattedCount}}</0> 点赞",
     "tabComments": "评论与捐赠",
-    "tabLedger": "账本",
-    "ledger": {
-      "publicAddress": "公开地址",
-      "viewOnMempool": "在 mempool.space 查看",
-      "openOnMempool": "在 mempool.space 打开交易",
-      "received": "收到",
-      "sent": "发送",
-      "unconfirmed": "未确认",
-      "block": "区块 {{height}}",
-      "btcUnit": "BTC",
-      "empty": "此地址暂无链上活动。",
-      "error": "无法加载链上活动。请稍后再试。",
-      "loadMore": "加载更多",
-      "loadingMore": "加载中……"
-    },
     "noCommentsTitle": "暂无评论",
     "noCommentsHint": "成为第一个留下支持留言的人。",
     "deleteDialogTitle": "删除此活动？",
     "deleteDialogBody": "这将发布一个 NIP-09 删除请求。行为良好的中继会将活动从信息流和直接链接中移除。过往的捐赠收据无论如何都会保留在链上。此操作无法撤销 — 若要继续接受捐赠，请改为编辑活动。",
     "storyHeading": "故事",
-    "donate": "捐赠",
     "share": "分享",
     "target": "目标：{{amount}}",
     "raised": "已募",
-    "ofGoal": "目标 {{amount}}",
-    "donationCount_one": "{{count}} 笔捐赠",
-    "donationCount_other": "{{count}} 笔捐赠",
-    "openInWallet": "在钱包中打开",
-    "payWithAgoraWallet": "使用 Agora 支付",
-    "openExternalWallet": "打开外部钱包"
-  },
-  "noBitcoin": {
-    "trigger": "没有比特币？",
-    "title": "还没有比特币？",
-    "description": "在 Cash App 中购买比特币，然后将其发送到此活动。",
-    "getItOn": "下载于",
-    "getCashApp": "获取 Cash App"
+    "ofGoal": "目标 {{amount}}"
   },
   "campaignVerification": {
     "verifiedBy": "验证者",
@@ -925,25 +857,6 @@
       "yourCampaignsDesc": "你的活动已在 Nostr 上线,通过活动链接即可接收捐款。在 /campaigns 浏览所有活动;{{appName}} 团队会在首页展示精选活动。",
       "empty": "暂无活动",
       "emptyHint": "成为在 {{appName}} 发起众筹的第一人。讲述你的故事、选择受益人、并分享链接。",
-      "venezuelaRelief": {
-        "title": "委内瑞拉需要<0>你</0>",
-        "body": "一场强烈地震袭击了委内瑞拉北部,Caracas 与 La Guaira 受灾最为严重。那里的家庭无法独自挺过这一切。你的捐款将直接送达灾区一线的救援活动,把你的善意化作今天的栖身之所、食物与希望。",
-        "donate": "为救援捐款",
-        "credit": "图片:居民在 Caracas 一栋倒塌建筑附近相拥。(AFP via Getty Images)",
-        "share": "分享",
-        "shareTitle": "在 Agora 上支援委内瑞拉地震救援",
-        "linkCopied": "链接已复制到剪贴板",
-        "learnMore": "了解更多",
-        "popupBody": "一场强烈地震袭击了委内瑞拉北部,Caracas 与 La Guaira 受灾最为严重。你的捐款将直接送达灾区一线的救援活动,把善意化作今天的栖身之所、食物与希望。",
-        "seoTitle": "委内瑞拉地震救援",
-        "seoDescription": "一场强烈地震袭击了委内瑞拉北部。在 Agora 上把 Bitcoin 直接捐给灾区一线的救援活动。无需平台、无需托管方、无需任何许可。",
-        "pageEyebrow": "紧急呼吁",
-        "pageHow": "你的捐款如何帮助灾区",
-         "pageHowBody": "Agora 是非托管的:你的 Bitcoin 从你的钱包直接送达救援活动的地址。没有平台抽成,没有托管方掌控资金,无论是给予还是接收都无需任何许可。下方的每一个活动都由在灾区一线响应地震的人们运作。",
-        "showcaseTitle": "救援活动",
-        "campaignCount_one": "{{count}} 个救援活动",
-        "campaignCount_other": "{{count}} 个救援活动"
-      },
       "whyDifferent": {
         "eyebrow": "为什么选 {{appName}}",
         "title": "我们与众不同。",
@@ -962,14 +875,6 @@
           "bullet2": "直接在链上结算到你拥有的钱包",
           "bullet3": "即使 {{appName}} 消失也能运作"
         },
-        "block3": {
-          "heading": "公开或私密。由你选择。",
-          "body": "受款人选择与自身威胁模型相匹配的收款方式。捐赠者只看到一个 QR；钱包会自动选择正确的协议。",
-          "publicLabel": "公开",
-          "publicSummary": "适用于每一个 Bitcoin 钱包。链上快速且可验证。",
-          "privateLabel": "私密",
-          "privateSummary": "BIP-352 静默支付。捐款到达不可链接的输出。"
-        },
         "readMore": "阅读完整说明"
       },
       "searchPlaceholder": "搜索活动…",
@@ -981,7 +886,7 @@
     "all": {
       "title": "活动",
       "seoTitle": "所有活动",
-      "description": "浏览 Agora 上发布的所有活动。",
+      "description": "浏览 Eranos 上发布的所有活动。",
       "sectionTagline": "精选活动优先展示，其余来自整个网络。可搜索或排序以进一步筛选。",
       "heroKicker": "活动",
       "heroHeading": "每一个理念，",
@@ -1149,7 +1054,6 @@
       "title": "高级",
       "subtitle": "钱包连接、系统配置和其他面向高级用户的选项。",
       "intro": "钱包连接、系统配置和其他高级选项。",
-      "wallet": "钱包",
       "torHeading": "Tor",
       "torToggle": "通过 Tor 路由流量",
       "torToggleDesc": "连接到中继并通过 Tor 网络加载媒体内容，以获得更强的隐私保护。预计性能会有所下降，且 Tor 连接时会有短暂延迟。",
@@ -1157,10 +1061,6 @@
       "torStatusLabel": "状态：",
       "torExitIp": "Tor 出口 IP：",
       "torCheckAgain": "重新检查"
-    },
-    "wallet": {
-      "title": "钱包",
-      "subtitle": "管理钱包连接和支付"
     }
   },
   "language": {
@@ -1312,360 +1212,6 @@
     "adminRequired": "需要管理员权限",
     "adminRequiredDesc": "只有平台管理员才能任命或移除组织者。"
   },
-  "wallet": {
-    "seoTitle": "钱包",
-    "seoDescription": "由你的 Nostr nsec 派生出的分层确定性比特币钱包。",
-    "loggedOut": {
-      "title": "比特币钱包",
-      "description": "一个由你的 Nostr 身份派生出的分层钱包。每次收款都使用新地址，完整的交易历史，地址不复用。",
-      "requiresNsec": "需要使用 nsec（你的 Nostr 私钥）登录。"
-    },
-    "unsupported": {
-      "title": "钱包不可用",
-      "extension": "你的浏览器扩展将密钥隔离保存，因此我们无法为你的钱包派生子密钥。",
-      "bunker": "你的远程签名器（NIP-46 bunker）将密钥保存在 bunker 一侧，因此我们无法为你的钱包派生子密钥。",
-      "other": "你的登录方式不暴露派生钱包所需的密钥。",
-      "instructions": "请退出并使用 nsec 重新登录以使用钱包。"
-    },
-    "scanFailed": "扫描钱包失败",
-    "retry": "重试",
-    "refreshBalance": "刷新余额",
-    "refreshBalanceTitle": "点击刷新余额",
-    "amountPending": "{{amount}} 待确认",
-    "pending": "待确认",
-    "send": "发送",
-    "transactions": "交易",
-    "receiveDialog": {
-      "title": "接收比特币",
-      "description": "分享一个地址以接收比特币。",
-      "addressIndex": "地址 #{{index}}",
-      "scanForNew": "检查新付款"
-    },
-    "tx": {
-      "pending": "待确认",
-      "today": "今天",
-      "yesterday": "昨天",
-      "daysAgo_one": "{{count}} 天前",
-      "daysAgo_other": "{{count}} 天前",
-      "received": "已收到",
-      "sent": "已发送",
-      "silentBadge": "静默",
-      "silentDetectedTitle": "通过 BIP-352 静默支付扫描检测到"
-    },
-    "openMenu": "钱包菜单",
-    "sendPublic": "发送",
-    "sendPrivate": "私密发送",
-    "tabs": {
-      "public": "公开",
-      "private": "私密"
-    }
-  },
-  "walletSettings": {
-    "backup": {
-      "label": "备份钱包"
-    },
-    "legacy": {
-      "label": "旧钱包恢复"
-    }
-  },
-  "walletLegacy": {
-    "seoTitle": "旧钱包恢复",
-    "seoDescription": "从之前各代 Agora 钱包中恢复资金。",
-    "title": "旧钱包恢复",
-    "subtitle": "选择你之前使用的钱包，将其余额归集到你当前的钱包中。",
-    "loggedOut": "请使用你的 Nostr 身份登录，以查找旧钱包中的资金。",
-    "scanning": "正在扫描 V2 测试版钱包中的资金……",
-    "v2Detected": {
-      "title": "在 V2 预发布测试版钱包中发现资金",
-      "body": "我们在你旧的 V2 测试版钱包的地址上发现了 <0>{{amount}}</0>。请打开下方的 V2 归集，将其转入你当前的钱包。"
-    },
-    "options": {
-      "v2Beta": {
-        "label": "V2 预发布测试版钱包",
-        "description": "归集来自 BIP-39 派生之前以 nsec 作为种子的 BIP-86 钱包中的资金。"
-      },
-      "v1Breeze": {
-        "label": "V1 Breeze 钱包",
-        "description": "归集旧 Lightning 托管钱包中的链上余额。"
-      },
-      "doubleTweak": {
-        "label": "Double-tweak SP 修复",
-        "description": "找回因早先发送漏洞而滞留的静默支付，并将它们归集回你的钱包。"
-      }
-    },
-    "footnote": "每个选项都是一次性的单向归集到你当前的钱包。旧钱包本身不会被恢复——只有其中保存的资金会被找回。"
-  },
-  "walletRecovery": {
-    "seoTitle": "恢复旧钱包",
-    "seoDescription": "从之前的 Lightning 钱包中恢复资金，并将其转入你由 Nostr 派生的比特币地址。",
-    "title": "恢复旧钱包",
-    "heading": "恢复你的旧钱包",
-    "subheading": "如果你之前在 Lightning 钱包中有资金，你可以将其全部转入由你的 Nostr 派生出的比特币地址。旧钱包不会被恢复——这是一次性的单向转移。",
-    "backToWallet": "返回钱包",
-    "loggedOut": {
-      "title": "登录以恢复",
-      "description": "请使用拥有旧 Lightning 钱包的 Nostr 身份登录，以便将资金转入其比特币地址。"
-    },
-    "destination": {
-      "title": "资金将被发送到",
-      "description": "你由 Nostr 派生的 Taproot 地址。"
-    },
-    "phrase": {
-      "title": "恢复短语",
-      "description": "粘贴你旧钱包的 12 词恢复短语。",
-      "checkingRelays": "正在中继上查找加密备份…",
-      "backupFoundTitle": "在你的中继上找到备份",
-      "backupFoundDesc": "我们在此账号发布的事件中找到了你旧钱包恢复短语的加密备份。",
-      "decryptAndUse": "解密并使用",
-      "placeholder": "word1 word2 word3 …",
-      "warning": "只粘贴你信任的恢复短语。任何拥有此短语的人都可以花费资金。转移完成后，请从你复制过它的任何地方删除它。",
-      "sweepButton": "将资金转入我的比特币地址"
-    },
-    "sweeping": {
-      "working": "处理中…",
-      "dontClose": "请不要关闭此标签页。旧钱包同步并广播交易可能需要最多一分钟。"
-    },
-    "success": {
-      "title": "恢复完成",
-      "sent": "已向你的比特币地址发送 {{sats}} sats。",
-      "viewTransaction": "查看交易"
-    },
-    "error": {
-      "title": "恢复失败",
-      "tryAgain": "重试"
-    },
-    "errors": {
-      "noNip44": "你的签名器不支持读取中继备份所需的 NIP-44 解密。请改为手动粘贴你的 12 词恢复短语。",
-      "decryptFailed": "无法解密中继备份。请改为手动粘贴你的 12 词恢复短语。",
-      "decryptGeneric": "解密中继备份失败。",
-      "invalidWordCount": "恢复短语必须是 12 或 24 个单词。",
-      "noBalance": "你的旧钱包没有可花费的余额。没有可以恢复的内容。",
-      "sweepGeneric": "恢复失败。请重试。"
-    },
-    "progress": {
-      "loadingSdk": "正在加载钱包 SDK…",
-      "connecting": "正在连接你的旧钱包…",
-      "checkingBalance": "正在查看余额…",
-      "preparingTransfer": "正在准备转移 {{sats}} sats…",
-      "broadcasting": "正在广播交易…"
-    },
-    "toast": {
-      "backupLoadedTitle": "已加载备份",
-      "backupLoadedDesc": "已从你的中继解密恢复短语。"
-    }
-  },
-  "walletBackup": {
-    "heading": "钱包助记词",
-    "dialogDescription": "你可以将这 24 词备份导入任何比特币钱包，以访问你的 Agora 钱包。",
-    "hidden": "点击以显示你的 24 词助记词。",
-    "revealAria": "显示助记词",
-    "hideAria": "隐藏助记词",
-    "warning": "任何拥有这些词的人都可以花掉你的比特币。切勿分享，切勿在任何网站上输入，切勿以明文存储在密码管理器之外的地方。"
-  },
-  "walletMigrate": {
-    "seoTitle": "迁移旧钱包",
-    "seoDescription": "将资金从你旧的 Agora 钱包（以 nsec 作为种子）转入新的 BIP-39 钱包。",
-    "title": "迁移旧钱包",
-    "heading": "迁移到你的新钱包",
-    "subheading": "Agora 的比特币钱包现在使用 BIP-39 助记词，因此可以导入任何钱包应用。你旧地址上的资金依然安全——此页面将通过一笔交易把它们转入你的新钱包。",
-    "backToWallet": "返回钱包",
-    "loading": "正在检查你的旧钱包…",
-    "warning": "这将构建一笔归集交易，消耗你旧钱包的全部 UTXO，并把总额（扣除少量网络手续费后）发送到你新钱包的第一个接收地址。一旦广播，此操作不可撤销。",
-    "startButton": "归集到新钱包",
-    "loggedOut": {
-      "title": "登录以进行迁移",
-      "description": "请使用拥有旧钱包的 Nostr 身份登录，以便将资金转入你的新地址。"
-    },
-    "unsupported": {
-      "title": "钱包不可用",
-      "description": "迁移仅适用于 nsec 登录，因为旧钱包的密钥是直接从你的 nsec 派生的。浏览器扩展和远程签名器登录无法执行此迁移。"
-    },
-    "noBlockbook": {
-      "title": "未配置 Blockbook",
-      "description": "迁移需要一个 Blockbook 索引器 URL 来扫描你的旧地址并广播归集交易。"
-    },
-    "noFunds": {
-      "title": "无需迁移",
-      "description": "你的旧钱包没有可花费的余额。所有资金都已在你的新钱包中。"
-    },
-    "detected": {
-      "title": "旧钱包中的资金",
-      "description": "这些资金将通过一笔交易转入你的新钱包。",
-      "bip86": "链上",
-      "sp": "静默支付",
-      "total": "总计"
-    },
-    "destination": {
-      "title": "目标地址",
-      "description": "你新钱包的第一个接收地址。"
-    },
-    "progress": {
-      "building": "正在构建交易…",
-      "signing": "正在签名输入…",
-      "broadcasting": "正在广播交易…",
-      "dontClose": "归集进行中，请勿关闭此标签页。"
-    },
-    "success": {
-      "title": "迁移完成",
-      "sent": "已向你的新钱包发送 {{sats}} sats（手续费 {{fee}} sats）。",
-      "viewTx": "查看交易"
-    },
-    "error": {
-      "title": "迁移失败",
-      "tryAgain": "重试"
-    },
-    "errors": {
-      "noV1Account": "无法访问旧钱包的密钥。",
-      "noDestination": "你的新钱包尚无接收地址。请等待钱包页面加载完成后重试。",
-      "noBlockbook": "未配置 Blockbook 索引器。迁移无法扫描你的旧地址。",
-      "noFunds": "在旧地址中未找到可花费的资金。",
-      "sweepGeneric": "迁移失败。请重试。"
-    },
-    "toast": {
-      "successTitle": "迁移完成",
-      "successDesc": "已将 {{sats}} sats 转入你的新钱包。"
-    }
-  },
-  "walletConnect": {
-    "status": "状态",
-    "ready": "就绪",
-    "notFound": "未找到",
-    "none": "无",
-    "add": "添加",
-    "active": "激活",
-    "connectionLabel": "NWC 连接",
-    "defaultWalletName": "Lightning 钱包",
-    "setActiveTitle": "设为激活",
-    "removeTitle": "移除钱包",
-    "helpText": "安装 WebLN 浏览器扩展或连接 NWC 钱包以发送 zap。",
-    "webln": {
-      "name": "WebLN",
-      "description": "浏览器扩展"
-    },
-    "nwc": {
-      "name": "Nostr Wallet Connect",
-      "description": "远程钱包连接",
-      "connectedCount_one": "已连接 {{count}} 个钱包",
-      "connectedCount_other": "已连接 {{count}} 个钱包"
-    },
-    "empty": {
-      "title": "未连接钱包",
-      "description": "添加一个 NWC 连接以启用即时 zap。"
-    },
-    "dialog": {
-      "title": "连接 NWC 钱包",
-      "description": "从你兼容 NWC 的钱包中粘贴连接字符串。",
-      "aliasPlaceholder": "钱包名称（可选）",
-      "connect": "连接",
-      "connecting": "连接中..."
-    },
-    "toast": {
-      "uriRequiredTitle": "需要连接 URI",
-      "uriRequiredDesc": "请输入有效的 NWC 连接 URI。",
-      "activeChangedTitle": "已切换激活钱包",
-      "activeChangedDesc": "所选钱包现在已激活用于 zap。"
-    }
-  },
-  "walletSend": {
-    "title": "发送比特币",
-    "send": "发送比特币",
-    "max": "MAX",
-    "tapAgainToConfirm": "再次点击确认",
-    "satPerVB": "{{rate}} sat/vB",
-    "notEnoughBitcoin": "比特币不足",
-    "recipient": {
-      "placeholder": "bc1…、sp1…",
-      "scan": "扫描二维码",
-      "sendToOnchain": "发送到比特币地址",
-      "sendToSilentPayment": "发送到静默支付地址",
-      "bitcoinAddress": "比特币地址",
-      "silentPayment": "静默支付地址",
-      "toLabel": "收件人",
-      "clear": "清除收件人",
-      "choosePaymentMethod": "请选择支付方式以继续"
-    },
-    "feeSpeed": {
-      "fastest": "~10 分钟",
-      "halfHour": "~30 分钟",
-      "hour": "~1 小时",
-      "economy": "~1 天",
-      "custom": "自定义"
-    },
-    "fee": {
-      "loading": "加载中…",
-      "unavailable": "不可用",
-      "loadFailed": "无法加载费率。",
-      "retry": "重试",
-      "orCustom": "或在下方输入自定义费率。",
-      "loadingTiers": "正在加载费率…",
-      "customPlaceholder": "例如 5",
-      "customAriaLabel": "自定义费率（sat/vB）"
-    },
-    "progress": {
-      "building": "正在构建交易…",
-      "signing": "正在签名…",
-      "broadcasting": "正在广播…",
-      "sending": "正在发送…"
-    },
-    "errors": {
-      "unavailable": "当前登录方式不支持 HD 钱包。",
-      "enterRecipient": "请输入比特币地址或 sp1… 静默支付地址。",
-      "noSpendable": "此钱包中没有可花费的比特币。",
-      "feesNotLoaded": "费率未加载。",
-      "enterAmount": "请输入金额。",
-      "insufficient": "比特币不足以支付该金额和网络费用。",
-      "waitingPrice": "正在等待 BTC 价格…",
-      "noneYet": "你还没有任何比特币。",
-      "feesNotLoadedYet": "费率尚未加载。",
-      "feeRateTooLow": "请输入至少 1 sat/vB 的费率。"
-    },
-    "scanError": {
-      "title": "无法读取该二维码",
-      "description": "需要的是比特币地址、静默支付地址（sp1…）或 bitcoin: URI。"
-    },
-    "toast": {
-      "failedTitle": "交易失败"
-    },
-    "broadcastError": {
-      "feeTooLowTitle": "网络费用过低",
-      "feeTooLowBodyWithMin": "Bitcoin 网络拒绝了该费用。当前最低费率约为 {{min}} sat/vB。",
-      "feeTooLowBody": "Bitcoin 网络拒绝了该费用。请选择更快的档位，或提高你的自定义费率。",
-      "rbfTitle": "替换交易需要更高的费用",
-      "rbfBody": "替换交易支付的费用必须高于原始交易。请提高费用后再试。",
-      "mempoolFullTitle": "Bitcoin 网络拥堵",
-      "mempoolFullBody": "mempool 已满，你的费用没有竞争力。请提高费用以便通过。",
-      "networkTitle": "无法连接到 Bitcoin 网络",
-      "networkBody": "请检查你的网络连接后再试。",
-      "mempoolConflictTitle": "交易冲突",
-      "mempoolConflictBody": "其中一个输入已被花费，或正在被另一笔交易花费。",
-      "tooLongChainTitle": "未确认交易过多",
-      "tooLongChainBody": "你有一长串未确认的交易。请等待其中一笔确认后再试。",
-      "badInputsTitle": "交易被拒绝",
-      "badInputsBody": "网络拒绝了此交易。请调整金额或收款人后再试。",
-      "absurdlyHighFeeTitle": "费用异常偏高",
-      "absurdlyHighFeeBody": "估算的费用高得可疑。请重新加载费率后再试。",
-      "unknownTitle": "交易失败",
-      "useHigherFee": "使用更高的费用",
-      "tryAgain": "重试",
-      "atMaxFeeTier": "你已选择最快的档位。"
-    },
-    "success": {
-      "title": "比特币已发送",
-      "satsAmount": "{{sats}} sats",
-      "viewTransaction": "查看交易",
-      "done": "完成"
-    },
-    "titlePublic": "发送比特币",
-    "titlePrivate": "私密发送",
-    "reuse": {
-      "checking": "正在检查地址…",
-      "sendAnyway": "仍然发送",
-      "acknowledge": "我了解风险——仍然发送",
-      "historyWarning": "该地址已在链上使用过。把你的私密资金发送到这里，会将其与该地址已有的交易历史关联，从而破坏静默支付的隐私性。请改用静默支付地址（sp1…），或仍然发送。",
-      "ownPublicWarning": "这是你自己公开钱包中的地址。把私密资金发送到它会合并两个钱包并将它们关联起来。请改用静默支付地址（sp1…），或仍然发送。"
-    },
-    "ownSilentPaymentBlocked": "这是你自己的静默支付地址。你不能从公开钱包向私密钱包发送资金——这样做会把你的私密静默支付资金与已在公开账本上暴露的币混合在一起，从而将你的私密钱包与一个已知身份关联，彻底破坏其隐私性。请改用其他地址发送。"
-  },
   "qrScanner": {
     "title": "扫描二维码",
     "close": "关闭",
@@ -1683,72 +1229,6 @@
       "overconstrained": "此设备的摄像头不支持所请求的设置。",
       "didntStart": "摄像头未启动。可能有其他应用正在使用它，或者你的浏览器阻止了扫描器。"
     }
-  },
-  "bitcoinPublic": {
-    "lead": "你发送的资金是公开的，可以追溯到你。",
-    "learnMore": "了解更多",
-    "body": "比特币是公开账本。你发送的交易可以永远追溯到你，即使被多人转手后也是如此。只发送给那些你愿意公开支持的人。",
-    "bodyWithCashOut": "比特币是公开账本。你发送的交易可以永远追溯到你，即使被多人转手后也是如此。只发送给那些你愿意公开支持的人，或在交易所兑换成法币。",
-    "iUnderstand": "我理解此交易是公开的。"
-  },
-  "spScan": {
-    "title": "检查新付款",
-    "subtitle": "扫描区块链以查找私密支付",
-    "descriptionHelp": "了解更多",
-    "description": "逐块遍历已配置的 BIP-352 索引器，以检测传入的静默支付。",
-    "since": "起始时间",
-    "preset": {
-      "lastHour": "最近一小时",
-      "last3h": "最近 3 小时",
-      "last24h": "最近 24 小时",
-      "lastWeek": "最近一周",
-      "lastMonth": "最近一个月",
-      "custom": "自定义…"
-    },
-    "customHours": "小时",
-    "customHoursPlaceholder": "例如 12",
-    "advanced": "高级选项",
-    "connectingIndexer": "正在连接索引器…",
-    "upToDate": "已是最新状态。",
-    "fromBlock": "起始区块",
-    "indexerTip": "索引器链尖",
-    "lastFullyScanned": "上次完整扫描",
-    "never": "从未",
-    "includeSpent": "包括已花费",
-    "includeSpentDesc": "同时检测已经被花费的静默支付。在错过扫描或重置后重建收款历史时使用。",
-    "blockProgress": "区块 {{current}} / {{to}}",
-    "matches_one": "{{count}} 项匹配",
-    "matches_other": "{{count}} 项匹配",
-    "scannedRange": "已扫描区块 {{from}} → {{to}}。",
-    "foundOutputs_one": "发现 {{count}} 个新输出。",
-    "foundOutputs_other": "发现 {{count}} 个新输出。",
-    "noNewPayments": "没有新的支付。",
-    "startScan": "开始扫描",
-    "resolveFailed": {
-      "title": "无法获取起始区块",
-      "description": "目前无法访问 mempool.space。请在“高级选项 → 起始区块”中手动输入起始区块以继续扫描。"
-    },
-    "reconcile": {
-      "title": "对账已花费的 UTXO",
-      "description": "将每个存储的静默支付 UTXO 与 Blockbook 进行比对，并移除那些已被花费的。如果发送后余额高于应有数额，请使用此功能。",
-      "checking": "正在检查 {{checked}} / {{total}}…",
-      "checked_one": "已检查 {{count}} 个 UTXO · 已清理 {{pruned}}。",
-      "checked_other": "已检查 {{count}} 个 UTXO · 已清理 {{pruned}}。",
-      "reconciling": "正在对账…",
-      "reconcileNow": "立即对账"
-    },
-    "autoScan": {
-      "label": "自动扫描",
-      "description": "在后台持续检查新的私密支付，即使你离开此页面也会继续。"
-    }
-  },
-  "spAutoScan": {
-    "scanning": "正在扫描…区块 {{current}} / {{to}}",
-    "caughtUp": "已是最新",
-    "neverScanned": "尚未扫描",
-    "lastScanned": "已扫描至区块 {{height}}",
-    "paused": "自动扫描已关闭",
-    "manualLink": "扫描选项"
   },
   "notifications": {
     "seoTitle": "通知",
@@ -1771,8 +1251,6 @@
     "actions": {
       "reactedToYour": "回应了你的{{noun}}",
       "repostedYour": "转发了你的{{noun}}",
-      "zappedYou": "给你打了 zap",
-      "zappedYouWithAmount": "给你打了 {{sats}} sats",
       "repliedToYourNote": "回复了你的笔记",
       "mentionedYou": "提到了你",
       "repliedToYourComment": "回复了你的评论",
@@ -1814,14 +1292,11 @@
       "emojiPack": "表情包",
       "podcastEpisode": "播客单集",
       "podcastTrailer": "播客预告",
-      "zapstoreAsset": "Zapstore 资源",
-      "zapstoreRelease": "Zapstore 发布",
       "stream": "直播",
       "status": "状态",
       "repository": "仓库",
       "customNip": "自定义 NIP",
       "calendarEvent": "日历事件",
-      "zapstoreApp": "Zapstore 应用",
       "playlist": "播放列表",
       "divine": "占卜",
       "community": "社区",
@@ -1874,10 +1349,6 @@
         "label": "转发",
         "description": "有人转发你的笔记时"
       },
-      "zaps": {
-        "label": "Zap",
-        "description": "有人通过 Lightning 或链上给你 zap 时"
-      },
       "mentions": {
         "label": "提及",
         "description": "有人在笔记中提到你时"
@@ -1911,7 +1382,7 @@
     "inputPlaceholder": "搜索",
     "filtersAria": "搜索过滤器",
     "tabs": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "nostr": "Nostr",
       "accounts": "用户"
     },
@@ -1988,8 +1459,8 @@
       "postsPrompt": "输入搜索关键词以查找 Nostr 内容。",
       "accounts": "没有找到匹配你搜索的用户。",
       "followsPrompt": "通过名字或 NIP-05 地址搜索用户。",
-      "agora": "没有找到匹配你搜索的 Agora 竞选、pledge 或群组。",
-      "agoraPrompt": "搜索 Agora 的竞选、pledge 和群组，或浏览最新内容。",
+      "agora": "没有找到匹配你搜索的 Eranos 竞选、pledge 或群组。",
+      "agoraPrompt": "搜索 Eranos 的竞选、pledge 和群组，或浏览最新内容。",
       "activeFilters": "已生效的过滤器：",
       "clearAll": "清除所有过滤器"
     }
@@ -2013,7 +1484,6 @@
       "editProfile": "编辑",
       "shareFollowLink": "分享关注链接",
       "moreOptions": "更多选项",
-      "donate": "捐赠",
       "campaignGoal": "目标 ${{amount}}"
     },
     "stats": {
@@ -2056,7 +1526,6 @@
       "addToList": "添加到列表",
       "shareFollowLink": "分享关注链接",
       "profileRecovery": "资料恢复",
-      "zap": "Zap",
       "awardBadge": "颁发徽章",
       "writeLetter": "写信",
       "mute": "静音 @{{name}}",
@@ -2138,8 +1607,6 @@
       "heading": "资料字段",
       "website": "网站",
       "websitePlaceholder": "https://yourwebsite.com",
-      "lightning": "Lightning",
-      "lightningPlaceholder": "you@walletofsatoshi.com",
       "labelPlaceholder": "标签",
       "tickerPlaceholder": "代码",
       "addressPlaceholder": "地址",
@@ -2169,11 +1636,6 @@
         "defaultLabel": "邮箱",
         "description": "联系电子邮件地址",
         "valuePlaceholder": "you@example.com"
-      },
-      "wallet": {
-        "label": "钱包",
-        "description": "加密货币钱包地址",
-        "valuePlaceholder": "地址"
       },
       "link": {
         "label": "链接",
@@ -2343,12 +1805,6 @@
     "reacted": "做出了反应",
     "reposted": "转发",
     "voted": "投了票",
-    "zap": {
-      "donatedTo": "捐赠给",
-      "donatedAmountTo": "捐赠 {{amount}} 给",
-      "sat_one": "{{formattedCount}} sat",
-      "sat_other": "{{formattedCount}} sats"
-    },
     "stream": {
       "untitled": "未命名直播",
       "live": "直播中",
@@ -2419,7 +1875,6 @@
       "nsiteDeployed": "部署了一个",
       "nsiteRedeployed": "重新部署了一个",
       "nsiteNoun": "nsite",
-      "zapped": "进行了 zap",
       "pledgeCreated": "创建了一个",
       "pledgeUpdated": "更新了一个",
       "pledgeNoun": "承诺",
@@ -2589,60 +2044,12 @@
         "body": "资金直接到达受款人。他们保留所有权，保留控制权。转移、兑换或花费；下面的指南解释了如何私密、安全地完成。"
       }
     },
-    "twoWays": {
-      "eyebrow": "比特币 · 一个 QR，两种选择",
-      "title": "两种收款方式。",
-      "lede": "两种选择都是比特币。区别在于为隐私付出什么代价。受款人创建活动时，选择接受哪些方式。如果两者都接受，捐赠页面会显示一个适用于任何钱包的 QR 码。",
-      "public": {
-        "kicker": "比特币公开支付",
-        "tagline": "通用 · 快速 · 透明",
-        "title": "适用于地球上所有钱包。",
-        "description": "捐款直接到达受款人控制的普通比特币地址。任何拥有比特币钱包的人都可以发送。无需新应用，无需新账户，无需学习曲线。",
-        "bullet1": "适用于所有比特币钱包：Cash App、Coinbase、Strike、硬件",
-        "bullet2": "最快结算：仅需比特币确认",
-        "bullet3": "链上可验证：任何人都可以看到受款人收到的金额",
-        "tradeoffTitle": "权衡：链上公开。",
-        "tradeoffIntro": "每一笔捐款在比特币区块链和 Nostr 上都是公开的。{{appName}} 仅推荐用于公开活动。如果你或你的捐赠者需要极致的隐私，包括来自国家行为者的隐私，请在参与前阅读<0>捐赠者指南</0>和<1>受款人指南</1>。"
-      },
-      "silent": {
-        "kicker": "比特币静默支付",
-        "tagline": "不可链接 · 直接 · BIP-352",
-        "title": "不可链接、链上、直接。",
-        "description": "捐款以 BIP-352 静默支付的形式发送。每一笔都到达一个全新的、不可链接的比特币输出，盯着区块链的观察者无法将其与活动联系起来。",
-        "bullet1": "捐赠轨迹无法在链上被重建",
-        "bullet2": "保护面临严重对手的受款人",
-        "bullet3": "保存在独立的私密余额中，永不与公开资金混合",
-        "tradeoffTitle": "权衡：静默支付尚处早期阶段。",
-        "tradeoffIntro": "在链上接收比特币最私密的方式，但生态系统目前还年轻和粗糙：",
-        "tradeoffBullet1": "支持的钱包很少。",
-        "tradeoffBullet2": "接收较慢。",
-        "tradeoffBullet3": "没有推送通知。",
-        "tradeoffBullet4": "钱包仍有错误。",
-        "tradeoffBullet5": "捐赠计数不公开。"
-      },
-      "noCustody": {
-        "title": "无托管。无中间人。",
-        "body": "{{appName}} 从不持有资金。捐款在比特币上以钱包对钱包的方式移动。两种选项中，没有服务器在捐赠者和受款人之间。如果 {{appName}} 明天消失，每个活动都会继续运作。",
-        "gofundme": {
-          "heading": "不像 GoFundMe",
-          "body": "没有平台可以冻结你的捐款、要求退款或因政策分歧而终止你的活动。"
-        },
-        "givesendgo": {
-          "heading": "不像 GiveSendGo",
-          "body": "没有支付处理商在中间，所以没有 Stripe、没有 Visa、没有银行可以在活动中切断你。"
-        },
-        "otherBitcoin": {
-          "heading": "不像其他'比特币'平台",
-          "body": "没有中央 Lightning 节点、托管方或 LSP 可能出现故障或下线。资金直接在链上结算到你控制的钱包。"
-        }
-      }
-    },
     "faq": {
       "eyebrow": "问题",
       "title": "常见问题。",
       "chapter1": {
         "label": "入门",
-        "description": "Agora 是什么、谁建造的、费用如何。"
+        "description": "Eranos 是什么、谁建造的、费用如何。"
       },
       "chapter2": {
         "label": "比特币捐赠",
@@ -2650,7 +2057,7 @@
       },
       "chapter3": {
         "label": "关于 Nostr",
-        "description": "Agora 所基于的开放协议，以及你的账户如何运作。"
+        "description": "Eranos 所基于的开放协议，以及你的账户如何运作。"
       }
     },
     "guides": {
@@ -2664,7 +2071,6 @@
         "description": "无需向支付处理商请求许可，直接向世界各地的受款人和运动发送比特币。",
         "bullet1": "使用你已有的任何比特币钱包。",
         "bullet2": "捐款直接到达受款人。没有托管方，没有中间人。",
-        "bullet3": "为了隐私，请使用支持静默支付的钱包。",
         "cta": "阅读捐赠者指南"
       },
       "recipient": {
@@ -2673,8 +2079,6 @@
         "title": "无需许可获得资金。",
         "description": "直接从相信你事业的人那里接收支持。无需银行账户，无需申请表，中间没有公司。",
         "bullet1": "注册后即可开始接收捐赠。",
-        "bullet2": "选择接受哪些支付类型：公开、静默支付或两者。",
-        "bullet3": "为了私密提现，先发送到静默支付钱包，然后再转发到任何地方。",
         "cta": "阅读受款人指南"
       },
       "stillStuck": "还有问题？",
@@ -2685,10 +2089,10 @@
   "faq": {
     "categories": {
       "getting-started": {
-        "label": "关于 Agora"
+        "label": "关于 Eranos"
       },
       "payments": {
-        "label": "在 Agora 上的比特币捐款"
+        "label": "在 Eranos 上的比特币捐款"
       },
       "about-nostr": {
         "label": "关于 Nostr"
@@ -2717,51 +2121,6 @@
           "{{appName}} 由 [Soapbox](https://soapbox.pub) 构建——一个为 Nostr 生态系统打造工具的开源团队，与 [世界自由大会（World Liberty Congress）](https://worldlibertycongress.org/) 合作完成。"
         ]
       },
-      "send-bitcoin-onchain": {
-        "question": "发送比特币是如何运作的？",
-        "answer": [
-          "当一位受款人创建一项活动时，他们可以选择接受哪种类型的支付：**公开**、**私密**或**两者皆可**。",
-          "**公开**捐款是真实的链上比特币。它们在公开区块链上结算，可在任何比特币钱包中使用，并且对所有人可见。",
-          "**私密**捐款使用**静默支付**（BIP-352）。它们同样在链上结算，但交易无法关联回受款人的捐款代码——因此不会出现在公开的捐款人列表或总额中。捐款人需要支持静默支付的钱包——我们推荐 [Ditto Wallet](https://ditto.pub) 或 [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)。",
-          "当一项活动同时接受**两者**时，{{appName}} 会显示一个同时编码两种端点的二维码。支持静默支付的钱包会将其识别为私密支付；其他钱包会退回到公开地址支付。捐款人无需选择——他们的钱包会自动选取正确的路径。",
-          "无论哪种方式，款项都会直接到达受款人。{{appName}} 从不接触这些资金。"
-        ]
-      },
-      "connect-wallet": {
-        "question": "{{appName}} 上的钱包是什么？",
-        "answer": [
-          "你的 {{appName}} 钱包是一个**自托管**的比特币钱包，由你的 Nostr 密钥派生而来。{{appName}} 从不持有你的资金——钱包运行在你的浏览器中，并使用一把只有你掌控的密钥在本地签署交易。它可以以两种方式接收比特币——作为任何比特币钱包都能支付的公开地址，以及作为受支持钱包可以私密支付的静默支付代码。无需注册任何东西；只要你拥有账户，它就存在了。",
-          "钱包有两个标签页：**公开**（你的普通比特币地址）和**私密**（静默支付）。这两笔余额被严格分开，永远无法一起花费——正是这种隔离让私密捐款在链上保持不可链接。当你创建活动时，你可以选择接受公开支付、私密支付，或两者皆可。要使用你收到的资金，请参阅**受款人指南**。",
-          "你也可以导出钱包的 24 个助记词，并将其导入任何标准的比特币钱包——参见下方“我能把我的 {{appName}} 钱包导出到其他比特币钱包吗？”。"
-        ]
-      },
-      "export-wallet": {
-        "question": "我能把我的 {{appName}} 钱包导出到其他比特币钱包吗？",
-        "answer": [
-          "可以。你的 {{appName}} 钱包是完全自托管的。{{appName}} 从不持有你的比特币，也从不接触你的密钥——钱包完全运行在你的浏览器中，使用一把由你的 Nostr 私钥（nsec）派生的密钥在本地签署交易。",
-          "从菜单中打开钱包，点击右上角的三点菜单，选择**备份钱包**。你会看到一段 24 个词的 BIP-39 助记词。请将其抄写在安全的地方（或保存在密码管理器中）——**任何拥有这些词的人都可以花掉你的比特币。**",
-          "你可以把这 24 个词导入任何标准的比特币钱包：**Sparrow**、**Electrum**、**BlueWallet**、**Phoenix**、**Trezor** 或 **Ledger**。{{appName}} 使用标准的 BIP-86（Taproot）和 BIP-352（静默支付）派生路径，因此无需任何特殊配置。",
-          "导入之后，另一个钱包会显示与你的 {{appName}} 钱包相同的余额和历史——它们是同一个钱包，只是从两个不同的视角查看而已。",
-          "助记词导出仅在你使用 nsec 登录时可用。浏览器扩展和远程签名器（bunker）登录会将你的私钥隔离开来，因此 {{appName}} 在这些模式下无法派生助记词。"
-        ]
-      },
-      "donations-are-public-general": {
-        "question": "{{appName}} 上的捐款是公开的吗？",
-        "answer": [
-          "这取决于受款人所接受的支付类型。",
-          "**公开捐款**会被记录在比特币区块链和 Nostr 上。任何人都可以看到金额、时间和地址。",
-          "**私密捐款**使用静默支付。它们无法被公开关联到受款人的捐款代码，不会出现在捐款人列表中，也不计入公开总额。",
-          "当一项活动同时接受两者时，由捐款人的钱包决定使用哪条路径——支持静默支付的钱包私密支付，其他钱包则支付公开地址。完整图景请阅读**捐款人指南**和**受款人指南**。"
-        ]
-      },
-      "why-donations-pending": {
-        "question": "为什么有些捐款显示为“**待确认**”？",
-        "answer": [
-          "**待确认**的捐款是真实的、已经发送出去的比特币——只是还在等待网络确认。捐款人的钱包已经广播了这笔交易，但它尚未被打包进区块。",
-          "比特币大约每 10 分钟产生一个新区块，矿工会根据捐款人支付的手续费来挑选交易。大多数捐款会在一小时内确认；当网络拥堵时，手续费较低的交易可能需要更长时间。{{appName}} 会自动重新检查确认状态，所以一旦有区块打包，**待确认**标签就会自行消失。",
-          "款项已经在路上——一旦确认，受款人就会看到这笔捐款计入活动总额。无论是受款人还是 {{appName}} 都无法加快它的速度；只有捐款人的钱包可以通过追加手续费来提速。"
-        ]
-      },
       "censorship-resistance": {
         "question": "这里所说的“抗审查”是什么意思？",
         "answer": [
@@ -2775,22 +2134,6 @@
           "比特币是世界上支持最广泛、最具抗审查能力的支付通道。每一个比特币钱包都可以发送它。",
           "在 {{appName}} 上，受款人可以选择如何接收：**公开**（普通的比特币地址）以获得最大触达；**私密**（静默支付）以获得不可关联的捐款；或者**两者皆可**——这样每位捐款人的钱包都会自动挑选合适的路径。只有面向大众的比特币应用的捐款人仍可贡献；拥有静默支付钱包的捐款人则默认获得隐私。",
           "代价是：公开的比特币交易在区块链上可见，且需支付矿工费。捐款人指南和受款人指南会说明如何应对这两种情况。"
-        ]
-      },
-      "why-not-silent-payments": {
-        "question": "{{appName}} 支持静默支付吗？",
-        "answer": [
-          "支持——发送和接收两端都支持。{{appName}} 内置的比特币钱包支持 BIP-352，因此当你从 {{appName}} 钱包发送比特币时，可以直接向任意静默支付地址（`sp1…`）付款。而当受款人创建活动时，他们可以选择与公开比特币支付一起接受静默支付，或者用静默支付完全替代公开支付。",
-          "静默支付捐款同样在链上结算，但交易无法关联回受款人的捐款代码——因此不会出现在公开的捐款人列表或总额中。",
-          "从 {{appName}} 之外发送静默支付需要支持 BIP-352 的钱包。多数面向大众的应用尚不支持，但 [Ditto Wallet](https://ditto.pub) 和 [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) 支持。",
-          "当一项活动同时接受两种类型的支付时，{{appName}} 会将其编码进同一个二维码中。支持静默支付的钱包以私密方式支付；其他人则支付公开地址。没有捐款人会被拒之门外，也没有受款人会被迫在触达与隐私之间做选择。"
-        ]
-      },
-      "why-not-lightning": {
-        "question": "为什么 {{appName}} 不使用闪电网络？",
-        "answer": [
-          "闪电网络需要一个闪电钱包。最容易上手的（Wallet of Satoshi、Strike、Breez）都是**托管的**——由公司持有资金，可能被关停、被地理屏蔽，或被施压冻结账户。非托管的闪电网络对新人而言技术门槛高且不够可靠。",
-          "我们希望 {{appName}} 能够服务于那些只用过 Cash App、Coinbase、Strike、Venmo 或 PayPal 这类大众比特币应用的人。链上比特币能与全世界的所有钱包兼容。"
         ]
       },
       "why-not-rotating-addresses": {
@@ -2836,19 +2179,6 @@
           "完整指南请参阅 [管理你的 Nostr 密钥](https://soapbox.pub/blog/managing-nostr-keys)。"
         ]
       },
-      "send-bitcoin-lightning": {
-        "question": "通过闪电网络发送比特币是如何运作的？",
-        "answer": [
-          "如果接收方在其个人资料中放置了闪电地址，你可以向那里发送。闪电网络在数秒内完成结算，手续费极低。",
-          "闪电网络发送不使用 {{appName}} 的捐款地址——它们会直接进入接收方自行设置的任意闪电钱包。{{appName}} 自身的捐款流程仅限于链上。"
-        ]
-      },
-      "what-are-zaps": {
-        "question": "Zaps 是什么？",
-        "answer": [
-          "Zaps 是 Nostr 上的小额闪电网络打赏，独立于 {{appName}} 的链上捐款流程。"
-        ]
-      },
       "fyp": {
         "question": "信息流是如何运作的？",
         "answer": [
@@ -2889,74 +2219,7 @@
   },
   "guides": {
     "shared": {
-      "tldrEyebrow": "简短版本",
-      "paymentBadge": {
-        "public": "公开支付",
-        "silent": "静默支付"
-      },
-      "paymentComparison": {
-        "donorHeader": "当你捐款时",
-        "recipientHeader": "当你创建活动时",
-        "donorRows": {
-          "whatYouSee": {
-            "label": "你所看到的",
-            "public": "一个普通的比特币地址，你可以从任何地方付款。",
-            "silent": "同一个二维码。如果你的钱包支持 BIP-352，它会选择静默支付端点。"
-          },
-          "walletSupport": {
-            "label": "钱包支持",
-            "public": "所有比特币钱包。Cash App、Coinbase、Strike、硬件钱包，任何一种。",
-            "silent": "目前支持的钱包很少。大多数会退回到普通的比特币交易。"
-          },
-          "privacy": {
-            "label": "捐款的隐私",
-            "public": "在链上公开。你的发送地址将永久与该活动关联。",
-            "silent": "接收端在链上无法被关联。你的发送钱包的踪迹仍是公开的。"
-          },
-          "settlement": {
-            "label": "结算",
-            "public": "正常的比特币确认。",
-            "silent": "同样的链上确认，但受款人必须扫描其钱包才能发现它。"
-          }
-        },
-        "recipientRows": {
-          "whatDonorsSee": {
-            "label": "捐款人所看到的",
-            "public": "一个普通的比特币地址。可与全世界的所有钱包一起使用。",
-            "silent": "一个 BIP-352 端点。捐款人的钱包需要支持静默支付；否则该捐款会退回到普通的比特币交易。"
-          },
-          "receivingSpeed": {
-            "label": "接收速度",
-            "public": "推送式。捐款立刻显示在活动页面上。",
-            "silent": "手动扫描。你的钱包必须沿着区块链查找。视钱包而定，可能需要数分钟至数小时。"
-          },
-          "pushNotifications": {
-            "label": "推送通知",
-            "public": "有。新捐款到达的瞬间你就能看到。",
-            "silent": "无。打开钱包并触发一次扫描才能发现它们。"
-          },
-          "donorList": {
-            "label": "捐款人列表 / 活动总额",
-            "public": "永久公开。金额和发送地址对任何人可见。",
-            "silent": "私密。活动页面无法显示静默支付捐款的数量或总额。"
-          },
-          "ecosystem": {
-            "label": "生态成熟度",
-            "public": "成熟。工具已经稳定。",
-            "silent": "前沿。钱包仍有 bug；预计会有错过的支付，要等到稍后扫描才显示出来。"
-          },
-          "bestFor": {
-            "label": "适合",
-            "public": "公开的众筹活动，社会证明和可见度对其有帮助。",
-            "silent": "捐款人或受款人的隐私比可见总额更重要的活动。"
-          },
-          "watchOutFor": {
-            "label": "需要留意",
-            "public": "每一位捐款人的永久公开记录。",
-            "silent": "目前体验颠簸。一些捐款要等到受款人扫描后才会显示。"
-          }
-        }
-      }
+      "tldrEyebrow": "简短版本"
     },
     "donor": {
       "tldr": {
@@ -2974,18 +2237,11 @@
             "title": "打开活动",
             "body": "你会看到一个二维码。如果活动同时接受两种选项，它会编码两个端点；你的钱包会选择合适的一个。"
           },
-          "payFromAnyWallet": {
-            "title": "用任意钱包付款",
-            "body": "Cash App、Coinbase、Strike、硬件钱包，任何一种。支付金额加上网络费用。"
-          },
           "arrivesDirectly": {
             "title": "直接到达",
             "body": "款项直接结算给受款人。{{appName}} 既不持有也不路由它们，地址是从受款人的 Nostr 私钥派生出来的。"
           }
         }
-      },
-      "comparison": {
-        "footnote": "活动可以仅接受公开、仅接受静默或同时接受两者。如果两者皆接受，二维码会携带两个端点。你的钱包会挑选它能使用的那一个。"
       },
       "publicVisible": {
         "title": "公开捐款会永远在链上可见",
@@ -2995,10 +2251,6 @@
         "heading": "私密地捐款",
         "intro": "这些步骤对**公开**捐款最为重要，因为其每一笔交易都永久绑定到同一个地址。**静默**捐款已经隐藏了接收端，因此风险更低。但无论哪种方式，针对你发送钱包的定向分析仍然可能；如果你的风险较高，这些步骤值得采取。挑一种，或者多管齐下。",
         "options": {
-          "silentWallet": {
-            "name": "使用支持静默支付的钱包",
-            "purpose": "使用支持 BIP-352 的比特币钱包付款。如果活动接受静默支付，你的钱包会自动使用该端点。"
-          },
           "nonKyc": {
             "name": "购买非 KYC 的比特币",
             "purpose": "点对点购买比特币，使其从一开始就不与你的政府身份相关联。最强的隐私起点。"
@@ -3006,23 +2258,12 @@
           "coinjoin": {
             "name": "先做 Coinjoin",
             "purpose": "把你的比特币与其他人的硬币混合，使其输出无法追溯到你的 KYC 购买记录。在活动只接受公开支付时尤其有用。"
-          },
-          "freshWallet": {
-            "name": "使用全新钱包",
-            "purpose": "从未接触过你主要身份或任何 KYC 交易所的钱包中捐款。"
           }
         }
       },
       "consumerApps": {
         "title": "面向大众的应用无法让你匿名",
         "body": "Cash App、Coinbase、Strike、Venmo、Kraken、Binance 和 PayPal 都会验证你的身份。无论你如何发送捐款，每笔交易都会与你的真实身份挂钩。请使用你自己掌控的非托管钱包。"
-      },
-      "silentToday": {
-        "heading": "关于静默支付当前状况的备注",
-        "paragraphs": [
-          "静默支付是链上接收比特币最具隐私性的方式，但生态仍处于早期阶段。大多数热门钱包尚不能向静默支付端点发送，因此当一个钱包无法做到时，该捐款会退回到一笔指向该活动公开地址的普通比特币交易（如果该活动同时接受两者）。",
-          "对于受款人而言，静默支付捐款也不会有推送通知，只有在受款人扫描其钱包之后才会出现，这可能需要数分钟到数小时。这一切并不影响你资金的安全，只是塑造了体验。"
-        ]
       }
     },
     "recipient": {
@@ -3052,20 +2293,6 @@
           "静默支付的捐款不属于该记录。它们对外部观察者不可见，也不会出现在活动的公开总额中；新捐款人只看到你所公布的活动进展。"
         ]
       },
-      "comparison": {
-        "footnote": "一个活动在创建后不能更改其接受的支付选项。如果你改变主意，请创建新的活动。"
-      },
-      "silentToday": {
-        "heading": "关于静默支付当前状况的备注",
-        "paragraphs": [
-          "静默支付是链上接收比特币最具隐私性的方式，但生态仍处于早期阶段。大多数热门钱包尚不能向静默支付端点发送，因此当捐款人的钱包无法做到时，该捐款会退回到一笔指向你公开地址的普通比特币交易（如果你同时接受两者）。",
-          "静默支付捐款也不会有推送通知，只有在你扫描你的钱包之后才会出现，这可能需要数分钟到数小时。这一切并不影响你资金的安全，只是塑造了日常体验。"
-        ]
-      },
-      "twoWallets": {
-        "title": "让你的公开余额与私密余额保持分离",
-        "body": "你的 {{appName}} 钱包会显示两个标签页：**公开**（你的普通比特币地址）和**私密**（静默支付）。它们被严格分开，这两笔余额永远无法在同一笔交易中花费——正是这种隔离让你的私密捐款保持不可链接。当你从**私密**标签页提现时，请发送到一个静默支付地址（**sp1…**），它会保持私密。如果你转而把私密资金发送到一个裸露的链上地址，{{appName}} 会进行检查：如果该地址此前被使用过，或属于你自己的公开钱包，它会向你发出警告，并要求你点击**仍然发送**，因为这样做会把你的私密资金与该地址的公开历史关联起来。发送到 **sp1…** 地址永远不会触发该警告。"
-      },
       "movePromptly": {
         "heading": "及时转移捐款",
         "steps": {
@@ -3083,14 +2310,6 @@
         "heading": "以私密方式提现",
         "intro": "在链上消费会留下踪迹，除非你先打断它。请从**私密**标签页提现，以保持静默支付捐款的不可链接性——先发送到一个静默支付钱包（一个 **sp1…** 地址），然后再向外消费；这一跳会切断你的活动与之后行为之间的联系。不要把私密资金发送到一个被重复使用过的或公开的地址，那样会重新关联它们。下面其他选项也可行，并各有取舍。",
         "options": {
-          "silentHop": {
-            "name": "静默支付钱包中转",
-            "purpose": "把你的捐款转到静默支付钱包（[Ditto Wallet](https://ditto.pub)、[Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)）。从那里开始，你的后续支出便不再与活动绑定。"
-          },
-          "lightningSwap": {
-            "name": "闪电网络兑换",
-            "purpose": "把链上比特币原子换成闪电网络支付。闪电网络支付不会进入公开区块链。"
-          },
           "coinjoin": {
             "name": "Coinjoin",
             "purpose": "把你的比特币与其他用户的硬币混合，使输出无法关联回输入。"
@@ -3110,68 +2329,5 @@
         "body": "托管型混币器可能盗取你的硬币、记录谁向谁发送了什么，或最终被证明是执法部门的诱饵。改用静默支付中转或非托管的 coinjoin 吧。"
       }
     }
-  },
-  "walletDoubleTweak": {
-    "seoTitle": "Double-tweak SP 修复",
-    "seoDescription": "找回因早先发送漏洞而滞留在链上的静默支付，并将它们归集到你的钱包。",
-    "title": "Double-tweak SP 修复",
-    "heading": "找回滞留的静默支付",
-    "subheading": "早先版本的 Agora 将部分静默支付输出编码到了错误的密钥，因此它们从未出现在你的钱包中。此工具会重新扫描链上的这些输出，并将找到的任何一笔归集到你的钱包。",
-    "back": "返回",
-    "loggedOut": "请使用收到这些静默支付的 Nostr 身份登录，以便将其找回。",
-    "unsupported": {
-      "title": "钱包不可用",
-      "description": "找回功能需要一个可在本地签名的钱包。请使用你的 nsec 登录以继续。"
-    },
-    "noIndexer": {
-      "title": "未配置静默支付索引器",
-      "description": "扫描滞留的支付需要一个 BIP-352 索引器 URL。请在钱包设置中设置一个后重试。"
-    },
-    "scan": {
-      "title": "扫描滞留的支付",
-      "description": "选择开始扫描的区块高度。找回功能会从该高度逐块检查至链尖。",
-      "fromHeightLabel": "起始区块高度",
-      "tipHint": "当前链尖：{{tip}}",
-      "start": "扫描",
-      "cancel": "取消扫描",
-      "progress": "正在扫描区块 {{current}} / {{to}} — 已发现 {{found}} 笔",
-      "tipMissing": "正在解析链尖…"
-    },
-    "noFunds": {
-      "title": "无可找回的资金",
-      "description": "在扫描范围内未发现滞留的静默支付。如果你预期有资金，请尝试更早的起始高度。"
-    },
-    "found": {
-      "title": "发现滞留的支付",
-      "description": "这些输出可以被归集回你的钱包。",
-      "count": "输出",
-      "recoverable": "可找回"
-    },
-    "destination": {
-      "title": "资金将发送至",
-      "description": "你当前钱包中的一个新接收地址。"
-    },
-    "sweepButton": "找回资金",
-    "sweeping": "正在找回你的资金…",
-    "dontClose": "找回完成前请勿关闭此页面。",
-    "success": {
-      "title": "找回完成",
-      "sent": "已将 {{sats}} sats 找回到你的钱包。",
-      "viewTx": "查看交易"
-    },
-    "error": {
-      "title": "找回失败",
-      "tryAgain": "重试"
-    },
-    "errors": {
-      "noDestination": "没有可用的目标地址。请先打开你的钱包。",
-      "noBlockbook": "未配置 Blockbook 服务器。请在钱包设置中设置一个。",
-      "sweepGeneric": "无法完成找回归集。"
-    },
-    "toast": {
-      "successTitle": "资金已找回",
-      "successDesc": "已将 {{sats}} sats 归集到你的钱包。"
-    },
-    "footnote": "这是一次单向归集到你当前钱包的操作。只会处理受影响的静默支付；其他一切保持不变。"
   }
 }

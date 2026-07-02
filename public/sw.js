@@ -1,5 +1,5 @@
 /**
- * Agora Service Worker
+ * Eranos Service Worker
  *
  * Handles incoming Web Push notifications from the nostr-push server and
  * opens/focuses the app when the user taps a notification.
@@ -14,17 +14,17 @@ self.addEventListener('push', (event) => {
   try {
     payload = event.data.json();
   } catch {
-    payload = { title: 'Agora', body: event.data.text() };
+    payload = { title: 'Eranos', body: event.data.text() };
   }
 
-  const title = payload.title ?? 'Agora';
+  const title = payload.title ?? 'Eranos';
   const options = {
     body: payload.body ?? '',
     icon: payload.icon ?? '/icon-192.png',
     badge: payload.badge ?? '/icon-192.png',
     data: payload.data ?? {},
     requireInteraction: false,
-    tag: payload.data?.subscription_id ?? 'agora-notification',
+    tag: payload.data?.subscription_id ?? 'eranos-notification',
     renotify: true,
   };
 
@@ -42,7 +42,7 @@ self.addEventListener('notificationclick', (event) => {
     self.clients
       .matchAll({ type: 'window', includeUncontrolled: true })
       .then((clientList) => {
-        // Focus an existing Agora tab if one is open
+        // Focus an existing Eranos tab if one is open
         for (const client of clientList) {
           if (new URL(client.url).origin === self.location.origin) {
             client.navigate('/notifications');
@@ -58,7 +58,7 @@ self.addEventListener('notificationclick', (event) => {
 // --- Activate immediately ---
 //
 // On activate:
-//   1. Wipe every Cache Storage entry. A previous version of Agora deployed
+//   1. Wipe every Cache Storage entry. A previous version of Eranos deployed
 //      a precaching service worker (Workbox-style) that's still serving stale
 //      HTML/JS to returning users on this origin. Clearing caches means future
 //      requests bypass anything the old SW left behind.

@@ -35,7 +35,6 @@ Chishandiso chinogona kushandiswa pamwechete neaya mabasa evamwe:
 
 - **Marerays eNostr:** Pakuverenga nokuburitsa zviitiko
 - **Maservers eBlossom:** Pakuisa mafaira uye kuchengeta media
-- **Lightning Network / NWC:** Pakubvisa muripo wezaps, kana ukasarudza kuishandisa
 - **Vapi veNIP-05:** Pakusimbisa ma-addresses eNostr
 
 Basa rega rega rinoshandiswa rakazvimirira uye rinogona kuva nemaitiro aro pamusoro pekubata data.

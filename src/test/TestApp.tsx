@@ -5,8 +5,6 @@ import { BrowserRouter } from "react-router-dom";
 import { AppProvider } from "@/components/AppProvider";
 import NostrProvider from "@/components/NostrProvider";
 import type { AppConfig } from "@/contexts/AppContext";
-import { NWCProvider } from "@/contexts/NWCContext";
-import { HdWalletSpProvider } from "@/contexts/HdWalletSpProvider";
 
 interface TestAppProps {
   children: React.ReactNode;
@@ -23,8 +21,8 @@ export function TestApp({ children }: TestAppProps) {
   });
 
   const defaultConfig: AppConfig = {
-    appName: "Agora",
-    appId: "agora",
+    appName: "Eranos",
+    appId: "eranos",
     homePage: "feed",
     theme: "light",
     useAppRelays: true,
@@ -39,7 +37,6 @@ export function TestApp({ children }: TestAppProps) {
       feedIncludeReposts: true,
       feedIncludeGenericReposts: true,
       feedIncludeReactions: false,
-      feedIncludeZaps: false,
       feedIncludeArticles: false,
       showArticles: false,
       showHighlights: false,
@@ -117,9 +114,6 @@ export function TestApp({ children }: TestAppProps) {
     imageProxy: '',
     lowBandwidthMode: false,
     torEnabled: false,
-    esploraApis: ['https://mempool.space/api'],
-    blockbookBaseUrl: 'https://btc.trezor.io',
-    bip352IndexerUrl: '',
     sidebarWidgets: [],
     aiBaseURL: 'https://ai.shakespeare.diy/v1',
     aiApiKey: '',
@@ -134,11 +128,7 @@ export function TestApp({ children }: TestAppProps) {
         <QueryClientProvider client={queryClient}>
           <NostrLoginProvider storageKey="test-login">
             <NostrProvider>
-              <NWCProvider>
-                <HdWalletSpProvider>
-                  <BrowserRouter>{children}</BrowserRouter>
-                </HdWalletSpProvider>
-              </NWCProvider>
+              <BrowserRouter>{children}</BrowserRouter>
             </NostrProvider>
           </NostrLoginProvider>
         </QueryClientProvider>

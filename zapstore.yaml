@@ -1,21 +1,19 @@
-repository: https://gitlab.com/soapbox-pub/agora-3
-
-name: Agora
+name: Eranos
 
 summary: Power to the people.
 
-description: Agora is a censorship-resistant donation platform built on Nostr and Bitcoin. No frozen bank accounts. No corporate shut-downs. Just direct support from people who believe in your cause.
+description: Eranos is a censorship-resistant donation platform built on Nostr and Grin. No frozen bank accounts. No corporate shut-downs. Just direct support from people who believe in your cause.
 
 tags:
   - nostr
   - social
   - messaging
-  - lightning
+  - grin
   - decentralized
 
 license: AGPL-3.0
 
-website: https://agora.spot
+website: https://eranos.fund
 
 icon: ./public/logo.png
 
@@ -59,14 +57,12 @@ supported_nips:
   - "40"  # Expiration timestamp
   - "44"  # Versioned encryption (NIP-44, used for DMs and encrypted settings)
   - "46"  # Nostr remote signing / bunker
-  - "47"  # Nostr Wallet Connect (NWC) for Lightning payments
   - "50"  # Search (used for profiles, trending, hashtags, media filter)
   - "51"  # Lists — mute (10000), pins (10001), bookmarks (10003), interests (10015), emoji (10030), follow sets (30000)
   - "52"  # Calendar events (kind 31922/31923) and RSVPs (kind 31925)
   - "53"  # Live activities and live chat (kind 30311/1311)
   - "55"  # Android signing via Amber
   - "56"  # Reporting (kind 1984)
-  - "57"  # Lightning zaps (kind 9734/9735)
   - "58"  # Badges (kind 30009/8/30008)
   - "59"  # Gift wrap (kind 1059, used inside NIP-17)
   - "65"  # Relay list metadata (kind 10002)

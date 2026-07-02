@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Trophy, Users, Hash, Zap, MessageSquare, HandHeart, Flame,
+  Trophy, Users, Hash, MessageSquare, HandHeart, Flame,
 } from 'lucide-react';
 import type { NostrMetadata } from '@nostrify/nostrify';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,7 +13,7 @@ import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useTrustedCountryStats } from '@/hooks/useTrustedCountryStats';
 import { useTrustedGlobalStats } from '@/hooks/useTrustedGlobalStats';
 import type {
-  StatsTimeframe, TopAction, TopContributor, TopDonor, TopPoster, TrendingHashtag,
+  StatsTimeframe, TopAction, TopDonor, TopPoster, TrendingHashtag,
   TrustedCountryStats,
 } from '@/lib/statsParser';
 import { genUserName } from '@/lib/genUserName';
@@ -120,11 +120,9 @@ function AggregateCounts({
 }) {
   const c = stats.counts;
   return (
-    <div className={cn('grid gap-2', compact ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-5')}>
+    <div className={cn('grid gap-2', compact ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3')}>
       <CountTile icon={MessageSquare} label="Comments"    value={c.commentCnt[timeframe]} />
       <CountTile icon={Users}         label="Authors"     value={c.authorCnt[timeframe]} />
-      <CountTile icon={Zap}           label="Sats zapped" value={c.zapAmount[timeframe]} />
-      <CountTile icon={HandHeart}     label="Zaps"        value={c.zapCnt[timeframe]} />
       <CountTile icon={Flame}         label="Submissions" value={c.submissionCnt[timeframe]} />
     </div>
   );
@@ -162,7 +160,6 @@ function Leaderboards({
     <div className={cn('grid gap-4', compact ? 'grid-cols-1' : 'md:grid-cols-2')}>
       <TopActionsList actions={tfData.topActions} />
       <TopPostersList posters={tfData.topPosters} />
-      <TopZappedList contributors={tfData.topContributors} />
       <TopDonorsList donors={tfData.topDonors} />
       <TrendingHashtagsList tags={tfData.trendingHashtags} className={compact ? undefined : 'md:col-span-2'} />
     </div>
@@ -208,7 +205,7 @@ function TopActionsList({ actions }: { actions: TopAction[] }) {
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium truncate">{a.title}</div>
                   <div className="text-[11px] text-muted-foreground tabular-nums">
-                    {a.submissions} submissions · {formatCompact(a.zapAmount)} sats zapped
+                    {a.submissions} submissions
                   </div>
                 </div>
               </Link>
@@ -246,33 +243,6 @@ function TopPostersList({ posters }: { posters: TopPoster[] }) {
   );
 }
 
-function TopZappedList({ contributors }: { contributors: TopContributor[] }) {
-  if (!contributors.length) {
-    return (
-      <div>
-        <SectionHeader icon={Zap} title="Most zapped" />
-        <EmptyRow label="zapped contributors" />
-      </div>
-    );
-  }
-  return (
-    <div>
-      <SectionHeader icon={Zap} title="Most zapped" />
-      <ul className="space-y-1.5">
-        {contributors.slice(0, 5).map((c, i) => (
-          <PubkeyRow
-            key={c.pubkey}
-            rank={i + 1}
-            pubkey={c.pubkey}
-            primary={`${formatCompact(c.totalSats)} sats`}
-            secondary={`${c.postCount} posts · avg ${formatCompact(c.avgSats)}`}
-          />
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 function TopDonorsList({ donors }: { donors: TopDonor[] }) {
   if (!donors.length) {
     return (
@@ -292,7 +262,6 @@ function TopDonorsList({ donors }: { donors: TopDonor[] }) {
             rank={i + 1}
             pubkey={d.pubkey}
             primary={`${formatCompact(d.totalSats)} sats`}
-            secondary={`${d.zapCount} zaps`}
           />
         ))}
       </ul>
@@ -393,13 +362,13 @@ function PanelSkeleton({ className, compact }: { className?: string; compact?: b
       )}
     >
       <Skeleton className="h-5 w-40" />
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-        {Array.from({ length: 5 }).map((_, i) => (
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {Array.from({ length: 3 }).map((_, i) => (
           <Skeleton key={i} className="h-12 rounded-lg" />
         ))}
       </div>
       <div className="grid gap-3 md:grid-cols-2">
-        {Array.from({ length: 4 }).map((_, i) => (
+        {Array.from({ length: 3 }).map((_, i) => (
           <Skeleton key={i} className="h-32 rounded-md" />
         ))}
       </div>

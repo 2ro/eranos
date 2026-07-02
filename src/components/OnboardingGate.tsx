@@ -696,7 +696,7 @@ interface SecureStepProps {
  *      large linked icons make the relationship the visual centerpiece.
  *   3. A no-recovery emphasis block — calm, informational tone (not a red
  *      destructive alert) but typographically dominant so the user can't
- *      breeze past the "there is no way to get this back" point.
+ *      sail past the "there is no way to get this back" point.
  *
  * This is the only captive-flow surface that explains the coupling and the
  * permanence to brand-new users, so it has to carry weight without scaring

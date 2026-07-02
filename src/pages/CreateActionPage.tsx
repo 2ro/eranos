@@ -19,11 +19,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
-import { usdToSats } from '@/lib/bitcoin';
 import { CAMPAIGN_CATEGORIES } from '@/lib/campaignCategories';
 import { getCountryInfo } from '@/lib/countries';
 import { createCountryIdentifier } from '@/lib/countryIdentifiers';
@@ -42,7 +40,6 @@ export function CreateActionPage() {
   const queryClient = useQueryClient();
   const { mutateAsync: createEvent } = useNostrPublish();
   const { toast } = useToast();
-  const { data: btcPrice } = useBtcPrice();
 
   const browserTimezone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -75,7 +72,7 @@ export function CreateActionPage() {
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
     () => new Set(),
   );
-  const [pledgeUsd, setPledgeUsd] = useState('');
+  const [pledgeSats, setPledgeSats] = useState('');
   const [deadline, setDeadline] = useState('');
   const [deadlineTime, setDeadlineTime] = useState('');
   const [coverImage, setCoverImage] = useState<string>('');
@@ -118,11 +115,11 @@ export function CreateActionPage() {
     description: t('pledges.create.seoDescription', { appName: config.appName }),
   });
 
-  const pledgeSatsPreview = useMemo(() => {
-    const n = Number(pledgeUsd.replace(/[, $]/g, ''));
+  const pledgeSatsParsed = useMemo(() => {
+    const n = Number(pledgeSats.replace(/[, ]/g, ''));
     if (!Number.isFinite(n) || n <= 0) return 0;
-    return usdToSats(n, btcPrice);
-  }, [btcPrice, pledgeUsd]);
+    return Math.floor(n);
+  }, [pledgeSats]);
 
   const submitMutation = useMutation({
     mutationFn: async () => {
@@ -133,15 +130,11 @@ export function CreateActionPage() {
 
       if (!trimmedTitle) throw new Error(t('pledges.create.errorTitleRequired'));
       if (!trimmedDescription) throw new Error(t('pledges.create.errorDescriptionRequired'));
-      if (!pledgeUsd.trim()) throw new Error(t('pledges.create.errorPledgeRequired'));
+      if (!pledgeSats.trim()) throw new Error(t('pledges.create.errorPledgeRequired'));
 
-      const pledgeUsdNum = Number(pledgeUsd.replace(/[, $]/g, ''));
-      if (!Number.isFinite(pledgeUsdNum) || pledgeUsdNum <= 0) {
+      const pledgeSatsNum = Math.floor(Number(pledgeSats.replace(/[, ]/g, '')));
+      if (!Number.isFinite(pledgeSatsNum) || pledgeSatsNum <= 0) {
         throw new Error(t('pledges.create.errorPledgeInvalid'));
-      }
-      const pledgeSats = usdToSats(pledgeUsdNum, btcPrice);
-      if (pledgeSats <= 0) {
-        throw new Error(t('pledges.create.errorPriceUnavailable'));
       }
 
       const now = Date.now();
@@ -162,7 +155,7 @@ export function CreateActionPage() {
       const tags: string[][] = [
         ['d', dTag],
         ['title', trimmedTitle],
-        ['bounty', String(pledgeSats)],
+        ['bounty', String(pledgeSatsNum)],
         ['t', 'agora-action'],
         ['alt', t('pledges.create.altText', { appName: config.appName, title: trimmedTitle })],
       ];
@@ -282,19 +275,16 @@ export function CreateActionPage() {
     <>
       <FormSection title={t('pledges.create.pledge')} requirement="Required">
         <div className="relative">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-            $
-          </span>
           <Input
             type="text"
-            inputMode="decimal"
+            inputMode="numeric"
             placeholder={t('pledges.create.pledgeAmountPlaceholder')}
-            value={pledgeUsd}
-            onChange={(e) => setPledgeUsd(e.target.value)}
-            className="pl-7 pr-14"
+            value={pledgeSats}
+            onChange={(e) => setPledgeSats(e.target.value)}
+            className="pr-14"
           />
           <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
-            USD
+            sats
           </span>
         </div>
       </FormSection>
@@ -394,11 +384,10 @@ export function CreateActionPage() {
 
   // Required-field gates for the wizard's Next buttons. Title + description
   // sit together on step 1, the pledge amount on step 2. The amount field
-  // also has to resolve to a positive sats value — without a BTC/USD price
-  // we can't compute the bounty and the publish will throw.
+  // has to resolve to a positive sats value or the publish will throw.
   const titleProvided = title.trim().length > 0;
   const descriptionProvided = description.trim().length > 0;
-  const pledgeProvided = pledgeUsd.trim().length > 0 && pledgeSatsPreview > 0;
+  const pledgeProvided = pledgeSats.trim().length > 0 && pledgeSatsParsed > 0;
 
   const submitting = submitMutation.isPending || coverUploading;
 
@@ -467,9 +456,9 @@ export function CreateActionPage() {
       ]}
       // Step 1 gates on title + description (both required), step 2
       // gates on the pledge amount (required, and must resolve to a
-      // positive sats value once the BTC/USD price is known). The
-      // deadline lives on step 2 alongside the amount but isn't
-      // gated — it's optional. Every step after that is opt-in.
+      // positive sats value). The deadline lives on step 2 alongside
+      // the amount but isn't gated — it's optional. Every step after
+      // that is opt-in.
       canAdvanceFromStep={(s) => {
         if (s === 1) return titleProvided && descriptionProvided;
         if (s === 2) return pledgeProvided;

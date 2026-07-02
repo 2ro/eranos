@@ -35,7 +35,6 @@ L'application peut interagir avec les services tiers suivants :
 
 - **Relais Nostr :** Pour lire et publier des événements
 - **Serveurs Blossom :** Pour le téléversement de fichiers et l'hébergement de médias
-- **Réseau Lightning / NWC :** Pour le traitement des paiements zap, si vous choisissez de les utiliser
 - **Fournisseurs NIP-05 :** Pour la vérification des adresses Nostr
 
 Chacun de ces services est exploité indépendamment et peut avoir ses propres pratiques de traitement des données.

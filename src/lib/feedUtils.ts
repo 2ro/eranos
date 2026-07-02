@@ -64,17 +64,7 @@ interface ReactionOverlay {
   pubkey: string;
 }
 
-/** Overlay describing a zap (kind 9735 Lightning or kind 8333 on-chain). */
-interface ZapOverlay {
-  /** The zap event itself (used for linking to the underlying nevent). */
-  event: NostrEvent;
-  /** Pubkey of the sender (resolved through P-tag / description / event.pubkey). */
-  pubkey: string;
-  /** Zap amount in sats. May be 0 if unparseable. */
-  sats: number;
-}
-
-/** A feed item — either a direct post, a repost, a reaction, or a zap wrapping the original event. */
+/** A feed item — either a direct post, a repost, or a reaction wrapping the original event. */
 export interface FeedItem {
   /** The event to display (original note / target event). */
   event: NostrEvent;
@@ -84,8 +74,6 @@ export interface FeedItem {
   repostEvent?: NostrEvent;
   /** If this item is a reaction overlay, the reaction event + actor pubkey. */
   reactedBy?: ReactionOverlay;
-  /** If this item is a zap overlay, the zap event + sender pubkey + amount. */
-  zappedBy?: ZapOverlay;
   /** Sort timestamp — uses the wrapper event's timestamp when present for correct ordering. */
   sortTimestamp: number;
 }

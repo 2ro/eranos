@@ -1,5 +1,3 @@
-import { formatSats, satsToUSDWhole } from '@/lib/bitcoin';
-
 /**
  * Addressable coordinate for a pledge (kind 36639): `36639:<pubkey>:<d>`.
  *
@@ -13,9 +11,8 @@ export function getPledgeCoord({ pubkey, id }: { pubkey: string; id: string }): 
   return `36639:${pubkey}:${id}`;
 }
 
-export function formatPledgeAmount(sats: number, btcPrice: number | undefined): string {
-  if (btcPrice) return satsToUSDWhole(sats, btcPrice);
-  return `${formatSats(sats)} sats`;
+export function formatPledgeAmount(sats: number): string {
+  return `${sats.toLocaleString()} sats`;
 }
 
 export function formatCompactPledgeDeadline(unixSeconds: number): { label: string; isPast: boolean } {

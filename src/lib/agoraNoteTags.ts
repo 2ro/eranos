@@ -7,7 +7,7 @@
  * cannot serve this purpose).
  *
  * Tagged kinds: 1 (notes, replies, quotes), 1111 (comments via usePostComment),
- * 8333 (onchain zaps), 9041 (zap goals), 30223 (campaigns), 31922 / 31923
+ * 9041 (fundraising goals), 30223 (campaigns), 31922 / 31923
  * (calendar events), 34550 (communities), 36639 (pledges).
  *
  * Country-rooted world posts (kind 1111 / 1068 with `#k=iso3166` or `geo`)

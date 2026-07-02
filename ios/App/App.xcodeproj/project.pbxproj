@@ -325,7 +325,7 @@
 				);
 				MARKETING_VERSION = 2.9.1;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
-				PRODUCT_BUNDLE_IDENTIFIER = spot.agora.app;
+				PRODUCT_BUNDLE_IDENTIFIER = fund.eranos.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_VERSION = 5.0;
@@ -348,7 +348,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.9.1;
-				PRODUCT_BUNDLE_IDENTIFIER = spot.agora.app;
+				PRODUCT_BUNDLE_IDENTIFIER = fund.eranos.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_VERSION = 5.0;

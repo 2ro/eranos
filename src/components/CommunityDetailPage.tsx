@@ -57,7 +57,6 @@ import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyLis
 import { useAuthor } from '@/hooks/useAuthor';
 import { useAuthors } from '@/hooks/useAuthors';
 import { useComments } from '@/hooks/useComments';
-import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCommunityBookmarks } from '@/hooks/useCommunityBookmarks';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -226,11 +225,9 @@ function ActivityTypePill({ icon, label }: { icon: React.ReactNode; label: strin
 
 function PledgeShelfCard({ pledge }: { pledge: Action }) {
   const { t } = useTranslation();
-  const { data: btcPrice } = useBtcPrice();
   return (
     <PledgeCard
       action={pledge}
-      btcPrice={btcPrice}
       variant="shelf"
       showAuthor
       showTranslate
@@ -949,7 +946,6 @@ export function CommunityDetailPage({ event }: { event: NostrEvent }) {
                 <PostActionBar
                   event={event}
                   replyLabel={t('groups.detail.comment')}
-                  hideZap
                   showShareInSidebar
                   onReply={() => setReplyOpen(true)}
                   onMore={() => setMoreMenuOpen(true)}

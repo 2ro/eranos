@@ -19,7 +19,6 @@ import {
   SmilePlus,
   PartyPopper,
   Users,
-  Zap,
 } from "lucide-react";
 import { nip19 } from "nostr-tools";
 import { type ReactNode, lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -80,21 +79,14 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { VoiceMessagePlayer } from "@/components/VoiceMessagePlayer";
-import { ZapDialog } from "@/components/ZapDialog";
 import { useAppContext } from "@/hooks/useAppContext";
 import { useAuthor } from "@/hooks/useAuthor";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useOpenPost } from "@/hooks/useOpenPost";
 import { useProfileUrl } from "@/hooks/useProfileUrl";
 import { useShareOrigin } from "@/hooks/useShareOrigin";
 import { toast } from "@/hooks/useToast";
 import { useEventStats } from "@/hooks/useTrending";
 import { useEventTranslation } from "@/hooks/useEventTranslation";
-import { canZap } from "@/lib/canZap";
-import { extractZapSender, extractZapMessage } from "@/hooks/useEventInteractions";
-import { getZapAmountSats } from "@/lib/zapHelpers";
-import { satsToUSD } from "@/lib/bitcoin";
-import { useBtcPrice } from "@/hooks/useBtcPrice";
 import { getContentWarning } from "@/lib/contentWarning";
 import { genUserName } from "@/lib/genUserName";
 import { getDisplayName } from "@/lib/getDisplayName";
@@ -109,7 +101,6 @@ import { publishedAtAction } from "@/lib/publishedAtAction";
 import { getEffectiveStreamStatus } from "@/lib/streamStatus";
 import { getEventRelaySource } from "@/lib/relayDebug";
 import { cn } from "@/lib/utils";
-import { hasGoalZapSplits } from "@/lib/goalUtils";
 
 
 /** Profile card for use in feeds (kind 0). */
@@ -123,14 +114,14 @@ function ProfileCardContent({ event }: { event: NostrEvent }) {
   );
 }
 
-/* ──── Shared activity card shell for reaction / repost / zap / poll vote ──── */
+/* ──── Shared activity card shell for reaction / repost / poll vote ──── */
 
 interface ActivityCardProps {
   /** The round element in the left column (icon bubble or avatar). */
   icon: ReactNode;
   /** The actor row content (avatar + name + label + timestamp). */
   actorRow: ReactNode;
-  /** Optional extra content below the actor row (zap message, vote label, etc.). */
+  /** Optional extra content below the actor row (vote label, etc.). */
   children?: ReactNode;
   /** Threaded mode: connector line below icon, no bottom border. */
   threaded?: boolean;
@@ -192,7 +183,7 @@ interface ActorRowProps {
   authorEvent?: NostrEvent;
   isLoading?: boolean;
   label: string;
-  /** Extra inline elements after the label (e.g. zap amount). */
+  /** Extra inline elements after the label. */
   extra?: ReactNode;
   /** Formatted timestamp string (e.g. timeAgo or full date). */
   timestampLabel: string;
@@ -246,7 +237,7 @@ interface NoteCardProps {
   highlight?: boolean;
   /** If true, suppress the kind-derived action header (e.g. "created a badge"). Used when the parent already provides context. */
   hideKindHeader?: boolean;
-  /** Override the NIP-22 context row prefix. Used by synthetic zap cards. */
+  /** Override the NIP-22 context row prefix. Used by synthetic activity cards. */
   commentContextPrefix?: string;
   /**
    * Suppress the NIP-22 "Commenting on …" context row. Used by pages
@@ -327,58 +318,6 @@ function isDeprecatedFollowSet(event: NostrEvent): boolean {
   return false;
 }
 
-function isStringTag(value: unknown): value is string[] {
-  return Array.isArray(value) && value.every((item) => typeof item === "string");
-}
-
-function getZapRequestTags(event: NostrEvent): string[][] {
-  if (event.kind !== 9735) return [];
-  const description = event.tags.find(([name]) => name === "description")?.[1];
-  if (!description) return [];
-
-  try {
-    const parsed = JSON.parse(description) as unknown;
-    if (!parsed || typeof parsed !== "object" || !("tags" in parsed)) return [];
-    const tags = (parsed as { tags?: unknown }).tags;
-    if (!Array.isArray(tags)) return [];
-    return tags.filter(isStringTag);
-  } catch {
-    return [];
-  }
-}
-
-function findZapTargetTag(event: NostrEvent, requestTags: string[][], name: string): string[] | undefined {
-  return event.tags.find(([tagName]) => tagName === name) ?? requestTags.find(([tagName]) => tagName === name);
-}
-
-function buildZapCommentEvent(event: NostrEvent, requestTags: string[][], senderPubkey: string, content: string): NostrEvent {
-  const tags: string[][] = [];
-  const aTag = findZapTargetTag(event, requestTags, "a");
-  const eTag = findZapTargetTag(event, requestTags, "e");
-  const recipientTag = findZapTargetTag(event, requestTags, "p");
-  const kindTag = findZapTargetTag(event, requestTags, "K") ?? findZapTargetTag(event, requestTags, "k");
-
-  if (aTag?.[1]) {
-    tags.push(["A", aTag[1], aTag[2] ?? ""]);
-    const targetKind = kindTag?.[1] ?? aTag[1].split(":")[0];
-    if (targetKind) tags.push(["K", targetKind]);
-  } else if (eTag?.[1]) {
-    tags.push(["E", eTag[1], eTag[2] ?? "", eTag[3] ?? recipientTag?.[1] ?? ""]);
-    if (kindTag?.[1]) tags.push(["K", kindTag[1]]);
-    if (recipientTag?.[1]) tags.push(["P", recipientTag[1]]);
-  } else if (recipientTag?.[1]) {
-    tags.push(["A", `0:${recipientTag[1]}:`], ["K", "0"]);
-  }
-
-  return {
-    ...event,
-    pubkey: senderPubkey,
-    kind: 1111,
-    content,
-    tags,
-  };
-}
-
 export const NoteCard = memo(function NoteCard({
   event,
   className,
@@ -397,31 +336,16 @@ export const NoteCard = memo(function NoteCard({
   const { t } = useTranslation();
   const actionTarget = actionEvent ?? event;
   const { config } = useAppContext();
-  const { user } = useCurrentUser();
   const shareOrigin = useShareOrigin();
   const author = useAuthor(event.pubkey);
-  const actionAuthor = useAuthor(actionEvent?.pubkey);
-  // Kind 9735 (Lightning zap) sender lives in the receipt's `P` tag / embedded
-  // zap-request `pubkey`; kind 8333 (on-chain Bitcoin zap) is signed by the
-  // donor directly so the event's own pubkey IS the sender.
-  const zapSenderPubkey = useMemo(() => {
-    if (event.kind === 9735) return extractZapSender(event);
-    if (event.kind === 8333) return event.pubkey;
-    return '';
-  }, [event]);
-  const zapRequestTags = useMemo(() => getZapRequestTags(event), [event]);
 
   const pollVoteLabel = usePollVoteLabel(event);
 
   const metadata = author.data?.metadata;
-  const actionMetadata = actionEvent ? actionAuthor.data?.metadata : metadata;
   const displayName = getDisplayName(metadata, event.pubkey);
   const profileUrl = useProfileUrl(event.pubkey, metadata);
   const encodedId = useMemo(() => encodeEventId(actionTarget), [actionTarget]);
   const { data: stats } = useEventStats(actionTarget.id, actionTarget);
-  // Cached BTC→USD spot price. Always queried (cheap, shared cache key) so the
-  // zap-card layout below can render amounts as USD when available.
-  const { data: btcPrice } = useBtcPrice();
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
 
@@ -437,10 +361,6 @@ export const NoteCard = memo(function NoteCard({
     });
   }, [event.id, event.kind, actionEvent]);
 
-  // Check if the current user can zap this event's author
-  // TODO: Enable zapping split-recipient NIP-75 goals once zap split payments are supported.
-  const canZapAuthor = user && canZap(actionMetadata) && !hasGoalZapSplits(actionTarget);
-
   const { onClick: openPost, onAuxClick: auxOpenPost } = useOpenPost(
     `/${encodedId}`,
   );
@@ -454,7 +374,6 @@ export const NoteCard = memo(function NoteCard({
       target.closest("[data-radix-dialog-content]") ||
       target.closest("[data-vaul-drawer]") ||
       target.closest("[data-vaul-drawer-overlay]") ||
-      target.closest('[data-testid="zap-modal"]') ||
       target.closest("button") ||
       target.closest("a")
     ) {
@@ -471,7 +390,6 @@ export const NoteCard = memo(function NoteCard({
       target.closest("[data-radix-dialog-content]") ||
       target.closest("[data-vaul-drawer]") ||
       target.closest("[data-vaul-drawer-overlay]") ||
-      target.closest('[data-testid="zap-modal"]') ||
       target.closest("button") ||
       target.closest("a")
     ) {
@@ -498,7 +416,7 @@ export const NoteCard = memo(function NoteCard({
   const isBadgeAward = event.kind === 8;
   const isBadge = isBadgeDefinition || isProfileBadges || isBadgeAward;
   const isCommunity = event.kind === 34550;
-  const isZapGoal = event.kind === 9041;
+  const isGoal = event.kind === 9041;
   const isAction = event.kind === 36639;
   const isCampaign = event.kind === 33863;
   const isReaction = event.kind === 7;
@@ -526,7 +444,6 @@ export const NoteCard = memo(function NoteCard({
   const isEncryptedDM = event.kind === 4;
   const isLetter = event.kind === 8211;
   const isVanish = event.kind === 62;
-  const isZap = event.kind === 9735 || event.kind === 8333;
   const isProfile = event.kind === 0;
   const isDevKind = isGitRepo || isPatch || isPullRequest || isCustomNip || isNsite;
   const isTextNote =
@@ -545,7 +462,7 @@ export const NoteCard = memo(function NoteCard({
     !isEmojiPack &&
     !isBadge &&
     !isCommunity &&
-    !isZapGoal &&
+    !isGoal &&
     !isAction &&
     !isCampaign &&
     !isReaction &&
@@ -562,7 +479,6 @@ export const NoteCard = memo(function NoteCard({
     !isEncryptedDM &&
     !isLetter &&
     !isVanish &&
-    !isZap &&
     !isProfile;
 
   const isComment = event.kind === 1111;
@@ -712,7 +628,7 @@ export const NoteCard = memo(function NoteCard({
           <BadgeAwardCard event={event} />
         ) : isCommunity ? (
           <GroupInlinePreview event={contentEvent} />
-        ) : isZapGoal ? (
+        ) : isGoal ? (
           <GoalCard event={event} />
 
         ) : isAction ? (
@@ -893,22 +809,6 @@ export const NoteCard = memo(function NoteCard({
         variant="chip"
       />
 
-      {canZapAuthor && (
-        <ZapDialog target={actionTarget}>
-          <button
-            className="inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10 transition-colors"
-            title={t('feed.actions.zap')}
-          >
-            <Zap className="size-[18px]" />
-            {stats?.zapAmount ? (
-              <span className="tabular-nums">
-                {formatNumber(stats.zapAmount)}
-              </span>
-            ) : null}
-          </button>
-        </ZapDialog>
-      )}
-
       <div className="flex-1" />
 
       <button
@@ -1046,39 +946,6 @@ export const NoteCard = memo(function NoteCard({
         }
         threaded={threaded} threadedLast={threadedLast} threadedLineClassName={threadedLineClassName}
         className={className} onClick={handleCardClick} onAuxClick={handleAuxClick}
-      />
-    );
-  }
-
-  // ── Zap receipt layout (kind 9735 Lightning, kind 8333 on-chain Bitcoin) ──
-  // Render as a synthetic NIP-22 card so spacing, header, body, and actions
-  // stay identical to comments while keeping actions tied to the zap receipt.
-  if (isZap) {
-    const zapAmountSats = getZapAmountSats(event);
-    const zapMessage = (event.kind === 8333 ? event.content : extractZapMessage(event)).trim();
-    const usdLabel = btcPrice ? satsToUSD(zapAmountSats, btcPrice) : undefined;
-    const satsLabel = t('noteCard.zap.sat', { count: zapAmountSats, formattedCount: formatNumber(zapAmountSats) });
-    const amountText = usdLabel ?? satsLabel;
-    const donationPrefix = zapAmountSats > 0 ? t('noteCard.zap.donatedAmountTo', { amount: amountText }) : t('noteCard.zap.donatedTo');
-    const zapCommentEvent = buildZapCommentEvent(
-      event,
-      zapRequestTags,
-      zapSenderPubkey || event.pubkey,
-      zapMessage,
-    );
-
-    return (
-      <NoteCard
-        event={zapCommentEvent}
-        actionEvent={event}
-        className={className}
-        compact={compact}
-        threaded={threaded}
-        threadedLineClassName={threadedLineClassName}
-        threadedLast={threadedLast}
-        highlight={highlight}
-        hideKindHeader
-        commentContextPrefix={donationPrefix}
       />
     );
   }
@@ -1952,10 +1819,6 @@ const KIND_HEADER_MAP: Record<number, KindHeaderConfig> = {
     action: (event) => publishedAtKey(event, { created: "noteCard.kindHeader.nsiteDeployed", updated: "noteCard.kindHeader.nsiteRedeployed", fallback: "noteCard.kindHeader.nsiteDeployed" }),
     noun: "noteCard.kindHeader.nsiteNoun",
     nounRoute: "/development",
-  },
-  9735: {
-    icon: Zap,
-    action: "noteCard.kindHeader.zapped",
   },
   36639: {
     icon: Megaphone,

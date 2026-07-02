@@ -99,7 +99,7 @@ function HeroLightningMapImpl({ className }: { className?: string }) {
         className="absolute -inset-[10%]"
         style={{
           background:
-            'radial-gradient(60% 55% at 62% 45%, hsl(24 100% 55% / 0.12) 0%, hsl(24 95% 50% / 0.07) 28%, hsl(220 30% 8% / 0) 65%)',
+            'radial-gradient(60% 55% at 62% 45%, hsl(40 100% 55% / 0.12) 0%, hsl(40 95% 50% / 0.07) 28%, hsl(220 30% 8% / 0) 65%)',
         }}
       />
 
@@ -115,15 +115,15 @@ function HeroLightningMapImpl({ className }: { className?: string }) {
               (which is what painted the visible "latitude line" along the
               equator and other country seams). */}
           <linearGradient id={arcId('land')} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="hsl(24 80% 50%)" />
-            <stop offset="100%" stopColor="hsl(24 70% 45%)" />
+            <stop offset="0%" stopColor="hsl(40 80% 50%)" />
+            <stop offset="100%" stopColor="hsl(40 70% 45%)" />
           </linearGradient>
 
           {/* Arc gradient — bright at midpoint, fading at endpoints, so
               the line reads as energy traveling rather than a solid wire. */}
           <linearGradient id={arcId('arc')} x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="hsl(24 100% 60%)" stopOpacity="0.0" />
-            <stop offset="35%" stopColor="hsl(24 100% 60%)" stopOpacity="0.85" />
+            <stop offset="0%" stopColor="hsl(40 100% 60%)" stopOpacity="0.0" />
+            <stop offset="35%" stopColor="hsl(40 100% 60%)" stopOpacity="0.85" />
             <stop offset="65%" stopColor="hsl(30 100% 65%)" stopOpacity="0.85" />
             <stop offset="100%" stopColor="hsl(30 100% 65%)" stopOpacity="0.0" />
           </linearGradient>
@@ -143,8 +143,8 @@ function HeroLightningMapImpl({ className }: { className?: string }) {
               the arcs at intersections. */}
           <radialGradient id={arcId('node-halo')}>
             <stop offset="0%" stopColor="hsl(30 100% 70%)" stopOpacity="0.9" />
-            <stop offset="40%" stopColor="hsl(24 100% 55%)" stopOpacity="0.45" />
-            <stop offset="100%" stopColor="hsl(24 100% 50%)" stopOpacity="0" />
+            <stop offset="40%" stopColor="hsl(40 100% 55%)" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="hsl(40 100% 50%)" stopOpacity="0" />
           </radialGradient>
         </defs>
 

@@ -62,7 +62,7 @@ export function impactLight(): void {
   }
 }
 
-/** Medium tap — zap button press, pull-to-refresh threshold, follow. */
+/** Medium tap — primary action press, pull-to-refresh threshold, follow. */
 export function impactMedium(): void {
   if (Capacitor.isNativePlatform()) {
     nativeImpact('Medium').catch((e) => warnHapticError('impactMedium', e));
@@ -71,7 +71,7 @@ export function impactMedium(): void {
   }
 }
 
-/** Success notification — zap payment success, post published. */
+/** Success notification — action completed successfully, post published. */
 export function notificationSuccess(): void {
   if (Capacitor.isNativePlatform()) {
     nativeNotification('Success').catch((e) => warnHapticError('notificationSuccess', e));

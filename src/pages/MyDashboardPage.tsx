@@ -1,11 +1,9 @@
-import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import {
   AtSign,
   Bell,
-  Bitcoin,
   ChevronRight,
   Globe2,
   HandHeart,
@@ -14,7 +12,6 @@ import {
   MessageCircle,
   Repeat2,
   Users,
-  Zap,
 } from 'lucide-react';
 
 import { LoginArea } from '@/components/auth/LoginArea';
@@ -36,17 +33,13 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCountryFollows } from '@/hooks/useCountryFollows';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useHdBtcPrice } from '@/hooks/useHdBtcPrice';
-import { useHdWallet } from '@/hooks/useHdWallet';
 import { useNotificationPreview } from '@/hooks/useNotificationPreview';
 import { useUserOrganizations, type UserOrganization } from '@/hooks/useUserOrganizations';
 
-import { satsToUSD, formatBTC } from '@/lib/bitcoin';
 import { getCountryInfo } from '@/lib/countries';
 import { getDisplayName } from '@/lib/genUserName';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
-import { getZapSenderPubkey, getZapAmountSats } from '@/lib/zapHelpers';
 import type { ParsedCampaign } from '@/lib/campaign';
 
 /**
@@ -56,10 +49,8 @@ import type { ParsedCampaign } from '@/lib/campaign';
  *
  *  1. **Personal hero** — avatar, greeting, three stat tiles derived from
  *     already-loaded section data (zero extra queries).
- *  2. **Utility strip** — wallet balance snapshot (`useHdWallet` + `useHdBtcPrice`,
- *     Blockbook-backed, nsec-only; graceful fallback for other login types) +
- *     notification preview (`useNotificationPreview`, limit 3 one-shot query,
- *     no persistent subscription).
+ *  2. **Utility strip** — notification preview (`useNotificationPreview`,
+ *     limit 3 one-shot query, no persistent subscription).
  *  3. **Content sections** — user's campaigns, countries, communities.
  *     Each section loads independently with skeleton / empty / error states
  *     and an `ErrorBoundary` so one relay timeout does not break the page.
@@ -67,9 +58,9 @@ import type { ParsedCampaign } from '@/lib/campaign';
  * All data hooks are called once in `LoggedInContent` and passed down so
  * TanStack Query subscriptions are shared rather than duplicated.
  *
- * Total cost: campaign, country, and community relay queries; one
- * lightweight notification preview query; and wallet + price lookups
- * (all cached by their respective hooks).
+ * Total cost: campaign, country, and community relay queries; and one
+ * lightweight notification preview query (all cached by their
+ * respective hooks).
  */
 export function MyDashboardPage() {
   const { config } = useAppContext();
@@ -119,15 +110,10 @@ function LoggedInContent({ pubkey }: { pubkey: string }) {
           />
         </ErrorBoundary>
 
-        {/* Zone 2: Wallet + notifications */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <ErrorBoundary fallback={null}>
-            <WalletSummaryCard />
-          </ErrorBoundary>
-          <ErrorBoundary fallback={null}>
-            <NotificationCard />
-          </ErrorBoundary>
-        </div>
+        {/* Zone 2: Notifications */}
+        <ErrorBoundary fallback={null}>
+          <NotificationCard />
+        </ErrorBoundary>
 
         {/* Zone 3: Content sections */}
         <ErrorBoundary
@@ -277,61 +263,6 @@ function StatTile({
   );
 }
 
-// ─── Zone 2: Wallet summary ─────────────────────────────────────────────────
-
-/**
- * Compact wallet balance card backed by `useHdWallet` +
- * `useHdBtcPrice` (both Blockbook-sourced, matching `/wallet` and the
- * top-nav balance pill so all three surfaces show the same USD figure).
- * The HD wallet requires an nsec login; for extension / bunker logins the
- * card shows a simple "View wallet" prompt instead of a balance. The card
- * always links to `/wallet`.
- */
-function WalletSummaryCard() {
-  const { availability, totalBalance, isLoading, error } = useHdWallet();
-  const { data: btcPrice } = useHdBtcPrice();
-  const walletAvailable = availability.status === 'available';
-
-  return (
-    <Link
-      to="/wallet"
-      className={cn(
-        'group block rounded-xl border border-border/60 bg-card p-4 shadow-sm',
-        'hover:shadow-md hover:border-border motion-safe:transition-all motion-safe:duration-200',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-      )}
-    >
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-          <Bitcoin className="size-4 text-orange-500" />
-          Wallet
-        </div>
-        <ChevronRight className="size-4 text-muted-foreground group-hover:text-muted-foreground motion-safe:transition-colors" />
-      </div>
-
-      {!walletAvailable ? (
-        <p className="text-sm text-muted-foreground">Wallet details</p>
-      ) : isLoading ? (
-        <div className="space-y-1.5">
-          <Skeleton className="h-7 w-24 rounded" />
-          <Skeleton className="h-3.5 w-16 rounded" />
-        </div>
-      ) : error ? (
-        <p className="text-sm text-muted-foreground">Unable to load</p>
-      ) : (
-        <div>
-          <span className="text-2xl font-bold tracking-tight">
-            {btcPrice ? satsToUSD(totalBalance, btcPrice) : '---'}
-          </span>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {formatBTC(totalBalance)} BTC
-          </p>
-        </div>
-      )}
-    </Link>
-  );
-}
-
 // ─── Zone 2: Notification summary ────────────────────────────────────────────
 
 /**
@@ -343,9 +274,6 @@ function WalletSummaryCard() {
  *
  * Each preview row shows: kind icon + actor name + action label + relative
  * time. Actor metadata comes from `useAuthor` (bounded to 3 calls).
- * For zap receipts (kind 9735), the sender pubkey is extracted via
- * `getZapSenderPubkey` (NIP-57 `P` tag / `description` JSON) rather than
- * using `event.pubkey` (which is the LNURL provider).
  */
 function NotificationCard() {
   const { events, isLoading } = useNotificationPreview();
@@ -394,9 +322,6 @@ function getNotificationAction(kind: number): { icon: React.ReactNode; verb: str
     case 6:
     case 16:
       return { icon: <Repeat2 className="size-3.5 text-green-500 shrink-0" />, verb: 'reposted your post' };
-    case 9735:
-    case 8333:
-      return { icon: <Zap className="size-3.5 text-amber-500 shrink-0" />, verb: 'zapped you' };
     case 1:
       return { icon: <AtSign className="size-3.5 text-blue-500 shrink-0" />, verb: 'mentioned you' };
     case 1111:
@@ -417,32 +342,14 @@ function shortRelativeTime(unixSec: number): string {
   return `${Math.floor(diff / 86_400)}d`;
 }
 
-/**
- * Extracts the correct actor pubkey for a notification event.
- * For zap receipts (kind 9735) the event signer is the LNURL provider,
- * not the person who sent the zap — use `getZapSenderPubkey` to resolve.
- * Kind 8333 and all other kinds sign directly, so `event.pubkey` is correct.
- */
-function getActorPubkey(event: NostrEvent): string {
-  if (event.kind === 9735) {
-    return getZapSenderPubkey(event);
-  }
-  return event.pubkey;
-}
-
-/** Compact one-line preview: "[avatar] Alice zapped you · 1,000 sats  2m" */
+/** Compact one-line preview: "[avatar] Alice reacted to your post  2m" */
 function NotificationPreviewRow({ event }: { event: NostrEvent }) {
-  const actorPubkey = useMemo(() => getActorPubkey(event), [event]);
+  const actorPubkey = event.pubkey;
   const author = useAuthor(actorPubkey);
   const metadata = author.data?.metadata;
   const actorName = getDisplayName(metadata, actorPubkey);
   const avatar = sanitizeUrl(metadata?.picture);
   const { icon, verb } = getNotificationAction(event.kind);
-
-  // Show sats for zap/donation events (pure extraction, no extra query)
-  const zapSats = (event.kind === 9735 || event.kind === 8333)
-    ? getZapAmountSats(event)
-    : 0;
 
   return (
     <div className="flex items-center gap-2 text-sm min-w-0">
@@ -453,9 +360,6 @@ function NotificationPreviewRow({ event }: { event: NostrEvent }) {
       )}
       <span className="flex-1 truncate text-muted-foreground">
         <span className="font-medium text-foreground">{actorName}</span>{' '}{verb}
-        {zapSats > 0 && (
-          <span className="text-muted-foreground"> &middot; {zapSats.toLocaleString()} sats</span>
-        )}
       </span>
       <span className="text-xs text-muted-foreground/60 tabular-nums shrink-0">
         {shortRelativeTime(event.created_at)}

@@ -1,11 +1,10 @@
 import { useNostr } from '@nostrify/react';
 import { type NLoginType, NUser, useNostrLogin } from '@nostrify/react/login';
-import { NRelay1, NSecSigner } from '@nostrify/nostrify';
+import { NBrowserSigner, NConnectSigner, NRelay1, NSecSigner } from '@nostrify/nostrify';
 import { nip19 } from 'nostr-tools';
 import { useCallback, useMemo } from 'react';
 
 import { useAuthor } from './useAuthor.ts';
-import { NSecSignerBtc, NBrowserSignerBtc, NConnectSignerBtc } from '@/lib/bitcoin-signers';
 import { signerWithNudge } from '@/lib/signerWithNudge';
 
 export function useCurrentUser() {
@@ -19,7 +18,7 @@ export function useCurrentUser() {
     switch (login.type) {
       case 'nsec': {
         const sk = nip19.decode(login.data.nsec) as { type: 'nsec'; data: Uint8Array };
-        user = new NUser(login.type, login.pubkey, new NSecSignerBtc(sk.data));
+        user = new NUser(login.type, login.pubkey, new NSecSigner(sk.data));
         break;
       }
       case 'bunker': {
@@ -30,7 +29,7 @@ export function useCurrentUser() {
         user = new NUser(
           login.type,
           login.pubkey,
-          new NConnectSignerBtc({
+          new NConnectSigner({
             relay: nostr.group(bunkerRelays),
             pubkey: login.data.bunkerPubkey,
             signer: clientSigner,
@@ -48,7 +47,7 @@ export function useCurrentUser() {
         break;
       }
       case 'extension':
-        user = new NUser(login.type, login.pubkey, new NBrowserSignerBtc());
+        user = new NUser(login.type, login.pubkey, new NBrowserSigner());
         break;
       // Other login types can be defined here
       default:

@@ -269,7 +269,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
               hideBorder
               defaultExpanded
               placeholder={t('feed.compose.placeholder')}
-              className="!bg-[hsl(24_100%_99%)] dark:!bg-[hsl(24_30%_12%)] border-t border-b border-t-primary/40 border-b-primary/20 rounded-t-2xl"
+              className="!bg-[hsl(40_100%_99%)] dark:!bg-[hsl(40_30%_12%)] border-t border-b border-t-primary/40 border-b-primary/20 rounded-t-2xl"
             />
           )}
 

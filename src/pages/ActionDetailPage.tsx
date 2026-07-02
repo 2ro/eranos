@@ -16,11 +16,9 @@ import {
 import { parseAction, useAction, type Action } from '@/hooks/useActions';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useComments } from '@/hooks/useComments';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
-import { useSubmissionZapTotals } from '@/hooks/useSubmissionZapTotals';
 import { useToast } from '@/hooks/useToast';
 import { getDisplayName } from '@/lib/genUserName';
 import { getGeoDisplayName } from '@/lib/countries';
@@ -31,7 +29,6 @@ import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommentsSection } from '@/components/CommentsSection';
 import { DetailCommentComposer } from '@/components/DetailCommentComposer';
@@ -83,7 +80,6 @@ export function ActionDetailPage({ pubkey, identifier }: ActionDetailPageProps) 
 
 function PledgeDetailContent({ action }: { action: Action }) {
   const { t } = useTranslation();
-  const { data: btcPrice } = useBtcPrice();
   const author = useAuthor(action.pubkey);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -106,17 +102,8 @@ function PledgeDetailContent({ action }: { action: Action }) {
     () => commentsData?.topLevelComments ?? [],
     [commentsData?.topLevelComments],
   );
-  const submissionIds = useMemo(() => topLevel.map((c) => c.id), [topLevel]);
-  const { data: zapTotals, isLoading: zapsLoading } = useSubmissionZapTotals(submissionIds);
-
-  const fundedSats = useMemo(() => {
-    const totals = zapTotals ?? new Map<string, number>();
-    return topLevel.reduce((sum, submission) => sum + (totals.get(submission.id) ?? 0), 0);
-  }, [topLevel, zapTotals]);
 
   const replyTree = useMemo((): ReplyNode[] => {
-    const totals = zapTotals ?? new Map<string, number>();
-
     const buildNode = (ev: NostrEvent): ReplyNode => {
       const allChildren = commentsData?.getDirectReplies(ev.id) ?? [];
       if (allChildren.length <= 1) {
@@ -134,14 +121,9 @@ function PledgeDetailContent({ action }: { action: Action }) {
     };
 
     return [...topLevel]
-      .sort((a, b) => {
-        const aSats = totals.get(a.id) ?? 0;
-        const bSats = totals.get(b.id) ?? 0;
-        if (bSats !== aSats) return bSats - aSats;
-        return b.created_at - a.created_at;
-      })
+      .sort((a, b) => b.created_at - a.created_at)
       .map((c) => buildNode(c));
-  }, [commentsData, topLevel, zapTotals]);
+  }, [commentsData, topLevel]);
 
   const pinnedNodes = useMemo(
     () => pinnedEvents.map((event): ReplyNode => ({ event, children: [] })),
@@ -154,7 +136,6 @@ function PledgeDetailContent({ action }: { action: Action }) {
   const creatorPicture = sanitizeUrl(metadata?.picture);
   const deadline = action.deadline ? formatDeadline(action.deadline, t) : null;
   const cover = sanitizeUrl(action.image);
-  const progressValue = action.bounty > 0 ? Math.min(100, Math.round((fundedSats / action.bounty) * 100)) : 0;
 
   const naddr = nip19.naddrEncode({
     kind: 36639,
@@ -223,11 +204,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
           <div className="lg:hidden mb-6">
             <PledgeFundingCard
               action={displayAction}
-              btcPrice={btcPrice}
-              fundedSats={fundedSats}
-              progressValue={progressValue}
               submissionsCount={topLevel.length}
-              isLoading={zapsLoading}
               onShare={handleShare}
             />
           </div>
@@ -281,11 +258,7 @@ function PledgeDetailContent({ action }: { action: Action }) {
             <div className="lg:sticky lg:top-4">
               <PledgeFundingCard
                 action={displayAction}
-                btcPrice={btcPrice}
-                fundedSats={fundedSats}
-                progressValue={progressValue}
                 submissionsCount={topLevel.length}
-                isLoading={zapsLoading}
                 onShare={handleShare}
               />
             </div>
@@ -449,7 +422,6 @@ function PledgeHero({
             <PostActionBar
               event={action.event}
               replyLabel={t('pledges.detail.submitLabel')}
-              hideZap
               showShareInSidebar
               onReply={onReply}
               onMore={onMore}
@@ -464,50 +436,30 @@ function PledgeHero({
 
 function PledgeFundingCard({
   action,
-  btcPrice,
-  fundedSats,
-  progressValue,
   submissionsCount,
-  isLoading,
   onShare,
 }: {
   action: Action;
-  btcPrice: number | undefined;
-  fundedSats: number;
-  progressValue: number;
   submissionsCount: number;
-  isLoading: boolean;
   onShare: () => void;
 }) {
   const { t } = useTranslation();
   return (
     <Card className="overflow-hidden border-0 shadow-none bg-transparent lg:border lg:shadow-sm lg:bg-card">
       <CardContent className="p-0 lg:p-5 space-y-5">
-        {isLoading ? (
-          <Skeleton className="h-28 w-full" />
-        ) : (
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <div className="text-2xl font-bold tracking-tight">
-                {formatPledgeAmount(fundedSats, btcPrice)}
-                <span className="ml-1.5 text-sm font-normal text-muted-foreground">{t('pledges.detail.funded')}</span>
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {t('pledges.detail.ofPledged', { amount: formatPledgeAmount(action.bounty, btcPrice) })}
-                {submissionsCount > 0 && (
-                  <>
-                    {' · '}
-                    {t('pledges.detail.submissionCount', { count: submissionsCount })}
-                  </>
-                )}
-              </div>
-            </div>
-            <Progress value={progressValue} className="h-2" />
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {t('pledges.detail.trustNote')}
-            </p>
+        <div className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+            {t('pledges.card.pledged')}
+          </p>
+          <div className="text-2xl font-bold tracking-tight">
+            {formatPledgeAmount(action.bounty)}
           </div>
-        )}
+          {submissionsCount > 0 && (
+            <div className="text-xs text-muted-foreground">
+              {t('pledges.detail.submissionCount', { count: submissionsCount })}
+            </div>
+          )}
+        </div>
 
         <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
           <Share2 className="size-4 mr-2" />

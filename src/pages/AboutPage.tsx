@@ -1,8 +1,7 @@
 import { useSeoMeta } from '@unhead/react';
 import { useMemo } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import {
-  AlertTriangle,
   ArrowRight,
   BadgeCheck,
   Bitcoin,
@@ -10,8 +9,6 @@ import {
   Globe,
   HandHeart,
   Megaphone,
-  ShieldCheck,
-  ShieldOff,
 } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { Link } from 'react-router-dom';
@@ -24,13 +21,12 @@ import { cn } from '@/lib/utils';
 /**
  * The /about page. A landing-style document modeled on the public
  * https://soapbox.pub/agora landing, brought in-app to explain how
- * the platform works. Five sections:
+ * the platform works. Four sections:
  *
  *   1. Hero (dark)
  *   2. How it works, in three steps (cream)
- *   3. Two ways to get paid: compare cards (dark)
- *   4. Need help? FAQ in three chapters (cream)
- *   5. Pick the side you're on: Donor / Recipient guides (white)
+ *   3. Need help? FAQ in three chapters (cream)
+ *   4. Pick the side you're on: Donor / Recipient guides (white)
  *
  * Typography follows the CampaignsPage hero recipe exactly: Bebas Neue
  * (`font-display`) is reserved for the hero H1 (italic, normal weight,
@@ -294,132 +290,7 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* ── 3. Two ways to get paid (white / dark navy variant) ─────────── */}
-      <section className="relative bg-white dark:bg-[#13181f] py-20 md:py-28 overflow-hidden">
-        {/* Subtle world-map texture in dark mode only */}
-        <div
-          aria-hidden
-          className="hidden dark:block absolute inset-0 opacity-[0.05] pointer-events-none"
-          style={{
-            backgroundImage: "url('/about/world-map-bg.png')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeader
-            eyebrow={t('about.twoWays.eyebrow')}
-            title={t('about.twoWays.title')}
-            lede={t('about.twoWays.lede')}
-          />
-
-          <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto items-start">
-            {/* Bitcoin Public Payments */}
-            <RailCard
-              accent="orange"
-              kicker={t('about.twoWays.public.kicker')}
-              tagline={t('about.twoWays.public.tagline')}
-              icon={<Bitcoin className="size-4" />}
-              title={t('about.twoWays.public.title')}
-              description={t('about.twoWays.public.description')}
-              bullets={[
-                t('about.twoWays.public.bullet1'),
-                t('about.twoWays.public.bullet2'),
-                t('about.twoWays.public.bullet3'),
-              ]}
-              tradeoffEmphasized
-              tradeoffTitle={t('about.twoWays.public.tradeoffTitle')}
-              tradeoffIntro={
-                <p>
-                  <Trans
-                    i18nKey="about.twoWays.public.tradeoffIntro"
-                    values={{ appName }}
-                    defaults="Every donation is public on the Bitcoin blockchain and on Nostr. {{appName}} is recommended only for above-ground campaigns. If you or your donors require extreme privacy, including from state actors, read the <0>Donor Guide</0> and <1>Recipient Guide</1> before participating."
-                    components={[
-                      <Link
-                        to="/about/donors"
-                        className="font-semibold text-primary hover:underline"
-                      />,
-                      <Link
-                        to="/about/recipients"
-                        className="font-semibold text-primary hover:underline"
-                      />,
-                    ]}
-                  />
-                </p>
-              }
-            />
-            {/* Bitcoin Silent Payments */}
-            <RailCard
-              accent="indigo"
-              kicker={t('about.twoWays.silent.kicker')}
-              tagline={t('about.twoWays.silent.tagline')}
-              icon={<ShieldOff className="size-4" />}
-              title={t('about.twoWays.silent.title')}
-              description={t('about.twoWays.silent.description')}
-              bullets={[
-                t('about.twoWays.silent.bullet1'),
-                t('about.twoWays.silent.bullet2'),
-                t('about.twoWays.silent.bullet3'),
-              ]}
-              tradeoffTitle={t('about.twoWays.silent.tradeoffTitle')}
-              tradeoffIntro={
-                <p>
-                  {t('about.twoWays.silent.tradeoffIntro')}
-                </p>
-              }
-              tradeoffBullets={[
-                <strong className="text-gray-800 dark:text-gray-100">{t('about.twoWays.silent.tradeoffBullet1')}</strong>,
-                <strong className="text-gray-800 dark:text-gray-100">{t('about.twoWays.silent.tradeoffBullet2')}</strong>,
-                <strong className="text-gray-800 dark:text-gray-100">{t('about.twoWays.silent.tradeoffBullet3')}</strong>,
-                <strong className="text-gray-800 dark:text-gray-100">{t('about.twoWays.silent.tradeoffBullet4')}</strong>,
-                <strong className="text-gray-800 dark:text-gray-100">
-                  {t('about.twoWays.silent.tradeoffBullet5')}
-                </strong>,
-              ]}
-            />
-          </div>
-
-          {/* No custody comparison block. The compare cards above show
-              the two options; this block answers the obvious next
-              question, "how is this actually different from existing
-              crowdfunding sites?", by name-checking the failure modes
-              of centralized and even other Bitcoin-based options. */}
-          <div className="mt-10 max-w-5xl mx-auto rounded-2xl border border-primary/20 dark:border-primary/30 bg-gradient-to-br from-white to-primary/5 dark:from-white/[0.04] dark:to-primary/[0.08] p-6 sm:p-8">
-            <div className="flex flex-col sm:flex-row items-start gap-5 mb-6">
-              <div className="size-12 shrink-0 rounded-xl bg-primary/10 dark:bg-primary/20 border border-primary/30 flex items-center justify-center">
-                <ShieldCheck className="size-6 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white mb-1.5">
-                  {t('about.twoWays.noCustody.title')}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-[15px]">
-                  {t('about.twoWays.noCustody.body', { appName })}
-                </p>
-              </div>
-            </div>
-
-            {/* Comparison grid */}
-            <ul className="grid sm:grid-cols-3 gap-5 sm:gap-6 pt-5 border-t border-primary/10 dark:border-white/10">
-              <ComparisonItem
-                heading={t('about.twoWays.noCustody.gofundme.heading')}
-                body={t('about.twoWays.noCustody.gofundme.body')}
-              />
-              <ComparisonItem
-                heading={t('about.twoWays.noCustody.givesendgo.heading')}
-                body={t('about.twoWays.noCustody.givesendgo.body')}
-              />
-              <ComparisonItem
-                heading={t('about.twoWays.noCustody.otherBitcoin.heading')}
-                body={t('about.twoWays.noCustody.otherBitcoin.body')}
-              />
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 4. Need help? FAQ (cream / dark navy, integrated as three chapters) ───── */}
+      {/* ── 3. Need help? FAQ (cream / dark navy, integrated as three chapters) ───── */}
       <section
         id="faq"
         className="bg-[#f5f1eb] dark:bg-[#0a0c14] py-20 md:py-28 scroll-mt-16"
@@ -445,7 +316,7 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* ── 5. Pick the side you're on (white / dark navy variant) ────────── */}
+      {/* ── 4. Pick the side you're on (white / dark navy variant) ────────── */}
       <section className="bg-white dark:bg-[#13181f] py-20 md:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
@@ -467,7 +338,6 @@ export function AboutPage() {
               bullets={[
                 t('about.guides.donor.bullet1'),
                 t('about.guides.donor.bullet2'),
-                t('about.guides.donor.bullet3'),
               ]}
               cta={t('about.guides.donor.cta')}
             />
@@ -482,8 +352,6 @@ export function AboutPage() {
               description={t('about.guides.recipient.description')}
               bullets={[
                 t('about.guides.recipient.bullet1'),
-                t('about.guides.recipient.bullet2'),
-                t('about.guides.recipient.bullet3'),
               ]}
               cta={t('about.guides.recipient.cta')}
             />
@@ -584,38 +452,6 @@ function FAQChapter({ number, title, description, categoryId }: FAQChapterProps)
   );
 }
 
-interface ComparisonItemProps {
-  heading: string;
-  body: string;
-  /** Defaults to light. On dark backgrounds, body copy switches to gray-300. */
-  theme?: 'light' | 'dark';
-}
-
-/**
- * One cell in the "Unlike GoFundMe / GiveSendGo / Bitcoin" grid
- * inside the No-Custody banner. Small heading + short body, no
- * separating border (the parent grid gap is the separator).
- */
-function ComparisonItem({ heading, body, theme = 'light' }: ComparisonItemProps) {
-  return (
-    <li>
-      <p className="text-xs font-bold uppercase tracking-widest text-primary mb-1.5">
-        {heading}
-      </p>
-      <p
-        className={cn(
-          'text-sm leading-relaxed',
-          theme === 'dark'
-            ? 'text-gray-300'
-            : 'text-gray-600 dark:text-gray-300',
-        )}
-      >
-        {body}
-      </p>
-    </li>
-  );
-}
-
 interface SectionHeaderProps {
   eyebrow: string;
   title: string;
@@ -692,110 +528,6 @@ function StepCard({ number, image, imageAlt, title, body }: StepCardProps) {
           {title}
         </h3>
         <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-[15px]">{body}</p>
-      </div>
-    </div>
-  );
-}
-
-interface RailCardProps {
-  accent: 'orange' | 'indigo';
-  kicker: string;
-  tagline: string;
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  bullets: string[];
-  tradeoffTitle: string;
-  tradeoffIntro: React.ReactNode;
-  tradeoffBullets?: React.ReactNode[];
-  /** When true, the trade-off block uses an amber alert-style title icon. */
-  tradeoffEmphasized?: boolean;
-}
-
-function RailCard({
-  accent,
-  kicker,
-  tagline,
-  icon,
-  title,
-  description,
-  bullets,
-  tradeoffTitle,
-  tradeoffIntro,
-  tradeoffBullets,
-  tradeoffEmphasized,
-}: RailCardProps) {
-  const headerGradient =
-    accent === 'orange'
-      ? 'from-primary to-primary/80'
-      : 'from-indigo-600 to-indigo-700';
-  const taglineColor =
-    accent === 'orange' ? 'text-primary-foreground/85' : 'text-indigo-100';
-  const checkColor =
-    accent === 'orange' ? 'text-emerald-600' : 'text-indigo-600';
-
-  return (
-    <div className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1c2230] shadow-sm overflow-hidden flex flex-col">
-      {/* Gradient header strip */}
-      <div className={cn('bg-gradient-to-r px-6 py-5 text-white', headerGradient)}>
-        <div className="flex items-center gap-2 mb-1">
-          {icon}
-          <span className="text-xs font-semibold uppercase tracking-widest">
-            {kicker}
-          </span>
-        </div>
-        <p className={cn('text-sm', taglineColor)}>{tagline}</p>
-      </div>
-
-      {/* Body */}
-      <div className="p-6 space-y-5 flex-1 flex flex-col">
-        <div>
-          <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white mb-2 leading-snug">
-            {title}
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-[15px]">
-            {description}
-          </p>
-        </div>
-
-        <ul className="space-y-2.5">
-          {bullets.map((b, i) => (
-            <li key={i} className="flex items-start gap-2.5">
-              <CircleCheck className={cn('size-4 shrink-0 mt-0.5', checkColor)} />
-              <span className="text-gray-700 dark:text-gray-300 text-sm leading-snug">{b}</span>
-            </li>
-          ))}
-        </ul>
-
-        {/* Trade-off block */}
-        <div className="mt-auto pt-5 border-t border-gray-100 dark:border-white/10">
-          <div className="flex items-center gap-2 mb-2">
-            {tradeoffEmphasized ? (
-              <AlertTriangle className="size-4 text-amber-600 dark:text-amber-400" />
-            ) : (
-              <span aria-hidden className="size-2 rounded-full bg-amber-500" />
-            )}
-            <span className="text-xs font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400">
-              {tradeoffTitle}
-            </span>
-          </div>
-          <div className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed space-y-2.5">
-            {tradeoffIntro}
-            {tradeoffBullets && tradeoffBullets.length > 0 && (
-              <ul className="space-y-2 pt-1">
-                {tradeoffBullets.map((b, i) => (
-                  <li key={i} className="flex items-start gap-2.5">
-                    <span
-                      aria-hidden
-                      className="mt-1.5 size-1.5 shrink-0 rounded-full bg-amber-500"
-                    />
-                    <span className="leading-snug">{b}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
       </div>
     </div>
   );

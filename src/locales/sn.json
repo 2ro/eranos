@@ -77,7 +77,6 @@
     "language": "Mutauro",
     "dashboard": "Dashboard",
     "myDashboard": "Dashboard Yangu",
-    "wallet": "Chikwama",
     "notifications": "Zviziviso",
     "messages": "Mameseji",
     "profile": "Profile",
@@ -119,7 +118,7 @@
     "showAllConversations": "Ratidza nhaurirano dzese",
     "friendsEmpty": "Hapana mameseji kubva kuvanhu vaunotevera.",
     "translateDialogTitle": "Dudzira mameseji epachivande?",
-    "translateDialogDescription": "Mameseji agamuchirwa achaendeswa kusevhisi yako yekushandura yawakagadzirisa. Mameseji atumirwa haazodudzirwi. Agora icharangarira sarudzo iyi pachigadzirwa ichi.",
+    "translateDialogDescription": "Mameseji agamuchirwa achaendeswa kusevhisi yako yekushandura yawakagadzirisa. Mameseji atumirwa haazodudzirwi. Eranos icharangarira sarudzo iyi pachigadzirwa ichi.",
     "confirmTranslate": "Dudzira mameseji",
     "newMessage": "Meseji itsva",
     "newMessageTitle": "Meseji itsva",
@@ -199,7 +198,7 @@
     "secure": {
       "title": "Chengetedza kiyi yako",
       "subtitle": "Daunirodha faira ugorichengeta panzvimbo yakachengetedzeka. Password manager inoshanda zvakanaka.",
-      "couplingNote": "Akaunti yako nechikwama chako zvinoshandisa kiyi imwe chete. Inosaina maposvo ako eNostr uye inovhura chikwama chako cheBitcoin paAgora.",
+      "couplingNote": "Akaunti yako nechikwama chako zvinoshandisa kiyi imwe chete. Inosaina maposvo ako eNostr uye inovhura chikwama chako cheBitcoin paEranos.",
       "permanenceHeadline": "Hapana nzira yekudzosa kiyi iyi kana ukairasa.",
       "permanenceBody": "Hapana kuireseta, hapana nhare yerubatsiro, hapana kudzoswa neemail. Ichengete usati waenderera mberi.",
       "button": "Daunirodha & enderera mberi",
@@ -278,19 +277,19 @@
       "global": "Pasi rose"
     },
     "empty": {
-      "homeAgora": "Nguva yakanyarara paAgora. Mishando mitsva, zvivimbiso, mipo, nezvinyorwa zvichaonekwa pano sezvinozoitika.",
-      "homeFollowingLoggedIn": "Feed yako yokutevera haina chinhu. Tevera vamwe vanhu kuti uone zvavari kuita, kana kuchinjira kuAgora kana Pasi rose.",
+      "homeAgora": "Nguva yakanyarara paEranos. Mishando mitsva, zvivimbiso, mipo, nezvinyorwa zvichaonekwa pano sezvinozoitika.",
+      "homeFollowingLoggedIn": "Feed yako yokutevera haina chinhu. Tevera vamwe vanhu kuti uone zvavari kuita, kana kuchinjira kuEranos kana Pasi rose.",
       "homeFollowingLoggedOut": "Pinda kuti uone zvinyorwa zvevanhu vauri kutevera.",
       "homeOther": "Hapana chokuratidza. Tarisa hukama hwerelay yako kana kuedza zvakare munguva pfupi.",
       "follows": "Feed yako haina chinhu. Tevera vamwe vanhu kuti uone zvinyorwa zvavo pano.",
       "global": "Hapana zvinyorwa zvakawanikwa. Tarisa hukama hwerelay yako kana kudzoka manje.",
-      "browseAgora": "Tarisa Feed yeAgora",
+      "browseAgora": "Tarisa Feed yeEranos",
       "browseGlobal": "Tarisa Feed yePasi rose",
       "discoverPeople": "Tsvaga vanhu vokutevera",
       "logIn": "Pinda"
     },
     "modeSwitcher": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "allNostr": "Pasi rose",
       "following": "Kutevera",
       "ariaLabel": "Mamiriro eFeed: {{label}}. Dzvanya kushandura.",
@@ -307,7 +306,6 @@
       "repost": "Tumira zvakare",
       "undoRepost": "Dzosera kutumira zvakare",
       "react": "Pindura nemiitiro",
-      "zap": "Zap",
       "share": "Govera",
       "more": "Zvimwe",
       "linkCopied": "Link yakopwa muclipboard"
@@ -482,7 +480,6 @@
       "noSubmissionsHint": "Iva wekutanga kupindura nehumbowo, uchapupu, kana basa rapera.",
       "funded": "yakatsigirwa",
       "ofPledged": "ye{{amount}} yakatsidzirwa",
-      "trustNote": "Chitsidziro ichi chinotsamira pakuvimba. Kufambisa kwemari kunosanganisa mazaps neresiti dzezvipo pamhinduro dzepamusoro.",
       "share": "Govera",
       "storyHeading": "Chitsidziro",
       "storyEmpty": "Akapa chitsidziro haasati anyora rondedzero yechitsidziro ichi."
@@ -644,32 +641,6 @@
     "headingEdit": "Gadzirisa campaign",
     "title": "Musoro",
     "titlePlaceholder": "Chengeta Chitoro chekupedzisira chemabhuku",
-    "wallet": "Chikwama cheBitcoin",
-    "myWalletLabel": "Chikwama cha{{name}}",
-    "myWalletDefault": "Chikwama changu",
-    "walletHeroNote": "Zvipo zvinopinda zvakananga muchikwama chako cheAgora.\nHapana munhu ari pakati.",
-    "walletHeroReassurance": "Iwe ndiwe une kiyi, saka ndiwe une mari. Bvisa mari nguva ipi zvayo kubva mutabhu yechikwama.",
-    "walletChoose": "Sarudza chikwama",
-    "walletCustom": "Chenyu",
-    "walletUseCustom": "Shandisa chikwama chako pachako",
-    "walletUseMine": "Shandisa chikwama changu cheAgora",
-    "acceptHeading": "Ndezvipi zvipo zvauchagamuchira?",
-    "acceptUnavailable": "Hazviwanikwi nekupinda uku.",
-    "acceptAllTitle": "Chipo chero chipi zvacho",
-    "acceptPublicTitle": "Zvipo zvepachena chete",
-    "acceptPrivateTitle": "Zvipo zvakavanzika chete",
-    "acceptAllHint": "Gamuchira zvipo zvepachena nezvakavanzika.",
-    "acceptPublicHint": "Vanopa vanopa kukero yeBitcoin yenguva dzose. Zvipo izvi zvinoonekwa nemunhu wese.",
-    "acceptPrivateHint": "Vanopa vanopa muchivande, saka zita ravo rinoramba rakavanzika kuruzhinji.",
-    "customWalletIntro": "Zadza chero zvipo zvauinazvo zvaunoda kugamuchira: kero yeruzhinji, kodhi yakavanzika, kana zvose zviri zviviri. Pakuita zvirinani imwechete inodikanwa.",
-    "customOnchainMeaning": "Zveruzhinji. Munhu wese anogona kuona zvipo izvi.",
-    "customSpMeaning": "Zvakavanzika. Zita reanopa rinoramba rakavanzika.",
-    "bitcoinAddress": "Kero yeBitcoin",
-    "bitcoinAddressPlaceholder": "bc1q… kana bc1p…",
-    "silentPaymentCode": "Kodhi yemubhadharo unyararo",
-    "silentPaymentCodePlaceholder": "sp1…",
-    "onchainInvalid": "Haisi kero yeBitcoin mainnet inozivikanwa (bc1q… / bc1p…).",
-    "spInvalid": "Haisi kodhi yeBIP-352 yemubhadharo unyararo inozivikanwa (sp1…).",
     "country": "Nyika",
     "countryPlaceholder": "Tsvaga nyika",
     "tags": "Marebhuro",
@@ -697,7 +668,6 @@
     "storyPlaceholder": "Govera nhoroondo, anobatsirwa, uye kuti mari ichashandiswa sei.",
     "goal": "Chinangwa",
     "goalPlaceholder": "25,000",
-    "goalNote": "Madhora eUS chete. Vapi vebhadhara muBitcoin; vatengi vanofungidzira mucherechedzo weUSD panguva yokutarisa.",
     "submitCreate": "Burisa campaign",
     "submitEdit": "Vandudza campaign",
     "publishing": "Kuburitsa…",
@@ -716,24 +686,14 @@
     "errorTitleRequired": "Musoro unodiwa.",
     "errorTitleInvalid": "Musoro unofanira kuva nemavara kana manhamba kuti URL yecampaign igadzirike.",
     "errorSlugInvalid": "Kupiwa zita kunofanira kunge kune mavara madiki, manhamba, uye dashes.",
-    "errorHdUnavailable": "Chikwama chakavakirwa hachiwanikwi pakupinda uku.",
-    "errorSpUnavailable": "Kero yemubhadharo unyararo haiwanikwi pakupinda uku.",
-    "errorOnchainInvalid": "Kero yepa-chain haisi kero yebech32(m) mainnet inozivikanwa (bc1q… / bc1p…).",
-    "errorSpInvalid": "Kodhi yemubhadharo unyararo haisi kodhi yeBIP-352 inozivikanwa (sp1…).",
-    "errorWalletRequired": "Ipa zvirinani imwechete chinangwa chechikwama — kero yeBitcoin mainnet (bc1q… / bc1p…) kana kodhi yemubhadharo unyararo (sp1…).",
     "errorGoalInvalid": "Chinangwa chinofanira kunge chiri madhora akakwana anopfuura zero.",
     "errorEditLatestMissing": "Hatina kuwana shanduro yazvino yecampaign iyi kuti tirivandudze.",
     "errorSlugCollision": "Une kare campaign ine kupiwa zita kwe«{{slug}}». Sarudza rimwe.",
     "errorBannerInvalid": "Bhana inofanira kuva URL ye https:// chaiyo.",
-    "errorHdDeriveFailed": "Hatina kukwanisa kuwana kero itsva yepa-chain kubva muchikwama chako.",
-    "errorHdDeriveInvalid": "Kero yakatorwa yatadza chenjedzo. Tapota wedzera kero yenyu.",
-    "errorWalletRequiredFallback": "Chinangwa chechikwama chinodikanwa.",
     "errorPublishedInvalid": "Chiitiko chakaburitswa chatadza chenjedzo. Tapota refresh moedza zvakare.",
     "wizard": {
       "titleStepTitle": "Tumidza campaign yako",
       "titleStepSubtitle": "Zita pfupi, riri pachena, ravapi vachaziva.",
-      "walletStepTitle": "Zvipo zvinoenda kupi?",
-      "walletStepSubtitle": "Sarudza chikwama chako cheAgora kana unamatire kero yako.",
       "bannerStepTitle": "Wedzera bhana",
       "bannerStepSubtitle": "Mufananidzo mumwe chete unotapira unotakura campaign pakadhi rega rega.",
       "storyStepTitle": "Taura nyaya yako",
@@ -773,43 +733,15 @@
     "like_one": "<0>{{formattedCount}}</0> Like",
     "like_other": "<0>{{formattedCount}}</0> maLike",
     "tabComments": "Mhinduro nezvipo",
-    "tabLedger": "Bhuku rezvakaitika",
-    "ledger": {
-      "publicAddress": "Kero yeruzhinji",
-      "viewOnMempool": "Ona pamempool.space",
-      "openOnMempool": "Vhura transaction pamempool.space",
-      "received": "Zvagamuchirwa",
-      "sent": "Zvatumirwa",
-      "unconfirmed": "Hazvisati zvasimbiswa",
-      "block": "Block {{height}}",
-      "btcUnit": "BTC",
-      "empty": "Hapana zvichakaitika pachain pakero iyi.",
-      "error": "Hatina kukwanisa kurodha zvakaitika pachain. Edza zvakare munguva pfupi.",
-      "loadMore": "Rodha zvimwe",
-      "loadingMore": "Kurodha…"
-    },
     "noCommentsTitle": "Hapana mhinduro parizvino",
     "noCommentsHint": "Iva wekutanga kusiya shoko rerutsigiro.",
     "deleteDialogTitle": "Bvisa campaign iyi?",
     "deleteDialogBody": "Izvi zvinoburitsa chikumbiro chekubvisa cheNIP-09. Marelay anozvibata zvakanaka achabvisa campaign mufeeds nezvirink zvakananga. Rezvi dzezvipo dzapfuura dzinoramba dzakachengetwa pachain. Izvi hazvigoni kudzosererwa — kuti urambe uchigamuchira zvipo, gadzirisa campaign panzvimbo yokuti uibvise.",
     "storyHeading": "Nyaya",
-    "donate": "Ipa",
     "share": "Govera",
     "target": "Chinangwa: {{amount}}",
     "raised": "yakaunganidzwa",
-    "ofGoal": "ye{{amount}} chinangwa",
-    "donationCount_one": "{{count}} chipo",
-    "donationCount_other": "{{count}} zvipo",
-    "openInWallet": "Vhura muchikwama",
-    "payWithAgoraWallet": "Bhadhara neAgora",
-    "openExternalWallet": "Vhura chikwama chekunze"
-  },
-  "noBitcoin": {
-    "trigger": "Hauna Bitcoin here?",
-    "title": "Hausati uine Bitcoin?",
-    "description": "Tenga Bitcoin muCash App, wozoituma kumushandirapamwe uyu.",
-    "getItOn": "Itore pa",
-    "getCashApp": "Tora Cash App"
+    "ofGoal": "ye{{amount}} chinangwa"
   },
   "campaignVerification": {
     "verifiedBy": "Yasimbiswa na",
@@ -925,25 +857,6 @@
       "yourCampaignsDesc": "Mishandirapamwe yako iri panetwork yeNostr uye mipiro inoshanda kuburikidza nemurawu wemushandirapamwe. Tarisa mishandirapamwe yose pa/campaigns; boka re{{appName}} rinosarudza yakananga papeji rekutanga.",
       "empty": "Hapana mishandirapamwe parizvino",
       "emptyHint": "Iva wekutanga kutanga kuunganidza mari pa{{appName}}. Taura nyaya yako, sarudza vanobatsirwa, uchipa rwumwe rwekugovera.",
-      "venezuelaRelief": {
-        "title": "Venezuela <0>inokuda</0>",
-        "body": "Kudengenyeka kwenyika kune simba kwakarova kuchamhembe kweVenezuela, kuchikuvadza Caracas neLa Guaira zvakanyanya. Mhuri dziri ikoko hadzigoni kupfuura mudambudziko iri dzega. Chipo chako chinonanga kumishandirapamwe yekubatsira iri panzvimbo, ichishandura tsitsi dzako kuva pekugara, chikafu, netariro nhasi.",
-        "donate": "Ipa kubatsira",
-        "credit": "Mufananidzo: vagari vachimbundirana pedyo nechivako chakawira muCaracas. (AFP via Getty Images)",
-        "share": "Govera",
-        "shareTitle": "Rubatsiro rwekudengenyeka kweVenezuela paAgora",
-        "linkCopied": "Chibatanidzwa chakopwa kuclipboard",
-        "learnMore": "Dzidza zvimwe",
-        "popupBody": "Kudengenyeka kwenyika kune simba kwakarova kuchamhembe kweVenezuela, kuchikuvadza Caracas neLa Guaira zvakanyanya. Chipo chako chinonanga kumishandirapamwe yekubatsira iri panzvimbo, ichishandura tsitsi kuva pekugara, chikafu, netariro nhasi.",
-        "seoTitle": "Rubatsiro rwekudengenyeka kweVenezuela",
-        "seoDescription": "Kudengenyeka kwenyika kune simba kwakarova kuchamhembe kweVenezuela. Ipa Bitcoin yakananga kumishandirapamwe yekubatsira iri panzvimbo paAgora. Hapana puratifomu, hapana muchengeti, hapana mvumo inodiwa.",
-        "pageEyebrow": "Chikumbiro chekukurumidza",
-        "pageHow": "Kuti chipo chako chinobatsira sei",
-          "pageHowBody": "Agora haichengeti mari: Bitcoin yako inonanga kubva muwallet yako kuenda kukero yemushandirapamwe wekubatsira. Hapana puratifomu inotora chikamu, hapana muchengeti anobata mari, uye hapana anoda mvumo yokupa kana kugamuchira. Mushandirapamwe wose uri pasi apa unotungamirirwa nevanhu vari kupindura kudengenyeka iri panzvimbo.",
-        "showcaseTitle": "Mishandirapamwe yekubatsira",
-        "campaignCount_one": "{{count}} mushandirapamwe wekubatsira",
-        "campaignCount_other": "Mishandirapamwe yekubatsira {{count}}"
-      },
       "whyDifferent": {
         "eyebrow": "Sei {{appName}}",
         "title": "Yakavakwa zvakasiyana.",
@@ -962,14 +875,6 @@
           "bullet2": "Inotsoropodzwa pamuchina kuenda muwallet yauno tora",
           "bullet3": "Inoshanda kunyange {{appName}} ikanyangarika"
         },
-        "block3": {
-          "heading": "Yeruzhinji kana yakavanzika. Kusarudza ndokwako.",
-          "body": "Vagamuchiri vanosarudza nzira yokugamuchira inoenderana nemamiriro avo enjodzi. Vapi vanoona QR imwe chete; wallet ndiyo inosarudza pirotokori yakakodzera.",
-          "publicLabel": "Yeruzhinji",
-          "publicSummary": "Inoshanda muwallet yose yeBitcoin. Yokukurumidza uye inoonekwa pamuchina.",
-          "privateLabel": "Yakavanzika",
-          "privateSummary": "BIP-352 silent payments. Zvipo zvinosvika pamiganhu isingabatanidziki."
-        },
         "readMore": "Verenga tsananguro yakazara"
       },
       "searchPlaceholder": "Tsvaga mishandirapamwe…",
@@ -981,7 +886,7 @@
     "all": {
       "title": "Mishandirapamwe",
       "seoTitle": "Mishandirapamwe yose",
-      "description": "Tarisa mishandirapamwe yose yakaiswa paAgora.",
+      "description": "Tarisa mishandirapamwe yose yakaiswa paEranos.",
       "sectionTagline": "Mishandirapamwe yakasarudzwa pakutanga, yotevedzwa nemamwe ose epanetwork. Tsvaga kana kuronga kuti utsanangure.",
       "heroKicker": "Mishandirapamwe",
       "heroHeading": "Chinangwa chimwe nechimwe,",
@@ -1149,7 +1054,6 @@
       "title": "Zvepamusoro",
       "subtitle": "Mibatanidzwa yechikwama, marongero esystem, nezvimwe zvinotenderwa kuvashandisi venyanzvi.",
       "intro": "Mibatanidzwa yechikwama, marongero esystem, nezvimwe zvepamusoro.",
-      "wallet": "Chikwama",
       "torHeading": "Tor",
       "torToggle": "Fambisa traffic kuburikidza neTor",
       "torToggleDesc": "Inobatanidza kune marelay uye inorodha media pamusoro peNetwork yeTor kuti uwane kuchengetedzeka kwakasimba. Tarisira kushanda kwakarefu uye kugumira kadiki Tor ichiri kubatanidza.",
@@ -1157,10 +1061,6 @@
       "torStatusLabel": "Mamiriro:",
       "torExitIp": "IP yokubuda kweTor:",
       "torCheckAgain": "Tarisa zvakare"
-    },
-    "wallet": {
-      "title": "Chikwama",
-      "subtitle": "Tarisira mibatanidzwa yechikwama nemibhadharo"
     }
   },
   "language": {
@@ -1312,360 +1212,6 @@
     "adminRequired": "Mvumo yeadmin inodikanwa",
     "adminRequiredDesc": "Vatariri vechikuva chete ndivo vanogona kusarudza kana kubvisa vagadziri."
   },
-  "wallet": {
-    "seoTitle": "Chikwama",
-    "seoDescription": "Chikwama cheBitcoin chenhevedzano chinobva pa nsec yako yeNostr.",
-    "loggedOut": {
-      "title": "Chikwama cheBitcoin",
-      "description": "Chikwama chenhevedzano chinobva pamuviri wako weNostr. Kero itsva pakugamuchira kwoga kwoga, nhoroondo yakazara yezvinoitwa, pasina kushandiswazve kwemakero.",
-      "requiresNsec": "Inoda kupinda nensec (kiyi yako yakavanzika yeNostr)."
-    },
-    "unsupported": {
-      "title": "Chikwama hachiwanike",
-      "extension": "Yekuwedzera yebrowser yako inochengeta kiyi yako yakavanzika yakaparadzaniswa, saka hatigoni kubvisa makiyi evana kuchikwama chako.",
-      "bunker": "Mubatsiri wako weakure (NIP-46 bunker) anochengeta kiyi yako yakavanzika kudivi rebunker, saka hatigoni kubvisa makiyi evana kuchikwama chako.",
-      "other": "Mhando yako yekupinda haiburitse kiyi yakavanzika inodiwa kuti tibvise chikwama chako.",
-      "instructions": "Buda wodzosera kupinda nensec yako kuti ushandise chikwama."
-    },
-    "scanFailed": "Kuongorora chikwama kwakundikana",
-    "retry": "Edzazve",
-    "refreshBalance": "Vandudza bharanzi",
-    "refreshBalanceTitle": "Dzvanya kuvandudza bharanzi",
-    "amountPending": "{{amount}} zvichakamirira",
-    "pending": "zvichakamirira",
-    "send": "Tumira",
-    "transactions": "Zvinoitwa",
-    "receiveDialog": {
-      "title": "Gamuchira Bitcoin",
-      "description": "Govera kero yokugamuchira bitcoin.",
-      "addressIndex": "Kero #{{index}}",
-      "scanForNew": "Tarisa mibhadharo mitsva"
-    },
-    "tx": {
-      "pending": "Zvichakamirira",
-      "today": "Nhasi",
-      "yesterday": "Nezuro",
-      "daysAgo_one": "mazuva {{count}} apfuura",
-      "daysAgo_other": "mazuva {{count}} apfuura",
-      "received": "Zvagamuchirwa",
-      "sent": "Zvatumirwa",
-      "silentBadge": "wakanyararira",
-      "silentDetectedTitle": "Zvakaonekwa kuburikidza nokuongorora kwemubhadharo wakanyararira weBIP-352"
-    },
-    "openMenu": "Menyu yechikwama",
-    "sendPublic": "Tumira",
-    "sendPrivate": "Tumira muchivande",
-    "tabs": {
-      "public": "Pachena",
-      "private": "Muchivande"
-    }
-  },
-  "walletSettings": {
-    "backup": {
-      "label": "Chengetedza chikwama"
-    },
-    "legacy": {
-      "label": "Kugarisa chikwama chekare"
-    }
-  },
-  "walletLegacy": {
-    "seoTitle": "Kugarisa Chikwama Chekare",
-    "seoDescription": "Garisa mari kubva muzvizvarwa zvakapfuura zvechikwama cheAgora.",
-    "title": "Kugarisa chikwama chekare",
-    "subtitle": "Sarudza chikwama chekare chawaishandisa wobvisa bharanzi yacho uchiipinza muchikwama chako chazvino.",
-    "loggedOut": "Pinda nemuviri wako weNostr kuti utsvake mari muzvikwama zvako zvekare.",
-    "scanning": "Kuongorora chikwama chebeta cheV2 kuti tiwane mari…",
-    "v2Detected": {
-      "title": "Mari yawanikwa muChikwama cheV2 Prelaunch Beta",
-      "body": "Takawana <0>{{amount}}</0> pamakero echikwama chako chekare cheV2 beta. Vhura kubvisa kweV2 pazasi kuti uiendese muchikwama chako chazvino."
-    },
-    "options": {
-      "v2Beta": {
-        "label": "V2 Prelaunch Beta Wallet",
-        "description": "Bvisa mari muchikwama cheBIP-86 chaishandisa nsec-se-seed chakatangwa BIP-39 derivation isati yaiswa."
-      },
-      "v1Breeze": {
-        "label": "V1 Breeze Wallet",
-        "description": "Bvisa bharanzi yepa-chain kubva paLightning custody yekare."
-      },
-      "doubleTweak": {
-        "label": "Kugadzirisa SP yeDouble-tweak",
-        "description": "Garisa mibhadharo yakanyararira yakasara nokuda kwebug yekutumira yekare uye uitumire zvakare muchikwama chako."
-      }
-    },
-    "footnote": "Sarudzo yega yega ndeyokubvisa kekamwe chete uchiisa muchikwama chako chazvino. Chikwama chekare pacho hachidzosererwi — mari yaiva mukati ndiyo chete inogariswa."
-  },
-  "walletRecovery": {
-    "seoTitle": "Garisa chikwama chekare",
-    "seoDescription": "Garisa mari kubva muchikwama chekare cheLightning uye uitumira kukero yako yeBitcoin yakabva paNostr.",
-    "title": "Garisa chikwama chekare",
-    "heading": "Garisa chikwama chako chekare",
-    "subheading": "Kana iwe wakambova nemari muchikwama cheLightning, unogona kuibvisa wese uchiitumira kukero yako yeBitcoin yakabva paNostr. Chikwama chako chekare hachidzosererwi — uku kutumira kwekamwe chete uye nzira imwe.",
-    "backToWallet": "Dzokera kuchikwama",
-    "loggedOut": {
-      "title": "Pinda kuti ugarise",
-      "description": "Pinda nemuviri weNostr waiva mwene wechikwama chekare cheLightning kuti mari ibviswe ichiendeswa kukero yacho yeBitcoin."
-    },
-    "destination": {
-      "title": "Mari ichatumirwa kunzvimbo iyi",
-      "description": "Kero yako yeTaproot yakabva paNostr."
-    },
-    "phrase": {
-      "title": "Mutsara wekugarisa",
-      "description": "Isa mutsara wekugarisa wemashoko gumi nemaviri kubva muchikwama chako chekare.",
-      "checkingRelays": "Kutarisa marelays ako kuti tiwane backup yakavharirwa nekiyi…",
-      "backupFoundTitle": "Backup yawanikwa pamarelays ako",
-      "backupFoundDesc": "Takawana backup yakavharirwa nekiyi yemutsara wekugarisa wechikwama chako chekare yakatumirwa kubva paakaundi ino.",
-      "decryptAndUse": "Vhura uchishandise",
-      "placeholder": "shoko1 shoko2 shoko3 …",
-      "warning": "Isa chete mutsara wekugarisa wamunovimba nawo. Ani naani anewo mutsara uyu anogona kushandisa mari. Kutumira kana kwapera, idzima panzvimbo dzese pawakaikopa.",
-      "sweepButton": "Tumira mari kukero yangu yeBitcoin"
-    },
-    "sweeping": {
-      "working": "Inoshanda…",
-      "dontClose": "Usavhare tabhu ino. Izvi zvinogona kutora kanosvika neminiti chikwama chekare chichiita synchronization uye zvinoitwa zvichitumirwa."
-    },
-    "success": {
-      "title": "Kugarisa kwapera",
-      "sent": "Yatumira {{sats}} sats kukero yako yeBitcoin.",
-      "viewTransaction": "Tarisa chinoitwa"
-    },
-    "error": {
-      "title": "Kugarisa kwakundikana",
-      "tryAgain": "Edzazve"
-    },
-    "errors": {
-      "noNip44": "Musainiri wako haatsigire kuvhura kweNIP-44 kunodiwa kuverenga backup yerelay. Isa zvako mutsara wekugarisa wemashoko gumi nemaviri nemaoko.",
-      "decryptFailed": "Hatina kukwanisa kuvhura backup yerelay. Isa zvako mutsara wekugarisa wemashoko gumi nemaviri nemaoko.",
-      "decryptGeneric": "Kuvhura backup yerelay kwakundikana.",
-      "invalidWordCount": "Mutsara wekugarisa unofanira kuva nemashoko gumi nemaviri kana makumi maviri nemana.",
-      "noBalance": "Chikwama chako chekare hachina bharanzi inogona kushandiswa. Hapana chinhu chekuti chigariswe.",
-      "sweepGeneric": "Kugarisa kwakundikana. Ndapota edzazve."
-    },
-    "progress": {
-      "loadingSdk": "Kuloda SDK yechikwama…",
-      "connecting": "Kubatanidza kuchikwama chako chekare…",
-      "checkingBalance": "Kutarisa bharanzi…",
-      "preparingTransfer": "Kugadzirira kutumira {{sats}} sats…",
-      "broadcasting": "Kuparadzira chinoitwa…"
-    },
-    "toast": {
-      "backupLoadedTitle": "Backup yaloda",
-      "backupLoadedDesc": "Mutsara wekugarisa wakavhurwa kubva pamarelays ako."
-    }
-  },
-  "walletBackup": {
-    "heading": "Mutsara weseed wechikwama",
-    "dialogDescription": "Unogona kupinda muchikwama chako cheAgora muchikwama chipi nechipi cheBitcoin nokupinza backup iyi yemashoko makumi maviri nemana.",
-    "hidden": "Dzvanya kuti uone mutsara weseed wemashoko makumi maviri nemana wako.",
-    "revealAria": "Ratidza mutsara weseed",
-    "hideAria": "Vanza mutsara weseed",
-    "warning": "Munhu wose anenge ane mashoko aya anogona kushandisa Bitcoin yako. Usaagovere kana wani, usaanyore pawebhusaiti, usaachengete sezvinyorwa zvakajeka kunze kwemanager wepassword."
-  },
-  "walletMigrate": {
-    "seoTitle": "Tamisira chikwama chekare",
-    "seoDescription": "Tora mari kubva muchikwama chekare cheAgora (nsec-se-seed) uchiipinza muchikwama chitsva cheBIP-39.",
-    "title": "Tamisira chikwama chekare",
-    "heading": "Tamisira kuchikwama chako chitsva",
-    "subheading": "Chikwama cheBitcoin cheAgora ikozvino chinoshandisa mutsara weseed weBIP-39 saka chinopinda muchikwama chipi nechipi. Mari yepamakero ako ekare ichiri yakachengetedzeka — peji rino rinoitora richiipinza muchikwama chako chitsva mukuita kumwe chete.",
-    "backToWallet": "Dzokera kuchikwama",
-    "loading": "Kuongorora chikwama chako chekare…",
-    "warning": "Izvi zvinovaka chiitiko chimwe chete chinotora UTXO yega yega yechikwama chako chekare uye chinotumira mari yose (kupfuura muripo mudiki wenetwork) kukero yekutanga yokugamuchira yechikwama chako chitsva. Kana zvaparadzirwa, kutamisira kwapera, hazvigoni kudzosererwa.",
-    "startButton": "Tora kuchikwama chitsva",
-    "loggedOut": {
-      "title": "Pinda kuti utamisire",
-      "description": "Pinda nemuviri weNostr unobata chikwama chekare kuti mari igone kutorwa ichiendeswa kukero yako itsva."
-    },
-    "unsupported": {
-      "title": "Chikwama hachiwanike",
-      "description": "Kutamisira kunoshanda chete nokupinda kwensec, nokuti makiyi echikwama chekare aibviswa zvakananga kubva pansec yako. Kupinda kwekuwedzera kwebrowser nokwemusainiri wekure hakugoni kuita kutamisira uku."
-    },
-    "noBlockbook": {
-      "title": "Blockbook haina kuiswa",
-      "description": "Kutamisira kunoda URL yemuongorori weBlockbook kuti ionorore makero ako ekare uye iparadzire chiitiko chokutora."
-    },
-    "noFunds": {
-      "title": "Hapana chokutamisira",
-      "description": "Chikwama chako chekare hachina bharanzi inogona kushandiswa. Zvose zviri muchikwama chako chitsva kare."
-    },
-    "detected": {
-      "title": "Mari iri muchikwama chako chekare",
-      "description": "Mari iyi ichatamiswa kuchikwama chako chitsva mukuita kumwe chete.",
-      "bip86": "Pacheni",
-      "sp": "Mibhadharo yakanyararira",
-      "total": "Yose"
-    },
-    "destination": {
-      "title": "Kwainoenda",
-      "description": "Kero yekutanga yokugamuchira yechikwama chako chitsva."
-    },
-    "progress": {
-      "building": "Kuvaka chiitiko…",
-      "signing": "Kusaina inputs…",
-      "broadcasting": "Kuparadzira chiitiko…",
-      "dontClose": "Usavhare tab ino panguva yokuti kutora kuchiri kuitwa."
-    },
-    "success": {
-      "title": "Kutamisira kwapera",
-      "sent": "Yatumira {{sats}} sats kuchikwama chako chitsva ({{fee}} sats muripo).",
-      "viewTx": "Tarisa chiitiko"
-    },
-    "error": {
-      "title": "Kutamisira kwakundikana",
-      "tryAgain": "Edzazve"
-    },
-    "errors": {
-      "noV1Account": "Hatina kukwanisa kuwana makiyi echikwama chekare.",
-      "noDestination": "Chikwama chako chitsva hachisati chine kero yokugamuchira. Mirira kuti peji rechikwama riloade woedza zvakare.",
-      "noBlockbook": "Muongorori weBlockbook haana kuiswa. Kutamisira hakugoni kuongorora makero ako ekare.",
-      "noFunds": "Hapana mari inogona kushandiswa yakawanikwa pamakero ekare.",
-      "sweepGeneric": "Kutamisira kwakundikana. Ndapota edzazve."
-    },
-    "toast": {
-      "successTitle": "Kutamisira kwapera",
-      "successDesc": "{{sats}} sats yatamiswa kuchikwama chako chitsva."
-    }
-  },
-  "walletConnect": {
-    "status": "Mamiriro",
-    "ready": "Yakagadzirira",
-    "notFound": "Haina kuwanikwa",
-    "none": "Hapana",
-    "add": "Wedzera",
-    "active": "Inoshanda",
-    "connectionLabel": "Mubatanidzwa weNWC",
-    "defaultWalletName": "Chikwama cheLightning",
-    "setActiveTitle": "Isa seinoshanda",
-    "removeTitle": "Bvisa chikwama",
-    "helpText": "Isa yekuwedzera yebrowser yeWebLN kana batanidza chikwama cheNWC kuti utumire mazaps.",
-    "webln": {
-      "name": "WebLN",
-      "description": "Yekuwedzera yebrowser"
-    },
-    "nwc": {
-      "name": "Nostr Wallet Connect",
-      "description": "Mubatanidzwa wechikwama chekure",
-      "connectedCount_one": "Chikwama {{count}} chakabatanidzwa",
-      "connectedCount_other": "Zvikwama {{count}} zvakabatanidzwa"
-    },
-    "empty": {
-      "title": "Hapana zvikwama zvakabatanidzwa",
-      "description": "Wedzera mubatanidzwa weNWC kuti uite kuti mazap akurumidze."
-    },
-    "dialog": {
-      "title": "Batanidza chikwama cheNWC",
-      "description": "Isa connection string kubva pachikwama chako chinoenderana neNWC.",
-      "aliasPlaceholder": "Zita rechikwama (zvinosarudzika)",
-      "connect": "Batanidza",
-      "connecting": "Kubatanidza..."
-    },
-    "toast": {
-      "uriRequiredTitle": "URI yokubatanidza inodiwa",
-      "uriRequiredDesc": "Ndapota isa URI yeNWC inoshanda.",
-      "activeChangedTitle": "Chikwama chinoshanda chashandurwa",
-      "activeChangedDesc": "Chikwama chakasarudzwa zvino chinoshanda pamazap."
-    }
-  },
-  "walletSend": {
-    "title": "Tumira Bitcoin",
-    "send": "Tumira Bitcoin",
-    "max": "MAX",
-    "tapAgainToConfirm": "Dzvanya zvakare kuti usimbise",
-    "satPerVB": "{{rate}} sat/vB",
-    "notEnoughBitcoin": "Bitcoin haina kukwana",
-    "recipient": {
-      "placeholder": "bc1…, sp1…",
-      "scan": "Skena kodhi yeQR",
-      "sendToOnchain": "Tumira kukero yeBitcoin",
-      "sendToSilentPayment": "Tumira kukero yemubhadharo wakanyararira",
-      "bitcoinAddress": "Kero yeBitcoin",
-      "silentPayment": "Kero yemubhadharo wakanyararira",
-      "toLabel": "Kuna",
-      "clear": "Bvisa mugamuchiri",
-      "choosePaymentMethod": "Sarudza nzira yokubhadhara kuti uenderere"
-    },
-    "feeSpeed": {
-      "fastest": "~10 maminitsi",
-      "halfHour": "~30 maminitsi",
-      "hour": "~awa 1",
-      "economy": "~zuva 1",
-      "custom": "Zvakasarudzwa"
-    },
-    "fee": {
-      "loading": "kuloadwa…",
-      "unavailable": "hazviwanike",
-      "loadFailed": "Hatina kukwanisa kuloadha mitengo yemiripo.",
-      "retry": "Edza zvakare",
-      "orCustom": "Kana isa mutengo wakasarudzwa pazasi.",
-      "loadingTiers": "Kuloadha mitengo yemiripo…",
-      "customPlaceholder": "semuenzaniso 5",
-      "customAriaLabel": "Mutengo wemuripo wakasarudzwa mu-sat/vB"
-    },
-    "progress": {
-      "building": "Kuvaka chinoitwa…",
-      "signing": "Kusaina…",
-      "broadcasting": "Kuparadzira…",
-      "sending": "Kutumira…"
-    },
-    "errors": {
-      "unavailable": "Chikwama cheHD hachiwanike pamhando yekupinda iyi.",
-      "enterRecipient": "Isa kero yeBitcoin kana kero yemubhadharo wakanyararira ye-sp1….",
-      "noSpendable": "Hapana Bitcoin inogona kushandiswa muchikwama ichi.",
-      "feesNotLoaded": "Migwagwa yemiripo haina kuloadwa.",
-      "enterAmount": "Isa huwandu.",
-      "insufficient": "Bitcoin haina kukwana pahuwandu uhwu + muripo wenetwork.",
-      "waitingPrice": "Kumirira mutengo weBTC…",
-      "noneYet": "Hauna kana Bitcoin parizvino.",
-      "feesNotLoadedYet": "Mitengo yemiripo haisati yaloadwa.",
-      "feeRateTooLow": "Isa mutengo wemuripo usingadarike 1 sat/vB."
-    },
-    "toast": {
-      "failedTitle": "Chinoitwa chakundikana"
-    },
-    "broadcastError": {
-      "feeTooLowTitle": "Muripo wenetwork wakaderera kwazvo",
-      "feeTooLowBodyWithMin": "Network yeBitcoin iri kuramba muripo uyu. Muripo mudikidiki parizvino unenge {{min}} sat/vB.",
-      "feeTooLowBody": "Network yeBitcoin iri kuramba muripo uyu. Sarudza mutsara unokurumidza kana usimudze mutengo wako wakasarudzwa.",
-      "rbfTitle": "Kutsiviwa kunoda muripo wakakwirira",
-      "rbfBody": "Chinoitwa chinotsiva chinofanira kubhadhara kupfuura chekutanga. Simudza muripo wozoedza zvakare.",
-      "mempoolFullTitle": "Network yeBitcoin yakazara",
-      "mempoolFullBody": "Mempool yakazara uye muripo wako haukwanisi kupikisana. Simudza muripo kuti upinde.",
-      "networkTitle": "Hatina kukwanisa kusvika kunetwork yeBitcoin",
-      "networkBody": "Tarisa kubatana kwako wozoedza zvakare.",
-      "mempoolConflictTitle": "Chinoitwa chinopikisana",
-      "mempoolConflictBody": "Imwe yezvinopinda yatoshandiswa kana iri kushandiswa nechimwe chinoitwa.",
-      "tooLongChainTitle": "Zvinoitwa zvisina kusimbiswa zvakawanda",
-      "tooLongChainBody": "Une cheni refu yezvinoitwa zvisina kusimbiswa. Mirira chimwe chisimbiswe wozoedza zvakare.",
-      "badInputsTitle": "Chinoitwa charambwa",
-      "badInputsBody": "Network yaramba chinoitwa ichi. Chinja huwandu kana mugamuchiri wozoedza zvakare.",
-      "absurdlyHighFeeTitle": "Muripo wakakwirira zvisina kujairika",
-      "absurdlyHighFeeBody": "Muripo wakatariswa wakakwirira nenzira inonetsa. Loadha mitengo yemiripo zvakare wozoedza.",
-      "unknownTitle": "Chinoitwa chakundikana",
-      "useHigherFee": "Shandisa muripo wakakwirira",
-      "tryAgain": "Edza zvakare",
-      "atMaxFeeTier": "Watove pamutsara unokurumidza kupfuura yose."
-    },
-    "success": {
-      "title": "Bitcoin yatumirwa",
-      "satsAmount": "{{sats}} sats",
-      "viewTransaction": "Tarisa chinoitwa",
-      "done": "Zvapera"
-    },
-    "scanError": {
-      "title": "Hatina kukwanisa kuverenga kodhi yeQR iyoyo",
-      "description": "Yakanga yakatarisirwa kero yeBitcoin, kero yemubhadharo wakanyararira (sp1…), kana bitcoin: URI."
-    },
-    "titlePublic": "Tumira Bitcoin",
-    "titlePrivate": "Tumira muchivande",
-    "reuse": {
-      "checking": "Kutarisa kero…",
-      "sendAnyway": "Tumira zvakadaro",
-      "acknowledge": "Ndinonzwisisa njodzi — tumira zvakadaro",
-      "historyWarning": "Kero iyi yatoshandiswa pacheni. Kutumira mari yako yakavanzika pano kunoibatanidza nenhoroondo yayo iripo yekutengeserana uye kunopedza kuvanzika kwemibhadharo yako yekunyararira. Shandisa kero yekubhadhara kunyararira (sp1…) panzvimbo yacho, kana kutumira zvakadaro.",
-      "ownPublicWarning": "Iyi ndiyo kero yechikwama chako pachako chepachena. Kutumira mari yako yakavanzika kwairi kunobatanidza zvikwama zviviri uye kuzvibatanidza pamwe. Shandisa kero yekubhadhara kunyararira (sp1…) panzvimbo yacho, kana kutumira zvakadaro."
-    },
-    "ownSilentPaymentBlocked": "Iyi ndiyo kero yako pachako yekubhadhara kunyararira. Haukwanisi kutumira uchibva muchikwama chako chepachena uchienda kuchikwama chako chakavanzika — kuita izvozvo kunosanganisa mari yako yakavanzika yekubhadhara kunyararira nemakoini akatoonekwa pacheni yepachena, zvichibatanidza chikwama chako chakavanzika kune chiziviso chinozivikanwa uye zvichiparadza kuvanzika kwacho. Tumira kune imwe kero panzvimbo yacho."
-  },
   "qrScanner": {
     "title": "Skena kodhi yeQR",
     "close": "Vhara",
@@ -1683,72 +1229,6 @@
       "overconstrained": "Kamera yemudziyo uyu haitsigire zvakumbirwa.",
       "didntStart": "Kamera haina kutanga. Imwe app inogona kunge iri kuishandisa, kana browser yako yakanga yavhara skena."
     }
-  },
-  "bitcoinPublic": {
-    "lead": "Mari yaunotumira inozivikanwa nemunhu wese uye inogona kudzokerwa kwauri.",
-    "learnMore": "Dzidza zvakawanda",
-    "body": "Bitcoin ibhuku reanozivikanwa nemunhu wese. Zvinoitwa zvaunotumira zvinogona kudzokerwa kwauri nekusingaperi, kunyangwe zvachinjwa nevanhu vakawanda. Tumira chete kune avo vaunoda kutsigira pachena.",
-    "bodyWithCashOut": "Bitcoin ibhuku reanozivikanwa nemunhu wese. Zvinoitwa zvaunotumira zvinogona kudzokerwa kwauri nekusingaperi, kunyangwe zvachinjwa nevanhu vakawanda. Tumira chete kune avo vaunoda kutsigira pachena, kana ushandure kumari yenyika paexchange.",
-    "iUnderstand": "Ndinonzwisisa kuti chinoitwa ichi chinozivikanwa nemunhu wese."
-  },
-  "spScan": {
-    "title": "Tarisa mibhadharo mitsva",
-    "subtitle": "Tsvaga muchitirakitiri chemibhadharo yakavanzika",
-    "descriptionHelp": "Ruzivo rwakawanda",
-    "description": "Inotevera muongorori weBIP-352 wakarongwa bhuroka nebhuroka kuti iwane mibhadharo yakanyararira inopinda.",
-    "since": "Kubvira",
-    "preset": {
-      "lastHour": "Awa rapfuura",
-      "last3h": "Maawa 3 apfuura",
-      "last24h": "Maawa 24 apfuura",
-      "lastWeek": "Vhiki rapfuura",
-      "lastMonth": "Mwedzi wapfuura",
-      "custom": "Zvakasarudzwa…"
-    },
-    "customHours": "Maawa",
-    "customHoursPlaceholder": "semuenzaniso 12",
-    "advanced": "Zvepamusoro",
-    "connectingIndexer": "Kubatanidza nemuongorori…",
-    "upToDate": "Watova pamberi pose.",
-    "fromBlock": "Kubva pabhuroka",
-    "indexerTip": "Pamusoro pemuongorori",
-    "lastFullyScanned": "Kupedzisira kuongorora kwakazara",
-    "never": "kana paine",
-    "includeSpent": "Sanganisira zvakatoshandiswa",
-    "includeSpentDesc": "Sanganisira mibhadharo yakanyararira yakazoshandiswa zvakare. Shandisa kana uchivaka history yokugamuchira mushure mekuongorora kwakapotsa kana kudzosera.",
-    "blockProgress": "Bhuroka {{current}} / {{to}}",
-    "matches_one": "kuenderana {{count}}",
-    "matches_other": "kuenderana {{count}}",
-    "scannedRange": "Mabhuroka akaongororwa {{from}} → {{to}}.",
-    "foundOutputs_one": "Yakawana mhedzisiro {{count}} itsva.",
-    "foundOutputs_other": "Yakawana mhedzisiro {{count}} itsva.",
-    "noNewPayments": "Hapana mibhadharo mitsva.",
-    "startScan": "Tanga kuongorora",
-    "resolveFailed": {
-      "title": "Hatina kukwanisa kutsvaga bhuroka rokutangira",
-      "description": "mempool.space haisi kuwanikwa pari zvino. Pinda bhuroka rokutangira pasi peZvepamusoro → Kubva pabhuroka kuti uongorore zvakadaro."
-    },
-    "reconcile": {
-      "title": "Reconcile UTXOs dzakashandiswa",
-      "description": "Inotarisa UTXO yega yega yakachengetwa yemubhadharo wakanyararira pamberi peBlockbook uye inobvisa idzo dzakashandiswa. Shandisa kana bharanzi yakakwirira pane zvaifanira mushure mokutumira.",
-      "checking": "Kutarisa {{checked}} / {{total}}…",
-      "checked_one": "Yatariswa UTXO {{count}} · yapfupiswa {{pruned}}.",
-      "checked_other": "Dzatariswa UTXOs {{count}} · dzapfupiswa {{pruned}}.",
-      "reconciling": "Kureconcile…",
-      "reconcileNow": "Reconcile zvino"
-    },
-    "autoScan": {
-      "label": "Tarisa woga",
-      "description": "Ramba uchitsvaga mibhadharo mitsva yakavanzika mushure, kunyange iwe wabva papeji ino."
-    }
-  },
-  "spAutoScan": {
-    "scanning": "Kutarisa… bhuroka {{current}} / {{to}}",
-    "caughtUp": "Yagara pamberi pose",
-    "neverScanned": "Haisati yatariswa",
-    "lastScanned": "Yatariswa kusvika pabhuroka {{height}}",
-    "paused": "Kutarisa kwoga kwakadzimwa",
-    "manualLink": "Sarudzo dzokutarisa"
   },
   "notifications": {
     "seoTitle": "Zviziviso",
@@ -1771,8 +1251,6 @@
     "actions": {
       "reactedToYour": "akadavira ku{{noun}} yako",
       "repostedYour": "akadzokorora {{noun}} yako",
-      "zappedYou": "akakuzapa",
-      "zappedYouWithAmount": "akakuzapa ne{{sats}} sats",
       "repliedToYourNote": "akapindura kunhau yako",
       "mentionedYou": "akakudoma",
       "repliedToYourComment": "akapindura kumhinduro yako",
@@ -1814,14 +1292,11 @@
       "emojiPack": "paketi yeemojis",
       "podcastEpisode": "chikamu chepodcast",
       "podcastTrailer": "trailer yepodcast",
-      "zapstoreAsset": "asset yeZapstore",
-      "zapstoreRelease": "release yeZapstore",
       "stream": "stream",
       "status": "mamiriro",
       "repository": "dura",
       "customNip": "NIP yakagadzirwa",
       "calendarEvent": "chiitiko chekarenda",
-      "zapstoreApp": "app yeZapstore",
       "playlist": "playlist",
       "divine": "kufemberera",
       "community": "nharaunda",
@@ -1874,10 +1349,6 @@
         "label": "Kudzokorora",
         "description": "Kana mumwe munhu adzokorora nhau dzako"
       },
-      "zaps": {
-        "label": "Zaps",
-        "description": "Kana mumwe munhu akutumira zap kuburikidza neLightning kana pacheni"
-      },
       "mentions": {
         "label": "Kudomwa",
         "description": "Kana mumwe munhu akudoma munhau"
@@ -1911,7 +1382,7 @@
     "inputPlaceholder": "Tsvaga",
     "filtersAria": "Mafilter ekutsvaga",
     "tabs": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "nostr": "Nostr",
       "accounts": "Vashandisi"
     },
@@ -1988,8 +1459,8 @@
       "postsPrompt": "Isa mubvunzo wokutsvaga kuti uwane zviri muNostr.",
       "accounts": "Hapana vashandisi vakawanikwa vanoenderana nokutsvaga kwako.",
       "followsPrompt": "Tsvaga vanhu nezita kana kero yeNIP-05.",
-      "agora": "Hapana macampaign, pledges, kana mapoka eAgora akawanikwa anoenderana nokutsvaga kwako.",
-      "agoraPrompt": "Tsvaga macampaign, pledges, nemapoka eAgora, kana kutarisa zvitsva.",
+      "agora": "Hapana macampaign, pledges, kana mapoka eEranos akawanikwa anoenderana nokutsvaga kwako.",
+      "agoraPrompt": "Tsvaga macampaign, pledges, nemapoka eEranos, kana kutarisa zvitsva.",
       "activeFilters": "Mafilter anoshanda:",
       "clearAll": "Bvisa mafilter ese"
     }
@@ -2013,7 +1484,6 @@
       "editProfile": "Gadzirisa",
       "shareFollowLink": "Govera link yokutevera",
       "moreOptions": "Zvimwe zvisarudzo",
-      "donate": "Ipa",
       "campaignGoal": "Chinangwa ${{amount}}"
     },
     "stats": {
@@ -2056,7 +1526,6 @@
       "addToList": "Wedzera kurondedzero",
       "shareFollowLink": "Govera link yokutevera",
       "profileRecovery": "Kudzosa pfungidziro",
-      "zap": "Zap",
       "awardBadge": "Ipa ratidziro",
       "writeLetter": "Nyora tsamba",
       "mute": "Nyararisa @{{name}}",
@@ -2138,8 +1607,6 @@
       "heading": "Ndima dzepfungidziro",
       "website": "Webhusayiti",
       "websitePlaceholder": "https://yourwebsite.com",
-      "lightning": "Lightning",
-      "lightningPlaceholder": "you@walletofsatoshi.com",
       "labelPlaceholder": "Mucherechedzo",
       "tickerPlaceholder": "Chiratidziri",
       "addressPlaceholder": "Kero",
@@ -2169,11 +1636,6 @@
         "defaultLabel": "Imeyili",
         "description": "Kero yeimeyili yokutaurirana",
         "valuePlaceholder": "you@example.com"
-      },
-      "wallet": {
-        "label": "Chikwama",
-        "description": "Kero yechikwama checryptocurrency",
-        "valuePlaceholder": "Kero"
       },
       "link": {
         "label": "Link",
@@ -2343,12 +1805,6 @@
     "reacted": "akapindura",
     "reposted": "akatumirazve",
     "voted": "akavhota",
-    "zap": {
-      "donatedTo": "akapa ku",
-      "donatedAmountTo": "akapa {{amount}} ku",
-      "sat_one": "{{formattedCount}} sat",
-      "sat_other": "{{formattedCount}} sats"
-    },
     "stream": {
       "untitled": "Stream isina musoro",
       "live": "MUMWE",
@@ -2419,7 +1875,6 @@
       "nsiteDeployed": "akaisa",
       "nsiteRedeployed": "akaisazve",
       "nsiteNoun": "nsite",
-      "zapped": "akazap",
       "pledgeCreated": "akagadzira",
       "pledgeUpdated": "akagadziridza",
       "pledgeNoun": "chivimbiso",
@@ -2589,60 +2044,12 @@
         "body": "Mari inosvika kumugamuchiri zvakananga. Vanochengeta umiriri, vanochengeta kutonga. Famba nayo, chinjana, kana kushandisa; magwaro ari pasi anotsanangura maitiro okuita zvakavanzika uye zvakachengeteka."
       }
     },
-    "twoWays": {
-      "eyebrow": "Bitcoin · QR imwe, zvisarudzo zviviri",
-      "title": "Nzira mbiri dzokubhadharwa.",
-      "lede": "Zvisarudzo zviviri zviri Bitcoin. Musiyano ndowekuti chii chaunoshandura nezvakavanzika. Apo mugamuchiri anogadzira mushando, anosarudza zvinopiwa zvinogamuchirwa. Kana iri yose, peji yokupa inoratidza QR imwe inoshanda neyose wallet.",
-      "public": {
-        "kicker": "Bitcoin Yokubhadhara Yeruzhinji",
-        "tagline": "Yepasi rose · Yokukurumidza · Yakajeka",
-        "title": "Inoshanda neyose wallet pasi rose.",
-        "description": "Zvipo zvinosvika kukero yeBitcoin yakajairika iyo mugamuchiri anotonga. Munhu wose ane wallet yeBitcoin anogona kutumira. Hapana app itsva, hapana akaundi itsva, hapana muraira wokudzidza.",
-        "bullet1": "Inoshanda muwallet yose yeBitcoin: Cash App, Coinbase, Strike, hardware",
-        "bullet2": "Kutsoropodza kunokurumidza zvikuru: zvichangotokyrigwa neBitcoin chete",
-        "bullet3": "Inogonzwa kushandiswa pamuchina: munhu wose anogona kuona zvinhu zvakagamuchirwa nemugamuchiri",
-        "tradeoffTitle": "Kushandura: Yeruzhinji pamuchina.",
-        "tradeoffIntro": "Chero chipo chiri pacheni cheBitcoin uye paNostr. {{appName}} inokurudzirwa chete makambeni epachena. Kana iwe kana vapi vako vachida zvakavanzika zvikuru, kusanganisira kubva kuvashori vehurumende, verenga <0>Gwaro romupi</0> ne<1>Gwaro romugamuchiri</1> usati wapinda."
-      },
-      "silent": {
-        "kicker": "Bitcoin Yokubhadhara Yakanyarara",
-        "tagline": "Isingabatanidziki · Zvakananga · BIP-352",
-        "title": "Isingabatanidziki, pamuchina, zvakananga.",
-        "description": "Zvipo zvinotumirwa sezvikamu zvakanyarara zveBIP-352. Chimwe nechimwe chinosvika pamuchina mutsva, usingabatanidziki, zvekuti munhu anotarisa pamuchina haakwanise kuzvibatanidza kumushando.",
-        "bullet1": "Mhare yezvipo haigone kuvakwa zvakare pamuchina",
-        "bullet2": "Inodzivirira vagamuchiri vanotarisana nevavengi vakaisvonaka",
-        "bullet3": "Inochengetwa muhuwandu hwakavanzika hwakaparadzana, isingatombosanganiswi nemari yeruzhinji",
-        "tradeoffTitle": "Kushandura: Zvokubhadhara zvakanyarara zvichiri pakutanga.",
-        "tradeoffIntro": "Nzira yakavanzika zvikuru yokugamuchira Bitcoin pamuchina, asi nharaunda yangu nhasi ichiri mudiki uye isina kunyatsoenzaniswa:",
-        "tradeoffBullet1": "Mawore mashoma anotsigira.",
-        "tradeoffBullet2": "Kugamuchira kunononoka.",
-        "tradeoffBullet3": "Hapana push notifications.",
-        "tradeoffBullet4": "Mawore achine bugs.",
-        "tradeoffBullet5": "Huwandu hwezvipo hahuna ruzhinji."
-      },
-      "noCustody": {
-        "title": "Hapana kuchengetedza. Hapana mumiriri.",
-        "body": "{{appName}} haichengete mari. Zvipo zvinofamba kubva muwallet kuenda muwallet paBitcoin. Hapana seva inomira pakati pemupi nemugamuchiri pachisarudzo chero chipi. Kana {{appName}} ikanyangarika mangwana, mushando wose unoramba uchishanda.",
-        "gofundme": {
-          "heading": "Kusiyana neGoFundMe",
-          "body": "Hapana puratifomu ingadzivirira zvipo zvako, kukumbira kudzoserwa, kana kupedza mushando wako pamusoro pekusawirirana kwemitemo."
-        },
-        "givesendgo": {
-          "heading": "Kusiyana neGiveSendGo",
-          "body": "Hapana mutsigiri wokubhadhara ari pakati, saka hapana Stripe, hapana Visa, hapana bhanga ringakucherekedza pakati pemushando."
-        },
-        "otherBitcoin": {
-          "heading": "Kusiyana nedzimwe puratifomu 'Bitcoin'",
-          "body": "Hapana Lightning node yepakati, muchengeti, kana LSP inogona kukundikana kana kunge offline. Mari inotsoropodzwa zvakananga pamuchina kuenda muwallet yauno tonga."
-        }
-      }
-    },
     "faq": {
       "eyebrow": "Mibvunzo",
       "title": "Mibvunzo inowanzobvunzwa.",
       "chapter1": {
         "label": "Kutanga",
-        "description": "Agora chii, ndiani akaivaka, uye inomudza marii."
+        "description": "Eranos chii, ndiani akaivaka, uye inomudza marii."
       },
       "chapter2": {
         "label": "Zvipo zveBitcoin",
@@ -2650,7 +2057,7 @@
       },
       "chapter3": {
         "label": "Pamusoro peNostr",
-        "description": "Pirotokori yakavhurika iyo Agora yakavakirwa, uye maitiro akaundi yako anoshanda."
+        "description": "Pirotokori yakavhurika iyo Eranos yakavakirwa, uye maitiro akaundi yako anoshanda."
       }
     },
     "guides": {
@@ -2664,7 +2071,6 @@
         "description": "Tumira Bitcoin zvakananga kuvagamuchiri uye mafambiro kwese kupi pasi rose, usingabvunza mvumo kumutsigiri wokubhadhara.",
         "bullet1": "Shandisa chero wallet yeBitcoin yauno tora.",
         "bullet2": "Zvipo zvinosvika zvakananga kumugamuchiri. Hapana muchengeti, hapana mumiriri.",
-        "bullet3": "Kune zvakavanzika, shandisa wallet inotsigira mubhadharo wakanyarara.",
         "cta": "Verenga Gwaro romupi"
       },
       "recipient": {
@@ -2673,8 +2079,6 @@
         "title": "Wana mari pasina mvumo.",
         "description": "Gamuchira rutsigiro zvakananga kubva kuvanhu vanotenda mukuda kwako. Hapana akaundi yebhanga, hapana fomu yekukumbira, hapana kambani pakati.",
         "bullet1": "Tanga kugamuchira zvipo pakarepo kana waitsa.",
-        "bullet2": "Sarudza marudzi emubhadharo aunogamuchira: zveruzhinji, zvokubhadhara zvakanyarara, kana zvose zviviri.",
-        "bullet3": "Kana iri yekubvisa zvakavanzika, tumira kune wallet yokubhadhara yakanyarara pakutanga, ipapo tumira kwese kwese.",
         "cta": "Verenga Gwaro romugamuchiri"
       },
       "stillStuck": "Wakanamatira here?",
@@ -2685,10 +2089,10 @@
   "faq": {
     "categories": {
       "getting-started": {
-        "label": "Nezve Agora"
+        "label": "Nezve Eranos"
       },
       "payments": {
-        "label": "Zvipo zveBitcoin paAgora"
+        "label": "Zvipo zveBitcoin paEranos"
       },
       "about-nostr": {
         "label": "Nezve Nostr"
@@ -2717,51 +2121,6 @@
           "{{appName}} yakavakwa ne[Soapbox](https://soapbox.pub), boka rakavhura kodhi rinogadzira maturusi enzvimbo yeNostr, vachishanda pamwe ne[World Liberty Congress](https://worldlibertycongress.org/)."
         ]
       },
-      "send-bitcoin-onchain": {
-        "question": "Kutumira Bitcoin kunoshanda sei?",
-        "answer": [
-          "Apo mugamuchiri anogadzira kambeni, anosarudza mhando dzemubhadharo dzaanozogamuchira: **pachena**, **zvakavanzika**, kana **zvese**.",
-          "Zvipo **zvepachena** chaizvo Bitcoin pa-chain. Zvinopedzwa pabhirochaina yepachena, zvinoshanda mu walleti yose yeBitcoin, uye zvinooneka kunemumwe nemumwe.",
-          "Zvipo **zvakavanzika** zvinoshandisa **mubhadharo wakanyarara** (BIP-352). Zvinopedzwa pa-chain zvakare, asi chibvumirano hachikwanise kubatanidzwa kudzokera kuchidimbu chechipo chemugamuchiri — saka hazvionekwe muzvinyorwa zvevapi zvepachena uye zvionekwa zvepachena. Mupi anoda walleti inotsigira mibhadharo yakanyarara — tinokurudzira [Ditto Wallet](https://ditto.pub) kana [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
-          "Apo kambeni inogamuchira **zvese**, {{appName}} inoratidza imwe kodhi yeQR ine zvinyorwa zvese zviri zviviri. MaWalleti emibhadharo yakanyarara anozviverenga sezvakavanzika; mamwe maWalleti anodzokera kukero yepachena. Vapi havatare kusarudza — walleti yavo inotora nzira yakakodzera ichizvichaira.",
-          "Pari pose, mubhadharo unoenda zvakananga kumugamuchiri. {{appName}} haina kana nguva imwe inobata mari iyi."
-        ]
-      },
-      "connect-wallet": {
-        "question": "Walleti iri pa{{appName}} chii?",
-        "answer": [
-          "Walleti yako ye{{appName}} iwalleti yeBitcoin **inozvichengeta** (self-custodial), yakavakwa kubva kukiyi yako yeNostr. {{appName}} haina kana nguva imwe inobata mari yako — walleti inomhanya mubrowser mako uye inosaina mishando ipapo nekiyi yaunozvidzora wega. Inogona kugashira Bitcoin nenzira mbiri — sekero yepachena inogona kubhadharwa newalleti yeBitcoin ipi zvayo, uye sekodhi yemibhadharo yakanyarara inogona kubhadharwa newalleti dzinokwanisa muchivande. Hapana chinonyoreswa; inovapo nguva yaunenge wave neakaundi.",
-          "Walleti ine matabu maviri: **Pachena** (kero yako yeBitcoin yakajairika) ne**Yakavanzika** (mibhadharo yakanyarara). Huwandu huviri uhu hunochengetwa hwakaparadzana zvachose uye hahungatombo shandiswi pamwechete — kuparadzana ikoko ndiko kunochengeta zvipo zvakavanzika zvisingabatanidziki pa-chain. Paunogadzira kambeni, unosarudza kuti unogamuchira mibhadharo yepachena, yakavanzika, kana zvese. Kuti ushandise zvawagamuchira, ona **Bhuku reMugamuchiri**.",
-          "Unogonawo kubudisa mutsara weseed wemazwi makumi maviri nemana wewalleti yako wougopinza muwalleti yeBitcoin ipi zvayo yakajairika — ona \"Ndinogona kubudisa walleti yangu ye{{appName}} ndichiipinza mune imwe walleti yeBitcoin here?\" pazasi."
-        ]
-      },
-      "export-wallet": {
-        "question": "Ndinogona kubudisa walleti yangu ye{{appName}} ndichiipinza mune imwe walleti yeBitcoin here?",
-        "answer": [
-          "Hongu. Walleti yako ye{{appName}} inozvichengeta zvizere. {{appName}} haina kana nguva imwe inobata Bitcoin yako uye haione makiyi ako — walleti inomhanya zvachose mubrowser mako, ichisaina mishando ipapo nekiyi inotorwa kubva kukiyi yako yakavanzika yeNostr (nsec).",
-          "Vhura walleti uchibva mumenyu, baya menyu yematombo matatu kumusoro kurudyi, wosarudza **Chengetedza chikwama**. Uchaona mutsara weseed weBIP-39 wemazwi makumi maviri nemana. Anyora pane imwe nzvimbo yakachengetedzeka (kana kuanochengeta mu password manager) — **chero ani anenge aine mazwi aya anogona kushandisa Bitcoin yako.**",
-          "Unogona kupinza mazwi makumi maviri nemana iwayo muwalleti yeBitcoin ipi zvayo yakajairika: **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, **Trezor**, kana **Ledger**. {{appName}} inoshandisa nzira dzakajairika dzekutora — BIP-86 (Taproot) neBIP-352 (mibhadharo yakanyarara) — saka hapana kumisikidza kwakasarudzika kunodikanwa.",
-          "Mushure mekupinza, walleti iyo imwe inoratidza bharanzi nenhoroondo zvakafanana newalleti yako ye{{appName}} — iwalleti imwechete, kungoti maonero maviri ayo.",
-          "Kubudisa mutsara weseed kunowanikwa chete kana wakapinda uchishandisa nsec. Kupinda kwekuwedzera kwebrowser nokwemusainiri wekure (bunker) kunochengeta kiyi yako yakavanzika yakaparadzaniswa, saka {{appName}} haigone kutora seed munzira idzodzo."
-        ]
-      },
-      "donations-are-public-general": {
-        "question": "Ko zvipo paAgora zvinoonekwa nemunhu wese here?",
-        "answer": [
-          "Zvinoenderana nemhando yemubhadharo yamugamuchiri anogamuchira.",
-          "**Zvipo zvepachena** zvinonyorwa pabhirochaina yeBitcoin uye paNostr. Munhu wese anogona kuona huwandu, nguva, uye makero.",
-          "**Zvipo zvakavanzika** zvinoshandisa mibhadharo yakanyarara. Hazvigone kubatanidzwa pachena kuchidimbu chechipo chemugamuchiri, hazvioneki muzvinyorwa zvevapi, uye hazviverengwe muzvionekwa zvepachena.",
-          "Apo kambeni inogamuchira zvese, walleti yemupi inosarudza nzira yekushandisa — maWalleti anokwanisa mibhadharo yakanyarara anobhadhara muchivande, mamwe anobhadhara kero yepachena. Verenga **Bhuku reMupi** ne**Bhuku reMugamuchiri** kuti uone mufananidzo wakazara."
-        ]
-      },
-      "why-donations-pending": {
-        "question": "Sei zvimwe zvipo zvichiti \"pending\"?",
-        "answer": [
-          "Chipo che**pending** iBitcoin chaiyo yatotumirwa — chiri kungomirira kusimbiswa nenetiweki. Walleti yemupi yakaparadzira chibvumirano, asi hachisati chabatanidzwa mubhirochaina.",
-          "Bitcoin inoburitsa bhirochaina itsva pamwe chete maminitsi gumi oga oga, uye vacheri vanosarudza zvibvumirano zvichienderana nemubhadharo wakabhadharwa nemupi. Zvipo zvakawanda zvinosimbiswa muawa imwe; zvine fee diki zvinogona kutora nguva refu apo netiweki yakabatikana. {{appName}} inocheka zvakare mamiriro ekusimbiswa ichizvichaira, saka chiratidzo che**pending** chinonyangarika choga kana bhirochaina yauya.",
-          "Mari iri munzira — mugamuchiri achaona chipo chichiverengwa muhuwandu hwekambeni kanongochisimbiswa. Hapana chimwe chinogona kuitwa nemugamuchiri kana {{appName}} kuti vamhanyise zvinhu; walleti yemupi chete ndiyo inogona kuwedzera fee."
-        ]
-      },
       "censorship-resistance": {
         "question": "\"Kushinga kucensorship\" pano kunorevei?",
         "answer": [
@@ -2775,22 +2134,6 @@
           "Bitcoin ndiyo nzira yemubhadharo inotsigirwa zvakanyanya uye yakashinga kucensorship pasi rose. Walleti yose yeBitcoin inogona kuitumira.",
           "Pa{{appName}}, vagamuchiri vanosarudza nzira yokugamuchira: **pachena** (kero yeBitcoin yakajairika) yekusvika kwakanyanya, **zvakavanzika** (mibhadharo yakanyarara) yezvipo zvisingatevedzeke, kana **zvese** kuitira kuti walleti yemupi mumwe nemumwe isarudze nzira yakakodzera zvakazvimirira. Vapi vane chete app yeBitcoin yemumusha vanogona kupawo; vapi vane walleti yemibhadharo yakanyarara vanogashira hukama hwakavanzika sezvakajairika.",
           "Chiri kunopikiswa ndechokuti zvibvumirano zveBitcoin zvepachena zvinooneka pabhirochaina uye zvinobhadhara mari kuvachera. Bhuku reMupi nereMugamuchiri zvinotsanangura nzira yokubata zvese."
-        ]
-      },
-      "why-not-silent-payments": {
-        "question": "Ko {{appName}} inotsigira mibhadharo yakanyarara here?",
-        "answer": [
-          "Hongu — kumativi ese ari maviri. Walleti yeBitcoin yakavakirwa mukati me{{appName}} inotsigira BIP-352, saka paunotumira Bitcoin kubva muwalleti yako ye{{appName}} unogona kubhadhara kero yemubhadharo wakanyarara (`sp1…`) zvakananga. Uye apo mugamuchiri anogadzira kambeni, anogona kugamuchira mibhadharo yakanyarara pamwe chete, kana panzvimbo, yemibhadharo yepachena yeBitcoin.",
-          "Zvipo zvemibhadharo yakanyarara zvichiri kupedzwa pa-chain, asi chibvumirano hachikwanise kubatanidzwa kudzokera kuchidimbu chechipo chemugamuchiri — saka hazvioneke muzvinyorwa zvevapi kana zvionekwa zvepachena.",
-          "Kutumira mubhadharo wakanyarara kubva kunze kwe{{appName}} kunoda walleti inotsigira BIP-352. Mamwe app emumusha haasati achitsigira, asi [Ditto Wallet](https://ditto.pub) ne[Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) zvinotsigira.",
-          "Apo kambeni inogamuchira mhando dzese mbiri dzemubhadharo, {{appName}} inozvinyora mukodhi imwe yeQR. MaWalleti anokwanisa mibhadharo yakanyarara anobhadhara muchivande; mamwe ese anobhadhara kero yepachena. Hapana mupi anosiyiwa, uye hapana mugamuchiri anomanikidzwa kusarudza pakati pekusvika nekuvanzika."
-        ]
-      },
-      "why-not-lightning": {
-        "question": "Sei {{appName}} isingashandisi Lightning?",
-        "answer": [
-          "Lightning inoda walleti yeLightning. Iri nyore (Wallet of Satoshi, Strike, Breez) **dzinochengetwa (custodial)** — kambani ndiyo inobata mari uye inogona kuvharwa, kuvharwa nenzvimbo, kana kumanikidzwa kurambidza maakaundi. Lightning isingachengetwe yakaoma munyaya yetekinoroji uye haina kuvimbika kuvanhu vatsva.",
-          "Tinoda {{appName}} ishande kune ane chete ruzivo rweBitcoin app yemumusha yakaita seCash App, Coinbase, Strike, Venmo, kana PayPal. Bitcoin on-chain inoshanda nemawalleti ese pasi rose."
         ]
       },
       "why-not-rotating-addresses": {
@@ -2836,19 +2179,6 @@
           "Kuti uwane bhuku rakazara, ona [Kutarisira Makey ako eNostr](https://soapbox.pub/blog/managing-nostr-keys)."
         ]
       },
-      "send-bitcoin-lightning": {
-        "question": "Kutumira Bitcoin neLightning kunoshanda sei?",
-        "answer": [
-          "Kana mugashiri aine kero yeLightning papurofiri yake, unogona kutumira kuiyoyo. Lightning inopedza mumaminetiisi mashomanana uye mari yebasa idiki.",
-          "Kutumira kweLightning hakushandisi kero yechipo ye{{appName}} — kunoenda zvakananga kuwalleti yeLightning ipi zvayo yakagadzirwa nemugashiri ega. Mafambisirwo echipo che{{appName}} pachayo zviri on-chain chete."
-        ]
-      },
-      "what-are-zaps": {
-        "question": "MaZaps chii?",
-        "answer": [
-          "MaZaps imari shoma yekutsigira yeLightning paNostr, yakasiyana nemafambisirwo echipo che{{appName}} on-chain."
-        ]
-      },
       "fyp": {
         "question": "Feed inoshanda sei?",
         "answer": [
@@ -2889,74 +2219,7 @@
   },
   "guides": {
     "shared": {
-      "tldrEyebrow": "Pfupiso",
-      "paymentBadge": {
-        "public": "Mubhadharo Wepachena",
-        "silent": "Mubhadharo Wakanyarara"
-      },
-      "paymentComparison": {
-        "donorHeader": "Paunopa chipo",
-        "recipientHeader": "Paunogadzira kambeni",
-        "donorRows": {
-          "whatYouSee": {
-            "label": "Zvauunoona",
-            "public": "Kero yeBitcoin yakajairika yaunogona kubhadhara kubva chero kupi.",
-            "silent": "QR imwechete. Walleti yako inotora endpoint yakanyarara kana inotsigira BIP-352."
-          },
-          "walletSupport": {
-            "label": "Rutsigiro rwemaWalleti",
-            "public": "Walleti yose yeBitcoin. Cash App, Coinbase, Strike, hardware, chero chii zvacho.",
-            "silent": "MaWalleti mashomanana nhasi. Mazhinji anodzokera kuchibvumirano cheBitcoin chakajairika."
-          },
-          "privacy": {
-            "label": "Kuvanzika kwechipo",
-            "public": "Pachena pa-chain. Kero yako yekutumira inobatanidzwa zvachose kukambeni.",
-            "silent": "Rutivi rwekugashira haruna kubatana pa-chain. Tsoka yewalleti yako yekutumira ichiri pachena."
-          },
-          "settlement": {
-            "label": "Kupedzwa",
-            "public": "Zvichaonekedzwa zvakajairika zveBitcoin.",
-            "silent": "Zvichaonekedzwa zvimwechete pa-chain, asi mugamuchiri anofanira kuscan walleti yake kuti aione."
-          }
-        },
-        "recipientRows": {
-          "whatDonorsSee": {
-            "label": "Zvinoonekwa nevapi",
-            "public": "Kero yeBitcoin yakajairika. Inoshanda nemawalleti ose pasi rose.",
-            "silent": "Endpoint yeBIP-352. MaWalleti evapi anoda rutsigiro rwemibhadharo yakanyarara; kana kusiri kudaro chipo chinodzokera kuchibvumirano cheBitcoin chakajairika."
-          },
-          "receivingSpeed": {
-            "label": "Mwero wekugashira",
-            "public": "Push-style. Zvipo zvinooneka pakarepo papeji yekambeni.",
-            "silent": "Kuscana neruoko. Walleti yako inofanira kufamba pabhirochaina ichizvitsvaga. Maminetiisi kusvika kumaawa, zvichienderana newalleti."
-          },
-          "pushNotifications": {
-            "label": "Zviziviso zvePush",
-            "public": "Hongu. Unoona zvipo zvitsva pakarepo zvinosvika.",
-            "silent": "Aiwa. Vhura walleti uye chitange kuscana kuti uzvione."
-          },
-          "donorList": {
-            "label": "Runyorwa rwevapi / huwandu hwekambeni",
-            "public": "Pachena nokusingaperi. Huwandu nemakero ekutumira zvinoonekwa kuna ani naani.",
-            "silent": "Zvakavanzika. Peji yekambeni haigone kuratidza huwandu kana mihoro yezvipo zvemibhadharo yakanyarara."
-          },
-          "ecosystem": {
-            "label": "Kukura kweEcosystem",
-            "public": "Yakakura. Maturusi akagadzikana.",
-            "silent": "Yemberi. MaWalleti achine mabug; tarisira mibhadharo yakakuvara inozoonekwa pakuscana kunotevera."
-          },
-          "bestFor": {
-            "label": "Zvinokwana zvakanyanya",
-            "public": "Kuunganidza mari kwepachena uko humbowo huzhinji nekuonekwa zvinobatsira.",
-            "silent": "Makambeni umo kuvanzika kwemupi kana mugamuchiri kwakakosha kupfuura huwandu hunoonekwa."
-          },
-          "watchOutFor": {
-            "label": "Ngwarira",
-            "public": "Rekodhi yepachena yenguva yose yemupi mumwe nemumwe.",
-            "silent": "UX isina kunaka nhasi. Zvimwe zvipo hazvioneki kusvikira mugamuchiri ascana."
-          }
-        }
-      }
+      "tldrEyebrow": "Pfupiso"
     },
     "donor": {
       "tldr": {
@@ -2974,18 +2237,11 @@
             "title": "Vhura kambeni",
             "body": "Unoona QR imwechete. Kana kambeni ichigamuchira zvese, inonyora endpoints mbiri; walleti yako inotora yakakodzera."
           },
-          "payFromAnyWallet": {
-            "title": "Bhadhara nemawalleti ipi zvayo",
-            "body": "Cash App, Coinbase, Strike, walleti yehardware, chero chii. Bhadhara mari nemari yenetiweki."
-          },
           "arrivesDirectly": {
             "title": "Inosvika zvakananga",
             "body": "Mari inoenda zvakananga kumugamuchiri. {{appName}} haina kana kubata kana kuviga, uye kero inotorwa kubva kukiyi yakavanzika yeNostr yemugamuchiri."
           }
         }
-      },
-      "comparison": {
-        "footnote": "Makambeni anogona kugamuchira yePachena chete, Yakanyarara chete, kana zvese. Kana zvese, QR yacho inotakura endpoints mbiri. Walleti yako inotora iyo yainogona kushandisa."
       },
       "publicVisible": {
         "title": "Zvipo zvepachena zvinooneka pa-chain nokusingaperi",
@@ -2995,10 +2251,6 @@
         "heading": "Kupa chipo chakavanzika",
         "intro": "Aya matanho akakosha kunyanya kuzvipo **Zvepachena**, apo chibvumirano chega chega chakasungwa zvachose kukero imwe. Zvipo **Zvakanyarara** zvinotovanza rutivi rwekugashira, saka njodzi yacho yakaderera. Kuongorora kunonyanya kweWalleti yako yekutumira kuchiri kuchikwanisika nzira dzese mbiri, saka kana njodzi yako iri pamusoro, aya matanho akakodzera. Sarudza imwe, kana wakomburiine.",
         "options": {
-          "silentWallet": {
-            "name": "Shandisa walleti yemibhadharo yakanyarara",
-            "purpose": "Bhadhara newalleti yeBitcoin inotsigira BIP-352. Kana kambeni ichigamuchira mibhadharo yakanyarara, walleti yako inoshandisa endpoint iyoyo zvichizvichaira."
-          },
           "nonKyc": {
             "name": "Tenga Bitcoin isiri yeKYC",
             "purpose": "Tenga Bitcoin peer-to-peer kuti isabatanidzwa nechitupa chako chemubatanidzwi kubva pakutanga. Pekutanga pakuvanzika pakanyanya kusimba."
@@ -3006,23 +2258,12 @@
           "coinjoin": {
             "name": "Ita Coinjoin kutanga",
             "purpose": "Sanganisa Bitcoin yako nemari yevamwe vanhu kuti zvinobuda zvisakwanise kutevedzerwa kushopu yako yeKYC. Inobatsira apo kambeni inogamuchira yepachena chete."
-          },
-          "freshWallet": {
-            "name": "Shandisa walleti nyowani",
-            "purpose": "Ipa chipo kubva muwalleti isina kumbobata hunhu hwako hwepamusoro kana exchange yeKYC."
           }
         }
       },
       "consumerApps": {
         "title": "Maapp emumusha haakwanise kukuita usingazivikanwe",
         "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance, naPayPal zvese zvinosimbisa hunhu hwako. Zvisinei kuti unotumira chipo sei, chibvumirano chega chega chinoramba chakasungwa nehunhu hwako chaihwo. Shandisa walleti isinochengetwa yaunodzora pachako."
-      },
-      "silentToday": {
-        "heading": "Chinyorwa nezvemibhadharo yakanyarara nhasi",
-        "paragraphs": [
-          "Mibhadharo yakanyarara ndiyo nzira yakavanzika kwazvo yokugashira Bitcoin pa-chain, asi ecosystem ichiri pwere. MaWalleti akakurumbira mazhinji haasati achikwanisa kutumira ku-endpoint yemibhadharo yakanyarara, saka kana walleti isingakwanisi, chipo chinodzokera kuchibvumirano cheBitcoin chakajairika kukero yepachena yekambeni (kana kambeni ichigamuchira zvese).",
-          "Kuvagamuchiri, zvipo zvemibhadharo yakanyarara zvinosvikawo pasina zviziviso zvePush uye zvinooneka chete mushure mekunge mugamuchiri ascana walleti yake, izvo zvinogona kutora maminetiisi kusvika maawa. Hapana ne hatomwe pazvinhu izvi inopiwa kubva kuchengeteka kwemari yako; inongoita zvekuita netarisiro."
-        ]
       }
     },
     "recipient": {
@@ -3052,20 +2293,6 @@
           "Zvipo zvemibhadharo yakanyarara hazvisi chikamu cherekodhi iyoyo. Hazvionekwe kune vatariri vekunze uye hazvioneki muzvionekwa zvepachena zvekambeni; vapi vatsva vanongoona zvauinotumira pamusoro pemafambiro ekambeni."
         ]
       },
-      "comparison": {
-        "footnote": "Haukwanise kuchinja zvinosarudzwa zvemubhadharo zvinogamuchirwa nekambeni mushure mekugadzirwa kwayo. Kana ukachinja pfungwa, gadzira kambeni nyowani."
-      },
-      "silentToday": {
-        "heading": "Chinyorwa nezvemibhadharo yakanyarara nhasi",
-        "paragraphs": [
-          "Mibhadharo yakanyarara ndiyo nzira yakavanzika kwazvo yokugashira Bitcoin pa-chain, asi ecosystem ichiri pwere. MaWalleti akakurumbira mazhinji haasati achikwanisa kutumira ku-endpoint yemibhadharo yakanyarara, saka kana walleti yemupi isingakwanisi, chipo chinodzokera kuchibvumirano cheBitcoin chakajairika kukero yako yepachena (kana uchigamuchira zvese).",
-          "Zvipo zvemibhadharo yakanyarara zvinosvikawo pasina zviziviso zvePush uye zvinooneka chete mushure mekunge wascana walleti yako, izvo zvinogona kutora maminetiisi kusvika maawa. Hapana ne hatomwe pazvinhu izvi inopiwa kubva kuchengeteka kwemari yako; inongoita zvekuita netarisiro yezuva nezuva."
-        ]
-      },
-      "twoWallets": {
-        "title": "Chengeta huwandu hwako hwePachena nehweYakavanzika hwakaparadzana",
-        "body": "Walleti yako ye{{appName}} inoratidza matabu maviri: **Pachena** (kero yako yeBitcoin yakajairika) ne**Yakavanzika** (mibhadharo yakanyarara). Anochengetwa akaparadzana zvachose, uye huwandu huviri uhu hahungatombo shandiswi mumushando mumwechete — kuparadzana ikoko ndiko kunochengeta zvipo zvako zvakavanzika zvisingabatanidziki. Paunokwidza mari kubva muchitabu che**Yakavanzika**, tumira kukero yemibhadharo yakanyarara (**sp1…**), iyo inoramba yakavanzika. Kana panzvimbo pacho ukatumira mari yakavanzika kukero yepa-chain isina chinhu, {{appName}} inoiongorora: kana kero yacho yakamboshandiswa, kana iri yewalleti yako yepachena, inokuyambira uye inokuita kuti udzvanye **Tumira zvakadaro**, nekuti kuita izvozvo kunobatanidza mari yako yakavanzika kunhoroondo yepachena yekero iyoyo. Kutumira kukero ye**sp1…** hakumboita kuti yambiro iyi ibude."
-      },
       "movePromptly": {
         "heading": "Fambisa zvipo nokukurumidza",
         "steps": {
@@ -3083,14 +2310,6 @@
         "heading": "Kukwidza mari nenzira yakavanzika",
         "intro": "Kushandisa mari pa-chain kunogadzira nzira yekutevera kunze kwekunge wamboibvuna kutanga. Kwidza mari kubva muchitabu che**Yakavanzika** kuti zvipo zvemibhadharo yakanyarara zvirambe zvisingabatanidziki — tanga watumira kuwalleti yemibhadharo yakanyarara (kero ye**sp1…**), wozoshandisa zvichitevera; kutsva uku kunobvuna chinongedzo pakati pekambeni yako neicho chinotevera. Usatumira mari yakavanzika kukero yakambodzokororwa kana yepachena, izvo zvinoibatanidza zvakare. Mamwe masarudzo apasi anoshanda zvakare uye ane kutarisana kwawo.",
         "options": {
-          "silentHop": {
-            "name": "Kufambisa kuwalleti yemibhadharo yakanyarara",
-            "purpose": "Fambisa zvipo zvako kuwalleti yemibhadharo yakanyarara ([Ditto Wallet](https://ditto.pub), [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)). Kubva ipapo, kushandisa kwako kunotevera hakuna kusungwa kukambeni."
-          },
-          "lightningSwap": {
-            "name": "Kutsinhanisa neLightning",
-            "purpose": "Atomic-swap yeBitcoin yepa-chain kuLightning. Mibhadharo yeLightning haisviki kubhirochaina yepachena."
-          },
           "coinjoin": {
             "name": "Coinjoin",
             "purpose": "Sanganisa Bitcoin yako nemari yevamwe vashandisi kuti chinobuda chisakwanise kubatanidzwa kuchinopinda."
@@ -3110,68 +2329,5 @@
         "body": "Mavhukauto akachengeterwa anokwanisa kuba mari yako, kunyora kuti ndiani akatumira chii, kana kuva matsvuura emagumbo eaw. Shandisa kufambisa kwemibhadharo yakanyarara kana coinjoin isinochengetwa pachinzvimbo chacho."
       }
     }
-  },
-  "walletDoubleTweak": {
-    "seoTitle": "Kugadzirisa SP yeDouble-tweak",
-    "seoDescription": "Garisa mibhadharo yakanyararira yakasara pachain nokuda kwebug yekutumira yekare uye uitumire muchikwama chako.",
-    "title": "Kugadzirisa SP yeDouble-tweak",
-    "heading": "Garisa mibhadharo yakanyararira yakasara",
-    "subheading": "Shanduro yekare yeAgora yakanyora mamwe maoutput emubhadharo wakanyararira pakiyi isiri iyo, saka haana kana kumboonekwa muchikwama chako. Chishandiso ichi chinoongorora chain zvakare kutsvaga maoutput iwayo uye chinotumira chero aanowana muchikwama chako.",
-    "back": "Dzokera",
-    "loggedOut": "Pinda nemuviri weNostr wakagamuchira mibhadharo yakanyararira kuti igone kugariswa.",
-    "unsupported": {
-      "title": "Chikwama hachiwanike",
-      "description": "Kugarisa kunoda chikwama chinogona kusaina panyangani. Pinda nensec yako kuti uenderere mberi."
-    },
-    "noIndexer": {
-      "title": "Hapana muongorori wemubhadharo wakanyararira wakaiswa",
-      "description": "URL yemuongorori weBIP-352 inodiwa kuti uongorore mibhadharo yakasara. Isa imwe mumarongero echikwama woedza zvakare."
-    },
-    "scan": {
-      "title": "Ongorora mibhadharo yakasara",
-      "description": "Sarudza kureba kweblock kwekutangira kuongorora. Kugarisa kunotarisa block yega yega kubva ipapo kusvika kumusoro wechain.",
-      "fromHeightLabel": "Kureba kweblock kwekutanga",
-      "tipHint": "Musoro wechain wazvino: {{tip}}",
-      "start": "Ongorora",
-      "cancel": "Kanzura kuongorora",
-      "progress": "Kuongorora block {{current}} ye{{to}} — {{found}} dzawanikwa",
-      "tipMissing": "Kuwana musoro wechain…"
-    },
-    "noFunds": {
-      "title": "Hapana chokugarisa",
-      "description": "Hapana mibhadharo yakanyararira yakasara yakawanikwa muchikamu chakaongororwa. Edza kureba kwekutanga kwekutangira kana waitarisira mari."
-    },
-    "found": {
-      "title": "Mibhadharo yakasara yawanikwa",
-      "description": "Maoutput aya anogona kutumirwa zvakare muchikwama chako.",
-      "count": "Maoutput",
-      "recoverable": "Zvinogona kugariswa"
-    },
-    "destination": {
-      "title": "Mari ichatumirwa kuna",
-      "description": "Kero itsva yokugamuchira muchikwama chako chazvino."
-    },
-    "sweepButton": "Garisa mari",
-    "sweeping": "Kugarisa mari yako…",
-    "dontClose": "Usavhare peji rino kusvika kugarisa kwapera.",
-    "success": {
-      "title": "Kugarisa kwapera",
-      "sent": "{{sats}} sats dzagariswa muchikwama chako.",
-      "viewTx": "Tarisa chiitiko"
-    },
-    "error": {
-      "title": "Kugarisa kwakundikana",
-      "tryAgain": "Edza zvakare"
-    },
-    "errors": {
-      "noDestination": "Hapana kero yokutumira inowanikwa. Vhura chikwama chako kutanga.",
-      "noBlockbook": "Hapana server yeBlockbook yakaiswa. Isa imwe mumarongero echikwama.",
-      "sweepGeneric": "Hatina kukwanisa kupedza kugarisa."
-    },
-    "toast": {
-      "successTitle": "Mari yagariswa",
-      "successDesc": "{{sats}} sats dzatumirwa muchikwama chako."
-    },
-    "footnote": "Uku kutumira kwenzira imwe chete muchikwama chako chazvino. Mibhadharo yakanyararira yakakanganiswa chete ndiyo inobatwa; hapana chimwe chinochinja."
   }
 }

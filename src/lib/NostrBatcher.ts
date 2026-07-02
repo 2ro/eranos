@@ -334,7 +334,7 @@ function isRepostFilter(filter: NostrFilter): boolean {
 
 /**
  * A filter that queries by a single `#e` tag with kinds and limit.
- * e.g. `{ kinds: [7, 9735], '#e': [eventId], limit: 10 }`
+ * e.g. `{ kinds: [7, 6], '#e': [eventId], limit: 10 }`
  * Must NOT have `authors` (that's the reaction pattern).
  */
 function isETagFilter(filter: NostrFilter): boolean {
@@ -359,12 +359,13 @@ function getETagValue(filter: NostrFilter): string {
 
 /**
  * A filter that queries by a single `#a` (addressable coordinate) tag with
- * kinds and limit. e.g. `{ kinds: [8333], '#a': [aTag], limit: 500 }`.
+ * kinds and limit. e.g. `{ kinds: [7], '#a': [aTag], limit: 500 }`.
  * Must NOT have `authors` — that's a different pattern.
  *
- * Used by per-card hooks like `useCampaignDonations` (one card → one REQ),
- * which fan out to N REQs when N cards mount in the same render. Batching
- * collapses them into a single `'#a': [aTag1, aTag2, …]` REQ.
+ * Used by per-card hooks that query one addressable event's related events
+ * (one card → one REQ), which fan out to N REQs when N cards mount in the
+ * same render. Batching collapses them into a single
+ * `'#a': [aTag1, aTag2, …]` REQ.
  */
 function isATagFilter(filter: NostrFilter): boolean {
   const keys = Object.keys(filter);
@@ -389,7 +390,7 @@ function getATagValue(filter: NostrFilter): string {
 /**
  * Check if a multi-filter array can be batched: every filter must be an
  * e-tag or q-tag filter referencing the same single event ID.
- * e.g. [{ kinds: [7, 9735], '#e': [id], limit: 10 }, { kinds: [1], '#q': [id], limit: 5 }]
+ * e.g. [{ kinds: [7, 6], '#e': [id], limit: 10 }, { kinds: [1], '#q': [id], limit: 5 }]
  */
 function isMultiFilterETagBatchable(filters: NostrFilter[]): string | null {
   if (filters.length < 2) return null;
@@ -548,8 +549,8 @@ export class NostrBatcher {
       }
 
       // { kinds: [...], '#a': [aTag] } (no authors)
-      // The dominant feed-page leak: each CampaignCard's `useCampaignDonations`
-      // fires `{ kinds: [8333], '#a': [aTag], limit: 500 }` independently,
+      // The dominant feed-page leak: each card's per-event hook fires
+      // `{ kinds: [7], '#a': [aTag], limit: 500 }` independently,
       // so 25 cards = 25 REQs. Batching collapses them per (kinds, limit)
       // shape into one REQ.
       if (isATagFilter(filter)) {
@@ -807,9 +808,9 @@ export class NostrBatcher {
       );
 
       // Group results by which addressable coordinate they reference via a-tag.
-      // A single event may reference multiple coordinates (e.g. a zap receipt
-      // tagging both a campaign and a pledge); attribute it to each matching
-      // coord so every caller waiting on those aTags receives it.
+      // A single event may reference multiple coordinates (e.g. a kind 7
+      // reaction tagging both a campaign and a pledge); attribute it to each
+      // matching coord so every caller waiting on those aTags receives it.
       const byATag = new Map<string, NostrEvent[]>();
       const aTagSet = new Set(aTags);
       for (const event of events) {

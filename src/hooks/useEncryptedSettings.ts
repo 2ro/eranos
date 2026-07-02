@@ -51,7 +51,6 @@ export interface EncryptedSettings {
   notificationPreferences?: {
     reactions?: boolean;
     reposts?: boolean;
-    zaps?: boolean;
     mentions?: boolean;
     comments?: boolean;
     badges?: boolean;

@@ -11,24 +11,18 @@ import {
   Pencil,
   Share2,
   ShieldCheck,
+  Target,
   Trash2,
-  Wallet,
 } from 'lucide-react';
 
 import { AuthorByline } from '@/components/AuthorByline';
-import { CampaignLedger } from '@/components/CampaignLedger';
 import { CampaignVerificationBadge } from '@/components/CampaignVerificationBadge';
 import { CommentsSection } from '@/components/CommentsSection';
-import {
-  CampaignWalletDonatePanel,
-} from '@/components/CampaignWalletDonatePanel';
-import { HDSendBitcoinDialog } from '@/components/HDSendBitcoinDialog';
+import { GrinPayDialog } from '@/components/GrinPayDialog';
 import { Lightbox } from '@/components/ImageGallery';
-import { NoBitcoinDialog } from '@/components/NoBitcoinDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ModerationMenu } from '@/components/moderation';
 import {
   AlertDialog,
@@ -45,21 +39,19 @@ import { DetailReplySkeleton, DetailStory } from '@/components/DetailStory';
 import { InteractionsModal, type InteractionTab } from '@/components/InteractionsModal';
 import { PostActionBar } from '@/components/PostActionBar';
 import { PinnedCommentHeader } from '@/components/PinnedCommentHeader';
-import { PendingBadge } from '@/components/PendingBadge';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { Progress } from '@/components/ui/progress';
 import { ThreadedReplyList, type ReplyNode } from '@/components/ThreadedReplyList';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaign } from '@/hooks/useCampaign';
-import { useCampaignDonations } from '@/hooks/useCampaignDonations';
+import { useCampaignGrinTotal } from '@/hooks/useCampaignGrinTotal';
+import { useGrinPayConfig } from '@/hooks/useGrinPay';
 import { useComments } from '@/hooks/useComments';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDeleteEvent } from '@/hooks/useDeleteEvent';
 import { useEventStats } from '@/hooks/useTrending';
-import { useHdWalletAccess } from '@/hooks/useHdWalletAccess';
 import { usePinnedEventComments } from '@/hooks/usePinnedEventComments';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
@@ -67,10 +59,10 @@ import { useEventTranslation } from '@/hooks/useEventTranslation';
 import {
   encodeCampaignNaddr,
   getCampaignCountryLabel,
+  grinDonationPaths,
   parseCampaign,
   type ParsedCampaign,
 } from '@/lib/campaign';
-import { satsToUSDWhole } from '@/lib/bitcoin';
 import { formatUsdGoal } from '@/lib/formatCampaignAmount';
 import { formatNumber } from '@/lib/formatNumber';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
@@ -85,12 +77,6 @@ interface CampaignDetailPageProps {
   relays?: string[];
 }
 
-function formatSatsFull(sats: number, btcPrice: number | undefined): string {
-  if (btcPrice) return satsToUSDWhole(sats, btcPrice);
-  if (sats >= 100_000_000) return `${(sats / 100_000_000).toLocaleString(undefined, { maximumFractionDigits: 4 })} BTC`;
-  return `${sats.toLocaleString()} sats`;
-}
-
 function collectReplyEvents(nodes: ReplyNode[], out = new Map<string, NostrEvent>()): Map<string, NostrEvent> {
   for (const node of nodes) {
     out.set(node.event.id, node.event);
@@ -103,10 +89,10 @@ function collectReplyEvents(nodes: ReplyNode[], out = new Map<string, NostrEvent
 export function CampaignDetailPage({ pubkey, identifier, relays }: CampaignDetailPageProps) {
   // Drop the default 600px column cap and the default right widget sidebar
   // — this page renders its own GoFundMe-style 2-column layout (article on
-  // the left, sticky donate card on the right). We don't pass a custom
+  // the left, sticky summary card on the right). We don't pass a custom
   // rightSidebar through MainLayout because the column needs to scroll
   // with the article on mobile (where the sidebar slot is invisible
-  // anyway). Keeping everything in one Outlet lets us inline the donate
+  // anyway). Keeping everything in one Outlet lets us inline the summary
   // column below the hero on small screens.
 
   const { data: campaign, isLoading, isError } = useCampaign({ pubkey, identifier, relays });
@@ -122,12 +108,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const { config } = useAppContext();
   const { user } = useCurrentUser();
   const author = useAuthor(campaign.pubkey);
-  const { data: btcPrice } = useBtcPrice();
-  // Detail page is a single instance, so live polling here is safe (unlike
-  // the card grids, which must not poll — see useCampaignDonations).
-  const { data: stats, isLoading: statsLoading } = useCampaignDonations(campaign, {
-    refetchInterval: 30_000,
-  });
   const navigate = useNavigate();
   const { toast } = useToast();
   const shareOrigin = useShareOrigin();
@@ -153,8 +133,7 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
 
   // Whether the engagement counters row above the comments list should
   // render — at least one of repost / quote / reaction has a non-zero
-  // count. Zaps are intentionally excluded for campaigns (donations are
-  // on-chain kind 8333 receipts; a zap count would suggest the wrong CTA).
+  // count.
   const hasStats =
     !!engagementStats?.replies ||
     !!engagementStats?.reposts ||
@@ -172,40 +151,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     canManagePins,
     togglePin,
   } = usePinnedEventComments(campaign.aTag, campaign.pubkey);
-
-  // Aggregate kind 8333 donation receipts by `(txid, donor)` so each
-  // donation surfaces as a single event in the donor list and the inline
-  // reply tree. Legacy donations (one receipt per beneficiary sharing the
-  // same txid + donor) collapse into one card showing the donation total.
-  const donationReceipts = useMemo((): NostrEvent[] => {
-    if (!stats?.receipts || stats.receipts.length === 0) return [];
-
-    type Aggregate = { canonical: NostrEvent; totalSats: number };
-    const byDonation = new Map<string, Aggregate>();
-
-    for (const receipt of stats.receipts) {
-      const txid = receipt.tags.find(([n]) => n === 'i')?.[1]?.replace(/^bitcoin:tx:/, '');
-      const amountTag = receipt.tags.find(([n]) => n === 'amount')?.[1];
-      const amount = amountTag ? Number(amountTag) : NaN;
-      if (!txid || !Number.isFinite(amount) || amount <= 0) continue;
-
-      const key = `${txid}:${receipt.pubkey}`;
-      const prev = byDonation.get(key);
-      const totalSats = (prev?.totalSats ?? 0) + amount;
-      const canonical = prev && prev.canonical.created_at >= receipt.created_at
-        ? prev.canonical
-        : receipt;
-      byDonation.set(key, { canonical, totalSats });
-    }
-
-    return Array.from(byDonation.values()).map(({ canonical, totalSats }) => ({
-      ...canonical,
-      tags: [
-        ...canonical.tags.filter(([n]) => n !== 'amount'),
-        ['amount', String(totalSats)],
-      ],
-    }));
-  }, [stats?.receipts]);
 
   const replyTree = useMemo((): ReplyNode[] => {
     const topLevelComments = commentsData?.topLevelComments ?? [];
@@ -226,13 +171,10 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
       };
     };
 
-    const commentNodes = topLevelComments.map((c) => buildCommentNode(c));
-    const donationNodes: ReplyNode[] = donationReceipts.map((ev) => ({ event: ev, children: [] }));
-
-    return [...commentNodes, ...donationNodes].sort(
-      (a, b) => b.event.created_at - a.event.created_at,
-    );
-  }, [commentsData, donationReceipts]);
+    return topLevelComments
+      .map((c) => buildCommentNode(c))
+      .sort((a, b) => b.event.created_at - a.event.created_at);
+  }, [commentsData]);
 
   const feedEventsById = useMemo(() => collectReplyEvents(replyTree), [replyTree]);
 
@@ -247,8 +189,6 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
   const cover = sanitizeUrl(campaign.banner) ?? sanitizeUrl(authorMetadata?.banner) ?? sanitizeUrl(authorMetadata?.picture);
 
   const countryLabel = getCampaignCountryLabel(campaign);
-  const raisedSats = stats?.totalSats ?? 0;
-  const pendingSats = stats?.pendingSats ?? 0;
 
   const isCreator = user?.pubkey === campaign.pubkey;
   const naddr = useMemo(() => encodeCampaignNaddr(campaign), [campaign]);
@@ -325,21 +265,13 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
     );
   };
 
-  // ── Donate column ──
+  // ── Summary column ──
   // Rendered twice in the JSX tree below: once inline under the hero on
   // mobile (`lg:hidden`), once as the sticky right column on desktop
   // (`hidden lg:block`). Building it as a const here keeps both call
-  // sites in sync — single source of truth for the donate UX.
-  const donateColumn = (
-    <DonateColumn
-      campaign={campaign}
-      raisedSats={raisedSats}
-      pendingSats={pendingSats}
-      statsLoading={statsLoading}
-      btcPrice={btcPrice}
-      donations={donationReceipts}
-      onShare={handleShare}
-    />
+  // sites in sync — single source of truth for the goal + share card.
+  const summaryColumn = (
+    <CampaignSummaryColumn campaign={campaign} onShare={handleShare} />
   );
 
   return (
@@ -399,13 +331,13 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
         )}
 
         {/* Two-column body. On mobile the right column collapses inline
-            immediately below the hero so the donate CTA stays above the
+            immediately below the hero so the goal summary stays above the
             fold. On lg+ the right column sticks to the viewport edge of
             the main content while the article scrolls. */}
         <div className="relative max-w-6xl mx-auto px-5 sm:px-6 lg:px-0 py-6 lg:py-10">
         <div className="lg:flex lg:gap-8 lg:items-start">
-          {/* Mobile-only inline donate card */}
-          <div id="campaign-donate" className="lg:hidden mb-6 scroll-mt-[4.5rem]">{donateColumn}</div>
+          {/* Mobile-only inline summary card */}
+          <div id="campaign-summary" className="lg:hidden mb-6 scroll-mt-[4.5rem]">{summaryColumn}</div>
 
           {/* Main article column */}
           <div className="flex-1 min-w-0 space-y-8">
@@ -462,72 +394,66 @@ function CampaignDetailContent({ campaign }: { campaign: ParsedCampaign }) {
                 </div>
               )}
 
-              <CampaignActivityTabs
-                campaign={campaign}
-                commentsTab={
-                  <CommentsSection className="mt-0">
-                    <DetailCommentComposer
-                      event={campaign.event}
-                      onSuccess={() => queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] })}
-                    />
+              <div className="mt-4">
+                <h2 className="mb-3 px-1 text-lg font-semibold tracking-tight">
+                  {t('campaignsDetail.tabComments')}
+                </h2>
+                <CommentsSection className="mt-0">
+                  <DetailCommentComposer
+                    event={campaign.event}
+                    onSuccess={() => queryClient.invalidateQueries({ queryKey: ['nostr', 'comments'] })}
+                  />
 
-                    {commentsLoading && statsLoading && replyTree.length === 0 ? (
-                      <div>
-                        {Array.from({ length: 3 }).map((_, i) => (
-                          <DetailReplySkeleton key={i} />
-                        ))}
-                      </div>
-                    ) : replyTree.length > 0 ? (
-                      <div>
-                        <ThreadedReplyList
-                          roots={replyTree}
-                          hideCommentContext
-                          leafCardClassName="py-4"
-                          renderAuthorBadge={(event) =>
-                            event.pubkey === campaign.pubkey ? <CampaignerBadge /> : null
-                          }
-                          renderItemHeader={(event) => (
-                            <CampaignPinHeader
-                              canManagePins={canManagePins}
-                              isPinned={isPinned(event.id)}
-                              pinPending={togglePin.isPending}
-                              onTogglePin={() => handleTogglePin(event)}
-                            />
-                          )}
-                        />
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => setReplyOpen(true)}
-                        className="block w-full px-6 py-10 text-center hover:bg-foreground/5 transition-colors"
-                      >
-                        <p className="text-base font-medium text-foreground">
-                          {t('campaignsDetail.noCommentsTitle')}
-                        </p>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {t('campaignsDetail.noCommentsHint')}
-                        </p>
-                      </button>
-                    )}
-                  </CommentsSection>
-                }
-              />
+                  {commentsLoading && replyTree.length === 0 ? (
+                    <div>
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <DetailReplySkeleton key={i} />
+                      ))}
+                    </div>
+                  ) : replyTree.length > 0 ? (
+                    <div>
+                      <ThreadedReplyList
+                        roots={replyTree}
+                        hideCommentContext
+                        leafCardClassName="py-4"
+                        renderAuthorBadge={(event) =>
+                          event.pubkey === campaign.pubkey ? <CampaignerBadge /> : null
+                        }
+                        renderItemHeader={(event) => (
+                          <CampaignPinHeader
+                            canManagePins={canManagePins}
+                            isPinned={isPinned(event.id)}
+                            pinPending={togglePin.isPending}
+                            onTogglePin={() => handleTogglePin(event)}
+                          />
+                        )}
+                      />
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setReplyOpen(true)}
+                      className="block w-full px-6 py-10 text-center hover:bg-foreground/5 transition-colors"
+                    >
+                      <p className="text-base font-medium text-foreground">
+                        {t('campaignsDetail.noCommentsTitle')}
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {t('campaignsDetail.noCommentsHint')}
+                      </p>
+                    </button>
+                  )}
+                </CommentsSection>
+              </div>
             </div>
           </div>
 
-          {/* Desktop-only donate column. The sticky inner wrapper tracks the
-              viewport while there's room to slide. When the donate card is
-              taller than the viewport (e.g. a campaign with many
-              beneficiaries) the bottom is reachable via the normal page
-              scroll: as the user scrolls down the article, the sticky
-              wrapper rides along until the flex row ends, exposing the
-              bottom of the column. This is preferable to capping the
-              column's height with `max-h` + `overflow-y-auto`, which traps
-              content behind a second scrollbar and visually clips the
-              bottom of the card. */}
+          {/* Desktop-only summary column. The sticky inner wrapper tracks
+              the viewport while there's room to slide; as the user scrolls
+              down the article, the sticky wrapper rides along until the
+              flex row ends. */}
           <aside className="hidden lg:block lg:w-[360px] lg:shrink-0 lg:self-start">
-            <div id="campaign-donate-desktop" className="lg:sticky lg:top-4 scroll-mt-20">{donateColumn}</div>
+            <div id="campaign-summary-desktop" className="lg:sticky lg:top-4 scroll-mt-20">{summaryColumn}</div>
           </aside>
         </div>
       </div>
@@ -617,119 +543,6 @@ function CampaignPinHeader({
       pinPending={pinPending}
       onTogglePin={onTogglePin}
     />
-  );
-}
-
-/**
- * Tabbed wrapper around the campaign's social + on-chain activity. The
- * "Comments & donations" tab is always present; "Ledger" only renders when
- * the campaign declares a public on-chain endpoint (`bc1q…` / `bc1p…`).
- *
- * Silent-payment-only campaigns intentionally have no ledger — the receive
- * address is unlinkable by design — so the component degrades to a single
- * un-tabbed surface in that case to avoid showing a lone disabled tab.
- *
- * Visual treatment: the tab strip reads as a *section header*, not a
- * control widget. The active tab label is the same size and weight as the
- * `<h2>` headings used elsewhere on the page; the inactive tabs sit beside
- * it as muted siblings. A 1px baseline border runs the full width of the
- * panel, and the active tab "lifts" off that baseline with a thicker
- * primary-tinted under-rule that visually flows into the content surface
- * below. The list overrides the default shadcn pill style entirely.
- */
-function CampaignActivityTabs({
-  campaign,
-  commentsTab,
-}: {
-  campaign: ParsedCampaign;
-  commentsTab: ReactNode;
-}) {
-  const { t } = useTranslation();
-  const onchainAddress = campaign.wallets.onchain?.value;
-
-  // No on-chain endpoint → no Ledger tab. Render the comments surface
-  // directly so we don't show a single lonely tab control. The caller
-  // already omits the inline title, so add a heading here that mirrors
-  // the section headers used elsewhere on the page.
-  if (!onchainAddress) {
-    return (
-      <div className="mt-4">
-        <h2 className="mb-3 px-1 text-lg font-semibold tracking-tight">
-          {t('campaignsDetail.tabComments')}
-        </h2>
-        {commentsTab}
-      </div>
-    );
-  }
-
-  return (
-    <Tabs defaultValue="comments" className="mt-4">
-      {/* Underline-style tab strip that reads as a section header.
-          Overrides every default class on shadcn's TabsList (which is a
-          muted pill control) — `h-auto`, no `bg-*`, no padding, no
-          rounding. The baseline `border-b border-primary/20` runs the
-          full width of the panel below, and each trigger draws a
-          thicker primary under-rule when active so the active tab
-          "owns" the panel surface below it. `gap-8` gives each label
-          room to breathe so they read as separate section headers
-          rather than a packed control. */}
-      <TabsList className="h-auto w-full justify-start gap-8 rounded-none border-b border-primary/20 bg-transparent p-0">
-        <CampaignActivityTabTrigger value="comments">
-          {t('campaignsDetail.tabComments')}
-        </CampaignActivityTabTrigger>
-        <CampaignActivityTabTrigger value="ledger">
-          {t('campaignsDetail.tabLedger')}
-        </CampaignActivityTabTrigger>
-      </TabsList>
-
-      {/* TabsContent's own `mt-4` puts a comfortable 16px gap between the
-          tab strip's baseline and the rounded panel below — without it,
-          the panel's rounded top corners visually overlap the under-rule. */}
-      <TabsContent value="comments" className="mt-4">
-        {commentsTab}
-      </TabsContent>
-
-      <TabsContent value="ledger" className="mt-4">
-        <CampaignLedger address={onchainAddress} />
-      </TabsContent>
-    </Tabs>
-  );
-}
-
-/**
- * Section-header-styled tab trigger. Overrides shadcn's default pill /
- * shadow active state (`data-[state=active]:bg-background data-[state=active]:shadow-sm`)
- * with an underline + colour shift, so the strip reads as a header instead
- * of a control. Sizing matches the page's other `<h2>` headings (`text-lg
- * font-semibold tracking-tight`) so the active tab label feels like the
- * canonical section title.
- */
-function CampaignActivityTabTrigger({
-  value,
-  children,
-}: {
-  value: string;
-  children: ReactNode;
-}) {
-  return (
-    <TabsTrigger
-      value={value}
-      className="
-        relative h-auto rounded-none border-0 bg-transparent px-1 py-2
-        text-lg font-semibold tracking-tight text-muted-foreground
-        shadow-none transition-colors
-        hover:text-foreground/90
-        focus-visible:ring-0 focus-visible:ring-offset-0
-        data-[state=active]:bg-transparent data-[state=active]:text-foreground
-        data-[state=active]:shadow-none
-        after:absolute after:-bottom-px after:left-0 after:right-0 after:h-0.5
-        after:rounded-full after:bg-transparent
-        data-[state=active]:after:bg-primary
-        motion-safe:after:transition-colors
-      "
-    >
-      {children}
-    </TabsTrigger>
   );
 }
 
@@ -1016,7 +829,6 @@ function CampaignHeading({
         <PostActionBar
           event={campaign.event}
           replyLabel={t('campaignsDetail.commentLabel')}
-          hideZap
           showShareInSidebar
           onReply={onReply}
           onMore={onMore}
@@ -1049,201 +861,95 @@ function CampaignStory({
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Donate column
+// Summary column
 // ─────────────────────────────────────────────────────────────────────
 
-interface DonateColumnProps {
-  campaign: ParsedCampaign;
-  raisedSats: number;
-  /**
-   * Unconfirmed mempool delta in sats. Positive = inbound pending, negative
-   * = beneficiary spending. Displayed as a pending badge under the raised
-   * total when non-zero.
-   */
-  pendingSats: number;
-  statsLoading: boolean;
-  btcPrice: number | undefined;
-  /** Aggregated kind 8333 donation events, newest first. */
-  donations: NostrEvent[];
-  onShare: () => void;
-}
-
-function DonateColumn({
-  campaign,
-  raisedSats,
-  pendingSats,
-  statsLoading,
-  btcPrice,
-  donations,
-  onShare,
-}: DonateColumnProps) {
+/**
+ * Goal row mirroring the one on {@link CampaignCard}: the campaign goal
+ * as a target (integer USD per NIP.md Kind 33863), plus the raised-so-far
+ * figure from the Grin payment-proof tally (`useCampaignGrinTotal` —
+ * verified receiver signatures, kernels confirmed on-chain, deduped by
+ * kernel). Raised is denominated in GRIN and the goal in USD, so the two
+ * are shown side by side without a conversion; the invisible bar keeps
+ * the card's vertical footprint where the progress bar used to sit.
+ */
+function CampaignGoalRow({ campaign }: { campaign: ParsedCampaign }) {
   const { t } = useTranslation();
-  const { user } = useCurrentUser();
-  const hdAccess = useHdWalletAccess();
-  const [sendOpen, setSendOpen] = useState(false);
-  const [noBitcoinOpen, setNoBitcoinOpen] = useState(false);
-  const isSilentPayment = !campaign.wallets.onchain;
-
-  // The in-app "Pay with Agora" button opens HDSendBitcoinDialog
-  // pre-filled with the campaign's on-chain address. The donor enters a
-  // USD amount and signs with their nsec-derived HD wallet — same flow
-  // they'd use from /wallet to send Bitcoin to anywhere else.
-  //
-  // Hide the button when:
-  //   - the donor is the campaign owner (paying yourself is a foot-gun).
-  //   - the campaign is silent-payment-only (no on-chain address to
-  //     prefill; SP donations require a BIP-352-aware wallet that derives
-  //     a fresh one-time output, which the in-app Taproot signer doesn't
-  //     do).
-  //   - the HD wallet isn't available for this login (extension/bunker
-  //     logins don't expose the secret key, so we can't derive child
-  //     keys — see useHdWalletAccess).
-  const canPayInApp =
-    !!user &&
-    !isSilentPayment &&
-    user.pubkey !== campaign.pubkey &&
-    hdAccess.status === 'available';
+  const { data: grinTotal } = useCampaignGrinTotal(campaign);
+  const raised = grinTotal && grinTotal.donationCount > 0;
 
   return (
-    // On mobile we drop the surface chrome (no rounded background) so
-    // the donate content flows inline with the page instead of being a
-    // floating box stacked between the hero and the story. On lg+ the
-    // sticky right sidebar uses `bg-card` with a brand-orange border
-    // on all four sides — same color family as the composer's
-    // top-and-sides border in the comments region, so both columns of
-    // the body read as siblings sharing one focal treatment.
-    <Card className="overflow-hidden border-0 shadow-none bg-transparent lg:bg-[hsl(24_100%_99%)] dark:lg:bg-[hsl(24_30%_12%)] lg:border lg:border-primary/40">
-      <CardContent className="p-0 lg:p-5 space-y-5">
-        {/* Raised stats + progress. Silent-payment campaigns hide all
-            aggregate numbers by design (per NIP.md Kind 33863) — only
-            the goal target (if any) is shown. */}
-        {isSilentPayment ? (
-          campaign.goalUsd && campaign.goalUsd > 0 ? (
-            <div className="text-xs text-muted-foreground">
-              {t('campaignsDetail.target', { amount: formatUsdGoal(campaign.goalUsd) })}
-            </div>
-          ) : null
-        ) : statsLoading ? (
-          <Skeleton className="h-16 w-full" />
-        ) : (
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <div className="text-2xl font-bold tracking-tight">
-                {formatSatsFull(raisedSats, btcPrice)}
-                <span className="ml-1.5 text-sm font-normal text-muted-foreground">
-                  {t('campaignsDetail.raised')}
-                </span>
-              </div>
-              {campaign.goalUsd ? (
-                <div className="text-xs text-muted-foreground">
-                  {t('campaignsDetail.ofGoal', { amount: formatUsdGoal(campaign.goalUsd) })}
-                  {donations.length > 0 && (
-                    <>
-                      {' · '}
-                      {t('campaignsDetail.donationCount', { count: donations.length })}
-                    </>
-                  )}
-                </div>
-              ) : donations.length > 0 ? (
-                <div className="text-xs text-muted-foreground">
-                  {t('campaignsDetail.donationCount', { count: donations.length })}
-                </div>
-              ) : null}
-              {pendingSats !== 0 && (
-                <PendingBadge
-                  amountLabel={formatSatsFull(Math.abs(pendingSats), btcPrice)}
-                  className="flex"
-                />
-              )}
-            </div>
-            {campaign.goalUsd && raisedUsd(raisedSats, btcPrice) !== undefined && (
-              <Progress
-                value={Math.min(
-                  100,
-                  Math.round((raisedUsd(raisedSats, btcPrice)! / campaign.goalUsd) * 100),
-                )}
-                // `bg-foreground/15` overrides the primitive's default
-                // `bg-secondary` track for legibility against the card
-                // surface — matches the treatment in CampaignCard.
-                className="h-2 bg-foreground/15"
-              />
-            )}
-          </div>
+    <div className="space-y-1.5">
+      <Progress value={0} className="h-2 invisible" aria-hidden />
+      <div className="flex items-baseline justify-between gap-2 text-sm">
+        <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+          <Target className="size-3.5" />
+          Fundraiser
+        </span>
+        {campaign.goalUsd && campaign.goalUsd > 0 && (
+          <span className="text-muted-foreground">Target: {formatUsdGoal(campaign.goalUsd)}</span>
         )}
-
-        {/* Primary actions */}
-        {
-          // Donors can either pay from their in-app Agora wallet (HD
-          // send dialog prefilled with the campaign address) or scan the
-          // QR from any external wallet. Both routes terminate at the
-          // same `w`-tag address on-chain. The in-app pay button is
-          // injected into the donate panel so it sits directly above
-          // "Open external wallet" — only one primary CTA stacked.
-          <div className="space-y-3">
-            <CampaignWalletDonatePanel
-              wallets={campaign.wallets}
-              primaryAction={
-                canPayInApp ? (
-                  <Button
-                    size="lg"
-                    className="w-full"
-                    onClick={() => setSendOpen(true)}
-                  >
-                    <Wallet className="size-5 mr-2" />
-                    {t('campaignsDetail.payWithAgoraWallet')}
-                  </Button>
-                ) : null
-              }
-            />
-            <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
-              <Share2 className="size-4 mr-2" />
-              {t('campaignsDetail.share')}
-            </Button>
-          </div>
-        }
-
-        {/* For donors who don't already hold Bitcoin: a low-emphasis text
-            link (no button chrome) that opens an instructional dialog
-            pointing at a mainstream on-ramp. Kept visually quiet so it
-            never competes with the primary on-chain CTA above. */}
-        <div className="text-center">
-          <button
-            type="button"
-            onClick={() => setNoBitcoinOpen(true)}
-            className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm transition-colors"
-          >
-            {t('noBitcoin.trigger')}
-          </button>
+      </div>
+      {raised && (
+        <div className="flex items-baseline justify-between gap-2 text-sm">
+          <span className="font-semibold text-primary">
+            {t('campaignsDetail.raisedGrin', { amount: grinTotal.totalGrin })}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {t('campaignsDetail.raisedCount', { count: grinTotal.donationCount })}
+          </span>
         </div>
-      </CardContent>
-      {canPayInApp && campaign.wallets.onchain && (
-        <HDSendBitcoinDialog
-          isOpen={sendOpen}
-          onClose={() => setSendOpen(false)}
-          walletScope="public"
-          btcPrice={btcPrice}
-          /* When the campaign exposes both an on-chain address and a
-             silent-payment code, prefill with a combined `bitcoin:`
-             BIP-21 URI so the picker's dropdown surfaces both rows and
-             the donor explicitly picks privacy vs. compatibility.
-             Otherwise prefill with the single address; the picker
-             accepts bare `bc1…` / `sp1…` inputs directly. */
-          initialRecipient={
-            campaign.wallets.sp?.value
-              ? `bitcoin:${campaign.wallets.onchain.value}?sp=${campaign.wallets.sp.value}`
-              : campaign.wallets.onchain.value
-          }
-        />
       )}
-      <NoBitcoinDialog open={noBitcoinOpen} onOpenChange={setNoBitcoinOpen} />
-    </Card>
+    </div>
   );
 }
 
-/** Convert sats to USD via the live BTC price; undefined when price unknown. */
-function raisedUsd(sats: number, btcPrice: number | undefined): number | undefined {
-  if (!btcPrice || !Number.isFinite(btcPrice) || btcPrice <= 0) return undefined;
-  return (sats / 100_000_000) * btcPrice;
+function CampaignSummaryColumn({
+  campaign,
+  onShare,
+}: {
+  campaign: ParsedCampaign;
+  onShare: () => void;
+}) {
+  const { t } = useTranslation();
+  const { goblinPayUrl, goblinPayApiToken } = useGrinPayConfig();
+  const [donateOpen, setDonateOpen] = useState(false);
+
+  // Donate is offered when any Grin path exists: the instance's GoblinPay
+  // invoice flow, the campaign's own GoblinPay receiving identity, or a
+  // published grin1 address.
+  const paths = grinDonationPaths(campaign, goblinPayUrl, goblinPayApiToken);
+  const canDonate = paths.invoice || paths.endpub || paths.address;
+
+  return (
+    // On mobile we drop the surface chrome (no rounded background) so
+    // the summary content flows inline with the page instead of being a
+    // floating box stacked between the hero and the story. On lg+ the
+    // sticky right sidebar uses `bg-card` with a brand-gold border
+    // on all four sides — same color family as the composer's
+    // top-and-sides border in the comments region, so both columns of
+    // the body read as siblings sharing one focal treatment.
+    <Card className="overflow-hidden border-0 shadow-none bg-transparent lg:bg-[hsl(40_100%_99%)] dark:lg:bg-[hsl(40_30%_12%)] lg:border lg:border-primary/40">
+      <CardContent className="p-0 lg:p-5 space-y-5">
+        <CampaignGoalRow campaign={campaign} />
+
+        {canDonate && (
+          <>
+            <Button size="lg" className="w-full" onClick={() => setDonateOpen(true)}>
+              <HandHeart className="size-4 mr-2" />
+              {t('campaignsDetail.donate')}
+            </Button>
+            <GrinPayDialog campaign={campaign} open={donateOpen} onOpenChange={setDonateOpen} />
+          </>
+        )}
+
+        <Button variant="outline" size="lg" className="w-full" onClick={onShare}>
+          <Share2 className="size-4 mr-2" />
+          {t('campaignsDetail.share')}
+        </Button>
+      </CardContent>
+    </Card>
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────

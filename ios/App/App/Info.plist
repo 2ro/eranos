@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>Agora</string>
+        <string>Eranos</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -48,11 +48,11 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Agora needs access to your photo library to upload images to your posts and profile.</string>
+	<string>Eranos needs access to your photo library to upload images to your posts and profile.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Agora needs camera access to take photos and videos for your posts, and to scan QR codes when sending Bitcoin.</string>
+	<string>Eranos needs camera access to take photos and videos for your posts, and to scan QR codes.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Agora needs access to your microphone to record voice messages.</string>
+	<string>Eranos needs access to your microphone to record voice messages.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>UIBackgroundModes</key>
@@ -61,7 +61,7 @@
 	</array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>spot.agora.app.notification-refresh</string>
+		<string>fund.eranos.app.notification-refresh</string>
 	</array>
 </dict>
 </plist>

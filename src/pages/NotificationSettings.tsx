@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
-import { Bell, BellOff, AlertTriangle, Heart, Repeat2, Zap, AtSign, MessageSquare, Users, Radio, MonitorSmartphone } from 'lucide-react';
+import { Bell, BellOff, AlertTriangle, Heart, Repeat2, AtSign, MessageSquare, Users, Radio, MonitorSmartphone } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -14,7 +14,7 @@ import { useEncryptedSettings } from '@/hooks/useEncryptedSettings';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { toast } from '@/hooks/useToast';
 
-type NotificationPrefKey = 'reactions' | 'reposts' | 'zaps' | 'mentions' | 'comments';
+type NotificationPrefKey = 'reactions' | 'reposts' | 'mentions' | 'comments';
 
 interface NotificationTypeRow {
   key: NotificationPrefKey;
@@ -40,13 +40,6 @@ const NOTIFICATION_TYPES: NotificationTypeRow[] = [
     kinds: [6, 16],
     descriptionKey: 'notifSettings.types.reposts.description',
     icon: <Repeat2 className="size-5" />,
-  },
-  {
-    key: 'zaps',
-    labelKey: 'notifSettings.types.zaps.label',
-    kinds: [9735, 8333],
-    descriptionKey: 'notifSettings.types.zaps.description',
-    icon: <Zap className="size-5" />,
   },
   {
     key: 'mentions',

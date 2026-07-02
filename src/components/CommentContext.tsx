@@ -6,7 +6,7 @@ import {
   Award, BarChart3, Bird, BookOpen, Camera, Clapperboard, FileText, Film,
   GitBranch, GitPullRequest, HandHeart, Highlighter, Mail, MapPin, Megaphone, MessageSquare, Mic, Music,
   Package, Palette, PartyPopper, Podcast, Radio, Rocket, SmilePlus,
-  Stars, Target, Users, UserCheck, Vote, Zap,
+  Stars, Target, Users, UserCheck, Vote,
 } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
@@ -155,7 +155,6 @@ const KIND_LABELS: Record<number, string> = {
   30000: 'a follow set',
   30621: 'a constellation',
   39089: 'a follow pack',
-  9735: 'a zap',
   9802: 'a highlight',
 };
 
@@ -205,7 +204,6 @@ const KIND_ICONS: Partial<Record<number, React.ComponentType<{ className?: strin
   3367: Palette,
   9041: Target,
   33863: HandHeart,
-  9735: Zap,
   9802: Highlighter,
   2473: Bird,
   12473: Bird,

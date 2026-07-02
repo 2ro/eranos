@@ -20,26 +20,6 @@ const DEFAULT_AI_MODEL = 'google/gemma-4-26b';
 /** Build-time default translation worker URL from the environment variable. */
 const DEFAULT_TRANSLATE_WORKER_URL = import.meta.env.VITE_TRANSLATE_WORKER_URL || '';
 
-/** Hardcoded defaults for the Bitcoin backend fields. Used for reset buttons. */
-const DEFAULT_ESPLORA_APIS = [
-  'https://mempool.emzy.de/api',
-  'https://mempool.space/api',
-  'https://blockstream.info/api',
-];
-const DEFAULT_BLOCKBOOK_BASE_URL = 'https://btc.trezor.io';
-const DEFAULT_BIP352_INDEXER_URL = 'https://silentpayments.dev/blindbit/mainnet';
-
-/** Validate an http(s) URL with no trailing slash. */
-function isValidEndpoint(url: string): boolean {
-  if (!/^https?:\/\//i.test(url)) return false;
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 /** The build-time default DSN from the environment variable. */
 const DEFAULT_SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || '';
 
@@ -51,7 +31,6 @@ export function AdvancedSettings() {
   const [systemOpen, setSystemOpen] = useState(true);
   const [aiOpen, setAiOpen] = useState(false);
   const [sentryOpen, setSentryOpen] = useState(false);
-  const [bitcoinOpen, setBitcoinOpen] = useState(false);
   const [dangerOpen, setDangerOpen] = useState(false);
   const [vanishDialogOpen, setVanishDialogOpen] = useState(false);
   const [statsPubkey, setStatsPubkey] = useState(config.nip85StatsPubkey);
@@ -65,15 +44,6 @@ export function AdvancedSettings() {
   const [modelDraft, setModelDraft] = useState(config.aiModel);
   const [showApiKey, setShowApiKey] = useState(false);
   const [systemPromptDraft, setSystemPromptDraft] = useState(config.aiSystemPrompt || DEFAULT_SYSTEM_PROMPT_TEMPLATE);
-
-  // Bitcoin backend drafts. `esploraApis` is an ordered array edited as one URL per line.
-  const [esploraApisDraft, setEsploraApisDraft] = useState(config.esploraApis.join('\n'));
-  const [blockbookDraft, setBlockbookDraft] = useState(config.blockbookBaseUrl);
-  const [bip352Draft, setBip352Draft] = useState(config.bip352IndexerUrl);
-
-  useEffect(() => { setEsploraApisDraft(config.esploraApis.join('\n')); }, [config.esploraApis]);
-  useEffect(() => { setBlockbookDraft(config.blockbookBaseUrl); }, [config.blockbookBaseUrl]);
-  useEffect(() => { setBip352Draft(config.bip352IndexerUrl); }, [config.bip352IndexerUrl]);
 
   useEffect(() => { setBaseUrlDraft(config.aiBaseURL); }, [config.aiBaseURL]);
   useEffect(() => { setApiKeyDraft(config.aiApiKey); }, [config.aiApiKey]);
@@ -146,67 +116,6 @@ export function AdvancedSettings() {
       updateConfig(() => ({ nip85StatsPubkey: '' }));
       toast({ title: 'Stats source cleared' });
     }
-  };
-
-  const commitEsploraApis = () => {
-    const urls = esploraApisDraft
-      .split('\n')
-      .map((line) => line.trim().replace(/\/+$/, ''))
-      .filter(Boolean);
-    if (urls.length === 0) {
-      setEsploraApisDraft(DEFAULT_ESPLORA_APIS.join('\n'));
-      updateConfig((current) => ({ ...current, esploraApis: DEFAULT_ESPLORA_APIS }));
-      toast({ title: 'Esplora endpoints reset to defaults' });
-      return;
-    }
-    const invalid = urls.find((url) => !isValidEndpoint(url));
-    if (invalid) {
-      toast({ title: 'Invalid Esplora endpoint', description: invalid, variant: 'destructive' });
-      return;
-    }
-    const changed =
-      urls.length !== config.esploraApis.length ||
-      urls.some((url, i) => url !== config.esploraApis[i]);
-    if (changed) {
-      updateConfig((current) => ({ ...current, esploraApis: urls }));
-      toast({ title: 'Esplora endpoints updated' });
-    }
-    // Normalize the textarea to the cleaned list.
-    setEsploraApisDraft(urls.join('\n'));
-  };
-
-  const commitBlockbook = () => {
-    const trimmed = blockbookDraft.trim().replace(/\/+$/, '');
-    if (!trimmed) {
-      setBlockbookDraft(DEFAULT_BLOCKBOOK_BASE_URL);
-      if (config.blockbookBaseUrl !== DEFAULT_BLOCKBOOK_BASE_URL) {
-        updateConfig((current) => ({ ...current, blockbookBaseUrl: DEFAULT_BLOCKBOOK_BASE_URL }));
-        toast({ title: 'Blockbook URL reset to default' });
-      }
-      return;
-    }
-    if (!isValidEndpoint(trimmed)) {
-      toast({ title: 'Invalid Blockbook URL', variant: 'destructive' });
-      return;
-    }
-    if (trimmed !== config.blockbookBaseUrl) {
-      updateConfig((current) => ({ ...current, blockbookBaseUrl: trimmed }));
-      toast({ title: 'Blockbook URL updated' });
-    }
-    setBlockbookDraft(trimmed);
-  };
-
-  const commitBip352 = () => {
-    const trimmed = bip352Draft.trim().replace(/\/+$/, '');
-    if (trimmed && !isValidEndpoint(trimmed)) {
-      toast({ title: 'Invalid indexer URL', variant: 'destructive' });
-      return;
-    }
-    if (trimmed !== config.bip352IndexerUrl) {
-      updateConfig((current) => ({ ...current, bip352IndexerUrl: trimmed }));
-      toast({ title: trimmed ? 'Silent-payment indexer updated' : 'Silent-payment scanning disabled' });
-    }
-    setBip352Draft(trimmed);
   };
 
   return (
@@ -527,143 +436,6 @@ export function AdvancedSettings() {
                     <span className="font-mono break-all">{DEFAULT_TRANSLATE_WORKER_URL}</span>
                   </div>
                 )}
-              </div>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-      </div>
-
-      {/* Bitcoin Section */}
-      <div>
-        <Collapsible open={bitcoinOpen} onOpenChange={setBitcoinOpen}>
-          <CollapsibleTrigger asChild>
-            <Button
-              variant="ghost"
-              className="relative w-full justify-between px-3 py-3.5 h-auto hover:bg-muted/20 hover:text-foreground rounded-none"
-            >
-              <span className="text-base font-semibold">Bitcoin</span>
-              {bitcoinOpen ? (
-                <ChevronUp className="h-4 w-4 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              )}
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <div className="px-3 pt-3 pb-4 space-y-5">
-
-              {/* Esplora API endpoints */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <Label htmlFor="esplora-apis" className="text-sm font-medium">
-                    Esplora API endpoints
-                  </Label>
-                  {esploraApisDraft.trim() !== DEFAULT_ESPLORA_APIS.join('\n') && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0"
-                      title="Restore to defaults"
-                      onClick={() => {
-                        setEsploraApisDraft(DEFAULT_ESPLORA_APIS.join('\n'));
-                        updateConfig((current) => ({ ...current, esploraApis: DEFAULT_ESPLORA_APIS }));
-                        toast({ title: 'Esplora endpoints reset to defaults' });
-                      }}
-                    >
-                      <RotateCcw className="h-3.5 w-3.5" />
-                    </Button>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1 mb-2">
-                  Esplora-compatible REST roots used for on-chain zaps, donations, and Bitcoin address/tx pages. One URL per line, no trailing slash. Tried in order with failover when an endpoint is rate-limited or down.
-                </p>
-                <Textarea
-                  id="esplora-apis"
-                  value={esploraApisDraft}
-                  onChange={(e) => setEsploraApisDraft(e.target.value)}
-                  onBlur={commitEsploraApis}
-                  placeholder={DEFAULT_ESPLORA_APIS.join('\n')}
-                  className="min-h-[88px] max-h-[200px] resize-y font-mono text-base md:text-sm"
-                  autoComplete="off"
-                  spellCheck={false}
-                />
-              </div>
-
-              {/* Blockbook base URL */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <Label htmlFor="blockbook-url" className="text-sm font-medium">
-                    Blockbook API URL
-                  </Label>
-                  {blockbookDraft.trim() !== DEFAULT_BLOCKBOOK_BASE_URL && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0"
-                      title="Restore to default"
-                      onClick={() => {
-                        setBlockbookDraft(DEFAULT_BLOCKBOOK_BASE_URL);
-                        updateConfig((current) => ({ ...current, blockbookBaseUrl: DEFAULT_BLOCKBOOK_BASE_URL }));
-                        toast({ title: 'Blockbook URL reset to default' });
-                      }}
-                    >
-                      <RotateCcw className="h-3.5 w-3.5" />
-                    </Button>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1 mb-2">
-                  Trezor Blockbook instance used by the HD wallet to scan balances and history. <span className="font-medium text-foreground/80">Privacy note:</span> the wallet's full xpub is sent to this server. Self-host for maximum privacy.
-                </p>
-                <Input
-                  id="blockbook-url"
-                  type="url"
-                  value={blockbookDraft}
-                  onChange={(e) => setBlockbookDraft(e.target.value)}
-                  onBlur={commitBlockbook}
-                  placeholder={DEFAULT_BLOCKBOOK_BASE_URL}
-                  className="font-mono text-base md:text-sm"
-                  autoComplete="off"
-                  spellCheck={false}
-                />
-              </div>
-
-              {/* BIP-352 silent payment indexer */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <Label htmlFor="bip352-url" className="text-sm font-medium">
-                    Silent payment indexer
-                  </Label>
-                  {bip352Draft.trim() !== DEFAULT_BIP352_INDEXER_URL && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0"
-                      title="Restore to default"
-                      onClick={() => {
-                        setBip352Draft(DEFAULT_BIP352_INDEXER_URL);
-                        updateConfig((current) => ({ ...current, bip352IndexerUrl: DEFAULT_BIP352_INDEXER_URL }));
-                        toast({ title: 'Silent-payment indexer reset to default' });
-                      }}
-                    >
-                      <RotateCcw className="h-3.5 w-3.5" />
-                    </Button>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1 mb-2">
-                  BIP-352 tweak-data indexer (BlindBit Oracle) used to detect incoming silent payments (<code className="bg-muted px-1 rounded">sp1…</code>). Your scan key never leaves the device. Leave empty to disable silent-payment scanning.
-                </p>
-                <Input
-                  id="bip352-url"
-                  type="url"
-                  value={bip352Draft}
-                  onChange={(e) => setBip352Draft(e.target.value)}
-                  onBlur={commitBip352}
-                  placeholder={DEFAULT_BIP352_INDEXER_URL}
-                  className="font-mono text-base md:text-sm"
-                  autoComplete="off"
-                  spellCheck={false}
-                />
               </div>
             </div>
           </CollapsibleContent>

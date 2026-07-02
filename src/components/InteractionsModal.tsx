@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Quote, Heart, Zap, X, ChevronRight } from 'lucide-react';
+import { Quote, Heart, X, ChevronRight } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import { nip19 } from 'nostr-tools';
 
@@ -14,7 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CustomEmojiImg, EmojifiedText } from '@/components/CustomEmoji';
 import { isCustomEmoji } from '@/lib/customEmoji';
-import { useEventInteractions, type RepostEntry, type QuoteEntry, type ReactionEntry, type ZapEntry } from '@/hooks/useEventInteractions';
+import { useEventInteractions, type RepostEntry, type QuoteEntry, type ReactionEntry } from '@/hooks/useEventInteractions';
 import { useAuthor } from '@/hooks/useAuthor';
 import { VerifiedNip05Text } from '@/components/Nip05Badge';
 import { genUserName } from '@/lib/genUserName';
@@ -22,7 +22,7 @@ import { timeAgo } from '@/lib/timeAgo';
 import { formatNumber } from '@/lib/formatNumber';
 import { cn } from '@/lib/utils';
 
-export type InteractionTab = 'reposts' | 'quotes' | 'reactions' | 'zaps';
+export type InteractionTab = 'reposts' | 'quotes' | 'reactions';
 
 interface InteractionsModalProps {
   eventId: string;
@@ -48,13 +48,11 @@ export function InteractionsModal({ eventId, open, onOpenChange, initialTab = 'r
   const repostCount = data?.reposts.length ?? 0;
   const quoteCount = data?.quotes.length ?? 0;
   const reactionCount = data?.reactions.length ?? 0;
-  const zapCount = data?.zaps.length ?? 0;
 
   const tabConfig: { key: InteractionTab; label: string; count: number; icon: React.ReactNode }[] = [
     { key: 'reposts', label: 'Reposts', count: repostCount, icon: <RepostIcon className="size-4" /> },
     { key: 'quotes', label: 'Quotes', count: quoteCount, icon: <Quote className="size-4" /> },
     { key: 'reactions', label: 'Reactions', count: reactionCount, icon: <Heart className="size-4" /> },
-    { key: 'zaps', label: 'Zaps', count: zapCount, icon: <Zap className="size-4" /> },
   ];
 
   return (
@@ -111,10 +109,8 @@ export function InteractionsModal({ eventId, open, onOpenChange, initialTab = 'r
             <RepostsTab reposts={data?.reposts ?? []} />
           ) : activeTab === 'quotes' ? (
             <QuotesTab quotes={data?.quotes ?? []} />
-          ) : activeTab === 'reactions' ? (
-            <ReactionsTab reactions={data?.reactions ?? []} />
           ) : (
-            <ZapsTab zaps={data?.zaps ?? []} />
+            <ReactionsTab reactions={data?.reactions ?? []} />
           )}
         </ScrollArea>
       </DialogContent>
@@ -198,32 +194,6 @@ function ReactionsTab({ reactions }: { reactions: ReactionEntry[] }) {
       <div className="divide-y divide-border">
         {reactions.map((entry, i) => (
           <ReactionRow key={`${entry.pubkey}-${i}`} entry={entry} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ──── Zaps Tab ──── */
-function ZapsTab({ zaps }: { zaps: ZapEntry[] }) {
-  if (zaps.length === 0) {
-    return <EmptyState message="No zaps yet" />;
-  }
-
-  const totalSats = zaps.reduce((sum, z) => sum + z.amountSats, 0);
-
-  return (
-    <div>
-      {/* Total */}
-      <div className="flex items-center justify-center gap-2 px-4 py-3 bg-secondary/30 border-b border-border">
-        <Zap className="size-4 text-amber-500 fill-amber-500" />
-        <span className="text-sm font-bold text-amber-500">{formatNumber(totalSats)} sats</span>
-        <span className="text-xs text-muted-foreground">from {zaps.length} zap{zaps.length !== 1 ? 's' : ''}</span>
-      </div>
-
-      <div className="divide-y divide-border">
-        {zaps.map((zap, i) => (
-          <ZapRow key={`${zap.senderPubkey}-${i}`} zap={zap} />
         ))}
       </div>
     </div>
@@ -316,51 +286,6 @@ function ReactionRow({ entry }: { entry: ReactionEntry }) {
   );
 }
 
-
-function ZapRow({ zap }: { zap: ZapEntry }) {
-  const author = useAuthor(zap.senderPubkey);
-  const metadata = author.data?.metadata;
-  const displayName = metadata?.name || genUserName(zap.senderPubkey);
-  const nevent = useMemo(() => nip19.neventEncode({ id: zap.eventId, author: zap.senderPubkey }), [zap.eventId, zap.senderPubkey]);
-
-  return (
-    <Link
-      to={`/${nevent}`}
-      className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors"
-    >
-      <Avatar className="size-10 shrink-0">
-        <AvatarImage src={metadata?.picture} alt={displayName} />
-        <AvatarFallback className="bg-primary/20 text-primary text-sm">
-          {displayName[0].toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <span className="font-bold text-sm truncate">
-            {author.data?.event ? (
-              <EmojifiedText tags={author.data.event.tags}>{displayName}</EmojifiedText>
-            ) : displayName}
-          </span>
-          {metadata?.nip05 && (
-            <VerifiedNip05Text nip05={metadata.nip05} pubkey={zap.senderPubkey} className="text-xs text-muted-foreground truncate" />
-          )}
-        </div>
-        {zap.message && (
-          <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{zap.message}</p>
-        )}
-      </div>
-
-      {/* Zap amount badge */}
-      <div className="flex items-center gap-1 shrink-0 bg-amber-500/10 text-amber-500 rounded-full px-2.5 py-1">
-        <Zap className="size-3.5 fill-amber-500" />
-        <span className="text-xs font-bold tabular-nums">{formatNumber(zap.amountSats)}</span>
-      </div>
-
-      <ChevronRight className="size-4 text-muted-foreground shrink-0" />
-    </Link>
-  );
-}
 
 function QuoteRow({ quote }: { quote: QuoteEntry }) {
   const author = useAuthor(quote.pubkey);

@@ -4,8 +4,8 @@
 <dict>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>webcredentials:agora.spot</string>
-		<string>webcredentials:agora.spot?mode=developer</string>
+		<string>webcredentials:eranos.fund</string>
+		<string>webcredentials:eranos.fund?mode=developer</string>
 	</array>
 </dict>
 </plist>

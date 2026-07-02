@@ -5,14 +5,13 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, Pause, Music, ListMusic, Disc3, Zap, Clock, Calendar, Tag } from 'lucide-react';
+import { ArrowLeft, Play, Pause, Music, ListMusic, Disc3, Clock, Calendar, Tag } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { nip19 } from 'nostr-tools';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useImageProxy } from '@/hooks/useImageProxy';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventStats } from '@/hooks/useTrending';
 
 import { useComments } from '@/hooks/useComments';
@@ -27,7 +26,6 @@ import { ReactionButton } from '@/components/ReactionButton';
 import { RepostMenu } from '@/components/RepostMenu';
 import { NoteMoreMenu } from '@/components/NoteMoreMenu';
 import { ReplyComposeModal } from '@/components/ReplyComposeModal';
-import { ZapDialog } from '@/components/ZapDialog';
 import { InteractionsModal, type InteractionTab } from '@/components/InteractionsModal';
 import { NoteCard } from '@/components/NoteCard';
 import { useAudioPlayer } from '@/contexts/audioPlayerContextDef';
@@ -60,7 +58,6 @@ function TrackDetail({ event }: { event: NostrEvent }) {
   const metadata = author.data?.metadata;
   const displayName = getDisplayName(metadata, event.pubkey);
   const profileUrl = useProfileUrl(event.pubkey, metadata);
-  const { user } = useCurrentUser();
 
   const stats = useEventStats(event.id, event);
   const { muteItems } = useMuteList();
@@ -93,8 +90,6 @@ function TrackDetail({ event }: { event: NostrEvent }) {
       player.playTrack(toAudioTrack(event, parsed));
     }
   };
-
-  const zapAmount = stats.data?.zapAmount ?? 0;
 
   return (
     <main className="">
@@ -185,25 +180,6 @@ function TrackDetail({ event }: { event: NostrEvent }) {
                 </button>
               )}
             </RepostMenu>
-
-            {user && user.pubkey !== event.pubkey && (
-              <ZapDialog target={event}>
-                <button
-                  className="size-11 rounded-full bg-secondary/50 text-muted-foreground hover:bg-secondary flex items-center justify-center transition-colors"
-                  title="Zap"
-                >
-                  <Zap className="size-5" />
-                </button>
-              </ZapDialog>
-            )}
-
-            {/* Zap stats */}
-            {zapAmount > 0 && (
-              <button onClick={() => setInteractionsTab('zaps')} className="ml-1 text-right hover:opacity-80">
-                <p className="text-lg font-bold leading-tight">{formatNumber(zapAmount)} sats</p>
-                <p className="text-xs text-muted-foreground">{formatNumber(stats.data?.zapCount ?? 0)} zap{(stats.data?.zapCount ?? 0) !== 1 ? 's' : ''}</p>
-              </button>
-            )}
           </div>
 
           {dur && (
@@ -229,12 +205,6 @@ function TrackDetail({ event }: { event: NostrEvent }) {
 
       {/* Interactions tabs */}
       <div className="flex border-b border-border mt-4">
-        <button
-          onClick={() => setInteractionsTab('zaps')}
-          className="flex-1 py-3 text-center text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors"
-        >
-          Top Zappers
-        </button>
         <button
           onClick={() => setReplyOpen(true)}
           className="flex-1 py-3 text-center text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors"

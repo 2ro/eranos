@@ -1,4 +1,4 @@
-import { startTransition, useEffect, useState, type ComponentType } from 'react';
+import { useState, type ComponentType } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -12,11 +12,10 @@ import {
   Search,
   Settings,
   User,
-  Wallet,
   X,
 } from 'lucide-react';
-import { nip19 } from 'nostr-tools';
 import { Capacitor } from '@capacitor/core';
+import { nip19 } from 'nostr-tools';
 
 import { LoginArea } from '@/components/auth/LoginArea';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -25,11 +24,8 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useFeedSettings } from '@/hooks/useFeedSettings';
-import { useHdBtcPrice } from '@/hooks/useHdBtcPrice';
-import { useHdWallet } from '@/hooks/useHdWallet';
-import { satsToUSD } from '@/lib/bitcoin';
-import { ZAPSTORE_URL } from '@/lib/zapstore';
 import { cn } from '@/lib/utils';
+import { ZAPSTORE_URL } from '@/lib/zapstore';
 
 interface NavItem {
   /** i18n key under `nav.*` for the label. */
@@ -121,9 +117,7 @@ export function TopNav() {
 
         {/* Right cluster */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {user ? (
-            <DeferredWalletBalancePill />
-          ) : (
+          {!user && (
             <>
               {/* When logged out, surface the language switcher so a visitor
                   who can't read the current UI language can find and pick
@@ -208,52 +202,6 @@ export function TopNav() {
   );
 }
 
-/**
- * Compact USD balance pill in the top-nav right cluster, replacing the
- * previous search icon. Reads the HD-wallet sats balance via {@link useHdWallet}
- * and converts to USD via {@link useHdBtcPrice}. Renders nothing when the wallet
- * isn't available (logged out, extension/bunker login, still loading, or no
- * price yet) so the chrome stays quiet rather than flashing placeholder text.
- */
-function DeferredWalletBalancePill() {
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    startTransition(() => setReady(true));
-  }, []);
-
-  return ready ? <WalletBalancePill /> : null;
-}
-
-function WalletBalancePill() {
-  const { t } = useTranslation();
-  const { availability, totalBalance, isLoading, error } = useHdWallet();
-  const { data: btcPrice } = useHdBtcPrice();
-
-  if (availability.status !== 'available') return null;
-  if (isLoading || error || !btcPrice) return null;
-
-  return (
-    <Link
-      to="/wallet"
-      className="shrink-0 inline-flex items-center text-primary rounded-md px-1 hover:bg-primary/10 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-      aria-label={t('nav.wallet')}
-      title={t('nav.wallet')}
-    >
-      <span
-        className="latin-display font-display font-normal tracking-wide leading-none uppercase text-xl inline-block tabular-nums"
-        style={{
-          WebkitTextStroke: '0.022em currentColor',
-          transform: 'skewX(-6deg) scaleX(1.1)',
-          transformOrigin: '0 100%',
-        }}
-      >
-        {satsToUSD(totalBalance, btcPrice)}
-      </span>
-    </Link>
-  );
-}
-
 function NavLinkButton({ item }: { item: NavItem }) {
   const { t } = useTranslation();
   return (
@@ -318,7 +266,6 @@ function getProfileMenuItems({
   return [
     ...(showDashboard ? [{ labelKey: 'nav.dashboard', to: '/dashboard', icon: Activity }] : []),
     { labelKey: 'nav.myDashboard', to: '/my-dashboard', icon: LayoutDashboard },
-    { labelKey: 'nav.wallet', to: '/wallet', icon: Wallet },
     { labelKey: 'nav.notifications', to: '/notifications', icon: Bell },
     { labelKey: 'nav.profile', to: `/${nip19.npubEncode(userPubkey)}`, icon: User },
     { labelKey: 'nav.search', to: '/search', icon: Search },

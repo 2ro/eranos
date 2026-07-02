@@ -5,11 +5,10 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import { Camera, Clock, DollarSign, Info, Megaphone, Palette } from 'lucide-react';
 
 import { parseAction, type Action } from '@/hooks/useActions';
-import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { countryCodeToFlag, getGeoDisplayName } from '@/lib/countries';
 import { CountryFlag } from '@/components/CountryFlag';
 import { DEFAULT_COVER_IMAGE } from '@/lib/defaultActionCovers';
-import { formatSats, satsToUSDWhole } from '@/lib/bitcoin';
+import { formatPledgeAmount } from '@/lib/pledges';
 import { cn } from '@/lib/utils';
 
 const ACTION_ICONS = {
@@ -28,7 +27,6 @@ function actionNaddr(action: Action): string {
 }
 
 export function ActionContent({ event, compact = true }: { event: NostrEvent; compact?: boolean }) {
-  const { data: btcPrice } = useBtcPrice();
   const action = parseAction(event);
   if (!action) return null;
 
@@ -98,9 +96,8 @@ export function ActionContent({ event, compact = true }: { event: NostrEvent; co
         <div className="flex items-center gap-2 text-sm">
           <DollarSign className="size-4 shrink-0 text-primary" />
           <span className="font-semibold">
-            {btcPrice ? satsToUSDWhole(action.bounty, btcPrice) : `${formatSats(action.bounty)} sats`}
+            {formatPledgeAmount(action.bounty)}
           </span>
-          {btcPrice && <span className="text-xs text-muted-foreground">~{formatSats(action.bounty)} sats</span>}
           {action.countryCode && (
             <>
               <span className="text-muted-foreground/50">·</span>

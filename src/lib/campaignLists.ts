@@ -21,7 +21,7 @@ import { sanitizeUrl } from '@/lib/sanitizeUrl';
  * ['icon', '<LucideIconName>']               // PascalCase, looked up via LucideIcon component
  * ['t', 'agora.campaign-list']               // hashtag namespace so all lists can be queried in one filter
  * ['a', '33863:<pubkey>:<d>']                // one per campaign, ARRAY ORDER = display order
- * ['alt', 'Agora campaign list: <title>']    // NIP-31
+ * ['alt', 'Eranos campaign list: <title>']    // NIP-31
  * ```
  *
  * **List-of-lists order** is encoded as a separate sentinel kind 30003
@@ -44,7 +44,7 @@ import { sanitizeUrl } from '@/lib/sanitizeUrl';
 /** Kind 30003 — NIP-51 Bookmark Set. */
 export const CAMPAIGN_LIST_KIND = 30003;
 
-/** Hashtag marker that identifies an Agora campaign list. */
+/** Hashtag marker that identifies an Eranos campaign list. */
 export const CAMPAIGN_LIST_HASHTAG = 'agora.campaign-list';
 
 /**
@@ -65,7 +65,7 @@ const SLUG_RE = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const ICON_NAME_RE = /^[A-Z][A-Za-z0-9]{0,63}$/;
 
 /**
- * A parsed Agora campaign list, ready for rendering. The membership
+ * A parsed Eranos campaign list, ready for rendering. The membership
  * (`coords`) is in display order — the order in which the `a` tags
  * appeared on the source event.
  */

@@ -4,49 +4,26 @@ import slugify from 'slugify';
 
 import { COUNTRIES } from '@/lib/countries';
 import { parseCountryIdentifier } from '@/lib/countryIdentifiers';
-import { validateBitcoinAddress } from '@/lib/bitcoin';
+import { isValidSlatepackAddress } from '@/lib/grinProof';
 
 /**
  * Addressable kind number for fundraising campaigns (see NIP.md, Kind 33863).
  *
- * Campaigns are self-authored — the event author owns the wallet declared
- * in the `w` tag and is the sole beneficiary of donations. There is no
- * recipient list, no split logic, and no on-behalf-of authorship.
+ * Campaigns are self-authored — the event author is the sole beneficiary
+ * of donations. There is no recipient list, no split logic, and no
+ * on-behalf-of authorship.
+ *
+ * Grin receiving config (both optional, both may be present):
+ * - `["grin", "<grin1…>"]` — a native Slatepack address; donors pay from
+ *   any Grin wallet and can publish a payment proof (kind 3414) that the
+ *   tally verifies trustlessly (see `lib/grinProof.ts`).
+ * - `["goblinpay", "<npub|nprofile>", "<signer pubkey>"]` — the campaign's
+ *   GoblinPay receiving identity (its per-campaign endpub; a campaign is a
+ *   GoblinPay "user"), plus (optional, element 3) the x-only pubkey (hex or
+ *   npub) of the GoblinPay server whose signed receipts count toward this
+ *   campaign's tally when published by donors.
  */
 export const CAMPAIGN_KIND = 33863;
-
-/**
- * Two ways a campaign can accept donations, distinguished by the `w` tag's
- * bech32(m) prefix:
- *
- * - **`onchain`** — the wallet is a public mainnet on-chain bech32(m)
- *   address (`bc1q…` segwit v0 or `bc1p…` Taproot). Donations are
- *   traceable; clients show progress, totals, and recent donations.
- * - **`sp`** — the wallet is a BIP-352 silent-payment code (`sp1…`).
- *   Donations are unlinkable by design; clients MUST hide all aggregate
- *   UI and MUST NOT publish donation receipts.
- */
-type CampaignWalletMode = 'onchain' | 'sp';
-
-/** Parsed wallet endpoint declared by a campaign's `w` tag. */
-interface CampaignWallet {
-  /** Raw bech32(m) string as it appears in the `w` tag. */
-  value: string;
-  /** Mode derived from the prefix. */
-  mode: CampaignWalletMode;
-}
-
-/**
- * The full set of wallet endpoints declared by a campaign. A campaign may
- * carry up to one endpoint per mode; at least one must be present, but
- * both modes may be present simultaneously (the QR code combines them).
- */
-export interface CampaignWallets {
-  /** On-chain mainnet bech32(m) address, if declared. */
-  onchain?: CampaignWallet;
-  /** BIP-352 silent-payment code, if declared. */
-  sp?: CampaignWallet;
-}
 
 /**
  * NIP-92 imeta block parsed from a campaign event. Pairs with the
@@ -86,12 +63,16 @@ export interface ParsedCampaign {
   banner?: string;
   /** NIP-92 imeta for the banner. Only present when the imeta's `url` matches the banner. */
   bannerImeta?: CampaignBannerImeta;
-  /** Bitcoin wallet endpoints (at least one is present). */
-  wallets: CampaignWallets;
   /** Fundraising goal in **integer US Dollars**, or `undefined` if not set. */
   goalUsd?: number;
   /** ISO 3166-1 alpha-2 country code parsed from a NIP-73 `i` tag. */
   countryCode?: string;
+  /** Native Grin Slatepack address (`grin1…`) donors can pay from any Grin wallet. Checksum-validated at parse. */
+  grinAddress?: string;
+  /** The campaign's GoblinPay receiving identity (npub or nprofile — its per-campaign endpub). */
+  goblinPayEndpub?: string;
+  /** x-only hex pubkey of the GoblinPay server whose signed receipts count toward this campaign. */
+  goblinPaySignerPubkey?: string;
   /** Created-at from the event. */
   createdAt: number;
 }
@@ -99,17 +80,6 @@ export interface ParsedCampaign {
 /** Returns the first value of a tag, or undefined. */
 function getTag(event: NostrEvent, name: string): string | undefined {
   return event.tags.find(([n]) => n === name)?.[1];
-}
-
-/** Returns all values of a tag in declaration order. */
-function getTagValues(event: NostrEvent, name: string): string[] {
-  const values: string[] = [];
-  for (const tag of event.tags) {
-    if (tag[0] !== name) continue;
-    if (typeof tag[1] !== 'string') continue;
-    values.push(tag[1]);
-  }
-  return values;
 }
 
 /** Parses a positive integer string. Returns undefined on failure. */
@@ -120,6 +90,53 @@ function parsePositiveInt(s: string | undefined): number | undefined {
   return n;
 }
 
+/** Parse + validate the `grin` tag (a `grin1…` Slatepack address). */
+function getGrinAddress(event: NostrEvent): string | undefined {
+  const raw = getTag(event, 'grin')?.trim().toLowerCase();
+  if (!raw || !isValidSlatepackAddress(raw)) return undefined;
+  return raw;
+}
+
+/**
+ * Parse the `goblinpay` tag: element 1 is the receiving identity (npub or
+ * nprofile), element 2 (optional) the receipt-signer pubkey (hex or npub).
+ * Malformed values are dropped field-by-field so one bad element doesn't
+ * take out the other.
+ */
+function getGoblinPayConfig(event: NostrEvent): {
+  endpub?: string;
+  signerPubkey?: string;
+} {
+  const tag = event.tags.find(([n]) => n === 'goblinpay');
+  if (!tag) return {};
+
+  let endpub: string | undefined;
+  const rawEndpub = typeof tag[1] === 'string' ? tag[1].trim() : '';
+  if (rawEndpub) {
+    try {
+      const decoded = nip19.decode(rawEndpub);
+      if (decoded.type === 'npub' || decoded.type === 'nprofile') endpub = rawEndpub;
+    } catch {
+      // not a valid NIP-19 identity — drop it
+    }
+  }
+
+  let signerPubkey: string | undefined;
+  const rawSigner = typeof tag[2] === 'string' ? tag[2].trim() : '';
+  if (/^[0-9a-f]{64}$/i.test(rawSigner)) {
+    signerPubkey = rawSigner.toLowerCase();
+  } else if (rawSigner.startsWith('npub1')) {
+    try {
+      const decoded = nip19.decode(rawSigner);
+      if (decoded.type === 'npub') signerPubkey = decoded.data;
+    } catch {
+      // ignore
+    }
+  }
+
+  return { endpub, signerPubkey };
+}
+
 function getCountryCode(event: NostrEvent): string | undefined {
   for (const [name, value] of event.tags) {
     if (name !== 'i' || typeof value !== 'string') continue;
@@ -127,65 +144,6 @@ function getCountryCode(event: NostrEvent): string | undefined {
     if (code && /^[A-Z]{2}$/.test(code)) return code;
   }
   return undefined;
-}
-
-/**
- * Parse a campaign wallet endpoint, returning the parsed wallet on success
- * or `null` if the string is missing, malformed, or for a network we
- * don't accept (testnet, regtest, etc.).
- *
- * Mode is inferred from the bech32 HRP/prefix:
- *
- * - `bc1q…` / `bc1p…` → mainnet on-chain (validated via @scure/btc-signer).
- * - `sp1…` → BIP-352 silent-payment code (validated via prefix + bech32m
- *   checksum at the donor's wallet when it derives the payment output).
- *
- * Any other prefix (`tb1…`, `bcrt1…`, `tsp1…`, `lnbc…`, etc.) is rejected.
- */
-export function parseCampaignWallet(value: string | undefined): CampaignWallet | null {
-  if (typeof value !== 'string') return null;
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-
-  // On-chain mainnet: bc1q (segwit v0) or bc1p (Taproot v1).
-  if (/^bc1[qp]/i.test(trimmed)) {
-    if (!validateBitcoinAddress(trimmed)) return null;
-    return { value: trimmed, mode: 'onchain' };
-  }
-
-  // Silent payments: sp1 followed by bech32m payload (mainnet only).
-  if (/^sp1[02-9ac-hj-np-z]+$/i.test(trimmed)) {
-    // @scure/btc-signer's address decoder doesn't currently parse BIP-352
-    // codes, so we accept any bech32m-shaped sp1 string. The checksum is
-    // verified by the donor's wallet when it derives the payment output; an
-    // invalid code there simply fails the donation flow.
-    return { value: trimmed, mode: 'sp' };
-  }
-
-  return null;
-}
-
-/**
- * Parse all of a campaign's `w` tags into a {@link CampaignWallets}
- * struct. Returns `null` if the campaign carries no `w` tags, any
- * individual `w` value fails {@link parseCampaignWallet}, or more than
- * one `w` value is present for the same mode (the spec permits at most
- * one endpoint per mode).
- */
-function parseCampaignWallets(values: string[]): CampaignWallets | null {
-  if (values.length === 0) return null;
-  const wallets: CampaignWallets = {};
-  for (const raw of values) {
-    const parsed = parseCampaignWallet(raw);
-    if (!parsed) return null;
-    if (wallets[parsed.mode]) {
-      // Two endpoints of the same mode is invalid per NIP.md.
-      return null;
-    }
-    wallets[parsed.mode] = parsed;
-  }
-  if (!wallets.onchain && !wallets.sp) return null;
-  return wallets;
 }
 
 /**
@@ -225,8 +183,7 @@ function getBannerImeta(event: NostrEvent, bannerUrl: string | undefined): Campa
 
 /**
  * Parses a kind 33863 event into a strongly-typed campaign, or returns
- * `null` if the event is missing a required field (kind, `d`, `title`, or
- * a valid `w` wallet endpoint).
+ * `null` if the event is missing a required field (kind, `d`, or `title`).
  */
 export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
   if (event.kind !== CAMPAIGN_KIND) return null;
@@ -235,15 +192,13 @@ export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
   const title = getTag(event, 'title');
   if (!identifier || !title) return null;
 
-  const wallets = parseCampaignWallets(getTagValues(event, 'w'));
-  if (!wallets) return null;
-
   // Banner — only accept https URLs. Formal sanitizeUrl pass happens at
   // the render site (this lib runs in tests without DOM); strip non-https
   // here so the parsed value is safe to interpolate into a fetch().
   const rawBanner = getTag(event, 'banner');
   const banner = rawBanner && /^https:\/\//i.test(rawBanner) ? rawBanner : undefined;
   const bannerImeta = getBannerImeta(event, banner);
+  const goblinPay = getGoblinPayConfig(event);
 
   return {
     event,
@@ -255,10 +210,32 @@ export function parseCampaign(event: NostrEvent): ParsedCampaign | null {
     story: event.content,
     banner,
     bannerImeta,
-    wallets,
     goalUsd: parsePositiveInt(getTag(event, 'goal')),
     countryCode: getCountryCode(event),
+    grinAddress: getGrinAddress(event),
+    goblinPayEndpub: goblinPay.endpub,
+    goblinPaySignerPubkey: goblinPay.signerPubkey,
     createdAt: event.created_at,
+  };
+}
+
+/**
+ * Which Grin donation paths a campaign + this instance can offer:
+ * - `invoice`: the instance-run GoblinPay invoice flow (needs the app
+ *   config's `goblinPayUrl` + `goblinPayApiToken`).
+ * - `endpub`: the campaign's own GoblinPay receiving identity
+ *   (scan-to-pay, no invoice).
+ * - `address`: the native `grin1…` Slatepack address.
+ */
+export function grinDonationPaths(
+  campaign: ParsedCampaign,
+  goblinPayUrl: string | undefined,
+  goblinPayApiToken: string | undefined,
+): { invoice: boolean; endpub: boolean; address: boolean } {
+  return {
+    invoice: !!goblinPayUrl && !!goblinPayApiToken,
+    endpub: !!campaign.goblinPayEndpub,
+    address: !!campaign.grinAddress,
   };
 }
 

@@ -13,10 +13,10 @@ import { BuildConfigSchema } from "./src/lib/schemas";
 /**
  * Load and validate the build-time app configuration file.
  * Returns the parsed config object, or `undefined` if the file doesn't exist.
- * Set the CONFIG_FILE env var to override the default path ("./agora.json").
+ * Set the CONFIG_FILE env var to override the default path ("./eranos.json").
  */
 function loadBuildConfig(): object | undefined {
-  const configPath = path.resolve(process.env.CONFIG_FILE ?? "./agora.json");
+  const configPath = path.resolve(process.env.CONFIG_FILE ?? "./eranos.json");
 
   let raw: string;
   try {

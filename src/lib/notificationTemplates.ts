@@ -35,12 +35,6 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
     body: '{{content}}',
   },
   {
-    id: 'zaps',
-    kinds: [9735],
-    title: '{{amount}} sats!',
-    body: '{{author_name}} zapped you',
-  },
-  {
     id: 'mentions',
     kinds: [1],
     title: '{{author_name}} Mentioned You!',

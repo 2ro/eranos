@@ -158,16 +158,9 @@ const KIND_LABELS: Record<number, string> = {
   9000: 'Group control event',
 
   // NIP-75
-  9041: 'Zap goal',
-  // NIP-61
-  9321: 'Nutzap',
+  9041: 'Fundraising goal',
   // Tidal
   9467: 'Tidal login',
-  // NIP-57 Zaps
-  9734: 'Zap request',
-  9735: 'Zap',
-  // Bitcoin Zap
-  8333: 'Bitcoin zap',
   // NIP-84
   9802: 'Highlight',
 
@@ -196,9 +189,6 @@ const KIND_LABELS: Record<number, string> = {
   10013: 'Private event relay list',
   // NIP-51
   10015: 'Interests list',
-  // NIP-61
-  10019: 'Nutzap mint recommendation',
-  // NIP-51
   10020: 'Media follows',
   10030: 'Emoji list',
   // NIP-17

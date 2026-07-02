@@ -2,24 +2,17 @@ import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import { AdvancedSettings } from '@/components/AdvancedSettings';
-import { WalletSettings } from '@/components/WalletSettings';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useTor } from '@/hooks/useTor';
 import { retryTor } from '@/lib/tor';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import { useState } from 'react';
 
 export function AdvancedSettingsPage() {
   const { t } = useTranslation();
-  const { user } = useCurrentUser();
   const { config, updateConfig } = useAppContext();
   const tor = useTor();
-  const [walletOpen, setWalletOpen] = useState(false);
 
   useSeoMeta({
     title: `${t('settings.advanced.title')} | ${t('settings.title')} | ${config.appName}`,
@@ -107,31 +100,6 @@ export function AdvancedSettingsPage() {
               )}
             </div>
           </div>
-        )}
-
-        {/* Wallet collapsible — only when logged in */}
-        {user && (
-          <Collapsible open={walletOpen} onOpenChange={setWalletOpen}>
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="ghost"
-                className="relative w-full justify-between px-3 py-3.5 h-auto hover:bg-muted/20 hover:text-foreground rounded-none"
-              >
-                <span className="text-base font-semibold">{t('settings.advanced.wallet')}</span>
-                {walletOpen ? (
-                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                )}
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full" />
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="pt-2 pb-4">
-                <WalletSettings />
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
         )}
 
         <AdvancedSettings />

@@ -6,8 +6,6 @@ import {
   ArrowRight,
   BadgeCheck,
   Check,
-  Eye,
-  EyeOff,
   HandHeart,
   PlusCircle,
 } from 'lucide-react';
@@ -19,11 +17,9 @@ import { CampaignListsStrip } from '@/components/campaign-lists/CampaignListsStr
 import { HeroLightningMap } from '@/components/HeroLightningMap';
 import { StartCampaignLink } from '@/components/StartCampaignLink';
 import { AppDownloadNudge } from '@/components/AppDownloadNudge';
-import { VenezuelaReliefBanner } from '@/components/VenezuelaReliefBanner';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useCampaignList } from '@/hooks/useCampaignLists';
 import { useAppContext } from '@/hooks/useAppContext';
-import { cn } from '@/lib/utils';
 import type { ParsedCampaign } from '@/lib/campaign';
 
 /**
@@ -130,7 +126,6 @@ export function CampaignsPage() {
 
   return (
     <main className="min-h-screen">
-      <VenezuelaReliefBanner />
       <Hero />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14 space-y-12" id="campaigns">
@@ -536,8 +531,8 @@ function WhyDifferentSection() {
           </p>
         </div>
 
-        {/* ── Three numbered chapters ────────────────────────── */}
-        <div className="grid md:grid-cols-3 gap-10 md:gap-8 lg:gap-12 relative">
+        {/* ── Numbered chapters ──────────────────────────────── */}
+        <div className="grid md:grid-cols-2 gap-10 md:gap-8 lg:gap-12 relative">
           <ManifestoChapter
             number="01"
             heading={t('campaigns.home.whyDifferent.block1.heading')}
@@ -558,24 +553,6 @@ function WhyDifferentSection() {
               t('campaigns.home.whyDifferent.block2.bullet3', { appName }),
             ]}
           />
-          <ManifestoChapter
-            number="03"
-            heading={t('campaigns.home.whyDifferent.block3.heading')}
-            body={t('campaigns.home.whyDifferent.block3.body')}
-          >
-            <div className="mt-5 grid grid-cols-2 rounded-xl border border-border overflow-hidden">
-              <ChoiceCell
-                tone="public"
-                label={t('campaigns.home.whyDifferent.block3.publicLabel')}
-                summary={t('campaigns.home.whyDifferent.block3.publicSummary')}
-              />
-              <ChoiceCell
-                tone="private"
-                label={t('campaigns.home.whyDifferent.block3.privateLabel')}
-                summary={t('campaigns.home.whyDifferent.block3.privateSummary')}
-              />
-            </div>
-          </ManifestoChapter>
         </div>
 
         {/* ── Closing CTA ────────────────────────────────────── */}
@@ -658,57 +635,6 @@ function ManifestoChapter({ number, heading, body, bullets, children }: Manifest
 
       {children}
     </article>
-  );
-}
-
-interface ChoiceCellProps {
-  tone: 'public' | 'private';
-  label: string;
-  summary: string;
-}
-
-/**
- * One half of Block 3's split-card. `public` cell is tinted with
- * brand-orange; `private` cell is a neutral muted tone, so the
- * pair reads as a binary choice without using off-brand colors.
- * Both cells share a single border via the parent grid + overflow-
- * hidden rounded wrapper.
- */
-function ChoiceCell({ tone, label, summary }: ChoiceCellProps) {
-  return (
-    <div
-      className={cn(
-        'p-4 sm:p-5',
-        tone === 'public'
-          ? 'bg-primary/[0.07] border-r border-border last:border-r-0'
-          : 'bg-muted/40',
-      )}
-    >
-      <div className="flex items-center gap-2 mb-2">
-        <span
-          aria-hidden
-          className={cn(
-            'inline-flex items-center justify-center size-6 rounded-md',
-            tone === 'public'
-              ? 'bg-primary/15 text-primary'
-              : 'bg-foreground/10 text-foreground/80',
-          )}
-        >
-          {tone === 'public' ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />}
-        </span>
-        <p
-          className={cn(
-            'text-[11px] font-bold tracking-[0.15em] uppercase',
-            tone === 'public' ? 'text-primary' : 'text-foreground/70',
-          )}
-        >
-          {label}
-        </p>
-      </div>
-      <p className="text-sm text-muted-foreground leading-snug">
-        {summary}
-      </p>
-    </div>
   );
 }
 

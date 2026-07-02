@@ -29,7 +29,12 @@
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 24 100% 50%;
+    /* Brand: GOLD (Plan 2's one deliberate shift from Agora's orange,
+       hue 24 → 40; high saturation kept). Tune by eye at the color
+       checkpoint — this hue is applied consistently to --border /
+       --input / --ring below and to the hue-40 companions inline in
+       components, so one edit here should travel with the rest. */
+    --primary: 40 96% 50%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96%;
     --secondary-foreground: 222 47% 11%;
@@ -43,9 +48,9 @@
     --accent-foreground: 222 47% 11%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 24 50% 82%;
-    --input: 24 50% 82%;
-    --ring: 24 100% 50%;
+    --border: 40 50% 82%;
+    --input: 40 50% 82%;
+    --ring: 40 96% 50%;
     --success: 142 72% 29%;
     --success-foreground: 138 60% 94%;
   }
@@ -57,7 +62,7 @@
     --card-foreground: 0 0% 95%;
     --popover: 0 0% 12%;
     --popover-foreground: 0 0% 95%;
-    --primary: 24 100% 50%;
+    --primary: 40 96% 50%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 18%;
     --secondary-foreground: 0 0% 95%;
@@ -67,9 +72,9 @@
     --accent-foreground: 0 0% 95%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 95%;
-    --border: 24 40% 30%;
-    --input: 24 40% 30%;
-    --ring: 24 100% 50%;
+    --border: 40 40% 30%;
+    --input: 40 40% 30%;
+    --ring: 40 96% 50%;
     --success: 142 60% 22%;
     --success-foreground: 138 60% 94%;
   }

@@ -8,7 +8,6 @@ import {
   GuideSteps,
   GuideTLDR,
   OptionGrid,
-  PaymentComparisonTable,
 } from '@/components/guide';
 import { useAppContext } from '@/hooks/useAppContext';
 import { getDonorGuideBlocks, type GuideBlock } from '@/lib/helpContent';
@@ -58,8 +57,6 @@ function GuideBlockRenderer({ block }: { block: GuideBlock }) {
       return <GuideTLDR block={block} />;
     case 'steps':
       return <GuideSteps block={block} />;
-    case 'paymentComparison':
-      return <PaymentComparisonTable block={block} />;
     case 'callout':
       return <CalloutCard block={block} />;
     case 'optionGrid':

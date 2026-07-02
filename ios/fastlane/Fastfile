@@ -3,7 +3,7 @@ default_platform(:ios)
 platform :ios do
   # ─── Lanes ────────────────────────────────────────────────────────────
 
-  desc "Build and sign the App Store IPA. Output at ../artifacts/Agora.ipa."
+  desc "Build and sign the App Store IPA. Output at ../artifacts/Eranos.ipa."
   lane :build_ipa do
     setup_lane_signing!
     build_release_ipa!
@@ -19,7 +19,7 @@ platform :ios do
     submit_release_for_review!(ipa_path)
   end
 
-  desc "Build, sign, and submit Agora to the App Store for review (single-step convenience)."
+  desc "Build, sign, and submit Eranos to the App Store for review (single-step convenience)."
   lane :release do
     setup_lane_signing!
     build_release_ipa!
@@ -83,7 +83,7 @@ platform :ios do
       configuration: "Release",
       export_method: "app-store",
       output_directory: "../artifacts",
-      output_name: "Agora.ipa",
+      output_name: "Eranos.ipa",
       clean: true,
       # Override the Xcode project's Automatic signing for this build only.
       # Match has already installed the AppStore cert + profile into the
@@ -93,7 +93,7 @@ platform :ios do
       xcargs: [
         "CODE_SIGN_STYLE=Manual",
         "CODE_SIGN_IDENTITY='Apple Distribution'",
-        "PROVISIONING_PROFILE_SPECIFIER='match AppStore spot.agora.app'",
+        "PROVISIONING_PROFILE_SPECIFIER='match AppStore fund.eranos.app'",
         "DEVELOPMENT_TEAM=GZLTTH5DLM",
       ].join(" "),
       export_options: {
@@ -101,7 +101,7 @@ platform :ios do
         signingStyle: "manual",
         teamID: "GZLTTH5DLM",
         provisioningProfiles: {
-          "spot.agora.app" => "match AppStore spot.agora.app",
+          "fund.eranos.app" => "match AppStore fund.eranos.app",
         },
       },
     )

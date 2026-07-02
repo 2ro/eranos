@@ -1,6 +1,6 @@
 import type { NostrEvent } from '@nostrify/nostrify';
 import type { ReactNode } from 'react';
-import { MessageCircle, MoreHorizontal, Share2, Zap } from 'lucide-react';
+import { MessageCircle, MoreHorizontal, Share2 } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,15 +8,10 @@ import { useTranslation } from 'react-i18next';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import { ReactionButton } from '@/components/ReactionButton';
 import { RepostMenu } from '@/components/RepostMenu';
-import { ZapDialog } from '@/components/ZapDialog';
-import { useAuthor } from '@/hooks/useAuthor';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useEventStats } from '@/hooks/useTrending';
 import { useShareOrigin } from '@/hooks/useShareOrigin';
 import { useToast } from '@/hooks/useToast';
-import { canZap } from '@/lib/canZap';
 import { formatNumber } from '@/lib/formatNumber';
-import { hasGoalZapSplits } from '@/lib/goalUtils';
 import { shareOrCopy } from '@/lib/share';
 import { cn } from '@/lib/utils';
 
@@ -26,10 +21,6 @@ interface PostActionBarProps {
   replyLabel?: string;
   onReply: () => void;
   onMore: () => void;
-  /** Hide the zap button entirely. Useful for events with their own donation
-   * flow (e.g. fundraising campaigns) where a generic Lightning zap is the
-   * wrong primary CTA. Defaults to false. */
-  hideZap?: boolean;
   /** Keep the share button visible at sidebar widths. Defaults to false. */
   showShareInSidebar?: boolean;
   /** Optional action rendered next to Share, e.g. Translate. */
@@ -43,20 +34,14 @@ export function PostActionBar({
   replyLabel,
   onReply,
   onMore,
-  hideZap = false,
   showShareInSidebar = false,
   translateAction,
   className,
 }: PostActionBarProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { user } = useCurrentUser();
   const shareOrigin = useShareOrigin();
-  const author = useAuthor(event.pubkey);
-  const metadata = author.data?.metadata;
   const effectiveReplyLabel = replyLabel ?? t('feed.actions.reply');
-  // TODO: Enable zapping split-recipient NIP-75 goals once zap split payments are supported.
-  const canZapAuthor = !hideZap && user && canZap(metadata) && !hasGoalZapSplits(event);
 
   const { data: stats } = useEventStats(event.id, event);
   const repostTotal = (stats?.reposts ?? 0) + (stats?.quotes ?? 0);
@@ -131,23 +116,6 @@ export function PostActionBar({
         reactionCount={stats?.reactions}
         variant="chip"
       />
-
-      {/* Zap */}
-      {canZapAuthor && (
-        <ZapDialog target={event}>
-          <button
-            className="inline-flex items-center gap-2 h-9 px-3 rounded-full text-sm font-medium text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10 transition-colors"
-            title={t('feed.actions.zap')}
-          >
-            <Zap className="size-[18px]" />
-            {stats?.zapAmount ? (
-              <span className="tabular-nums">{formatNumber(stats.zapAmount)}</span>
-            ) : (
-              <span className="hidden sm:inline">{t('feed.actions.zap')}</span>
-            )}
-          </button>
-        </ZapDialog>
-      )}
 
       {/* Spacer pushes share/more to the right */}
       <div className="flex-1" />

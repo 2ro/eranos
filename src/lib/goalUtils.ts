@@ -5,8 +5,8 @@ import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 // ── Kind constant ─────────────────────────────────────────────────────────────
 
-/** NIP-75 Zap Goal (regular event). */
-const ZAP_GOAL_KIND = 9041;
+/** NIP-75 fundraising goal (kind 9041, regular event). */
+const GOAL_KIND = 9041;
 
 function normalizeRelayUrl(value: string | undefined): string | undefined {
   if (!value) return undefined;
@@ -28,7 +28,7 @@ export interface ParsedGoal {
   amountMsat: number;
   /** Target amount in satoshis (convenience). */
   amountSats: number;
-  /** Relay URLs for tallying zaps. */
+  /** Relay URLs for tallying donations. */
   relays: string[];
   /** Optional deadline timestamp (unix seconds). */
   closedAt?: number;
@@ -38,22 +38,16 @@ export interface ParsedGoal {
   summary?: string;
   /** If the goal links to a community, the `a` tag coordinate. */
   communityATag?: string;
-  /** The pubkey receiving zaps (event author). */
+  /** The pubkey receiving donations (event author). */
   beneficiary: string;
-  /** Whether this goal declares NIP-57 zap splits. */
-  hasZapSplits: boolean;
-}
-
-export function hasGoalZapSplits(event: NostrEvent): boolean {
-  return event.kind === ZAP_GOAL_KIND && event.tags.some(([n]) => n === 'zap');
 }
 
 /**
- * Parse a kind 9041 zap goal event into structured data.
+ * Parse a kind 9041 fundraising goal event into structured data.
  * Returns `null` if the event is invalid or missing required tags.
  */
 export function parseGoalEvent(event: NostrEvent): ParsedGoal | null {
-  if (event.kind !== ZAP_GOAL_KIND) return null;
+  if (event.kind !== GOAL_KIND) return null;
 
   const title = event.content.trim();
   if (!title) return null;
@@ -94,7 +88,6 @@ export function parseGoalEvent(event: NostrEvent): ParsedGoal | null {
     summary,
     communityATag,
     beneficiary: event.pubkey,
-    hasZapSplits: hasGoalZapSplits(event),
   };
 }
 

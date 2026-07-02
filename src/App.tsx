@@ -20,9 +20,7 @@ import { useNsecPasteGuard } from "@/hooks/useNsecPasteGuard";
 import { useTor } from "@/hooks/useTor";
 import type { AppConfig } from "@/contexts/AppContext";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
-import { NWCProvider } from "@/contexts/NWCContext";
 import { OnboardingProvider } from "@/contexts/OnboardingProvider";
-import { HdWalletSpProvider } from "@/contexts/HdWalletSpProvider";
 import { BuildConfigSchema, type BuildConfig } from "@/lib/schemas";
 import { secureStorage } from "@/lib/secureStorage";
 import AppRouter from "./AppRouter";
@@ -43,8 +41,8 @@ const queryClient = new QueryClient({
 
 /** Hardcoded fallback values. Always provides every required field. */
 const hardcodedConfig: AppConfig = {
-  appName: "Agora",
-  appId: "agora",
+  appName: "Eranos",
+  appId: "eranos",
   shareOrigin: import.meta.env.VITE_SHARE_ORIGIN || undefined,
   homePage: "campaigns",
   client: "naddr1qvzqqqru7cpzq7q6z5ns2hm5c8msyv83qwzxpxe52j8c4d4q5m92wsp9sflelkh9qqzkzem0wfssdl264k",
@@ -61,7 +59,6 @@ const hardcodedConfig: AppConfig = {
     feedIncludeReposts: true,
     feedIncludeGenericReposts: true,
     feedIncludeReactions: false,
-    feedIncludeZaps: true,
     feedIncludeArticles: true,
     showArticles: true,
     showHighlights: true,
@@ -121,7 +118,6 @@ const hardcodedConfig: AppConfig = {
     "feed",
     "communities",
     "world",
-    "wallet",
     "agent",
     "messages",
     "profile",
@@ -151,13 +147,6 @@ const hardcodedConfig: AppConfig = {
   lowBandwidthMode: false,
   torEnabled: false,
   curatorPubkey: '932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d',
-  esploraApis: [
-    'https://mempool.emzy.de/api',
-    'https://mempool.space/api',
-    'https://blockstream.info/api',
-  ],
-  blockbookBaseUrl: 'https://btc.trezor.io',
-  bip352IndexerUrl: 'https://silentpayments.dev/blindbit/mainnet',
   sidebarWidgets: [
     { id: 'trends' },
     { id: 'hot-posts' },
@@ -168,6 +157,13 @@ const hardcodedConfig: AppConfig = {
   aiModel: 'google/gemma-4-26b',
   aiSystemPrompt: '',
   translateWorkerUrl: import.meta.env.VITE_TRANSLATE_WORKER_URL || '',
+  // Grin payments (Plan 2, C1). The GoblinPay instance URL/token are
+  // deployment-specific and land via build config (APP_CONFIG) or env;
+  // empty disables the in-app GoblinPay path. The node is read-only
+  // (kernel lookups for the payment-proof tally).
+  goblinPayUrl: import.meta.env.VITE_GOBLINPAY_URL || '',
+  goblinPayApiToken: import.meta.env.VITE_GOBLINPAY_API_TOKEN || '',
+  grinNodeUrl: import.meta.env.VITE_GRIN_NODE_URL || 'https://api.grin.money',
 };
 
 /**
@@ -231,17 +227,13 @@ export function App() {
                   <InitialSyncRunner />
                   <NativeNotifications />
 
-                    <NWCProvider>
-                      <OnboardingProvider>
-                        <TooltipProvider>
-                          <HdWalletSpProvider>
-                            <AudioPlayerProvider>
-                              <AppRouter />
-                            </AudioPlayerProvider>
-                          </HdWalletSpProvider>
-                        </TooltipProvider>
-                      </OnboardingProvider>
-                  </NWCProvider>
+                  <OnboardingProvider>
+                    <TooltipProvider>
+                      <AudioPlayerProvider>
+                        <AppRouter />
+                      </AudioPlayerProvider>
+                    </TooltipProvider>
+                  </OnboardingProvider>
                 </RelayProvider>
               </NostrLoginProvider>
             </QueryClientProvider>

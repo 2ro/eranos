@@ -5,7 +5,7 @@
     android:viewportHeight="1200">
 
     <!--
-      Agora double-bolt logo from public/logo.svg (viewBox "0 0 720 880").
+      Eranos double-bolt logo from public/logo.svg (viewBox "0 0 720 880").
       Android 12 splash masks the icon to a circle at 2/3 of the canvas
       (~800dp of 1200dp). The logo is 720x880 (portrait); scale 880 -> 800
       (factor 800/880 = 0.9091) giving a scaled width of ~654, then center:

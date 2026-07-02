@@ -504,7 +504,6 @@ export function CalendarEventDetailPage({ event }: { event: NostrEvent }) {
               <PostActionBar
                 event={event}
                 replyLabel={t('calendarEvents.detail.comment')}
-                hideZap
                 showShareInSidebar
                 onReply={() => setReplyOpen(true)}
                 onMore={() => setMoreMenuOpen(true)}

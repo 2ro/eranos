@@ -10,11 +10,11 @@ Mutemo uyu unoshanda kune zvese zvinooneka kuburikidza ne{{appName}}, kusanganis
 
 {{appName}} **chishandiso chemutengi** chepurotokoro yeNostr, donhodzo rakavhurika risina nzvimbo huru rekurukurirano. Kunzwisisa zvakavakwa kwacho izvozvo zvakakosha kumutemo uyu:
 
-- **Zvivakwa zvedu:** Tinochengeta **rerai yeAgora** ne**Agora Blossom server**, izvo zvinoshanda serai rinozvimirira nemuchengeti wefaira we{{appName}}. Tine simba rakazara rekutarisira zvinhu zvakachengetwa pamabasa aya.
+- **Zvivakwa zvedu:** Tinochengeta **rerai yeEranos** ne**Eranos Blossom server**, izvo zvinoshanda serai rinozvimirira nemuchengeti wefaira we{{appName}}. Tine simba rakazara rekutarisira zvinhu zvakachengetwa pamabasa aya.
 - **Marerai evevamwe:** Vashandisi vanogona kubatanidzwawo neimwe Nostr rerai inoshandiswa nevamwe vakazvimirira. {{appName}} inotora uye inoratidza zvinhu zvinobva kumarerai api zvawo aakabatana navo mushandisi. Hatina simba rekutarisira marerai evevamwe, asi tinotonga zvinoratidzwa nechishandiso.
 - **Maservers emawero evamwe:** Vashandisi vanogona kutumira mifananidzo nemavhidhio kuwakavandudzika neBlossom maservers evevamwe. Hatishandise kana kutarisira aya mabasa ekunze.
 
-Tinotora mutoro wakakwana wezvinoitika muchishandiso chedu. Pazvivakwa zvedu (Agora rerai uye Agora Blossom server), tinogona kubvisa zvinhu zvakananga nekudzima makaundi anodarika. Kune zvinhu zvinobva kumabasa evevamwe, tinotambira kuvharira kuratidzwa kwawo mukati me{{appName}}.
+Tinotora mutoro wakakwana wezvinoitika muchishandiso chedu. Pazvivakwa zvedu (Eranos rerai uye Eranos Blossom server), tinogona kubvisa zvinhu zvakananga nekudzima makaundi anodarika. Kune zvinhu zvinobva kumabasa evevamwe, tinotambira kuvharira kuratidzwa kwawo mukati me{{appName}}.
 
 ## Zvinhu Nezvinoitika Zvisingatenderwi
 
@@ -33,8 +33,8 @@ Zvinotevera zvakanyatsobviswa pa{{appName}}. Vashandisi vanowanikwa vachiita che
 
 - **Kusefa kwezvinhu:** Tinochengetedza nekushandisa nzira dzekusefa zvinhu mukati mechishandiso kudzivirira mishonga yeCSAE inozivikanwa pakuratidzwa, pasinei kuti inobva kurerai ipi zvayo.
 - **Kushuma kwemushandisi:** Tinopa zvishandiso zvekushuma mukati meapp kupa mvumo kuvashandisi kupa chiratidzo kuzvinhu zvinofungidzirwa zveCSAE kuti zvionongorwe pakarepo.
-- **Kutarisira kweAgora rerai:** Pa-Agora rerai redu pachedu, tinotarisira zvinhu nemwoyo wese uye ticharumura chero mishonga yeCSAE pakarepo nekuvharira makaundi anobatana nokusingaperi.
-- **Kutarisira kweAgora Blossom server:** Pasever yedu yefaira yeAgora Blossom, tichabvisa chero mediya yeCSAE pakarepo uye kuvharira akaundi rakaiteresera.
+- **Kutarisira kweEranos rerai:** Pa-Eranos rerai redu pachedu, tinotarisira zvinhu nemwoyo wese uye ticharumura chero mishonga yeCSAE pakarepo nekuvharira makaundi anobatana nokusingaperi.
+- **Kutarisira kweEranos Blossom server:** Pasever yedu yefaira yeEranos Blossom, tichabvisa chero mediya yeCSAE pakarepo uye kuvharira akaundi rakaiteresera.
 - **Kuvharira marerai evevamwe:** Marerai evevamwe anozivikanwa kuti ano-host kana ano-tolerate mishonga yeCSAE anogona kubviswa pa-default rerai list ye{{appName}} uye kuvharirwa kubva kuwedzerwa nevashandisi.
 - **Zvishandiso zvekuvharira nekunyaradza:** Vashandisi vanogona kunyaradza kana kuvharira makaundi pamutsetse wemutengi, vachidzivirira zvinhu kubva kumakaundi iwayo kuti zvisaonekwe mufid yavo.
 
@@ -43,7 +43,7 @@ Zvinotevera zvakanyatsobviswa pa{{appName}}. Vashandisi vanowanikwa vachiita che
 Kana zvinhu kana maitiro eCSAE awanikwa, {{appName}} ichatora zviito zvinotevera sezvinodikanwa:
 
 - **Kuvharira kwezvinhu pakarepo:** Zvinhu zveCSAE zvinozivikanwa zvichavharirwa kubva pakuratidzwa muchishandiso kuburikidza nezvisefedzo zvezvinhu uye marondedzero ekuvharira.
-- **Kubvisa kubva muzvivakwa zveAgora:** Zvinhu zveCSAE pa-Agora rerai uye Agora Blossom server zvichabviswa pakarepo, uye makaundi anobatana acharamwadzwa nokusingaperi.
+- **Kubvisa kubva muzvivakwa zveEranos:** Zvinhu zveCSAE pa-Eranos rerai uye Eranos Blossom server zvichabviswa pakarepo, uye makaundi anobatana acharamwadzwa nokusingaperi.
 - **Kuvharira makaundi:** Makey everuzhinji eNostr anobatana neuchengetedzi hweCSAE acharangarwa kumarondedzero ekuvharira mutsetse weapp, achidzivirira zvinhu zvavo kubva pakuoneka mu{{appName}} pasinei kuti zvinobva kurerai ipi zvayo.
 - **Kuvharira rerai:** Marerai evevamwe anokundikana kugadzirisa zvinhu zveCSAE anogona kubviswa kubva pa-default rerai list ye{{appName}} uye kuvharirwa kubva kuwedzerwa nevashandisi.
 - **Kushuma kuvakuru:** Tichashuma mishonga yeCSAE yakaonekwa ku[National Center for Missing & Exploited Children (NCMEC)](https://www.missingkids.org/gethelpnow/cybertipline) kuburikidza neCyberTipline, uye kumamishonga ekushandisa mutemo ane simba.
@@ -63,7 +63,7 @@ Shumo dzese dzezvinhu zveCSAE dzinobatwa nehurongwa hwepamusoro uye dzichaongoro
 
 {{appName}} yakazvipira kushanda pamwe zvakakwana nevemishonga yekushandisa mutemo iri kuferefeta CSAE. Kunyange {{appName}} isingachengeti zvinhu zvemushandisi pamaserver ayo pachayo, tichaita zvinotevera:
 
-- Kupa chero ruzivo runowanikwa kwatiri — kusanganisira data inobva kuAgora rerai uye Agora Blossom server — inogona kubatsira kuferefeta, maererano nemutemo unoshandiswa.
+- Kupa chero ruzivo runowanikwa kwatiri — kusanganisira data inobva kuEranos rerai uye Eranos Blossom server — inogona kubatsira kuferefeta, maererano nemutemo unoshandiswa.
 - Kuziva nekugovera maURL chaiwo erelay nemaURL emaservers efaira kwakaoneswa zvinhu zvinodarika, kuitira kuti vekushandisa mutemo vagone kubata zvakananga nevashandisi ivavo.
 - Kuchengetedza chero humbowo kana ruzivo runowanikwa pakugamuchira chikumbiro chemutemo chinokwanisika.
 - Kushumira mishonga yeCSAE yakaonekwa kuNCMEC nevamwe vakuru vakakodzera nemwoyo wese.
@@ -72,7 +72,7 @@ Shumo dzese dzezvinhu zveCSAE dzinobatwa nehurongwa hwepamusoro uye dzichaongoro
 
 Hunhu hwekusava nenzvimbo huru hweNostr kunoreva kuti hapana boka rimwe rine simba rakakwana pamusoro pezvinhu zvese pasaiti. {{appName}} inogamuchira chokwadi chinotevera nenzira yedu kune chimwe nechimwe:
 
-- **Simba rakakwana pamusoro pezvivakwa zvedu pachedu:** Tinogona uye tinobvisa zvinhu kubva paAgora rerai uye Agora Blossom server. Mishonga yeCSAE yakawanikwa pazvivakwa zvedu inobviswa pakarepo uye makaundi anorambwa nokusingaperi.
+- **Simba rakakwana pamusoro pezvivakwa zvedu pachedu:** Tinogona uye tinobvisa zvinhu kubva paEranos rerai uye Eranos Blossom server. Mishonga yeCSAE yakawanikwa pazvivakwa zvedu inobviswa pakarepo uye makaundi anorambwa nokusingaperi.
 - **Simba rakangotemerwa pamarerai evevamwe:** Hatigone kubvisa zvinhu kubva kumarerai evevamwe. Asi, tinovharira zvinhu zvakadaro kubva pakuratidzwa mukati meapp yedu kuburikidza nezvisefedzo nezvirondedzero zvekuvharira pamutsetse wemutengi.
 - **Vashandisi vanodzora kubatana kwavo kurerai:** Kunyange vashandisi vachigona kubatana kumarerai avanenge vasarudza, {{appName}} inochengetedza kodzero yekuvharira kubatana kumarerai anozivikanwa kuti ano-host zvinhu zveCSAE.
 - **Makey everuzhinji mazita ekunyepedzera:** Makaundi eNostr anoonekwa nemapeya emakey ekriptiografi, pane hunhu hwakasimbiswa. Asi bedzi tichavharira nekushumira makey anodarika uye kushanda pamwe nevekushandisa mutemo kuti tizive vanhu vari kumashure kwawo.

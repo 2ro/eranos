@@ -77,7 +77,6 @@
     "language": "語言",
     "dashboard": "儀表板",
     "myDashboard": "我的儀表板",
-    "wallet": "錢包",
     "notifications": "通知",
     "messages": "私訊",
     "profile": "個人資料",
@@ -119,7 +118,7 @@
     "showAllConversations": "顯示所有對話",
     "friendsEmpty": "沒有來自您追蹤的人的訊息。",
     "translateDialogTitle": "要翻譯私人訊息嗎？",
-    "translateDialogDescription": "收到的訊息將會傳送至你設定的翻譯服務。已傳送的訊息不會被翻譯。Agora 會在此裝置上記住這個選擇。",
+    "translateDialogDescription": "收到的訊息將會傳送至你設定的翻譯服務。已傳送的訊息不會被翻譯。Eranos 會在此裝置上記住這個選擇。",
     "confirmTranslate": "翻譯訊息",
     "newMessage": "新訊息",
     "newMessageTitle": "新訊息",
@@ -199,7 +198,7 @@
     "secure": {
       "title": "儲存你的金鑰",
       "subtitle": "下載檔案並存放在安全的地方。密碼管理員是個好選擇。",
-      "couplingNote": "你的帳號和錢包共用這把金鑰。它會簽署你的 Nostr 貼文，並開啟你在 Agora 上的 Bitcoin 錢包。",
+      "couplingNote": "你的帳號和錢包共用這把金鑰。它會簽署你的 Nostr 貼文，並開啟你在 Eranos 上的 Bitcoin 錢包。",
       "permanenceHeadline": "金鑰一旦遺失，便無法復原。",
       "permanenceBody": "沒有重設、沒有客服、也無法透過電子郵件找回。請先妥善保存，再繼續下一步。",
       "button": "下載並繼續",
@@ -278,19 +277,19 @@
       "global": "全球"
     },
     "empty": {
-      "homeAgora": "Agora 暫時安靜。新的活動、承諾、捐贈和帖子將在發生時顯示在這裡。",
-      "homeFollowingLoggedIn": "你的關注 Feed 為空。關注一些人來看看他們在做什麼，或切換到 Agora 或全球。",
+      "homeAgora": "Eranos 暫時安靜。新的活動、承諾、捐贈和帖子將在發生時顯示在這裡。",
+      "homeFollowingLoggedIn": "你的關注 Feed 為空。關注一些人來看看他們在做什麼，或切換到 Eranos 或全球。",
       "homeFollowingLoggedOut": "登入以檢視你關注的人的帖子。",
       "homeOther": "暫無內容。請檢查你的中繼連線，或稍後再試。",
       "follows": "你的 Feed 為空。關注一些人，以便在此處看到他們的帖子。",
       "global": "未找到帖子。請檢查你的中繼連線，或稍後再來。",
-      "browseAgora": "瀏覽 Agora Feed",
+      "browseAgora": "瀏覽 Eranos Feed",
       "browseGlobal": "瀏覽全球 Feed",
       "discoverPeople": "發現可關注的人",
       "logIn": "登入"
     },
     "modeSwitcher": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "allNostr": "全球",
       "following": "關注中",
       "ariaLabel": "Feed 模式：{{label}}。點選更改。",
@@ -307,7 +306,6 @@
       "repost": "轉發",
       "undoRepost": "撤銷轉發",
       "react": "反應",
-      "zap": "Zap",
       "share": "分享",
       "more": "更多",
       "linkCopied": "連結已複製到剪貼簿"
@@ -482,7 +480,6 @@
       "noSubmissionsHint": "成為第一個以證據、佐證或已完成工作回應的人。",
       "funded": "已資助",
       "ofPledged": "目標 {{amount}}",
-      "trustNote": "此懸賞基於信任。資助進度彙總頂級提交上的 zaps 和捐贈收據。",
       "share": "分享",
       "storyHeading": "懸賞",
       "storyEmpty": "發起人尚未為此懸賞撰寫詳情。"
@@ -644,32 +641,6 @@
     "headingEdit": "編輯活動",
     "title": "標題",
     "titlePlaceholder": "拯救最後一家書店",
-    "wallet": "比特幣錢包",
-    "myWalletLabel": "{{name}} 的錢包",
-    "myWalletDefault": "我的錢包",
-    "walletHeroNote": "捐款會直接進入您自己的 Agora 錢包。\n沒有中間人。",
-    "walletHeroReassurance": "您持有金鑰，因此您持有資金。隨時都可以從錢包分頁提領。",
-    "walletChoose": "選擇錢包",
-    "walletCustom": "自定義",
-    "walletUseCustom": "改用自定義錢包",
-    "walletUseMine": "使用我的 Agora 錢包",
-    "acceptHeading": "您願意接受哪些捐款？",
-    "acceptUnavailable": "此登入方式無法使用。",
-    "acceptAllTitle": "任何捐款",
-    "acceptPublicTitle": "僅接受公開捐款",
-    "acceptPrivateTitle": "僅接受私密捐款",
-    "acceptAllHint": "同時接受公開與私密的捐款。",
-    "acceptPublicHint": "捐款者捐到一個一般的比特幣地址。這些捐款任何人都看得到。",
-    "acceptPrivateHint": "捐款者以私密方式捐款，因此他們的身分不會對外公開。",
-    "customWalletIntro": "填入您想要接受的任何捐款方式：公開地址、私密代碼，或兩者皆可。至少需要填寫一項。",
-    "customOnchainMeaning": "公開。任何人都能看到這些捐款。",
-    "customSpMeaning": "私密。捐款者的身分將保持隱藏。",
-    "bitcoinAddress": "比特幣地址",
-    "bitcoinAddressPlaceholder": "bc1q… 或 bc1p…",
-    "silentPaymentCode": "靜默支付代碼",
-    "silentPaymentCodePlaceholder": "sp1…",
-    "onchainInvalid": "不是已識別的主網比特幣地址（bc1q… / bc1p…）。",
-    "spInvalid": "不是已識別的 BIP-352 靜默支付代碼（sp1…）。",
     "country": "國家",
     "countryPlaceholder": "搜尋國家/地區",
     "tags": "標籤",
@@ -697,7 +668,6 @@
     "storyPlaceholder": "分享背景、受益物件，以及資金的使用方式。",
     "goal": "目標",
     "goalPlaceholder": "25,000",
-    "goalNote": "整數美元。捐贈者以比特幣支付；客戶端在檢視時估算美元等值。",
     "submitCreate": "發起活動",
     "submitEdit": "更新活動",
     "publishing": "釋出中……",
@@ -716,24 +686,14 @@
     "errorTitleRequired": "標題為必填項。",
     "errorTitleInvalid": "標題必須包含字母或數字，才能建立活動 URL。",
     "errorSlugInvalid": "識別符號必須是小寫字母、數字和連字元。",
-    "errorHdUnavailable": "此登入方式不支援內建錢包。",
-    "errorSpUnavailable": "此登入方式不支援靜默支付地址。",
-    "errorOnchainInvalid": "鏈上地址不是已識別的主網 bech32(m) 地址（bc1q… / bc1p…）。",
-    "errorSpInvalid": "靜默支付代碼不是已識別的 BIP-352 程式碼（sp1…）。",
-    "errorWalletRequired": "至少提供一個錢包端點 — 一個比特幣主網地址（bc1q… / bc1p…）或一個靜默支付代碼（sp1…）。",
     "errorGoalInvalid": "目標必須是正整數美元金額。",
     "errorEditLatestMissing": "找不到此活動的最新版本以更新。",
     "errorSlugCollision": "你已有一個識別符號為「{{slug}}」的活動。請選擇其他。",
     "errorBannerInvalid": "橫幅必須是有效的 https:// URL。",
-    "errorHdDeriveFailed": "無法從你的錢包派生新的鏈上地址。",
-    "errorHdDeriveInvalid": "派生的錢包地址未通過驗證。請改為新增自定義地址。",
-    "errorWalletRequiredFallback": "需要錢包端點。",
     "errorPublishedInvalid": "已釋出的事件未通過驗證。請重新整理並重試。",
     "wizard": {
       "titleStepTitle": "為你的活動命名",
       "titleStepSubtitle": "簡短、清晰,讓捐贈者一眼就能認出。",
-      "walletStepTitle": "捐款要送到哪裡?",
-      "walletStepSubtitle": "選擇你的 Agora 錢包,或貼上自己的地址。",
       "bannerStepTitle": "新增橫幅",
       "bannerStepSubtitle": "一張搶眼的圖片,讓你的活動在每張卡片上脫穎而出。",
       "storyStepTitle": "說說你的故事",
@@ -773,43 +733,15 @@
     "like_one": "<0>{{formattedCount}}</0> 點贊",
     "like_other": "<0>{{formattedCount}}</0> 點贊",
     "tabComments": "評論與捐贈",
-    "tabLedger": "賬本",
-    "ledger": {
-      "publicAddress": "公開地址",
-      "viewOnMempool": "在 mempool.space 檢視",
-      "openOnMempool": "在 mempool.space 開啟交易",
-      "received": "收到",
-      "sent": "送出",
-      "unconfirmed": "未確認",
-      "block": "區塊 {{height}}",
-      "btcUnit": "BTC",
-      "empty": "此地址尚無鏈上活動。",
-      "error": "無法載入鏈上活動。請稍後再試。",
-      "loadMore": "載入更多",
-      "loadingMore": "載入中…"
-    },
     "noCommentsTitle": "暫無評論",
     "noCommentsHint": "成為第一個留下支持留言的人。",
     "deleteDialogTitle": "刪除此活動？",
     "deleteDialogBody": "這將釋出一個 NIP-09 刪除請求。行為良好的中繼會將活動從資訊流和直接連結中移除。過往的捐贈收據無論如何都會保留在鏈上。此操作無法撤銷 — 若要繼續接受捐贈，請改為編輯活動。",
     "storyHeading": "故事",
-    "donate": "捐贈",
     "share": "分享",
     "target": "目標：{{amount}}",
     "raised": "已募",
-    "ofGoal": "目標 {{amount}}",
-    "donationCount_one": "{{count}} 筆捐贈",
-    "donationCount_other": "{{count}} 筆捐贈",
-    "openInWallet": "在錢包中開啟",
-    "payWithAgoraWallet": "使用 Agora 支付",
-    "openExternalWallet": "開啟外部錢包"
-  },
-  "noBitcoin": {
-    "trigger": "沒有比特幣？",
-    "title": "還沒有比特幣？",
-    "description": "在 Cash App 中購買比特幣，然後將其傳送到此活動。",
-    "getItOn": "下載於",
-    "getCashApp": "取得 Cash App"
+    "ofGoal": "目標 {{amount}}"
   },
   "campaignVerification": {
     "verifiedBy": "驗證者",
@@ -929,25 +861,6 @@
       "searchAriaLabel": "搜尋活動",
       "noMatch": "沒有活動符合「{{query}}」",
       "noMatchHint": "請嘗試不同的搜尋字詞,或清除搜尋。",
-      "venezuelaRelief": {
-        "title": "委內瑞拉需要<0>你</0>",
-        "body": "一場強烈地震襲擊了 Venezuela 北部，其中 Caracas 與 La Guaira 受創最重。當地的家庭無法獨自撐過這場災難。你的捐款將直接送達當地的救援活動，讓你的關懷在今天就化為遮風避雨的住所、溫飽的食物，以及繼續走下去的希望。",
-        "donate": "捐助救援",
-        "credit": "照片:居民在 Caracas 一棟倒塌建築附近相擁。(AFP via Getty Images)",
-        "share": "分享",
-        "shareTitle": "Agora 上的委內瑞拉地震救援",
-        "linkCopied": "連結已複製到剪貼簿",
-        "learnMore": "了解更多",
-        "popupBody": "一場強烈地震襲擊了 Venezuela 北部，其中 Caracas 與 La Guaira 受創最重。你的捐款將直接送達當地的救援活動，讓關懷在今天就化為遮風避雨的住所、溫飽的食物，以及繼續走下去的希望。",
-        "seoTitle": "委內瑞拉地震救援",
-        "seoDescription": "一場強烈地震襲擊了 Venezuela 北部。在 Agora 上將 Bitcoin 直接捐給當地一線的救援活動。沒有平台、沒有託管方，也不需要任何許可。",
-        "pageEyebrow": "緊急募款",
-        "pageHow": "你的捐款如何發揮作用",
-         "pageHowBody": "Agora 是非託管的：你的 Bitcoin 會從你的錢包直接送到救援活動的位址。沒有平台從中抽成，沒有託管方握住資金，給予或接受都不需要任何人的許可。以下每一項活動，都是由在當地一線回應這場地震的人們所發起。",
-        "showcaseTitle": "救援活動",
-        "campaignCount_one": "{{count}} 個救援活動",
-        "campaignCount_other": "{{count}} 個救援活動"
-      },
       "whyDifferent": {
         "eyebrow": "為什麼選擇 {{appName}}",
         "title": "生來不同。",
@@ -966,14 +879,6 @@
           "bullet2": "在鏈上結算到你擁有的錢包",
           "bullet3": "即使 {{appName}} 消失也能運作"
         },
-        "block3": {
-          "heading": "公開或私密。由你選擇。",
-          "body": "受款人可選擇符合自身威脅模型的收款方式。捐款者只會看到一個 QR；錢包會選擇正確的協議。",
-          "publicLabel": "公開",
-          "publicSummary": "適用於所有比特幣錢包。快速，且可在鏈上驗證。",
-          "privateLabel": "私密",
-          "privateSummary": "BIP-352 silent payments。捐款會落到無法關聯的 outputs。"
-        },
         "readMore": "閱讀完整說明"
       },
       "verifyCampaigns": "驗證活動"
@@ -981,7 +886,7 @@
     "all": {
       "title": "活動",
       "seoTitle": "所有活動",
-      "description": "瀏覽 Agora 上釋出的所有活動。",
+      "description": "瀏覽 Eranos 上釋出的所有活動。",
       "sectionTagline": "精選活動優先，其餘來自整個網路。搜尋或排序以進一步篩選。",
       "heroKicker": "活動",
       "heroHeading": "每一份心意，",
@@ -1149,7 +1054,6 @@
       "title": "高階",
       "subtitle": "錢包連線、系統配置和其他面向高階使用者的選項。",
       "intro": "錢包連線、系統配置和其他高階選項。",
-      "wallet": "錢包",
       "torHeading": "Tor",
       "torToggle": "透過 Tor 路由流量",
       "torToggleDesc": "連線至中繼節點並透過 Tor 網路載入媒體，以獲得更強的隱私保護。預期速度會較慢，且 Tor 連線期間會有短暫延遲。",
@@ -1157,10 +1061,6 @@
       "torStatusLabel": "狀態：",
       "torExitIp": "Tor 出口 IP：",
       "torCheckAgain": "重新檢查"
-    },
-    "wallet": {
-      "title": "錢包",
-      "subtitle": "管理錢包連線和支付"
     }
   },
   "language": {
@@ -1312,296 +1212,6 @@
     "adminRequired": "需要管理員許可權",
     "adminRequiredDesc": "只有平臺管理員才能任命或移除組織者。"
   },
-  "wallet": {
-    "seoTitle": "錢包",
-    "seoDescription": "由你的 Nostr nsec 派生出的分層確定性比特幣錢包。",
-    "loggedOut": {
-      "title": "比特幣錢包",
-      "description": "一個由你的 Nostr 身份派生出的分層錢包。每次收款都使用新地址，完整的交易歷史，地址不復用。",
-      "requiresNsec": "需要使用 nsec（你的 Nostr 私鑰）登入。"
-    },
-    "unsupported": {
-      "title": "錢包不可用",
-      "extension": "你的瀏覽器擴充套件將金鑰隔離儲存，因此我們無法為你的錢包派生子金鑰。",
-      "bunker": "你的遠端簽名器（NIP-46 bunker）將金鑰儲存在 bunker 一側，因此我們無法為你的錢包派生子金鑰。",
-      "other": "你的登入方式不暴露派生錢包所需的金鑰。",
-      "instructions": "請退出並使用 nsec 重新登入以使用錢包。"
-    },
-    "scanFailed": "掃描錢包失敗",
-    "retry": "重試",
-    "refreshBalance": "刷新余額",
-    "refreshBalanceTitle": "點選刷新余額",
-    "amountPending": "{{amount}} 待確認",
-    "pending": "待確認",
-    "send": "傳送",
-    "transactions": "交易",
-    "receiveDialog": {
-      "title": "接收比特幣",
-      "description": "分享一個地址以接收比特幣。",
-      "addressIndex": "地址 #{{index}}",
-      "scanForNew": "檢查新付款"
-    },
-    "tx": {
-      "pending": "待確認",
-      "today": "今天",
-      "yesterday": "昨天",
-      "daysAgo_one": "{{count}} 天前",
-      "daysAgo_other": "{{count}} 天前",
-      "received": "已收到",
-      "sent": "已傳送",
-      "silentBadge": "靜默",
-      "silentDetectedTitle": "通過 BIP-352 靜默支付掃描檢測到"
-    },
-    "openMenu": "錢包選單",
-    "sendPublic": "傳送",
-    "sendPrivate": "私密傳送",
-    "tabs": {
-      "public": "公開",
-      "private": "私密"
-    }
-  },
-  "walletSettings": {
-    "backup": {
-      "label": "備份錢包"
-    },
-    "legacy": {
-      "label": "舊版錢包恢復"
-    }
-  },
-  "walletLegacy": {
-    "seoTitle": "舊版錢包恢復",
-    "seoDescription": "從先前世代的 Agora 錢包中恢復資金。",
-    "title": "舊版錢包恢復",
-    "subtitle": "選擇你之前使用過的錢包，並將其餘額一次性轉入你目前的錢包。",
-    "loggedOut": "請使用你的 Nostr 身份登入，以查詢你舊錢包中的資金。",
-    "scanning": "正在掃描 V2 beta 錢包中的資金…",
-    "v2Detected": {
-      "title": "在 V2 預發布 Beta 錢包中找到資金",
-      "body": "我們在你舊的 V2 beta 錢包的地址中找到了 <0>{{amount}}</0>。開啟下方的 V2 轉移功能以將其轉入你目前的錢包。"
-    },
-    "options": {
-      "v2Beta": {
-        "label": "V2 預發布 Beta 錢包",
-        "description": "從採用 nsec 作為種子的 BIP-86 錢包（在 BIP-39 派生之前推出）中轉移資金。"
-      },
-      "v1Breeze": {
-        "label": "V1 Breeze 錢包",
-        "description": "從舊版 Lightning 託管中轉移鏈上餘額。"
-      },
-      "doubleTweak": {
-        "label": "雙重 tweak SP 修復",
-        "description": "找回因早期傳送錯誤而擱淺的靜默支付，並將其轉回你的錢包。"
-      }
-    },
-    "footnote": "每個選項都是將資金一次性單向轉入你目前的錢包。舊錢包本身不會被恢復——只有其中持有的資金會被取回。"
-  },
-  "walletRecovery": {
-    "seoTitle": "恢復舊錢包",
-    "seoDescription": "從之前的 Lightning 錢包中恢復資金，並將其轉入你由 Nostr 派生的比特幣地址。",
-    "title": "恢復舊錢包",
-    "heading": "恢復你的舊錢包",
-    "subheading": "如果你之前在 Lightning 錢包中有資金，你可以將其全部轉入由你的 Nostr 派生出的比特幣地址。舊錢包不會被恢復——這是一次性的單向轉移。",
-    "backToWallet": "返回錢包",
-    "loggedOut": {
-      "title": "登入以恢復",
-      "description": "請使用擁有舊 Lightning 錢包的 Nostr 身份登入，以便將資金轉入其比特幣地址。"
-    },
-    "destination": {
-      "title": "資金將被髮送到",
-      "description": "你由 Nostr 派生的 Taproot 地址。"
-    },
-    "phrase": {
-      "title": "恢復短語",
-      "description": "貼上你舊錢包的 12 詞恢復短語。",
-      "checkingRelays": "正在中繼上查詢加密備份…",
-      "backupFoundTitle": "在你的中繼上找到備份",
-      "backupFoundDesc": "我們在此賬號釋出的事件中找到了你舊錢包恢復短語的加密備份。",
-      "decryptAndUse": "解密並使用",
-      "placeholder": "word1 word2 word3 …",
-      "warning": "只貼上你信任的恢復短語。任何擁有此短語的人都可以花費資金。轉移完成後，請從你複製過它的任何地方刪除它。",
-      "sweepButton": "將資金轉入我的比特幣地址"
-    },
-    "sweeping": {
-      "working": "處理中…",
-      "dontClose": "請不要關閉此標籤頁。舊錢包同步並廣播交易可能需要最多一分鐘。"
-    },
-    "success": {
-      "title": "恢復完成",
-      "sent": "已向你的比特幣地址傳送 {{sats}} sats。",
-      "viewTransaction": "檢視交易"
-    },
-    "error": {
-      "title": "恢復失敗",
-      "tryAgain": "重試"
-    },
-    "errors": {
-      "noNip44": "你的簽名器不支援讀取中繼備份所需的 NIP-44 解密。請改為手動貼上你的 12 詞恢復短語。",
-      "decryptFailed": "無法解密中繼備份。請改為手動貼上你的 12 詞恢復短語。",
-      "decryptGeneric": "解密中繼備份失敗。",
-      "invalidWordCount": "恢復短語必須是 12 或 24 個單詞。",
-      "noBalance": "你的舊錢包沒有可花費的餘額。沒有可以恢復的內容。",
-      "sweepGeneric": "恢復失敗。請重試。"
-    },
-    "progress": {
-      "loadingSdk": "正在載入錢包 SDK…",
-      "connecting": "正在連線你的舊錢包…",
-      "checkingBalance": "正在檢視餘額…",
-      "preparingTransfer": "正在準備轉移 {{sats}} sats…",
-      "broadcasting": "正在廣播交易…"
-    },
-    "toast": {
-      "backupLoadedTitle": "已載入備份",
-      "backupLoadedDesc": "已從你的中繼解密恢復短語。"
-    }
-  },
-  "walletBackup": {
-    "heading": "錢包助記詞",
-    "dialogDescription": "您可以將這 24 個單字的備份匯入任何比特幣錢包，以存取您的 Agora 錢包。",
-    "hidden": "點按以顯示您的 24 個單字助記詞。",
-    "revealAria": "顯示助記詞",
-    "hideAria": "隱藏助記詞",
-    "warning": "任何擁有這些單字的人都能花用您的比特幣。請絕對不要分享、不要輸入到任何網站，也不要在密碼管理員以外的地方以明文儲存。"
-  },
-  "walletConnect": {
-    "status": "狀態",
-    "ready": "就緒",
-    "notFound": "未找到",
-    "none": "無",
-    "add": "新增",
-    "active": "啟用",
-    "connectionLabel": "NWC 連線",
-    "defaultWalletName": "Lightning 錢包",
-    "setActiveTitle": "設為啟用",
-    "removeTitle": "移除錢包",
-    "helpText": "安裝 WebLN 瀏覽器擴充套件或連線 NWC 錢包以傳送 zap。",
-    "webln": {
-      "name": "WebLN",
-      "description": "瀏覽器擴充套件"
-    },
-    "nwc": {
-      "name": "Nostr Wallet Connect",
-      "description": "遠端錢包連線",
-      "connectedCount_one": "已連線 {{count}} 個錢包",
-      "connectedCount_other": "已連線 {{count}} 個錢包"
-    },
-    "empty": {
-      "title": "未連線錢包",
-      "description": "新增一個 NWC 連線以啟用即時 zap。"
-    },
-    "dialog": {
-      "title": "連線 NWC 錢包",
-      "description": "從你相容 NWC 的錢包中貼上連線字串。",
-      "aliasPlaceholder": "錢包名稱（可選）",
-      "connect": "連線",
-      "connecting": "連線中..."
-    },
-    "toast": {
-      "uriRequiredTitle": "需要連線 URI",
-      "uriRequiredDesc": "請輸入有效的 NWC 連線 URI。",
-      "activeChangedTitle": "已切換啟用錢包",
-      "activeChangedDesc": "所選錢包現在已啟用用於 zap。"
-    }
-  },
-  "walletSend": {
-    "title": "傳送比特幣",
-    "send": "傳送比特幣",
-    "max": "MAX",
-    "tapAgainToConfirm": "再次點選確認",
-    "satPerVB": "{{rate}} sat/vB",
-    "notEnoughBitcoin": "比特幣不足",
-    "recipient": {
-      "placeholder": "bc1…、sp1…",
-      "scan": "掃描 QR 碼",
-      "sendToOnchain": "傳送至比特幣地址",
-      "sendToSilentPayment": "傳送至靜默支付地址",
-      "bitcoinAddress": "比特幣地址",
-      "silentPayment": "靜默支付地址",
-      "toLabel": "收件人",
-      "clear": "清除收件人",
-      "choosePaymentMethod": "請選擇付款方式以繼續"
-    },
-    "feeSpeed": {
-      "fastest": "~10 分鐘",
-      "halfHour": "~30 分鐘",
-      "hour": "~1 小時",
-      "economy": "~1 天",
-      "custom": "自訂"
-    },
-    "fee": {
-      "loading": "載入中…",
-      "unavailable": "無法使用",
-      "loadFailed": "無法載入費率。",
-      "retry": "重試",
-      "orCustom": "或在下方輸入自訂費率。",
-      "loadingTiers": "正在載入費率…",
-      "customPlaceholder": "例如 5",
-      "customAriaLabel": "自訂費率（sat/vB）"
-    },
-    "progress": {
-      "building": "正在構建交易…",
-      "signing": "正在簽名…",
-      "broadcasting": "正在廣播…",
-      "sending": "正在傳送…"
-    },
-    "errors": {
-      "unavailable": "當前登入方式不支援 HD 錢包。",
-      "enterRecipient": "請輸入比特幣地址或 sp1… 靜默支付地址。",
-      "noSpendable": "此錢包中沒有可花費的比特幣。",
-      "feesNotLoaded": "費率未載入。",
-      "feesNotLoadedYet": "費率尚未載入。",
-      "feeRateTooLow": "請輸入至少 1 sat/vB 的費率。",
-      "enterAmount": "請輸入金額。",
-      "insufficient": "比特幣不足以支付該金額和網路費用。",
-      "waitingPrice": "正在等待 BTC 價格…",
-      "noneYet": "你還沒有任何比特幣。"
-    },
-    "scanError": {
-      "title": "無法讀取該 QR 碼",
-      "description": "預期為比特幣地址、靜默支付地址（sp1…）或 bitcoin: URI。"
-    },
-    "toast": {
-      "failedTitle": "交易失敗"
-    },
-    "broadcastError": {
-      "feeTooLowTitle": "網路費用過低",
-      "feeTooLowBodyWithMin": "Bitcoin 網路正在拒絕此費用。目前的最低費率約為 {{min}} sat/vB。",
-      "feeTooLowBody": "Bitcoin 網路正在拒絕此費用。請選擇更快的費率等級或提高你的自訂費率。",
-      "rbfTitle": "替換交易需要更高的費用",
-      "rbfBody": "替換交易支付的費用必須高於原交易。請提高費用後再試一次。",
-      "mempoolFullTitle": "Bitcoin 網路擁塞",
-      "mempoolFullBody": "mempool 已滿，你的費用沒有競爭力。請提高費用以順利通過。",
-      "networkTitle": "無法連線至 Bitcoin 網路",
-      "networkBody": "請檢查你的網路連線後再試一次。",
-      "mempoolConflictTitle": "交易衝突",
-      "mempoolConflictBody": "其中一個輸入已被花費，或正在被另一筆交易花費。",
-      "tooLongChainTitle": "未確認交易過多",
-      "tooLongChainBody": "你有一長串未確認的交易。請等待其中一筆確認後再試一次。",
-      "badInputsTitle": "交易已被拒絕",
-      "badInputsBody": "網路拒絕了此交易。請調整金額或收件人後再試一次。",
-      "absurdlyHighFeeTitle": "費用異常偏高",
-      "absurdlyHighFeeBody": "估算的費用高得可疑。請重新載入費率後再試一次。",
-      "unknownTitle": "交易失敗",
-      "useHigherFee": "使用更高費用",
-      "tryAgain": "再試一次",
-      "atMaxFeeTier": "你已處於最快的費率等級。"
-    },
-    "success": {
-      "title": "比特幣已傳送",
-      "satsAmount": "{{sats}} sats",
-      "viewTransaction": "檢視交易",
-      "done": "完成"
-    },
-    "titlePublic": "傳送比特幣",
-    "titlePrivate": "私密傳送",
-    "reuse": {
-      "checking": "正在檢查位址…",
-      "sendAnyway": "仍然傳送",
-      "acknowledge": "我了解風險——仍然傳送",
-      "historyWarning": "此位址已在鏈上使用過。將你的私密資金傳送到這裡，會把它與該位址既有的交易紀錄關聯，破壞靜默支付的隱私性。請改用靜默支付位址（sp1…），或仍然傳送。",
-      "ownPublicWarning": "這是你自己公開錢包中的位址。將私密資金傳送到它會合併兩個錢包並將其關聯。請改用靜默支付位址（sp1…），或仍然傳送。"
-    },
-    "ownSilentPaymentBlocked": "這是你自己的靜默支付位址。你無法從公開錢包傳送到私密錢包——這樣做會將你的私密靜默支付資金與已在公開帳本上曝光的幣混合，使你的私密錢包與已知身分產生關聯，破壞其隱私性。請改用其他位址傳送。"
-  },
   "qrScanner": {
     "title": "掃描 QR 碼",
     "close": "關閉",
@@ -1618,64 +1228,6 @@
       "busy": "另一個應用程式正在使用相機。請關閉它後再試。",
       "overconstrained": "此裝置的相機不支援所請求的設定。",
       "didntStart": "相機未啟動。可能有其他應用程式正在使用它，或者你的瀏覽器阻止了掃描器。"
-    }
-  },
-  "bitcoinPublic": {
-    "lead": "你傳送的資金是公開的，可以追溯到你。",
-    "learnMore": "瞭解更多",
-    "body": "比特幣是公開賬本。你傳送的交易可以永遠追溯到你，即使被多人轉手後也是如此。只發送給那些你願意公開支持的人。",
-    "bodyWithCashOut": "比特幣是公開賬本。你傳送的交易可以永遠追溯到你，即使被多人轉手後也是如此。只發送給那些你願意公開支持的人，或在交易所兌換成法幣。",
-    "iUnderstand": "我理解此交易是公開的。"
-  },
-  "spScan": {
-    "title": "檢查新付款",
-    "subtitle": "掃描區塊鏈以尋找私密支付",
-    "descriptionHelp": "了解更多",
-    "description": "逐塊遍歷已配置的 BIP-352 索引器，以檢測傳入的靜默支付。",
-    "since": "起始時間",
-    "preset": {
-      "lastHour": "過去一小時",
-      "last3h": "過去 3 小時",
-      "last24h": "過去 24 小時",
-      "lastWeek": "過去一週",
-      "lastMonth": "過去一個月",
-      "custom": "自訂…"
-    },
-    "customHours": "小時",
-    "customHoursPlaceholder": "例如 12",
-    "advanced": "進階",
-    "connectingIndexer": "正在連接索引器…",
-    "upToDate": "您已是最新狀態。",
-    "fromBlock": "起始區塊",
-    "indexerTip": "索引器鏈尖",
-    "lastFullyScanned": "上次完整掃描",
-    "never": "從未",
-    "includeSpent": "包括已花費",
-    "includeSpentDesc": "同時檢測已經被花費的靜默支付。在錯過掃描或重置後重建收款歷史時使用。",
-    "blockProgress": "區塊 {{current}} / {{to}}",
-    "matches_one": "{{count}} 項匹配",
-    "matches_other": "{{count}} 項匹配",
-    "scannedRange": "已掃描區塊 {{from}} → {{to}}。",
-    "foundOutputs_one": "發現 {{count}} 個新輸出。",
-    "foundOutputs_other": "發現 {{count}} 個新輸出。",
-    "noNewPayments": "沒有新的支付。",
-    "startScan": "開始掃描",
-    "resolveFailed": {
-      "title": "無法查詢起始區塊",
-      "description": "目前無法連線至 mempool.space。請在「進階 → 起始區塊」下方輸入一個起始區塊以繼續掃描。"
-    },
-    "reconcile": {
-      "title": "對賬已花費的 UTXO",
-      "description": "將每個儲存的靜默支付 UTXO 與 Blockbook 進行比對，並移除那些已被花費的。如果傳送後餘額高於應有數額，請使用此功能。",
-      "checking": "正在檢查 {{checked}} / {{total}}…",
-      "checked_one": "已檢查 {{count}} 個 UTXO · 已清理 {{pruned}}。",
-      "checked_other": "已檢查 {{count}} 個 UTXO · 已清理 {{pruned}}。",
-      "reconciling": "正在對賬…",
-      "reconcileNow": "立即對賬"
-    },
-    "autoScan": {
-      "label": "自動掃描",
-      "description": "在後臺持續檢查新的私密支付，即使你離開此頁面也是如此。"
     }
   },
   "notifications": {
@@ -1699,8 +1251,6 @@
     "actions": {
       "reactedToYour": "回應了你的{{noun}}",
       "repostedYour": "轉發了你的{{noun}}",
-      "zappedYou": "給你打了 zap",
-      "zappedYouWithAmount": "給你打了 {{sats}} sats",
       "repliedToYourNote": "回覆了你的筆記",
       "mentionedYou": "提到了你",
       "repliedToYourComment": "回覆了你的評論",
@@ -1742,14 +1292,11 @@
       "emojiPack": "表情包",
       "podcastEpisode": "播客單集",
       "podcastTrailer": "播客預告",
-      "zapstoreAsset": "Zapstore 資源",
-      "zapstoreRelease": "Zapstore 釋出",
       "stream": "直播",
       "status": "狀態",
       "repository": "倉庫",
       "customNip": "自定義 NIP",
       "calendarEvent": "日曆事件",
-      "zapstoreApp": "Zapstore 應用",
       "playlist": "播放列表",
       "divine": "占卜",
       "community": "社群",
@@ -1802,10 +1349,6 @@
         "label": "轉發",
         "description": "有人轉發你的筆記時"
       },
-      "zaps": {
-        "label": "Zap",
-        "description": "有人通過 Lightning 或鏈上給你 zap 時"
-      },
       "mentions": {
         "label": "提及",
         "description": "有人在筆記中提到你時"
@@ -1839,7 +1382,7 @@
     "inputPlaceholder": "搜尋",
     "filtersAria": "搜尋過濾器",
     "tabs": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "nostr": "Nostr",
       "accounts": "使用者"
     },
@@ -1916,8 +1459,8 @@
       "postsPrompt": "輸入搜尋關鍵詞以查詢 Nostr 內容。",
       "accounts": "沒有找到匹配你搜尋的使用者。",
       "followsPrompt": "通過名字或 NIP-05 地址搜尋使用者。",
-      "agora": "沒有找到匹配你搜索的 Agora 競選、pledge 或群組。",
-      "agoraPrompt": "搜尋 Agora 的競選、pledge 和群組，或瀏覽最新內容。",
+      "agora": "沒有找到匹配你搜索的 Eranos 競選、pledge 或群組。",
+      "agoraPrompt": "搜尋 Eranos 的競選、pledge 和群組，或瀏覽最新內容。",
       "activeFilters": "已生效的過濾器：",
       "clearAll": "清除所有過濾器"
     }
@@ -1941,7 +1484,6 @@
       "editProfile": "編輯",
       "shareFollowLink": "分享關注連結",
       "moreOptions": "更多選項",
-      "donate": "捐贈",
       "campaignGoal": "目標 ${{amount}}"
     },
     "stats": {
@@ -1984,7 +1526,6 @@
       "addToList": "新增到列表",
       "shareFollowLink": "分享關注連結",
       "profileRecovery": "資料恢復",
-      "zap": "Zap",
       "awardBadge": "頒發徽章",
       "writeLetter": "寫信",
       "mute": "靜音 @{{name}}",
@@ -2066,8 +1607,6 @@
       "heading": "資料欄位",
       "website": "網站",
       "websitePlaceholder": "https://yourwebsite.com",
-      "lightning": "Lightning",
-      "lightningPlaceholder": "you@walletofsatoshi.com",
       "labelPlaceholder": "標籤",
       "tickerPlaceholder": "程式碼",
       "addressPlaceholder": "地址",
@@ -2097,11 +1636,6 @@
         "defaultLabel": "郵箱",
         "description": "聯絡電子郵件地址",
         "valuePlaceholder": "you@example.com"
-      },
-      "wallet": {
-        "label": "錢包",
-        "description": "加密貨幣錢包地址",
-        "valuePlaceholder": "地址"
       },
       "link": {
         "label": "連結",
@@ -2271,12 +1805,6 @@
     "reacted": "做出了反應",
     "reposted": "轉發",
     "voted": "投了票",
-    "zap": {
-      "donatedTo": "捐贈給",
-      "donatedAmountTo": "捐贈 {{amount}} 給",
-      "sat_one": "{{formattedCount}} sat",
-      "sat_other": "{{formattedCount}} sats"
-    },
     "stream": {
       "untitled": "未命名直播",
       "live": "直播中",
@@ -2347,7 +1875,6 @@
       "nsiteDeployed": "部署了一個",
       "nsiteRedeployed": "重新部署了一個",
       "nsiteNoun": "nsite",
-      "zapped": "進行了 zap",
       "pledgeCreated": "建立了一個",
       "pledgeUpdated": "更新了一個",
       "pledgeNoun": "承諾",
@@ -2517,60 +2044,12 @@
         "body": "資金直接到達受款人。他們保留所有權，保留控制權。轉移、兌換或花費；下面的指南解釋瞭如何私密、安全地完成。"
       }
     },
-    "twoWays": {
-      "eyebrow": "比特幣 · 一個 QR，兩種選擇",
-      "title": "兩種收款方式。",
-      "lede": "兩種選擇都是比特幣。區別在於為隱私付出什麼代價。受款人建立活動時，選擇接受哪些方式。如果兩者都接受，捐贈頁面會顯示一個適用於任何錢包的 QR 碼。",
-      "public": {
-        "kicker": "比特幣公開支付",
-        "tagline": "通用 · 快速 · 透明",
-        "title": "適用於地球上所有錢包。",
-        "description": "捐款直接到達受款人控制的普通比特幣地址。任何擁有比特幣錢包的人都可以傳送。無需新應用，無需新賬戶，無需學習曲線。",
-        "bullet1": "適用於所有比特幣錢包：Cash App、Coinbase、Strike、硬體",
-        "bullet2": "最快結算：僅需比特幣確認",
-        "bullet3": "鏈上可驗證：任何人都可以看到受款人收到的金額",
-        "tradeoffTitle": "權衡：鏈上公開。",
-        "tradeoffIntro": "每一筆捐款在比特幣區塊鏈和 Nostr 上都是公開的。{{appName}} 僅推薦用於公開活動。如果你或你的捐贈者需要極致的隱私，包括來自國家行為者的隱私，請在參與前閱讀<0>捐贈者指南</0>和<1>受款人指南</1>。"
-      },
-      "silent": {
-        "kicker": "比特幣靜默支付",
-        "tagline": "不可連結 · 直接 · BIP-352",
-        "title": "不可連結、鏈上、直接。",
-        "description": "捐款以 BIP-352 靜默支付的形式傳送。每一筆都到達一個全新的、不可連結的比特幣輸出，盯著區塊鏈的觀察者無法將其與活動聯絡起來。",
-        "bullet1": "捐贈軌跡無法在鏈上被重建",
-        "bullet2": "保護面臨嚴重對手的受款人",
-        "bullet3": "保存在獨立的私密餘額中，絕不與公開資金混合",
-        "tradeoffTitle": "權衡：靜默支付尚處早期階段。",
-        "tradeoffIntro": "在鏈上接收比特幣最私密的方式，但生態系統目前還年輕和粗糙：",
-        "tradeoffBullet1": "支援的錢包很少。",
-        "tradeoffBullet2": "接收較慢。",
-        "tradeoffBullet3": "沒有推送通知。",
-        "tradeoffBullet4": "錢包仍有錯誤。",
-        "tradeoffBullet5": "捐贈計數不公開。"
-      },
-      "noCustody": {
-        "title": "無託管。無中間人。",
-        "body": "{{appName}} 從不持有資金。捐款在比特幣上以錢包對錢包的方式移動。兩種選項中，沒有伺服器在捐贈者和受款人之間。如果 {{appName}} 明天消失，每個活動都會繼續運作。",
-        "gofundme": {
-          "heading": "不像 GoFundMe",
-          "body": "沒有平臺可以凍結你的捐款、要求退款或因政策分歧而終止你的活動。"
-        },
-        "givesendgo": {
-          "heading": "不像 GiveSendGo",
-          "body": "沒有支付處理商在中間，所以沒有 Stripe、沒有 Visa、沒有銀行可以在活動中切斷你。"
-        },
-        "otherBitcoin": {
-          "heading": "不像其他'比特幣'平臺",
-          "body": "沒有中央 Lightning 節點、託管方或 LSP 可能出現故障或下線。資金直接在鏈上結算到你控制的錢包。"
-        }
-      }
-    },
     "faq": {
       "eyebrow": "問題",
       "title": "常見問題。",
       "chapter1": {
         "label": "入門",
-        "description": "Agora 是什麼、誰建造的、費用如何。"
+        "description": "Eranos 是什麼、誰建造的、費用如何。"
       },
       "chapter2": {
         "label": "比特幣捐贈",
@@ -2578,7 +2057,7 @@
       },
       "chapter3": {
         "label": "關於 Nostr",
-        "description": "Agora 所基於的開放協議，以及你的賬戶如何運作。"
+        "description": "Eranos 所基於的開放協議，以及你的賬戶如何運作。"
       }
     },
     "guides": {
@@ -2592,7 +2071,6 @@
         "description": "無需向支付處理商請求許可，直接向世界各地的受款人和運動傳送比特幣。",
         "bullet1": "使用你已有的任何比特幣錢包。",
         "bullet2": "捐款直接到達受款人。沒有託管方，沒有中間人。",
-        "bullet3": "為了隱私，請使用支援靜默支付的錢包。",
         "cta": "閱讀捐贈者指南"
       },
       "recipient": {
@@ -2601,8 +2079,6 @@
         "title": "無需許可獲得資金。",
         "description": "直接從相信你事業的人那裡接收支持。無需銀行賬戶，無需申請表，中間沒有公司。",
         "bullet1": "註冊後即可開始接收捐贈。",
-        "bullet2": "選擇接受哪些支付型別：公開、靜默支付或兩者。",
-        "bullet3": "為了私密提現，先發送到靜默支付錢包，然後再轉發到任何地方。",
         "cta": "閱讀受款人指南"
       },
       "stillStuck": "還有問題？",
@@ -2613,10 +2089,10 @@
   "faq": {
     "categories": {
       "getting-started": {
-        "label": "關於 Agora"
+        "label": "關於 Eranos"
       },
       "payments": {
-        "label": "在 Agora 上的比特幣捐款"
+        "label": "在 Eranos 上的比特幣捐款"
       },
       "about-nostr": {
         "label": "關於 Nostr"
@@ -2645,51 +2121,6 @@
           "{{appName}} 由 [Soapbox](https://soapbox.pub) 構建——一個為 Nostr 生態系統打造工具的開源團隊，與 [世界自由大會（World Liberty Congress）](https://worldlibertycongress.org/) 合作完成。"
         ]
       },
-      "send-bitcoin-onchain": {
-        "question": "傳送比特幣是如何運作的？",
-        "answer": [
-          "當一位受款人建立一項活動時，他們可以選擇接受哪種型別的支付：**公開**、**私密**或**兩者皆可**。",
-          "**公開**捐款是真實的鏈上比特幣。它們在公開區塊鏈上結算，可在任何比特幣錢包中使用，並且對所有人可見。",
-          "**私密**捐款使用**靜默支付**（BIP-352）。它們同樣在鏈上結算，但交易無法關聯回受款人的捐款代碼——因此不會出現在公開的捐款人列表或總額中。捐款人需要支援靜默支付的錢包——我們推薦 [Ditto Wallet](https://ditto.pub) 或 [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)。",
-          "當一項活動同時接受**兩者**時，{{appName}} 會顯示一個同時編碼兩種端點的二維碼。支援靜默支付的錢包會將其識別為私密支付；其他錢包會退回到公開地址支付。捐款人無需選擇——他們的錢包會自動選取正確的路徑。",
-          "無論哪種方式，款項都會直接到達受款人。{{appName}} 從不接觸這些資金。"
-        ]
-      },
-      "connect-wallet": {
-        "question": "{{appName}} 上的錢包是什麼？",
-        "answer": [
-          "你的 {{appName}} 錢包是一個**自我託管**的 Bitcoin 錢包，由你的 Nostr 金鑰構建而成。{{appName}} 從不持有你的資金——錢包在你的瀏覽器中執行，並使用只有你能掌控的金鑰於本機簽署交易。它可以以兩種方式接收 Bitcoin——作為任何 Bitcoin 錢包都能支付的公開地址，以及作為受支援錢包可以私密支付的靜默支付代碼。無需註冊任何東西；只要你擁有帳戶，它就存在了。",
-          "錢包有兩個分頁：**公開**（你的普通比特幣地址）和**私密**（靜默支付）。這兩個餘額被嚴格地分開，永遠無法一起被花用——正是這種隔離讓私密捐款在鏈上無法被連結。當你建立活動時，你選擇接受公開支付、私密支付，或兩者皆可。要使用你收到的資金，請參閱**受款人指南**。",
-          "你也可以匯出錢包的 24 字種子片語，並將其匯入任何標準的 Bitcoin 錢包——請參閱下方的「我可以把 {{appName}} 錢包匯出到其他 Bitcoin 錢包嗎？」。"
-        ]
-      },
-      "export-wallet": {
-        "question": "我可以把 {{appName}} 錢包匯出到其他 Bitcoin 錢包嗎？",
-        "answer": [
-          "可以。你的 {{appName}} 錢包是完全自我託管的。{{appName}} 從不持有你的 Bitcoin，也從不會看到你的金鑰——錢包完全在你的瀏覽器中執行，並使用一把由你的 Nostr 私鑰（nsec）衍生而來的金鑰於本機簽署交易。",
-          "從選單開啟錢包，點選右上角的三點選單，並選擇**備份錢包**。你將看到一組 24 字的 BIP-39 種子片語。請將其抄寫在安全的地方（或儲存在密碼管理員中）——**任何持有這些字詞的人都能花用你的 Bitcoin。**",
-          "你可以把這 24 個字匯入任何標準的 Bitcoin 錢包：**Sparrow**、**Electrum**、**BlueWallet**、**Phoenix**、**Trezor** 或 **Ledger**。{{appName}} 使用標準的 BIP-86（Taproot）與 BIP-352（靜默支付）衍生路徑，因此無需特殊設定。",
-          "匯入之後，另一個錢包會顯示與你的 {{appName}} 錢包相同的餘額與歷史記錄——它們是同一個錢包，只是兩個不同的檢視。",
-          "種子片語匯出僅在你以 nsec 登入時可用。瀏覽器擴充功能與遠端簽署器（bunker）登入會將你的私鑰隔離，因此 {{appName}} 在這些模式下無法衍生種子。"
-        ]
-      },
-      "donations-are-public-general": {
-        "question": "{{appName}} 上的捐款是公開的嗎？",
-        "answer": [
-          "這取決於受款人所接受的支付型別。",
-          "**公開捐款**會被記錄在比特幣區塊鏈和 Nostr 上。任何人都可以看到金額、時間和地址。",
-          "**私密捐款**使用靜默支付。它們無法被公開關聯到受款人的捐款代碼，不會出現在捐款人列表中，也不計入公開總額。",
-          "當一項活動同時接受兩者時，由捐款人的錢包決定使用哪條路徑——支援靜默支付的錢包私密支付，其他錢包則支付公開地址。完整圖景請閱讀**捐款人指南**和**受款人指南**。"
-        ]
-      },
-      "why-donations-pending": {
-        "question": "為什麼有些捐款顯示為「**待確認**」？",
-        "answer": [
-          "**待確認**的捐款是真實的比特幣，已經被送出——只是還在等待網路確認。捐款人的錢包已經廣播了交易，但它尚未被納入區塊。",
-          "比特幣大約每 10 分鐘產生一個新區塊，礦工會根據捐款人支付的手續費來挑選交易。大多數捐款會在一小時內確認；當網路繁忙時，手續費較低的交易可能需要更久。{{appName}} 會自動重新檢查確認狀態，因此一旦交易進入區塊，**待確認**標籤就會自行消失。",
-          "款項已經在路上——交易一旦確認，受款人就會看到該捐款計入活動總額。受款人與 {{appName}} 都無法加速這個過程；只有捐款人的錢包能夠提高手續費。"
-        ]
-      },
       "censorship-resistance": {
         "question": "這裡所說的“抗審查”是什麼意思？",
         "answer": [
@@ -2703,22 +2134,6 @@
           "比特幣是世界上支援最廣泛、最具抗審查能力的支付通道。每一個比特幣錢包都可以傳送它。",
           "在 {{appName}} 上，受款人可以選擇如何接收：**公開**（普通的比特幣地址）以獲得最大觸達；**私密**（靜默支付）以獲得不可關聯的捐款；或者**兩者皆可**——這樣每位捐款人的錢包都會自動挑選合適的路徑。只有面向大眾的比特幣應用的捐款人仍可貢獻；擁有靜默支付錢包的捐款人則預設獲得隱私。",
           "代價是：公開的比特幣交易在區塊鏈上可見，且需支付礦工費。捐款人指南和受款人指南會說明如何應對這兩種情況。"
-        ]
-      },
-      "why-not-silent-payments": {
-        "question": "{{appName}} 支援靜默支付嗎？",
-        "answer": [
-          "支援——傳送和接收兩端都支援。{{appName}} 內建的比特幣錢包支援 BIP-352，因此當你從 {{appName}} 錢包傳送比特幣時，可以直接向任意靜默支付地址（`sp1…`）付款。而當受款人建立活動時，他們可以選擇與公開比特幣支付一起接受靜默支付，或者用靜默支付完全替代公開支付。",
-          "靜默支付捐款同樣在鏈上結算，但交易無法關聯回受款人的捐款代碼——因此不會出現在公開的捐款人列表或總額中。",
-          "從 {{appName}} 之外發送靜默支付需要支援 BIP-352 的錢包。多數面向大眾的應用尚不支援，但 [Ditto Wallet](https://ditto.pub) 和 [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) 支援。",
-          "當一項活動同時接受兩種型別的支付時，{{appName}} 會將其編碼進同一個二維碼中。支援靜默支付的錢包以私密方式支付；其他人則支付公開地址。沒有捐款人會被拒之門外，也沒有受款人會被迫在觸達與隱私之間做選擇。"
-        ]
-      },
-      "why-not-lightning": {
-        "question": "為什麼 {{appName}} 不使用閃電網路？",
-        "answer": [
-          "閃電網路需要一個閃電錢包。最容易上手的（Wallet of Satoshi、Strike、Breez）都是**託管的**——由公司持有資金，可能被關停、被地理遮蔽，或被施壓凍結賬戶。非託管的閃電網路對新人而言技術門檻高且不夠可靠。",
-          "我們希望 {{appName}} 能夠服務於那些只用過 Cash App、Coinbase、Strike、Venmo 或 PayPal 這類大眾比特幣應用的人。鏈上比特幣能與全世界的所有錢包相容。"
         ]
       },
       "why-not-rotating-addresses": {
@@ -2764,19 +2179,6 @@
           "完整指南請參閱 [管理你的 Nostr 金鑰](https://soapbox.pub/blog/managing-nostr-keys)。"
         ]
       },
-      "send-bitcoin-lightning": {
-        "question": "通過閃電網路傳送比特幣是如何運作的？",
-        "answer": [
-          "如果接收方在其個人資料中放置了閃電地址，你可以向那裡傳送。閃電網路在數秒內完成結算，手續費極低。",
-          "閃電網路傳送不使用 {{appName}} 的捐款地址——它們會直接進入接收方自行設定的任意閃電錢包。{{appName}} 自身的捐款流程僅限於鏈上。"
-        ]
-      },
-      "what-are-zaps": {
-        "question": "Zaps 是什麼？",
-        "answer": [
-          "Zaps 是 Nostr 上的小額閃電網路打賞，獨立於 {{appName}} 的鏈上捐款流程。"
-        ]
-      },
       "fyp": {
         "question": "資訊流是如何運作的？",
         "answer": [
@@ -2817,74 +2219,7 @@
   },
   "guides": {
     "shared": {
-      "tldrEyebrow": "簡短版本",
-      "paymentBadge": {
-        "public": "公開支付",
-        "silent": "靜默支付"
-      },
-      "paymentComparison": {
-        "donorHeader": "當你捐款時",
-        "recipientHeader": "當你建立活動時",
-        "donorRows": {
-          "whatYouSee": {
-            "label": "你所看到的",
-            "public": "一個普通的比特幣地址，你可以從任何地方付款。",
-            "silent": "同一個二維碼。如果你的錢包支援 BIP-352，它會選擇靜默支付端點。"
-          },
-          "walletSupport": {
-            "label": "錢包支援",
-            "public": "所有比特幣錢包。Cash App、Coinbase、Strike、硬體錢包，任何一種。",
-            "silent": "目前支援的錢包很少。大多數會退回到普通的比特幣交易。"
-          },
-          "privacy": {
-            "label": "捐款的隱私",
-            "public": "在鏈上公開。你的傳送地址將永久與該活動關聯。",
-            "silent": "接收端在鏈上無法被關聯。你的傳送錢包的蹤跡仍是公開的。"
-          },
-          "settlement": {
-            "label": "結算",
-            "public": "正常的比特幣確認。",
-            "silent": "同樣的鏈上確認，但受款人必須掃描其錢包才能發現它。"
-          }
-        },
-        "recipientRows": {
-          "whatDonorsSee": {
-            "label": "捐款人所看到的",
-            "public": "一個普通的比特幣地址。可與全世界的所有錢包一起使用。",
-            "silent": "一個 BIP-352 端點。捐款人的錢包需要支援靜默支付；否則該捐款會退回到普通的比特幣交易。"
-          },
-          "receivingSpeed": {
-            "label": "接收速度",
-            "public": "推送式。捐款立刻顯示在活動頁面上。",
-            "silent": "手動掃描。你的錢包必須沿著區塊鏈查詢。視錢包而定，可能需要數分鐘至數小時。"
-          },
-          "pushNotifications": {
-            "label": "推送通知",
-            "public": "有。新捐款到達的瞬間你就能看到。",
-            "silent": "無。開啟錢包並觸發一次掃描才能發現它們。"
-          },
-          "donorList": {
-            "label": "捐款人列表 / 活動總額",
-            "public": "永久公開。金額和傳送地址對任何人可見。",
-            "silent": "私密。活動頁面無法顯示靜默支付捐款的數量或總額。"
-          },
-          "ecosystem": {
-            "label": "生態成熟度",
-            "public": "成熟。工具已經穩定。",
-            "silent": "前沿。錢包仍有 bug；預計會有錯過的支付，要等到稍後掃描才顯示出來。"
-          },
-          "bestFor": {
-            "label": "適合",
-            "public": "公開的眾籌活動，社會證明和可見度對其有幫助。",
-            "silent": "捐款人或受款人的隱私比可見總額更重要的活動。"
-          },
-          "watchOutFor": {
-            "label": "需要留意",
-            "public": "每一位捐款人的永久公開記錄。",
-            "silent": "目前體驗顛簸。一些捐款要等到受款人掃描後才會顯示。"
-          }
-        }
-      }
+      "tldrEyebrow": "簡短版本"
     },
     "donor": {
       "tldr": {
@@ -2902,18 +2237,11 @@
             "title": "開啟活動",
             "body": "你會看到一個二維碼。如果活動同時接受兩種選項，它會編碼兩個端點；你的錢包會選擇合適的一個。"
           },
-          "payFromAnyWallet": {
-            "title": "用任意錢包付款",
-            "body": "Cash App、Coinbase、Strike、硬體錢包，任何一種。支付金額加上網路費用。"
-          },
           "arrivesDirectly": {
             "title": "直接到達",
             "body": "款項直接結算給受款人。{{appName}} 既不持有也不路由它們，地址是從受款人的 Nostr 私鑰派生出來的。"
           }
         }
-      },
-      "comparison": {
-        "footnote": "活動可以僅接受公開、僅接受靜默或同時接受兩者。如果兩者皆接受，二維碼會攜帶兩個端點。你的錢包會挑選它能使用的那一個。"
       },
       "publicVisible": {
         "title": "公開捐款會永遠在鏈上可見",
@@ -2923,10 +2251,6 @@
         "heading": "私密地捐款",
         "intro": "這些步驟對**公開**捐款最為重要，因為其每一筆交易都永久繫結到同一個地址。**靜默**捐款已經隱藏了接收端，因此風險更低。但無論哪種方式，針對你傳送錢包的定向分析仍然可能；如果你的風險較高，這些步驟值得采取。挑一種，或者多管齊下。",
         "options": {
-          "silentWallet": {
-            "name": "使用支援靜默支付的錢包",
-            "purpose": "使用支援 BIP-352 的比特幣錢包付款。如果活動接受靜默支付，你的錢包會自動使用該端點。"
-          },
           "nonKyc": {
             "name": "購買非 KYC 的比特幣",
             "purpose": "點對點購買比特幣，使其從一開始就不與你的政府身份相關聯。最強的隱私起點。"
@@ -2934,23 +2258,12 @@
           "coinjoin": {
             "name": "先做 Coinjoin",
             "purpose": "把你的比特幣與其他人的硬幣混合，使其輸出無法追溯到你的 KYC 購買記錄。在活動只接受公開支付時尤其有用。"
-          },
-          "freshWallet": {
-            "name": "使用全新錢包",
-            "purpose": "從未接觸過你主要身份或任何 KYC 交易所的錢包中捐款。"
           }
         }
       },
       "consumerApps": {
         "title": "面向大眾的應用無法讓你匿名",
         "body": "Cash App、Coinbase、Strike、Venmo、Kraken、Binance 和 PayPal 都會驗證你的身份。無論你如何傳送捐款，每筆交易都會與你的真實身份掛鉤。請使用你自己掌控的非託管錢包。"
-      },
-      "silentToday": {
-        "heading": "關於靜默支付當前狀況的備註",
-        "paragraphs": [
-          "靜默支付是鏈上接收比特幣最具隱私性的方式，但生態仍處於早期階段。大多數熱門錢包尚不能向靜默支付端點發送，因此當一個錢包無法做到時，該捐款會退回到一筆指向該活動公開地址的普通比特幣交易（如果該活動同時接受兩者）。",
-          "對於受款人而言，靜默支付捐款也不會有推送通知，只有在受款人掃描其錢包之後才會出現，這可能需要數分鐘到數小時。這一切並不影響你資金的安全，只是塑造了體驗。"
-        ]
       }
     },
     "recipient": {
@@ -2980,20 +2293,6 @@
           "靜默支付的捐款不屬於該記錄。它們對外部觀察者不可見，也不會出現在活動的公開總額中；新捐款人只看到你所公佈的活動進展。"
         ]
       },
-      "comparison": {
-        "footnote": "一個活動在建立後不能更改其接受的支付選項。如果你改變主意，請建立新的活動。"
-      },
-      "silentToday": {
-        "heading": "關於靜默支付當前狀況的備註",
-        "paragraphs": [
-          "靜默支付是鏈上接收比特幣最具隱私性的方式，但生態仍處於早期階段。大多數熱門錢包尚不能向靜默支付端點發送，因此當捐款人的錢包無法做到時，該捐款會退回到一筆指向你公開地址的普通比特幣交易（如果你同時接受兩者）。",
-          "靜默支付捐款也不會有推送通知，只有在你掃描你的錢包之後才會出現，這可能需要數分鐘到數小時。這一切並不影響你資金的安全，只是塑造了日常體驗。"
-        ]
-      },
-      "twoWallets": {
-        "title": "讓你的公開與私密餘額保持分離",
-        "body": "你的 {{appName}} 錢包顯示兩個分頁：**公開**（你的普通比特幣地址）和**私密**（靜默支付）。它們被嚴格地分開，這兩個餘額永遠無法在同一筆交易中被花用——正是這種隔離讓你的私密捐款無法被連結。當你從**私密**分頁提現時，請送往一個靜默支付地址（**sp1…**），它會保持私密。如果你反而把私密資金送往一個裸露的鏈上地址，{{appName}} 會檢查它：如果該地址先前已被使用過，或屬於你自己的公開錢包，它會警告你並要求你點選**仍要傳送**，因為這麼做會把你的私密資金連結到該地址的公開歷史。送往 **sp1…** 地址則永遠不會觸發此警告。"
-      },
       "movePromptly": {
         "heading": "及時轉移捐款",
         "steps": {
@@ -3011,14 +2310,6 @@
         "heading": "以私密方式提現",
         "intro": "在鏈上消費會留下蹤跡，除非你先打斷它。從**私密**分頁提現，以保持靜默支付捐款無法被連結——先轉入一個靜默支付錢包（一個 **sp1…** 地址），然後再向外消費；這一跳會切斷你的活動與之後行為之間的聯絡。不要把私密資金送往重複使用過的或公開的地址，那會重新將其連結起來。下面其他選項也可行，並各有取捨。",
         "options": {
-          "silentHop": {
-            "name": "靜默支付錢包中轉",
-            "purpose": "把你的捐款轉到靜默支付錢包（[Ditto Wallet](https://ditto.pub)、[Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)）。從那裡開始，你的後續支出便不再與活動繫結。"
-          },
-          "lightningSwap": {
-            "name": "閃電網路兌換",
-            "purpose": "把鏈上比特幣原子換成閃電網路支付。閃電網路支付不會進入公開區塊鏈。"
-          },
           "coinjoin": {
             "name": "Coinjoin",
             "purpose": "把你的比特幣與其他使用者的硬幣混合，使輸出無法關聯回輸入。"
@@ -3038,140 +2329,5 @@
         "body": "託管型混幣器可能盜取你的硬幣、記錄誰向誰傳送了什麼，或最終被證明是執法部門的誘餌。改用靜默支付中轉或非託管的 coinjoin 吧。"
       }
     }
-  },
-  "walletMigrate": {
-    "seoTitle": "遷移舊錢包",
-    "seoDescription": "將你舊版 Agora 錢包（以 nsec 作為種子）中的資金轉入新的 BIP-39 錢包。",
-    "title": "遷移舊錢包",
-    "heading": "遷移到你的新錢包",
-    "subheading": "Agora 的比特幣錢包現在採用 BIP-39 助記詞，因此可匯入任何錢包應用。你舊地址中的資金仍然安全——此頁面會在一筆交易中將它們轉入你的新錢包。",
-    "backToWallet": "返回錢包",
-    "loading": "正在檢查你的舊錢包…",
-    "warning": "這會建立一筆單一的轉移交易，消耗你舊錢包中的每個 UTXO，並將總額（扣除少量網路費用後）傳送到你新錢包的第一個收款地址。一經廣播，此操作即為最終結果，無法撤銷。",
-    "startButton": "轉入新錢包",
-    "loggedOut": {
-      "title": "登入以遷移",
-      "description": "請使用擁有舊錢包的 Nostr 身份登入，以便將資金轉入你的新地址。"
-    },
-    "unsupported": {
-      "title": "錢包不可用",
-      "description": "遷移僅適用於 nsec 登入，因為舊錢包的金鑰是直接從你的 nsec 派生的。瀏覽器擴充套件和遠端簽名器登入無法執行此遷移。"
-    },
-    "noBlockbook": {
-      "title": "未配置 Blockbook",
-      "description": "遷移需要一個 Blockbook 索引器 URL 來掃描你的舊地址並廣播轉移交易。"
-    },
-    "noFunds": {
-      "title": "沒有可遷移的資金",
-      "description": "你的舊錢包沒有可花費的餘額。一切都已在你的新錢包中。"
-    },
-    "detected": {
-      "title": "你舊錢包中的資金",
-      "description": "這些資金將在一筆交易中轉入你的新錢包。",
-      "bip86": "鏈上",
-      "sp": "靜默支付",
-      "total": "總計"
-    },
-    "destination": {
-      "title": "目的地",
-      "description": "你新錢包的第一個收款地址。"
-    },
-    "progress": {
-      "building": "正在構建交易…",
-      "signing": "正在簽名輸入…",
-      "broadcasting": "正在廣播交易…",
-      "dontClose": "轉移進行期間請勿關閉此標籤頁。"
-    },
-    "success": {
-      "title": "遷移完成",
-      "sent": "已向你的新錢包傳送 {{sats}} sats（{{fee}} sats 費用）。",
-      "viewTx": "檢視交易"
-    },
-    "error": {
-      "title": "遷移失敗",
-      "tryAgain": "重試"
-    },
-    "errors": {
-      "noV1Account": "無法存取舊錢包的金鑰。",
-      "noDestination": "你的新錢包尚無收款地址。請等待錢包頁面載入後再試一次。",
-      "noBlockbook": "未配置 Blockbook 索引器。遷移無法掃描你的舊地址。",
-      "noFunds": "在舊地址中未找到可花費的資金。",
-      "sweepGeneric": "遷移失敗。請重試。"
-    },
-    "toast": {
-      "successTitle": "遷移完成",
-      "successDesc": "{{sats}} sats 已轉入你的新錢包。"
-    }
-  },
-  "walletDoubleTweak": {
-    "seoTitle": "雙重 tweak SP 修復",
-    "seoDescription": "找回因早期傳送錯誤而擱淺在鏈上的靜默支付，並將其轉入你的錢包。",
-    "title": "雙重 tweak SP 修復",
-    "heading": "找回擱淺的靜默支付",
-    "subheading": "早期版本的 Agora 將某些靜默支付輸出編碼到了錯誤的金鑰上，因此它們從未出現在你的錢包中。此工具會重新掃描鏈上以尋找這些輸出，並將找到的任何輸出轉入你的錢包。",
-    "back": "返回",
-    "loggedOut": "請使用接收這些靜默支付的 Nostr 身份登入，以便將它們找回。",
-    "unsupported": {
-      "title": "錢包不可用",
-      "description": "找回需要一個能在本地簽名的錢包。請使用你的 nsec 登入以繼續。"
-    },
-    "noIndexer": {
-      "title": "未配置靜默支付索引器",
-      "description": "需要一個 BIP-352 索引器 URL 來掃描擱淺的支付。請在錢包設定中設定一個後再試一次。"
-    },
-    "scan": {
-      "title": "掃描擱淺的支付",
-      "description": "選擇開始掃描的區塊高度。找回會檢查從該處到鏈尖的每一個區塊。",
-      "fromHeightLabel": "起始區塊高度",
-      "tipHint": "目前鏈尖：{{tip}}",
-      "start": "掃描",
-      "cancel": "取消掃描",
-      "progress": "正在掃描區塊 {{current}} / {{to}} — 已發現 {{found}}",
-      "tipMissing": "正在查詢鏈尖…"
-    },
-    "noFunds": {
-      "title": "沒有可找回的內容",
-      "description": "在掃描範圍內未找到擱淺的靜默支付。若你預期有資金，請嘗試更早的起始高度。"
-    },
-    "found": {
-      "title": "找到擱淺的支付",
-      "description": "這些輸出可以轉回你的錢包。",
-      "count": "輸出",
-      "recoverable": "可找回"
-    },
-    "destination": {
-      "title": "資金將被傳送到",
-      "description": "你目前錢包中的一個全新收款地址。"
-    },
-    "sweepButton": "找回資金",
-    "sweeping": "正在找回你的資金…",
-    "dontClose": "在找回完成前請勿關閉此頁面。",
-    "success": {
-      "title": "找回完成",
-      "sent": "已將 {{sats}} sats 找回到你的錢包。",
-      "viewTx": "檢視交易"
-    },
-    "error": {
-      "title": "找回失敗",
-      "tryAgain": "重試"
-    },
-    "errors": {
-      "noDestination": "沒有可用的目的地地址。請先開啟你的錢包。",
-      "noBlockbook": "未配置 Blockbook 伺服器。請在錢包設定中設定一個。",
-      "sweepGeneric": "無法完成找回轉移。"
-    },
-    "toast": {
-      "successTitle": "資金已找回",
-      "successDesc": "{{sats}} sats 已轉入你的錢包。"
-    },
-    "footnote": "這是一次單向轉入你目前錢包的轉移。只會觸及受影響的靜默支付；其他內容不會有任何變動。"
-  },
-  "spAutoScan": {
-    "scanning": "正在掃描… 區塊 {{current}} / {{to}}",
-    "caughtUp": "已是最新",
-    "neverScanned": "尚未掃描",
-    "lastScanned": "已掃描至區塊 {{height}}",
-    "paused": "自動掃描已關閉",
-    "manualLink": "掃描選項"
   }
 }

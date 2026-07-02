@@ -77,7 +77,6 @@
     "language": "भाषा",
     "dashboard": "डैशबोर्ड",
     "myDashboard": "मेरा डैशबोर्ड",
-    "wallet": "वॉलेट",
     "notifications": "नोटिफिकेशन",
     "messages": "संदेश",
     "profile": "प्रोफ़ाइल",
@@ -119,7 +118,7 @@
     "showAllConversations": "सभी बातचीत दिखाएँ",
     "friendsEmpty": "जिन लोगों को आप फ़ॉलो करते हैं उनसे कोई संदेश नहीं।",
     "translateDialogTitle": "निजी संदेशों का अनुवाद करें?",
-    "translateDialogDescription": "प्राप्त संदेश आपकी कॉन्फ़िगर की गई अनुवाद सेवा को भेजे जाएंगे। भेजे गए संदेशों का अनुवाद नहीं किया जाएगा। Agora इस डिवाइस पर यह विकल्प याद रखेगा।",
+    "translateDialogDescription": "प्राप्त संदेश आपकी कॉन्फ़िगर की गई अनुवाद सेवा को भेजे जाएंगे। भेजे गए संदेशों का अनुवाद नहीं किया जाएगा। Eranos इस डिवाइस पर यह विकल्प याद रखेगा।",
     "confirmTranslate": "संदेशों का अनुवाद करें",
     "newMessage": "नया संदेश",
     "newMessageTitle": "नया संदेश",
@@ -199,7 +198,7 @@
     "secure": {
       "title": "अपनी चाबी सहेजें",
       "subtitle": "फ़ाइल डाउनलोड करें और कहीं सुरक्षित जगह रखें। पासवर्ड मैनेजर भी ठीक है।",
-      "couplingNote": "आपका अकाउंट और आपका वॉलेट यही चाबी साझा करते हैं। यह आपकी Nostr पोस्ट साइन करती है और Agora पर आपका Bitcoin वॉलेट खोलती है।",
+      "couplingNote": "आपका अकाउंट और आपका वॉलेट यही चाबी साझा करते हैं। यह आपकी Nostr पोस्ट साइन करती है और Eranos पर आपका Bitcoin वॉलेट खोलती है।",
       "permanenceHeadline": "अगर यह चाबी खो गई, तो इसे वापस पाने का कोई तरीका नहीं है।",
       "permanenceBody": "न रीसेट, न सपोर्ट लाइन, न ईमेल से रिकवरी। आगे बढ़ने से पहले इसे सहेज लें।",
       "button": "डाउनलोड करें और आगे बढ़ें",
@@ -278,19 +277,19 @@
       "global": "Global"
     },
     "empty": {
-      "homeAgora": "Agora पर शांत पल। नए कैंपेन, प्लेज, डोनेशन और पोस्ट यहाँ आते ही दिखेंगे।",
-      "homeFollowingLoggedIn": "आपका फ़ॉलो फ़ीड खाली है। कुछ लोगों को फ़ॉलो करें और देखें वे क्या कर रहे हैं, या Agora या Global पर जाएँ।",
+      "homeAgora": "Eranos पर शांत पल। नए कैंपेन, प्लेज, डोनेशन और पोस्ट यहाँ आते ही दिखेंगे।",
+      "homeFollowingLoggedIn": "आपका फ़ॉलो फ़ीड खाली है। कुछ लोगों को फ़ॉलो करें और देखें वे क्या कर रहे हैं, या Eranos या Global पर जाएँ।",
       "homeFollowingLoggedOut": "जिन लोगों को आप फ़ॉलो करते हैं उनकी पोस्ट देखने के लिए लॉग इन करें।",
       "homeOther": "दिखाने के लिए कुछ नहीं। अपने relay कनेक्शन जाँचें या थोड़ी देर में दोबारा कोशिश करें।",
       "follows": "आपका फ़ीड खाली है। कुछ लोगों को फ़ॉलो करें ताकि उनकी पोस्ट यहाँ दिखें।",
       "global": "कोई पोस्ट नहीं मिली। अपने relay कनेक्शन जाँचें या जल्द वापस आएँ।",
-      "browseAgora": "Agora फ़ीड देखें",
+      "browseAgora": "Eranos फ़ीड देखें",
       "browseGlobal": "Global फ़ीड देखें",
       "discoverPeople": "फ़ॉलो करने के लिए लोगों की खोज करें",
       "logIn": "लॉग इन करें"
     },
     "modeSwitcher": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "allNostr": "Global",
       "following": "फ़ॉलो कर रहे हैं",
       "ariaLabel": "फ़ीड मोड: {{label}}. बदलने के लिए क्लिक करें।",
@@ -307,7 +306,6 @@
       "repost": "रीपोस्ट",
       "undoRepost": "रीपोस्ट हटाएँ",
       "react": "रिएक्ट करें",
-      "zap": "Zap",
       "share": "शेयर करें",
       "more": "और",
       "linkCopied": "लिंक क्लिपबोर्ड पर कॉपी हो गया"
@@ -416,12 +414,6 @@
     "reacted": "ने रिएक्ट किया",
     "reposted": "ने रीपोस्ट किया",
     "voted": "ने वोट किया",
-    "zap": {
-      "donatedTo": "को डोनेट किया",
-      "donatedAmountTo": "{{amount}} डोनेट किया को",
-      "sat_one": "{{formattedCount}} sat",
-      "sat_other": "{{formattedCount}} sats"
-    },
     "stream": {
       "untitled": "बिना शीर्षक स्ट्रीम",
       "live": "LIVE",
@@ -492,7 +484,6 @@
       "nsiteDeployed": "ने डिप्लॉय की एक",
       "nsiteRedeployed": "ने फिर से डिप्लॉय की एक",
       "nsiteNoun": "nsite",
-      "zapped": "ने ज़ैप किया",
       "pledgeCreated": "ने बनाया एक",
       "pledgeUpdated": "ने अपडेट किया एक",
       "pledgeNoun": "प्लेज",
@@ -662,60 +653,12 @@
         "body": "फंड सीधे प्राप्तकर्ता तक पहुँचते हैं। उनके पास कस्टडी रहती है, उनके पास नियंत्रण रहता है। उन्हें कहीं भेजें, स्वैप करें, या खर्च करें; नीचे की गाइड बताती हैं कि इसे निजी तौर पर और सुरक्षित रूप से कैसे करें।"
       }
     },
-    "twoWays": {
-      "eyebrow": "Bitcoin · एक QR, दो विकल्प",
-      "title": "पेमेंट लेने के दो तरीके।",
-      "lede": "दोनों विकल्प Bitcoin हैं। फ़र्क बस यह है कि प्राइवेसी के लिए आप क्या समझौता करते हैं। जब प्राप्तकर्ता कैंपेन बनाते हैं, तो वे चुनते हैं कि कौन-से विकल्प स्वीकार करने हैं। अगर दोनों, तो डोनेशन पेज एक ही QR कोड दिखाता है जो किसी भी वॉलेट के साथ काम करता है।",
-      "public": {
-        "kicker": "Bitcoin पब्लिक पेमेंट",
-        "tagline": "सर्व-उपयोगी · तेज़ · पारदर्शी",
-        "title": "धरती के हर वॉलेट के साथ काम करता है।",
-        "description": "डोनेशन एक नियमित Bitcoin एड्रेस पर पहुँचते हैं जिसे प्राप्तकर्ता नियंत्रित करते हैं। कोई भी किसी भी Bitcoin वॉलेट से भेज सकता है। न नया ऐप, न नया अकाउंट, न सीखने की मेहनत।",
-        "bullet1": "हर Bitcoin वॉलेट में काम करता है: Cash App, Coinbase, Strike, हार्डवेयर",
-        "bullet2": "सबसे तेज़ सेटलमेंट: सिर्फ़ Bitcoin confirmations",
-        "bullet3": "ऑन-चेन सत्यापन योग्य: कोई भी देख सकता है कि प्राप्तकर्ता को क्या मिला",
-        "tradeoffTitle": "समझौता: ऑन-चेन पर सार्वजनिक।",
-        "tradeoffIntro": "हर डोनेशन Bitcoin ब्लॉकचेन और Nostr पर सार्वजनिक होता है। {{appName}} केवल खुले अभियानों के लिए सुझाया जाता है। अगर आपको या आपके डोनर को सरकारी निगाहों से भी अत्यधिक प्राइवेसी चाहिए, तो भाग लेने से पहले <0>डोनर गाइड</0> और <1>प्राप्तकर्ता गाइड</1> पढ़ें।"
-      },
-      "silent": {
-        "kicker": "Bitcoin साइलेंट पेमेंट",
-        "tagline": "अनलिंक करने योग्य नहीं · सीधा · BIP-352",
-        "title": "अनलिंक करने योग्य नहीं, ऑन-चेन, सीधा।",
-        "description": "डोनेशन BIP-352 साइलेंट पेमेंट के रूप में भेजे जाते हैं। हर एक एक नए, अनलिंक न होने वाले Bitcoin आउटपुट पर पहुँचता है जिसे ब्लॉकचेन देख रहा कोई भी पर्यवेक्षक कैंपेन से नहीं जोड़ सकता।",
-        "bullet1": "ऑन-चेन पर डोनेशन का सिलसिला फिर से नहीं बनाया जा सकता",
-        "bullet2": "गंभीर दुश्मनों का सामना कर रहे प्राप्तकर्ताओं की रक्षा करता है",
-        "bullet3": "एक अलग निजी balance में रखे जाते हैं, सार्वजनिक फंड के साथ कभी नहीं मिलाए जाते",
-        "tradeoffTitle": "समझौता: साइलेंट पेमेंट अभी शुरुआती हैं।",
-        "tradeoffIntro": "ऑन-चेन पर Bitcoin पाने का सबसे निजी तरीका, लेकिन इकोसिस्टम आज भी नया और कच्चा है:",
-        "tradeoffBullet1": "कुछ ही वॉलेट सपोर्ट करते हैं।",
-        "tradeoffBullet2": "रिसीव करना धीमा है।",
-        "tradeoffBullet3": "Push नोटिफिकेशन नहीं हैं।",
-        "tradeoffBullet4": "वॉलेट में अभी भी bug हैं।",
-        "tradeoffBullet5": "डोनेशन की संख्या सार्वजनिक नहीं होती।"
-      },
-      "noCustody": {
-        "title": "कोई कस्टडी नहीं। कोई बिचौलिया नहीं।",
-        "body": "{{appName}} कभी फंड नहीं रखता। डोनेशन Bitcoin पर वॉलेट-से-वॉलेट चलते हैं। किसी भी विकल्प में डोनर और प्राप्तकर्ता के बीच कोई सर्वर खड़ा नहीं है। अगर {{appName}} कल ग़ायब हो जाए, तो हर कैंपेन काम करता रहेगा।",
-        "gofundme": {
-          "heading": "GoFundMe के विपरीत",
-          "body": "कोई प्लेटफ़ॉर्म आपके डोनेशन फ़्रीज़ नहीं कर सकता, रिफंड की माँग नहीं कर सकता, या नीति के विवाद पर आपका कैंपेन बंद नहीं कर सकता।"
-        },
-        "givesendgo": {
-          "heading": "GiveSendGo के विपरीत",
-          "body": "बीच में कोई पेमेंट प्रोसेसर नहीं बैठा है, इसलिए न Stripe, न Visa, न कोई बैंक आपको कैंपेन के बीच में रोक सकता है।"
-        },
-        "otherBitcoin": {
-          "heading": "अन्य ‘Bitcoin’ प्लेटफ़ॉर्म के विपरीत",
-          "body": "कोई केंद्रीय Lightning node, कस्टोडियन, या LSP नहीं जो विफल हो जाए या ऑफ़लाइन हो जाए। फंड सीधे ऑन-चेन उस वॉलेट में सेटल होते हैं जिसे आप नियंत्रित करते हैं।"
-        }
-      }
-    },
     "faq": {
       "eyebrow": "सवाल",
       "title": "अक्सर पूछे जाने वाले।",
       "chapter1": {
         "label": "शुरुआत करना",
-        "description": "Agora क्या है, इसे किसने बनाया, और इसकी क़ीमत क्या है।"
+        "description": "Eranos क्या है, इसे किसने बनाया, और इसकी क़ीमत क्या है।"
       },
       "chapter2": {
         "label": "Bitcoin डोनेशन",
@@ -723,7 +666,7 @@
       },
       "chapter3": {
         "label": "Nostr के बारे में",
-        "description": "वह खुला प्रोटोकॉल जिस पर Agora बना है, और आपका अकाउंट कैसे काम करता है।"
+        "description": "वह खुला प्रोटोकॉल जिस पर Eranos बना है, और आपका अकाउंट कैसे काम करता है।"
       }
     },
     "guides": {
@@ -737,7 +680,6 @@
         "description": "किसी पेमेंट प्रोसेसर से इजाज़त माँगे बिना, दुनिया में कहीं भी प्राप्तकर्ताओं और आंदोलनों को सीधे Bitcoin भेजें।",
         "bullet1": "किसी भी Bitcoin वॉलेट का इस्तेमाल करें जो आपके पास पहले से है।",
         "bullet2": "डोनेशन सीधे प्राप्तकर्ता तक पहुँचते हैं। कोई कस्टोडियन नहीं, कोई बिचौलिया नहीं।",
-        "bullet3": "प्राइवेसी के लिए, ऐसा वॉलेट इस्तेमाल करें जो साइलेंट पेमेंट सपोर्ट करता हो।",
         "cta": "डोनर गाइड पढ़ें"
       },
       "recipient": {
@@ -746,8 +688,6 @@
         "title": "बिना इजाज़त के फंडिंग पाएँ।",
         "description": "उन लोगों से सीधा समर्थन पाएँ जो आपकी वजह पर भरोसा करते हैं। न कोई बैंक खाता, न आवेदन फ़ॉर्म, न बीच में कोई कंपनी।",
         "bullet1": "साइन अप करते ही डोनेशन लेना शुरू करें।",
-        "bullet2": "चुनें कि किस प्रकार के भुगतान स्वीकार करें: सार्वजनिक, साइलेंट पेमेंट, या दोनों।",
-        "bullet3": "निजी कैश-आउट के लिए, पहले साइलेंट-पेमेंट वॉलेट में भेजें, फिर कहीं भी फ़ॉरवर्ड करें।",
         "cta": "प्राप्तकर्ता गाइड पढ़ें"
       },
       "stillStuck": "अब भी अटके हैं?",
@@ -924,7 +864,6 @@
       "noSubmissionsHint": "प्रमाण, सबूत, या पूरा किया गया काम के साथ जवाब देने वाले पहले व्यक्ति बनें।",
       "funded": "फंडेड",
       "ofPledged": "{{amount}} में से प्लेज किया गया",
-      "trustNote": "यह प्लेज भरोसे पर आधारित है। फंडिंग की प्रगति शीर्ष-स्तर के सबमिशन पर zaps और डोनेशन रसीद जोड़कर बनती है।",
       "share": "शेयर करें",
       "storyHeading": "प्लेज",
       "storyEmpty": "प्लेज बनाने वाले ने अभी इस प्लेज के लिए विवरण नहीं लिखा है।"
@@ -1086,32 +1025,6 @@
     "headingEdit": "कैंपेन एडिट करें",
     "title": "शीर्षक",
     "titlePlaceholder": "Save the Last Bookstore",
-    "wallet": "Bitcoin वॉलेट",
-    "myWalletLabel": "{{name}} का वॉलेट",
-    "myWalletDefault": "मेरा वॉलेट",
-    "walletHeroNote": "दान सीधे आपके अपने Agora वॉलेट में आता है।\nकोई बिचौलिया नहीं।",
-    "walletHeroReassurance": "चाबी आपके पास रहती है, इसलिए पैसा भी आपके पास रहता है। वॉलेट टैब से किसी भी समय निकासी करें।",
-    "walletChoose": "वॉलेट चुनें",
-    "walletCustom": "कस्टम",
-    "walletUseCustom": "इसके बजाय कस्टम वॉलेट का उपयोग करें",
-    "walletUseMine": "मेरे Agora वॉलेट का उपयोग करें",
-    "acceptHeading": "आप किस तरह के दान स्वीकार करेंगे?",
-    "acceptUnavailable": "इस लॉगिन के साथ उपलब्ध नहीं है।",
-    "acceptAllTitle": "कोई भी दान",
-    "acceptPublicTitle": "केवल सार्वजनिक दान",
-    "acceptPrivateTitle": "केवल निजी दान",
-    "acceptAllHint": "सार्वजनिक और निजी, दोनों तरह के दान लें।",
-    "acceptPublicHint": "दानदाता एक सामान्य Bitcoin एड्रेस पर देते हैं। ये दान किसी को भी दिखाई देते हैं।",
-    "acceptPrivateHint": "दानदाता निजी तौर पर देते हैं, ताकि उनकी पहचान सबसे छिपी रहे।",
-    "customWalletIntro": "जो भी दान आप स्वीकार करना चाहते हैं, उसे भरें: एक सार्वजनिक पता, एक निजी कोड, या दोनों। कम से कम एक ज़रूरी है।",
-    "customOnchainMeaning": "सार्वजनिक। ये दान कोई भी देख सकता है।",
-    "customSpMeaning": "निजी। दानदाता की पहचान छिपी रहती है।",
-    "bitcoinAddress": "Bitcoin एड्रेस",
-    "bitcoinAddressPlaceholder": "bc1q… या bc1p…",
-    "silentPaymentCode": "साइलेंट-पेमेंट कोड",
-    "silentPaymentCodePlaceholder": "sp1…",
-    "onchainInvalid": "यह कोई पहचाना mainnet Bitcoin एड्रेस नहीं है (bc1q… / bc1p…)।",
-    "spInvalid": "यह कोई पहचाना BIP-352 साइलेंट-पेमेंट कोड नहीं है (sp1…)।",
     "country": "देश",
     "countryPlaceholder": "देश खोजें",
     "tags": "टैग",
@@ -1139,7 +1052,6 @@
     "storyPlaceholder": "पृष्ठभूमि, किसे लाभ होगा, और फंड का उपयोग कैसे होगा, यह शेयर करें।",
     "goal": "लक्ष्य",
     "goalPlaceholder": "25,000",
-    "goalNote": "पूरे US डॉलर। डोनर Bitcoin में भुगतान करते हैं; क्लाइंट देखने के समय USD-समकक्ष का अनुमान लगाते हैं।",
     "submitCreate": "कैंपेन लॉन्च करें",
     "submitEdit": "कैंपेन अपडेट करें",
     "publishing": "पब्लिश हो रहा है…",
@@ -1158,24 +1070,14 @@
     "errorTitleRequired": "शीर्षक ज़रूरी है।",
     "errorTitleInvalid": "शीर्षक में अक्षर या अंक होने चाहिए ताकि कैंपेन URL बन सके।",
     "errorSlugInvalid": "पहचानकर्ता में छोटे अक्षर, अंक, और हाइफ़न ही होने चाहिए।",
-    "errorHdUnavailable": "इस लॉगिन के लिए बिल्ट-इन वॉलेट उपलब्ध नहीं है।",
-    "errorSpUnavailable": "इस लॉगिन के लिए साइलेंट-पेमेंट एड्रेस उपलब्ध नहीं है।",
-    "errorOnchainInvalid": "ऑन-चेन एड्रेस कोई पहचाना mainnet bech32(m) एड्रेस नहीं है (bc1q… / bc1p…)।",
-    "errorSpInvalid": "साइलेंट-पेमेंट कोड कोई पहचाना BIP-352 कोड नहीं है (sp1…)।",
-    "errorWalletRequired": "कम से कम एक वॉलेट endpoint दें — एक Bitcoin mainnet एड्रेस (bc1q… / bc1p…) या एक साइलेंट-पेमेंट कोड (sp1…)।",
     "errorGoalInvalid": "लक्ष्य एक धनात्मक पूर्ण-डॉलर राशि होनी चाहिए।",
     "errorEditLatestMissing": "इस कैंपेन का सबसे नया संस्करण अपडेट करने के लिए नहीं मिला।",
     "errorSlugCollision": "आपके पास पहले से \"{{slug}}\" पहचानकर्ता वाला कैंपेन है। दूसरा चुनें।",
     "errorBannerInvalid": "बैनर एक मान्य https:// URL होना चाहिए।",
-    "errorHdDeriveFailed": "आपके वॉलेट से नया ऑन-चेन एड्रेस derive नहीं कर सके।",
-    "errorHdDeriveInvalid": "Derive किया गया वॉलेट एड्रेस सत्यापन में विफल। कृपया एक कस्टम एड्रेस जोड़ें।",
-    "errorWalletRequiredFallback": "वॉलेट endpoint ज़रूरी है।",
     "errorPublishedInvalid": "पब्लिश किया गया event सत्यापन में विफल। कृपया रिफ्रेश करके दोबारा कोशिश करें।",
     "wizard": {
       "titleStepTitle": "अपने कैंपेन को नाम दें",
       "titleStepSubtitle": "एक छोटा, स्पष्ट नाम जिसे डोनर पहचान सकें।",
-      "walletStepTitle": "डोनेशन कहाँ जाएँगे?",
-      "walletStepSubtitle": "अपना Agora वॉलेट चुनें या अपना एड्रेस पेस्ट करें।",
       "bannerStepTitle": "एक बैनर जोड़ें",
       "bannerStepSubtitle": "एक प्रभावशाली इमेज हर कार्ड पर कैंपेन को आगे बढ़ाती है।",
       "storyStepTitle": "अपनी कहानी बताएँ",
@@ -1215,43 +1117,15 @@
     "like_one": "<0>{{formattedCount}}</0> लाइक",
     "like_other": "<0>{{formattedCount}}</0> लाइक",
     "tabComments": "कमेंट और डोनेशन",
-    "tabLedger": "लेजर",
-    "ledger": {
-      "publicAddress": "पब्लिक एड्रेस",
-      "viewOnMempool": "mempool.space पर देखें",
-      "openOnMempool": "mempool.space पर ट्रांज़ैक्शन खोलें",
-      "received": "प्राप्त",
-      "sent": "भेजा गया",
-      "unconfirmed": "अपुष्ट",
-      "block": "ब्लॉक {{height}}",
-      "btcUnit": "BTC",
-      "empty": "इस एड्रेस के लिए अभी कोई ऑन-चेन गतिविधि नहीं है।",
-      "error": "ऑन-चेन गतिविधि लोड नहीं हो सकी। कुछ देर बाद फिर कोशिश करें।",
-      "loadMore": "और लोड करें",
-      "loadingMore": "लोड हो रहा है…"
-    },
     "noCommentsTitle": "अभी कोई कमेंट नहीं",
     "noCommentsHint": "समर्थन का संदेश छोड़ने वाले पहले व्यक्ति बनें।",
     "deleteDialogTitle": "इस कैंपेन को डिलीट करें?",
     "deleteDialogBody": "इससे एक NIP-09 डिलीशन रिक्वेस्ट पब्लिश होती है। सही तरीक़े से चलने वाले रिले कैंपेन को फ़ीड और सीधे लिंक से हटा देंगे। पिछली डोनेशन रसीदें ऑन-चेन वैसे भी रहेंगी। यह क्रिया वापस नहीं ली जा सकती — डोनेशन लेना जारी रखने के लिए इसके बजाय कैंपेन एडिट करें।",
     "storyHeading": "कहानी",
-    "donate": "डोनेट करें",
     "share": "शेयर करें",
     "target": "लक्ष्य: {{amount}}",
     "raised": "जुटाए",
-    "ofGoal": "{{amount}} के लक्ष्य में से",
-    "donationCount_one": "{{count}} डोनेशन",
-    "donationCount_other": "{{count}} डोनेशन",
-    "openInWallet": "वॉलेट में खोलें",
-    "payWithAgoraWallet": "Agora से भुगतान करें",
-    "openExternalWallet": "बाहरी वॉलेट खोलें"
-  },
-  "noBitcoin": {
-    "trigger": "Bitcoin नहीं है?",
-    "title": "अभी तक Bitcoin नहीं है?",
-    "description": "Cash App में Bitcoin खरीदें, फिर इसे इस अभियान को भेजें।",
-    "getItOn": "इसे पाएं",
-    "getCashApp": "Cash App प्राप्त करें"
+    "ofGoal": "{{amount}} के लक्ष्य में से"
   },
   "campaignVerification": {
     "verifiedBy": "द्वारा सत्यापित",
@@ -1371,25 +1245,6 @@
       "searchAriaLabel": "कैंपेन खोजें",
       "noMatch": "“{{query}}” से मेल खाने वाला कोई कैंपेन नहीं",
       "noMatchHint": "अलग खोज शब्द आज़माएँ, या खोज साफ़ करें।",
-      "venezuelaRelief": {
-        "title": "Venezuela को <0>आपकी</0> ज़रूरत है",
-        "body": "उत्तरी Venezuela में एक भीषण भूकंप आया है, जिसने Caracas और La Guaira को सबसे ज़्यादा तबाह किया है। वहाँ के परिवार इस मुश्किल वक़्त से अकेले नहीं उबर सकते। आपका दान सीधे ज़मीन पर चल रहे राहत अभियानों तक पहुँचता है, और आज ही आपकी करुणा को आसरा, भोजन और उम्मीद में बदल देता है।",
-        "donate": "राहत के लिए दान करें",
-        "credit": "Caracas, Venezuela की तस्वीरें। (AP; AFP via Getty Images)",
-        "share": "साझा करें",
-        "shareTitle": "Agora पर Venezuela भूकंप राहत",
-        "linkCopied": "लिंक क्लिपबोर्ड पर कॉपी हो गया",
-        "learnMore": "और जानें",
-        "popupBody": "उत्तरी Venezuela में एक भीषण भूकंप आया है, जिसने Caracas और La Guaira को सबसे ज़्यादा तबाह किया है। आपका दान सीधे ज़मीन पर चल रहे राहत अभियानों तक पहुँचता है, और आज ही करुणा को आसरा, भोजन और उम्मीद में बदल देता है।",
-        "seoTitle": "Venezuela भूकंप राहत",
-        "seoDescription": "उत्तरी Venezuela में एक भीषण भूकंप आया है। Agora पर ज़मीन पर चल रहे राहत अभियानों को सीधे Bitcoin दान करें। कोई प्लेटफ़ॉर्म नहीं, कोई कस्टोडियन नहीं, अनुमति की ज़रूरत नहीं।",
-        "pageEyebrow": "आपातकालीन अपील",
-        "pageHow": "आपका दान कैसे मदद करता है",
-        "pageHowBody": "Agora नॉन-कस्टोडियल है: आपका Bitcoin सीधे आपके वॉलेट से किसी राहत अभियान के पते पर जाता है। कोई प्लेटफ़ॉर्म हिस्सा नहीं काटता, कोई कस्टोडियन धन नहीं रखता, और देने या पाने के लिए किसी को अनुमति की ज़रूरत नहीं। नीचे दिया गया हर अभियान ज़मीन पर भूकंप से जूझ रहे लोगों द्वारा चलाया जा रहा है।",
-        "showcaseTitle": "राहत अभियान",
-        "campaignCount_one": "{{count}} राहत अभियान",
-        "campaignCount_other": "{{count}} राहत अभियान"
-      },
       "whyDifferent": {
         "eyebrow": "क्यों {{appName}}",
         "title": "अलग ढंग से बना।",
@@ -1408,14 +1263,6 @@
           "bullet2": "आपके अपने वॉलेट में on-chain सेटलमेंट",
           "bullet3": "{{appName}} गायब होने पर भी काम करता है"
         },
-        "block3": {
-          "heading": "सार्वजनिक या निजी। चुनाव आपका।",
-          "body": "प्राप्तकर्ता अपने threat model के हिसाब से receiving option चुनते हैं। डोनर को एक QR दिखता है; वॉलेट सही protocol चुनता है।",
-          "publicLabel": "सार्वजनिक",
-          "publicSummary": "हर Bitcoin वॉलेट में काम करता है। तेज़ और on-chain सत्यापन योग्य।",
-          "privateLabel": "निजी",
-          "privateSummary": "BIP-352 silent payments। डोनेशन unlinkable outputs पर पहुँचते हैं।"
-        },
         "readMore": "पूरा विवरण पढ़ें"
       },
       "verifyCampaigns": "अभियानों को सत्यापित करें"
@@ -1423,7 +1270,7 @@
     "all": {
       "title": "कैंपेन",
       "seoTitle": "सभी कैंपेन",
-      "description": "Agora पर पब्लिश हुए हर कैंपेन को देखें।",
+      "description": "Eranos पर पब्लिश हुए हर कैंपेन को देखें।",
       "sectionTagline": "पहले फ़ीचर्ड कैंपेन, फिर बाक़ी नेटवर्क। नतीजों को परिष्कृत करने के लिए खोजें या क्रमबद्ध करें।",
       "heroKicker": "कैंपेन",
       "heroHeading": "हर मक़सद,",
@@ -1591,7 +1438,6 @@
       "title": "उन्नत",
       "subtitle": "वॉलेट कनेक्शन, सिस्टम कॉन्फ़िगरेशन, और पावर यूज़र के लिए अन्य उन्नत विकल्प।",
       "intro": "वॉलेट कनेक्शन, सिस्टम कॉन्फ़िगरेशन, और अन्य उन्नत विकल्प।",
-      "wallet": "वॉलेट",
       "torHeading": "Tor",
       "torToggle": "Tor के ज़रिए ट्रैफ़िक भेजें",
       "torToggleDesc": "Tor नेटवर्क पर रिले से जुड़ता है और मीडिया लोड करता है, जिससे प्राइवेसी मज़बूत होती है। धीमी परफ़ॉर्मेंस और Tor के जुड़ने में थोड़ी देरी की उम्मीद रखें।",
@@ -1599,10 +1445,6 @@
       "torStatusLabel": "स्टेटस:",
       "torExitIp": "Tor exit IP:",
       "torCheckAgain": "फिर से जाँचें"
-    },
-    "wallet": {
-      "title": "वॉलेट",
-      "subtitle": "वॉलेट कनेक्शन और भुगतान प्रबंधित करें"
     }
   },
   "language": {
@@ -1754,296 +1596,6 @@
     "adminRequired": "एडमिन एक्सेस ज़रूरी है",
     "adminRequiredDesc": "केवल प्लेटफ़ॉर्म एडमिन ही ऑर्गनाइज़र नियुक्त या हटा सकते हैं।"
   },
-  "wallet": {
-    "seoTitle": "वॉलेट",
-    "seoDescription": "आपके Nostr nsec से derive किया गया hierarchical-deterministic Bitcoin वॉलेट।",
-    "loggedOut": {
-      "title": "Bitcoin वॉलेट",
-      "description": "आपकी Nostr पहचान से derive किया गया एक hierarchical वॉलेट। हर रिसीव पर नया एड्रेस, पूरा transaction इतिहास, कोई एड्रेस दोहराव नहीं।",
-      "requiresNsec": "nsec (आपकी Nostr secret key) के साथ लॉगिन ज़रूरी है।"
-    },
-    "unsupported": {
-      "title": "वॉलेट उपलब्ध नहीं",
-      "extension": "आपका ब्राउज़र एक्सटेंशन आपकी secret key को अलग रखता है, इसलिए हम आपके वॉलेट के लिए child keys derive नहीं कर सकते।",
-      "bunker": "आपका रिमोट signer (NIP-46 bunker) आपकी secret key को bunker की तरफ़ रखता है, इसलिए हम आपके वॉलेट के लिए child keys derive नहीं कर सकते।",
-      "other": "आपका लॉगिन प्रकार उस secret key को expose नहीं करता जो आपके वॉलेट को derive करने के लिए चाहिए।",
-      "instructions": "वॉलेट इस्तेमाल करने के लिए लॉग आउट करें और अपनी nsec से फिर साइन इन करें।"
-    },
-    "scanFailed": "वॉलेट scan नहीं हो सका",
-    "retry": "दोबारा कोशिश करें",
-    "refreshBalance": "बैलेंस रिफ्रेश करें",
-    "refreshBalanceTitle": "बैलेंस रिफ्रेश करने के लिए क्लिक करें",
-    "amountPending": "{{amount}} पेंडिंग",
-    "pending": "पेंडिंग",
-    "send": "भेजें",
-    "transactions": "Transactions",
-    "receiveDialog": {
-      "title": "Bitcoin पाएँ",
-      "description": "Bitcoin पाने के लिए एक एड्रेस शेयर करें।",
-      "addressIndex": "एड्रेस #{{index}}",
-      "scanForNew": "नए भुगतानों की जाँच करें"
-    },
-    "tx": {
-      "pending": "पेंडिंग",
-      "today": "आज",
-      "yesterday": "कल",
-      "daysAgo_one": "{{count}}d पहले",
-      "daysAgo_other": "{{count}}d पहले",
-      "received": "मिले",
-      "sent": "भेजे",
-      "silentBadge": "silent",
-      "silentDetectedTitle": "BIP-352 साइलेंट पेमेंट scan से पाया गया"
-    },
-    "openMenu": "वॉलेट मेन्यू",
-    "sendPublic": "भेजें",
-    "sendPrivate": "निजी रूप से भेजें",
-    "tabs": {
-      "public": "सार्वजनिक",
-      "private": "निजी"
-    }
-  },
-  "walletSettings": {
-    "backup": {
-      "label": "वॉलेट बैकअप करें"
-    },
-    "legacy": {
-      "label": "पुराने वॉलेट की रिकवरी"
-    }
-  },
-  "walletLegacy": {
-    "seoTitle": "पुराने वॉलेट की रिकवरी",
-    "seoDescription": "पिछली Agora वॉलेट generations से फंड रिकवर करें।",
-    "title": "पुराने वॉलेट की रिकवरी",
-    "subtitle": "वह पुराना वॉलेट चुनें जो आपने इस्तेमाल किया था और उसका बैलेंस अपने मौजूदा वॉलेट में sweep करें।",
-    "loggedOut": "अपने पुराने वॉलेट में फंड ढूँढने के लिए अपनी Nostr पहचान से लॉग इन करें।",
-    "scanning": "फंड के लिए V2 beta वॉलेट scan किया जा रहा है…",
-    "v2Detected": {
-      "title": "V2 Prelaunch Beta वॉलेट में फंड मिले",
-      "body": "हमें आपके पुराने V2 beta वॉलेट के एड्रेस पर <0>{{amount}}</0> मिले। इन्हें अपने मौजूदा वॉलेट में ले जाने के लिए नीचे V2 sweep खोलें।"
-    },
-    "options": {
-      "v2Beta": {
-        "label": "V2 Prelaunch Beta वॉलेट",
-        "description": "BIP-39 derivation से पहले शिप हुए nsec-as-seed BIP-86 वॉलेट से फंड sweep करें।"
-      },
-      "v1Breeze": {
-        "label": "V1 Breeze वॉलेट",
-        "description": "पुरानी Lightning custody से ऑन-चेन बैलेंस sweep करें।"
-      },
-      "doubleTweak": {
-        "label": "Double-tweak SP फ़िक्स",
-        "description": "पहले की किसी भेजने वाली bug से अटके रह गए साइलेंट पेमेंट रिकवर करें और उन्हें वापस अपने वॉलेट में sweep करें।"
-      }
-    },
-    "footnote": "हर विकल्प आपके मौजूदा वॉलेट में एक-तरफ़ा sweep है। पुराना वॉलेट खुद बहाल नहीं होता — सिर्फ़ उसमें रखे फंड रिकवर होते हैं।"
-  },
-  "walletRecovery": {
-    "seoTitle": "पुराना वॉलेट रिकवर करें",
-    "seoDescription": "पिछले Lightning वॉलेट से फंड रिकवर करें और उन्हें अपने Nostr-derived Bitcoin एड्रेस पर भेजें।",
-    "title": "पुराना वॉलेट रिकवर करें",
-    "heading": "अपना पुराना वॉलेट रिकवर करें",
-    "subheading": "अगर आपने पहले Lightning वॉलेट में फंड रखे थे, तो आप उन्हें अपने Nostr-derived Bitcoin एड्रेस में sweep कर सकते हैं। आपका पुराना वॉलेट बहाल नहीं होता — यह एक बार का, एक-तरफ़ा ट्रांसफ़र है।",
-    "backToWallet": "वॉलेट पर वापस",
-    "loggedOut": {
-      "title": "रिकवर करने के लिए लॉग इन करें",
-      "description": "उस Nostr पहचान से लॉग इन करें जिसके पास पुराना Lightning वॉलेट था ताकि फंड उसके Bitcoin एड्रेस पर sweep हो सकें।"
-    },
-    "destination": {
-      "title": "फंड यहाँ भेजे जाएँगे",
-      "description": "आपका Nostr-derived Taproot एड्रेस।"
-    },
-    "phrase": {
-      "title": "रिकवरी फ़्रेज़",
-      "description": "अपने पुराने वॉलेट का 12-शब्द रिकवरी फ़्रेज़ paste करें।",
-      "checkingRelays": "एन्क्रिप्टेड बैकअप के लिए आपके रिले जाँचे जा रहे हैं…",
-      "backupFoundTitle": "आपके रिले पर बैकअप मिला",
-      "backupFoundDesc": "हमें इस अकाउंट से पब्लिश किया गया आपके पुराने वॉलेट के रिकवरी फ़्रेज़ का एन्क्रिप्टेड बैकअप मिला।",
-      "decryptAndUse": "Decrypt करें और इस्तेमाल करें",
-      "placeholder": "word1 word2 word3 …",
-      "warning": "केवल वही रिकवरी फ़्रेज़ paste करें जिस पर आप भरोसा करते हैं। इस फ़्रेज़ वाला कोई भी फंड ख़र्च कर सकता है। sweep पूरा होने के बाद, इसे हर उस जगह से डिलीट कर दें जहाँ आपने कॉपी किया था।",
-      "sweepButton": "मेरे Bitcoin एड्रेस पर फंड sweep करें"
-    },
-    "sweeping": {
-      "working": "काम चल रहा है…",
-      "dontClose": "यह टैब बंद न करें। पुराने वॉलेट के sync होने और transaction के broadcast होने में एक मिनट तक लग सकता है।"
-    },
-    "success": {
-      "title": "रिकवरी पूरी हुई",
-      "sent": "आपके Bitcoin एड्रेस पर {{sats}} sats भेजे।",
-      "viewTransaction": "Transaction देखें"
-    },
-    "error": {
-      "title": "रिकवरी विफल",
-      "tryAgain": "दोबारा कोशिश करें"
-    },
-    "errors": {
-      "noNip44": "आपका signer NIP-44 decryption सपोर्ट नहीं करता, जो रिले बैकअप पढ़ने के लिए ज़रूरी है। इसकी जगह 12-शब्द रिकवरी फ़्रेज़ ख़ुद paste करें।",
-      "decryptFailed": "रिले बैकअप decrypt नहीं हो सका। इसकी जगह 12-शब्द रिकवरी फ़्रेज़ ख़ुद paste करें।",
-      "decryptGeneric": "रिले बैकअप decrypt नहीं हो सका।",
-      "invalidWordCount": "रिकवरी फ़्रेज़ 12 या 24 शब्दों का होना चाहिए।",
-      "noBalance": "आपके पुराने वॉलेट में कोई ख़र्च-योग्य बैलेंस नहीं है। रिकवर करने के लिए कुछ नहीं है।",
-      "sweepGeneric": "रिकवरी विफल। कृपया दोबारा कोशिश करें।"
-    },
-    "progress": {
-      "loadingSdk": "वॉलेट SDK लोड हो रही है…",
-      "connecting": "आपके पुराने वॉलेट से जुड़ रहे हैं…",
-      "checkingBalance": "बैलेंस जाँचा जा रहा है…",
-      "preparingTransfer": "{{sats}} sats का ट्रांसफ़र तैयार किया जा रहा है…",
-      "broadcasting": "Transaction broadcast किया जा रहा है…"
-    },
-    "toast": {
-      "backupLoadedTitle": "बैकअप लोड हो गया",
-      "backupLoadedDesc": "रिकवरी फ़्रेज़ आपके रिले से decrypt हो गया।"
-    }
-  },
-  "walletBackup": {
-    "heading": "वॉलेट रिकवरी फ़्रेज़",
-    "dialogDescription": "इस 24-शब्द बैकअप को import करके आप अपने Agora वॉलेट तक किसी भी Bitcoin वॉलेट में पहुँच सकते हैं।",
-    "hidden": "अपना 24-शब्द रिकवरी फ़्रेज़ देखने के लिए टैप करें।",
-    "revealAria": "रिकवरी फ़्रेज़ दिखाएँ",
-    "hideAria": "रिकवरी फ़्रेज़ छुपाएँ",
-    "warning": "इन शब्दों वाला कोई भी आपका Bitcoin ख़र्च कर सकता है। इन्हें कभी शेयर न करें, कभी किसी वेबसाइट पर टाइप न करें, password manager के बाहर कभी प्लेनटेक्स्ट में न रखें।"
-  },
-  "walletConnect": {
-    "status": "स्थिति",
-    "ready": "तैयार",
-    "notFound": "नहीं मिला",
-    "none": "कोई नहीं",
-    "add": "जोड़ें",
-    "active": "सक्रिय",
-    "connectionLabel": "NWC कनेक्शन",
-    "defaultWalletName": "Lightning वॉलेट",
-    "setActiveTitle": "सक्रिय के तौर पर सेट करें",
-    "removeTitle": "वॉलेट हटाएँ",
-    "helpText": "Zap भेजने के लिए WebLN ब्राउज़र एक्सटेंशन इंस्टॉल करें या एक NWC वॉलेट कनेक्ट करें।",
-    "webln": {
-      "name": "WebLN",
-      "description": "ब्राउज़र एक्सटेंशन"
-    },
-    "nwc": {
-      "name": "Nostr Wallet Connect",
-      "description": "रिमोट वॉलेट कनेक्शन",
-      "connectedCount_one": "{{count}} वॉलेट कनेक्टेड",
-      "connectedCount_other": "{{count}} वॉलेट कनेक्टेड"
-    },
-    "empty": {
-      "title": "कोई वॉलेट कनेक्ट नहीं",
-      "description": "तुरंत zaps के लिए एक NWC कनेक्शन जोड़ें।"
-    },
-    "dialog": {
-      "title": "NWC वॉलेट कनेक्ट करें",
-      "description": "अपने NWC-संगत वॉलेट से connection string paste करें।",
-      "aliasPlaceholder": "वॉलेट का नाम (वैकल्पिक)",
-      "connect": "कनेक्ट करें",
-      "connecting": "कनेक्ट हो रहा है..."
-    },
-    "toast": {
-      "uriRequiredTitle": "Connection URI ज़रूरी",
-      "uriRequiredDesc": "कृपया एक मान्य NWC connection URI दर्ज करें।",
-      "activeChangedTitle": "सक्रिय वॉलेट बदला",
-      "activeChangedDesc": "चुना गया वॉलेट अब zaps के लिए सक्रिय है।"
-    }
-  },
-  "walletSend": {
-    "title": "Bitcoin भेजें",
-    "send": "Bitcoin भेजें",
-    "max": "MAX",
-    "tapAgainToConfirm": "पुष्टि के लिए फिर टैप करें",
-    "satPerVB": "{{rate}} sat/vB",
-    "notEnoughBitcoin": "पर्याप्त बिटकॉइन नहीं",
-    "recipient": {
-      "placeholder": "bc1…, sp1…",
-      "scan": "QR कोड स्कैन करें",
-      "sendToOnchain": "Bitcoin एड्रेस पर भेजें",
-      "sendToSilentPayment": "साइलेंट पेमेंट एड्रेस पर भेजें",
-      "bitcoinAddress": "Bitcoin एड्रेस",
-      "silentPayment": "साइलेंट पेमेंट एड्रेस",
-      "toLabel": "किसे",
-      "clear": "प्राप्तकर्ता हटाएँ",
-      "choosePaymentMethod": "जारी रखने के लिए भुगतान विधि चुनें"
-    },
-    "feeSpeed": {
-      "fastest": "~10 मिनट",
-      "halfHour": "~30 मिनट",
-      "hour": "~1 घंटा",
-      "economy": "~1 दिन",
-      "custom": "कस्टम"
-    },
-    "fee": {
-      "loading": "लोड हो रहा है…",
-      "unavailable": "अनुपलब्ध",
-      "loadFailed": "Fee rates लोड नहीं हो सकीं।",
-      "retry": "फिर कोशिश करें",
-      "orCustom": "या नीचे एक कस्टम रेट डालें।",
-      "loadingTiers": "Fee rates लोड हो रही हैं…",
-      "customPlaceholder": "उदा. 5",
-      "customAriaLabel": "sat/vB में कस्टम fee rate"
-    },
-    "progress": {
-      "building": "Transaction बन रहा है…",
-      "signing": "Sign हो रहा है…",
-      "broadcasting": "Broadcast हो रहा है…",
-      "sending": "भेजा जा रहा है…"
-    },
-    "errors": {
-      "unavailable": "इस लॉगिन प्रकार के लिए HD वॉलेट उपलब्ध नहीं है।",
-      "enterRecipient": "एक Bitcoin एड्रेस या sp1… साइलेंट पेमेंट एड्रेस दर्ज करें।",
-      "noSpendable": "इस वॉलेट में कोई ख़र्च-योग्य Bitcoin नहीं।",
-      "feesNotLoaded": "Fee rates लोड नहीं हुईं।",
-      "enterAmount": "एक राशि दर्ज करें।",
-      "insufficient": "इस राशि + नेटवर्क फ़ीस के लिए Bitcoin पर्याप्त नहीं।",
-      "waitingPrice": "BTC दाम का इंतज़ार है…",
-      "noneYet": "आपके पास अभी कोई Bitcoin नहीं है।",
-      "feesNotLoadedYet": "Fee rates अभी तक लोड नहीं हुई हैं।",
-      "feeRateTooLow": "कम से कम 1 sat/vB का fee rate डालें।"
-    },
-    "toast": {
-      "failedTitle": "Transaction विफल"
-    },
-    "broadcastError": {
-      "feeTooLowTitle": "नेटवर्क fee बहुत कम है",
-      "feeTooLowBodyWithMin": "Bitcoin नेटवर्क इस fee को अस्वीकार कर रहा है। अभी न्यूनतम लगभग {{min}} sat/vB है।",
-      "feeTooLowBody": "Bitcoin नेटवर्क इस fee को अस्वीकार कर रहा है। कोई तेज़ tier चुनें या अपना custom rate बढ़ाएँ।",
-      "rbfTitle": "Replacement के लिए ज़्यादा fee चाहिए",
-      "rbfBody": "Replacement transaction को मूल से ज़्यादा fee देनी होगी। Fee बढ़ाकर दोबारा कोशिश करें।",
-      "mempoolFullTitle": "Bitcoin नेटवर्क पर भीड़ है",
-      "mempoolFullBody": "Mempool भरा हुआ है और आपकी fee प्रतिस्पर्धी नहीं है। आगे बढ़ने के लिए fee बढ़ाएँ।",
-      "networkTitle": "Bitcoin नेटवर्क तक नहीं पहुँचा जा सका",
-      "networkBody": "अपना कनेक्शन जाँचें और दोबारा कोशिश करें।",
-      "mempoolConflictTitle": "विरोधाभासी transaction",
-      "mempoolConflictBody": "एक input पहले ही खर्च हो चुका है या किसी दूसरे transaction द्वारा खर्च किया जा रहा है।",
-      "tooLongChainTitle": "बहुत सारे unconfirmed transactions",
-      "tooLongChainBody": "आपके पास unconfirmed transactions की लंबी chain है। किसी एक के confirm होने का इंतज़ार करें और दोबारा कोशिश करें।",
-      "badInputsTitle": "Transaction अस्वीकृत हो गया",
-      "badInputsBody": "नेटवर्क ने इस transaction को अस्वीकार कर दिया। राशि या प्राप्तकर्ता बदलकर दोबारा कोशिश करें।",
-      "absurdlyHighFeeTitle": "Fee असामान्य रूप से ज़्यादा है",
-      "absurdlyHighFeeBody": "अनुमानित fee संदिग्ध रूप से ज़्यादा है। Fee rates दोबारा लोड करें और कोशिश करें।",
-      "unknownTitle": "Transaction विफल",
-      "useHigherFee": "ज़्यादा fee इस्तेमाल करें",
-      "tryAgain": "दोबारा कोशिश करें",
-      "atMaxFeeTier": "आप पहले से सबसे तेज़ tier पर हैं।"
-    },
-    "scanError": {
-      "title": "वह QR कोड पढ़ा नहीं जा सका",
-      "description": "एक Bitcoin एड्रेस, साइलेंट पेमेंट एड्रेस (sp1…), या bitcoin: URI अपेक्षित था।"
-    },
-    "success": {
-      "title": "Bitcoin भेज दिया",
-      "satsAmount": "{{sats}} sats",
-      "viewTransaction": "Transaction देखें",
-      "done": "हो गया"
-    },
-    "titlePublic": "Bitcoin भेजें",
-    "titlePrivate": "निजी रूप से भेजें",
-    "reuse": {
-      "checking": "पता जाँचा जा रहा है…",
-      "sendAnyway": "फिर भी भेजें",
-      "acknowledge": "मैं जोखिम समझता/समझती हूँ — फिर भी भेजें",
-      "historyWarning": "यह पता ऑन-चेन पहले ही उपयोग हो चुका है. यहाँ अपने निजी फंड भेजने से वे इसके मौजूदा लेन-देन इतिहास से जुड़ जाते हैं और आपके साइलेंट पेमेंट की निजता समाप्त हो जाती है. इसके बजाय साइलेंट पेमेंट पता (sp1…) उपयोग करें, या फिर भी भेजें.",
-      "ownPublicWarning": "यह आपके अपने सार्वजनिक वॉलेट का पता है. इसमें अपने निजी फंड भेजने से दोनों वॉलेट मिल जाते हैं और आपस में जुड़ जाते हैं. इसके बजाय साइलेंट पेमेंट पता (sp1…) उपयोग करें, या फिर भी भेजें."
-    },
-    "ownSilentPaymentBlocked": "यह आपके अपने साइलेंट पेमेंट का पता है. आप अपने सार्वजनिक वॉलेट से अपने निजी वॉलेट में नहीं भेज सकते — ऐसा करने से आपके निजी साइलेंट पेमेंट फंड पहले से सार्वजनिक लेजर पर उजागर हो चुके कॉइन के साथ मिल जाते हैं, जिससे आपका निजी वॉलेट किसी ज्ञात पहचान से जुड़ जाता है और उसकी निजता समाप्त हो जाती है. इसके बजाय किसी अलग पते पर भेजें."
-  },
   "qrScanner": {
     "title": "QR कोड स्कैन करें",
     "close": "बंद करें",
@@ -2060,64 +1612,6 @@
       "busy": "कोई दूसरा ऐप कैमरे का इस्तेमाल कर रहा है। उसे बंद करके दोबारा कोशिश करें।",
       "overconstrained": "इस डिवाइस का कैमरा अनुरोधित सेटिंग्स को सपोर्ट नहीं करता।",
       "didntStart": "कैमरा शुरू नहीं हुआ। कोई दूसरा ऐप इसका उपयोग कर रहा हो सकता है, या आपके ब्राउज़र ने स्कैनर को ब्लॉक कर दिया हो।"
-    }
-  },
-  "bitcoinPublic": {
-    "lead": "आप जो पैसा भेजते हैं वह सार्वजनिक है और आप तक trace किया जा सकता है।",
-    "learnMore": "और जानें",
-    "body": "Bitcoin एक सार्वजनिक ledger है। आप जो transaction भेजते हैं उसे हमेशा के लिए आप तक trace किया जा सकता है, चाहे वह कई लोगों के बीच हाथ बदल चुका हो। इसे केवल उन्हीं को भेजें जिनका आप सार्वजनिक रूप से समर्थन करना चाहते हैं।",
-    "bodyWithCashOut": "Bitcoin एक सार्वजनिक ledger है। आप जो transaction भेजते हैं उसे हमेशा के लिए आप तक trace किया जा सकता है, चाहे वह कई लोगों के बीच हाथ बदल चुका हो। इसे केवल उन्हीं को भेजें जिनका आप सार्वजनिक रूप से समर्थन करना चाहते हैं, या किसी एक्सचेंज पर कैश आउट करें।",
-    "iUnderstand": "मैं समझता/समझती हूँ कि यह transaction सार्वजनिक है।"
-  },
-  "spScan": {
-    "title": "नए भुगतानों की जाँच करें",
-    "subtitle": "निजी भुगतानों के लिए blockchain स्कैन करें",
-    "descriptionHelp": "अधिक जानकारी",
-    "description": "आने वाले साइलेंट पेमेंट का पता लगाने के लिए कॉन्फ़िगर किए गए BIP-352 indexer को block-by-block चलाता है।",
-    "since": "के बाद से",
-    "preset": {
-      "lastHour": "पिछला एक घंटा",
-      "last3h": "पिछले 3 घंटे",
-      "last24h": "पिछले 24 घंटे",
-      "lastWeek": "पिछला हफ़्ता",
-      "lastMonth": "पिछला महीना",
-      "custom": "कस्टम…"
-    },
-    "customHours": "घंटे",
-    "customHoursPlaceholder": "उदा. 12",
-    "advanced": "उन्नत",
-    "connectingIndexer": "Indexer से जुड़ रहे हैं…",
-    "upToDate": "आप पहले से ही अप टू डेट हैं।",
-    "fromBlock": "किस block से",
-    "indexerTip": "Indexer tip",
-    "lastFullyScanned": "आख़िरी पूरी तरह scan किया गया",
-    "never": "कभी नहीं",
-    "includeSpent": "पहले से ख़र्च हो चुके भी शामिल करें",
-    "includeSpentDesc": "उन साइलेंट पेमेंट का भी पता लगाएँ जो तब से ख़र्च हो चुके हैं। चूके scan या रीसेट के बाद रिसीव इतिहास फिर से बनाते समय इस्तेमाल करें।",
-    "blockProgress": "Block {{current}} / {{to}}",
-    "matches_one": "{{count}} match",
-    "matches_other": "{{count}} matches",
-    "scannedRange": "Block {{from}} → {{to}} scan हुए।",
-    "foundOutputs_one": "{{count}} नया output मिला।",
-    "foundOutputs_other": "{{count}} नए outputs मिले।",
-    "noNewPayments": "कोई नया भुगतान नहीं।",
-    "startScan": "Scan शुरू करें",
-    "resolveFailed": {
-      "title": "शुरुआती block का पता नहीं चल सका",
-      "description": "mempool.space अभी पहुँच से बाहर है। फिर भी scan करने के लिए उन्नत → किस block से के तहत एक शुरुआती block डालें।"
-    },
-    "reconcile": {
-      "title": "ख़र्च किए गए UTXO का मिलान करें",
-      "description": "हर स्टोर किए गए साइलेंट-पेमेंट UTXO को Blockbook से जाँचता है और ख़र्च हो चुके किसी भी UTXO को हटाता है। अगर भेजने के बाद बैलेंस उससे ज़्यादा दिखे जितना होना चाहिए, तो इसका इस्तेमाल करें।",
-      "checking": "{{checked}} / {{total}} जाँचे जा रहे हैं…",
-      "checked_one": "{{count}} UTXO जाँचा · {{pruned}} हटाया।",
-      "checked_other": "{{count}} UTXO जाँचे · {{pruned}} हटाए।",
-      "reconciling": "मिलान हो रहा है…",
-      "reconcileNow": "अभी मिलान करें"
-    },
-    "autoScan": {
-      "label": "अपने आप scan करें",
-      "description": "बैकग्राउंड में नए निजी पेमेंट के लिए जाँचते रहें, तब भी जब आप यह पेज छोड़ देते हैं।"
     }
   },
   "notifications": {
@@ -2141,8 +1635,6 @@
     "actions": {
       "reactedToYour": "ने आपकी {{noun}} पर रिएक्ट किया",
       "repostedYour": "ने आपकी {{noun}} रीपोस्ट की",
-      "zappedYou": "ने आपको ज़ैप किया",
-      "zappedYouWithAmount": "ने आपको {{sats}} sats ज़ैप किए",
       "repliedToYourNote": "ने आपके नोट का जवाब दिया",
       "mentionedYou": "ने आपको मेंशन किया",
       "repliedToYourComment": "ने आपके कमेंट का जवाब दिया",
@@ -2184,14 +1676,11 @@
       "emojiPack": "इमोजी पैक",
       "podcastEpisode": "पॉडकास्ट एपिसोड",
       "podcastTrailer": "पॉडकास्ट ट्रेलर",
-      "zapstoreAsset": "Zapstore एसेट",
-      "zapstoreRelease": "Zapstore रिलीज़",
       "stream": "स्ट्रीम",
       "status": "स्टेटस",
       "repository": "रिपॉज़िटरी",
       "customNip": "कस्टम NIP",
       "calendarEvent": "कैलेंडर इवेंट",
-      "zapstoreApp": "Zapstore ऐप",
       "playlist": "प्लेलिस्ट",
       "divine": "divine",
       "community": "कम्युनिटी",
@@ -2244,10 +1733,6 @@
         "label": "रीपोस्ट",
         "description": "जब कोई आपके नोट को रीपोस्ट करे"
       },
-      "zaps": {
-        "label": "Zaps",
-        "description": "जब कोई आपको lightning या ऑन-चेन zap भेजे"
-      },
       "mentions": {
         "label": "मेंशन",
         "description": "जब कोई आपको नोट में मेंशन करे"
@@ -2281,7 +1766,7 @@
     "inputPlaceholder": "खोजें",
     "filtersAria": "खोज फ़िल्टर",
     "tabs": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "nostr": "Nostr",
       "accounts": "उपयोगकर्ता"
     },
@@ -2358,8 +1843,8 @@
       "postsPrompt": "Nostr कंटेंट ढूँढने के लिए खोज दर्ज करें।",
       "accounts": "आपकी खोज से मेल खाता कोई उपयोगकर्ता नहीं मिला।",
       "followsPrompt": "नाम या NIP-05 एड्रेस से लोगों को खोजें।",
-      "agora": "आपकी खोज से मेल खाते कोई Agora कैंपेन, प्लेज, या ग्रुप नहीं मिले।",
-      "agoraPrompt": "Agora कैंपेन, प्लेज, और ग्रुप खोजें, या नवीनतम देखें।",
+      "agora": "आपकी खोज से मेल खाते कोई Eranos कैंपेन, प्लेज, या ग्रुप नहीं मिले।",
+      "agoraPrompt": "Eranos कैंपेन, प्लेज, और ग्रुप खोजें, या नवीनतम देखें।",
       "activeFilters": "सक्रिय फ़िल्टर:",
       "clearAll": "सभी फ़िल्टर साफ़ करें"
     }
@@ -2383,7 +1868,6 @@
       "editProfile": "एडिट करें",
       "shareFollowLink": "फ़ॉलो लिंक शेयर करें",
       "moreOptions": "और विकल्प",
-      "donate": "डोनेट करें",
       "campaignGoal": "लक्ष्य ${{amount}}"
     },
     "stats": {
@@ -2426,7 +1910,6 @@
       "addToList": "लिस्ट में जोड़ें",
       "shareFollowLink": "फ़ॉलो लिंक शेयर करें",
       "profileRecovery": "प्रोफ़ाइल रिकवरी",
-      "zap": "Zap",
       "awardBadge": "बैज दें",
       "writeLetter": "चिट्ठी लिखें",
       "mute": "@{{name}} को म्यूट करें",
@@ -2508,8 +1991,6 @@
       "heading": "प्रोफ़ाइल फ़ील्ड",
       "website": "वेबसाइट",
       "websitePlaceholder": "https://yourwebsite.com",
-      "lightning": "Lightning",
-      "lightningPlaceholder": "you@walletofsatoshi.com",
       "labelPlaceholder": "लेबल",
       "tickerPlaceholder": "Ticker",
       "addressPlaceholder": "एड्रेस",
@@ -2539,11 +2020,6 @@
         "defaultLabel": "ईमेल",
         "description": "संपर्क ईमेल एड्रेस",
         "valuePlaceholder": "you@example.com"
-      },
-      "wallet": {
-        "label": "वॉलेट",
-        "description": "क्रिप्टोकरेंसी वॉलेट एड्रेस",
-        "valuePlaceholder": "एड्रेस"
       },
       "link": {
         "label": "लिंक",
@@ -2613,10 +2089,10 @@
   "faq": {
     "categories": {
       "getting-started": {
-        "label": "Agora के बारे में"
+        "label": "Eranos के बारे में"
       },
       "payments": {
-        "label": "Agora पर Bitcoin डोनेशन"
+        "label": "Eranos पर Bitcoin डोनेशन"
       },
       "about-nostr": {
         "label": "Nostr के बारे में"
@@ -2645,51 +2121,6 @@
           "{{appName}} को [Soapbox](https://soapbox.pub) ने बनाया है, जो Nostr ecosystem के लिए टूल बनाने वाली एक ओपन-सोर्स टीम है, [World Liberty Congress](https://worldlibertycongress.org/) के साथ मिलकर।"
         ]
       },
-      "send-bitcoin-onchain": {
-        "question": "Bitcoin भेजना कैसे काम करता है?",
-        "answer": [
-          "जब कोई प्राप्तकर्ता कैंपेन बनाता है, तो वह चुनता है कि किस प्रकार के भुगतान स्वीकार करना है: **सार्वजनिक**, **निजी**, या **दोनों**।",
-          "**सार्वजनिक** डोनेशन असली Bitcoin ऑन-चेन होते हैं। ये सार्वजनिक ब्लॉकचेन पर सेटल होते हैं, हर Bitcoin वॉलेट में काम करते हैं, और किसी को भी दिखते हैं।",
-          "**निजी** डोनेशन **साइलेंट पेमेंट** (BIP-352) का इस्तेमाल करते हैं। ये भी ऑन-चेन सेटल होते हैं, लेकिन transaction को प्राप्तकर्ता के डोनेशन कोड से नहीं जोड़ा जा सकता — इसलिए ये सार्वजनिक डोनर लिस्ट और कुल आँकड़ों से बाहर रहते हैं। डोनर को ऐसा वॉलेट चाहिए जो साइलेंट पेमेंट सपोर्ट करता हो — हम [Ditto Wallet](https://ditto.pub) या [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) की सलाह देते हैं।",
-          "जब कैंपेन **दोनों** स्वीकार करता है, तो {{appName}} एक ही QR कोड दिखाता है जो दोनों endpoints encode करता है। साइलेंट-पेमेंट वॉलेट इसे निजी के तौर पर पढ़ते हैं; अन्य वॉलेट सार्वजनिक एड्रेस पर वापस आ जाते हैं। डोनर को चुनना नहीं पड़ता — उनका वॉलेट सही रास्ता ख़ुद चुन लेता है।",
-          "किसी भी तरीक़े से, भुगतान सीधे प्राप्तकर्ता को जाता है। {{appName}} फंड को कभी नहीं छूता।"
-        ]
-      },
-      "connect-wallet": {
-        "question": "{{appName}} पर वॉलेट क्या है?",
-        "answer": [
-          "आपका {{appName}} वॉलेट एक **सेल्फ-कस्टोडियल** Bitcoin वॉलेट है, जो आपकी Nostr key से बनता है। {{appName}} आपके फंड को कभी नहीं रखता — वॉलेट आपके ब्राउज़र में चलता है और transactions पर स्थानीय रूप से एक ऐसी key से sign करता है जिसे केवल आप नियंत्रित करते हैं। यह Bitcoin दोनों तरह से पा सकता है — एक सार्वजनिक एड्रेस के तौर पर जिस पर कोई भी Bitcoin वॉलेट भुगतान कर सकता है, और एक साइलेंट-पेमेंट कोड के तौर पर जिस पर सक्षम वॉलेट निजी तौर पर भुगतान कर सकते हैं। साइन अप करने के लिए कुछ नहीं; जिस पल आपके पास अकाउंट है, यह मौजूद है।",
-          "वॉलेट के दो टैब होते हैं: **Public** (आपका नियमित Bitcoin एड्रेस) और **Private** (साइलेंट पेमेंट)। ये दोनों balances सख़्ती से अलग रखे जाते हैं और कभी एक साथ ख़र्च नहीं किए जा सकते — यही अलगाव निजी डोनेशन को ऑन-चेन पर अनलिंक न होने योग्य बनाए रखता है। जब आप कैंपेन बनाते हैं, तो आप चुनते हैं कि सार्वजनिक भुगतान, निजी भुगतान, या दोनों स्वीकार करें। जो आपको मिले उसे ख़र्च करने के लिए, **प्राप्तकर्ता गाइड** देखें।",
-          "आप अपने वॉलेट का 24-शब्द seed phrase एक्सपोर्ट करके किसी भी मानक Bitcoin वॉलेट में इम्पोर्ट भी कर सकते हैं — नीचे \"क्या मैं अपना {{appName}} वॉलेट किसी दूसरे Bitcoin वॉलेट में एक्सपोर्ट कर सकता हूँ?\" देखें।"
-        ]
-      },
-      "export-wallet": {
-        "question": "क्या मैं अपना {{appName}} वॉलेट किसी दूसरे Bitcoin वॉलेट में एक्सपोर्ट कर सकता हूँ?",
-        "answer": [
-          "हाँ। आपका {{appName}} वॉलेट पूरी तरह सेल्फ-कस्टोडियल है। {{appName}} आपके Bitcoin को कभी नहीं रखता और आपकी keys को कभी नहीं देखता — वॉलेट पूरी तरह आपके ब्राउज़र में चलता है, transactions पर स्थानीय रूप से एक ऐसी key से sign करता है जो आपकी Nostr गुप्त key (nsec) से बनी है।",
-          "मेन्यू से वॉलेट खोलें, ऊपर दाईं ओर तीन-डॉट वाला मेन्यू टैप करें, और **वॉलेट बैकअप करें** चुनें। आपको एक 24-शब्द BIP-39 seed phrase दिखेगा। इसे कहीं सुरक्षित जगह लिख लें (या किसी password manager में सेव कर लें) — **इन शब्दों वाला कोई भी व्यक्ति आपका Bitcoin ख़र्च कर सकता है।**",
-          "आप उन 24 शब्दों को किसी भी मानक Bitcoin वॉलेट में इम्पोर्ट कर सकते हैं: **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, एक **Trezor**, या एक **Ledger**। {{appName}} मानक BIP-86 (Taproot) और BIP-352 (साइलेंट पेमेंट) derivation paths का इस्तेमाल करता है, इसलिए किसी विशेष configuration की ज़रूरत नहीं है।",
-          "इम्पोर्ट करने के बाद, दूसरा वॉलेट आपके {{appName}} वॉलेट के समान balance और history दिखाता है — वे एक ही वॉलेट हैं, बस उसके दो views हैं।",
-          "Seed-phrase एक्सपोर्ट केवल तभी उपलब्ध है जब आप nsec के साथ साइन इन करते हैं। Browser-extension और remote-signer (bunker) logins आपकी गुप्त key को अलग रखते हैं, इसलिए {{appName}} उन modes में seed नहीं बना सकता।"
-        ]
-      },
-      "donations-are-public-general": {
-        "question": "क्या {{appName}} पर डोनेशन सार्वजनिक हैं?",
-        "answer": [
-          "यह इस पर निर्भर करता है कि प्राप्तकर्ता किस तरह के भुगतान स्वीकार करता है।",
-          "**सार्वजनिक डोनेशन** Bitcoin ब्लॉकचेन और Nostr पर दर्ज होते हैं। कोई भी राशि, समय, और एड्रेस देख सकता है।",
-          "**निजी डोनेशन** साइलेंट पेमेंट का इस्तेमाल करते हैं। ये सार्वजनिक रूप से प्राप्तकर्ता के डोनेशन कोड से नहीं जोड़े जा सकते, डोनर लिस्ट में नहीं दिखते, और सार्वजनिक कुल आँकड़ों में नहीं गिने जाते।",
-          "जब कैंपेन दोनों स्वीकार करता है, तो डोनर का वॉलेट तय करता है कि किस रास्ते का इस्तेमाल हो — साइलेंट-पेमेंट-सक्षम वॉलेट निजी तौर पर भुगतान करते हैं, अन्य सार्वजनिक एड्रेस पर भुगतान करते हैं। पूरी तस्वीर के लिए **डोनर गाइड** और **प्राप्तकर्ता गाइड** पढ़ें।"
-        ]
-      },
-      "why-donations-pending": {
-        "question": "कुछ डोनेशन \"**pending**\" क्यों दिखाते हैं?",
-        "answer": [
-          "**pending** डोनेशन असली Bitcoin है जो पहले ही भेजा जा चुका है — बस नेटवर्क द्वारा कन्फ़र्म होने का इंतज़ार कर रहा है। डोनर के वॉलेट ने transaction ब्रॉडकास्ट कर दिया है, लेकिन यह अभी तक किसी ब्लॉक में शामिल नहीं हुआ है।",
-          "Bitcoin हर लगभग 10 मिनट में एक नया ब्लॉक बनाता है, और माइनर डोनर द्वारा दी गई fee के आधार पर transactions चुनते हैं। ज़्यादातर डोनेशन एक घंटे के अंदर कन्फ़र्म हो जाते हैं; जब नेटवर्क व्यस्त हो तो कम fee वाले डोनेशन को ज़्यादा समय लग सकता है। {{appName}} कन्फ़र्मेशन स्टेटस को अपने आप दोबारा जाँचता है, इसलिए जैसे ही एक ब्लॉक आता है, **pending** लेबल अपने आप ग़ायब हो जाता है।",
-          "फंड रास्ते में है — कन्फ़र्म होते ही प्राप्तकर्ता को डोनेशन कैंपेन के कुल में जुड़ता दिखेगा। इसे तेज़ करने के लिए प्राप्तकर्ता या {{appName}} कुछ नहीं कर सकता; केवल डोनर का वॉलेट ही fee बढ़ा सकता है।"
-        ]
-      },
       "censorship-resistance": {
         "question": "यहाँ \"सेंसरशिप-प्रतिरोधी\" का क्या मतलब है?",
         "answer": [
@@ -2703,22 +2134,6 @@
           "Bitcoin दुनिया में सबसे व्यापक रूप से सपोर्टेड और सेंसरशिप-प्रतिरोधी पेमेंट रेल है। हर Bitcoin वॉलेट इसे भेज सकता है।",
           "{{appName}} पर, प्राप्तकर्ता चुनते हैं कि कैसे पाएँ: **सार्वजनिक** (एक नियमित Bitcoin एड्रेस) अधिकतम पहुँच के लिए, **निजी** (साइलेंट पेमेंट) न जोड़े जा सकने वाले डोनेशन के लिए, या **दोनों** ताकि हर डोनर का वॉलेट सही रास्ता ख़ुद चुन ले। ऐसे डोनर जिनके पास सिर्फ़ एक उपभोक्ता Bitcoin ऐप है, फिर भी योगदान दे सकते हैं; साइलेंट-पेमेंट वॉलेट वाले डोनर को डिफ़ॉल्ट रूप से प्राइवेसी मिलती है।",
           "समझौता यह है कि सार्वजनिक Bitcoin transactions ब्लॉकचेन पर दिखते हैं और miner फ़ीस देते हैं। डोनर और प्राप्तकर्ता गाइड समझाती हैं कि दोनों को कैसे संभालें।"
-        ]
-      },
-      "why-not-silent-payments": {
-        "question": "क्या {{appName}} साइलेंट पेमेंट सपोर्ट करता है?",
-        "answer": [
-          "हाँ — दोनों तरफ़ से। {{appName}} का बिल्ट-इन Bitcoin वॉलेट BIP-352 सपोर्ट करता है, इसलिए जब आप अपने {{appName}} वॉलेट से Bitcoin भेजते हैं, तो आप किसी भी साइलेंट-पेमेंट एड्रेस (`sp1…`) पर सीधे भुगतान कर सकते हैं। और जब एक प्राप्तकर्ता कैंपेन बनाता है, तो वह सार्वजनिक Bitcoin भुगतान के साथ, या उसकी जगह, साइलेंट पेमेंट स्वीकार कर सकता है।",
-          "साइलेंट-पेमेंट डोनेशन भी ऑन-चेन सेटल होते हैं, लेकिन transaction को प्राप्तकर्ता के डोनेशन कोड से नहीं जोड़ा जा सकता — इसलिए ये सार्वजनिक डोनर लिस्ट या कुल आँकड़ों में नहीं दिखते।",
-          "{{appName}} के बाहर से साइलेंट पेमेंट भेजने के लिए ऐसा वॉलेट चाहिए जो BIP-352 सपोर्ट करता हो। अधिकांश उपभोक्ता ऐप अभी नहीं करते, लेकिन [Ditto Wallet](https://ditto.pub) और [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) करते हैं।",
-          "जब कैंपेन दोनों तरह के भुगतान स्वीकार करता है, तो {{appName}} उन्हें एक ही QR कोड में encode कर देता है। साइलेंट-पेमेंट-सक्षम वॉलेट निजी तौर पर भुगतान करते हैं; बाक़ी सब सार्वजनिक एड्रेस पर भुगतान करते हैं। कोई डोनर बाहर नहीं किया जाता, और किसी प्राप्तकर्ता को पहुँच और प्राइवेसी में से चुनने पर मजबूर नहीं किया जाता।"
-        ]
-      },
-      "why-not-lightning": {
-        "question": "{{appName}} Lightning का इस्तेमाल क्यों नहीं करता?",
-        "answer": [
-          "Lightning के लिए Lightning वॉलेट चाहिए। सबसे आसान वाले (Wallet of Satoshi, Strike, Breez) **custodial** हैं — एक कंपनी फंड रखती है और उसे बंद किया जा सकता है, geo-block किया जा सकता है, या अकाउंट फ़्रीज़ करने के लिए दबाव डाला जा सकता है। Non-custodial Lightning तकनीकी रूप से माँगपूर्ण है और नए लोगों के लिए भरोसेमंद नहीं।",
-          "हम चाहते हैं कि {{appName}} ऐसे व्यक्ति के लिए काम करे जिसका Bitcoin का एकमात्र अनुभव Cash App, Coinbase, Strike, Venmo, या PayPal जैसा कोई नियमित उपभोक्ता ऐप है। ऑन-चेन Bitcoin धरती के हर वॉलेट के साथ काम करता है।"
         ]
       },
       "why-not-rotating-addresses": {
@@ -2764,19 +2179,6 @@
           "पूरी गाइड के लिए, [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys) देखें।"
         ]
       },
-      "send-bitcoin-lightning": {
-        "question": "Lightning के ज़रिए Bitcoin भेजना कैसे काम करता है?",
-        "answer": [
-          "अगर किसी प्राप्तकर्ता की प्रोफ़ाइल पर Lightning एड्रेस है, तो आप उस पर भेज सकते हैं। Lightning सेकंडों में सेटल होता है और फ़ीस बहुत कम होती हैं।",
-          "Lightning भेजे {{appName}} के डोनेशन एड्रेस का इस्तेमाल नहीं करते — वे सीधे उस Lightning वॉलेट पर जाते हैं जो प्राप्तकर्ता ने ख़ुद सेट किया है। {{appName}} का अपना डोनेशन फ़्लो केवल ऑन-चेन है।"
-        ]
-      },
-      "what-are-zaps": {
-        "question": "Zaps क्या हैं?",
-        "answer": [
-          "Zaps Nostr पर छोटी Lightning टिप्स हैं, जो {{appName}} के ऑन-चेन डोनेशन फ़्लो से अलग हैं।"
-        ]
-      },
       "fyp": {
         "question": "फ़ीड कैसे काम करता है?",
         "answer": [
@@ -2817,74 +2219,7 @@
   },
   "guides": {
     "shared": {
-      "tldrEyebrow": "छोटा संस्करण",
-      "paymentBadge": {
-        "public": "सार्वजनिक भुगतान",
-        "silent": "साइलेंट पेमेंट"
-      },
-      "paymentComparison": {
-        "donorHeader": "जब आप डोनेट करते हैं",
-        "recipientHeader": "जब आप बनाते हैं",
-        "donorRows": {
-          "whatYouSee": {
-            "label": "आप क्या देखते हैं",
-            "public": "एक नियमित Bitcoin एड्रेस जिसे आप कहीं से भी भुगतान कर सकते हैं।",
-            "silent": "वही QR। आपका वॉलेट साइलेंट-पेमेंट endpoint चुन लेता है अगर वह BIP-352 सपोर्ट करता है।"
-          },
-          "walletSupport": {
-            "label": "वॉलेट सपोर्ट",
-            "public": "हर Bitcoin वॉलेट। Cash App, Coinbase, Strike, हार्डवेयर, कुछ भी।",
-            "silent": "आज कुछ ही वॉलेट। ज़्यादातर एक नियमित Bitcoin transaction पर वापस आ जाते हैं।"
-          },
-          "privacy": {
-            "label": "डोनेशन की प्राइवेसी",
-            "public": "ऑन-चेन सार्वजनिक। आपका भेजने वाला एड्रेस कैंपेन से हमेशा के लिए जुड़ा रहता है।",
-            "silent": "पाने वाला पक्ष ऑन-चेन पर न जोड़े जा सकने वाला है। आपके भेजने वाले वॉलेट का सिलसिला अभी भी सार्वजनिक है।"
-          },
-          "settlement": {
-            "label": "सेटलमेंट",
-            "public": "सामान्य Bitcoin confirmations.",
-            "silent": "वही ऑन-चेन confirmations, लेकिन प्राप्तकर्ता को इसे ढूँढने के लिए अपना वॉलेट scan करना पड़ता है।"
-          }
-        },
-        "recipientRows": {
-          "whatDonorsSee": {
-            "label": "डोनर क्या देखते हैं",
-            "public": "एक नियमित Bitcoin एड्रेस। धरती के हर वॉलेट के साथ काम करता है।",
-            "silent": "एक BIP-352 endpoint. डोनर के वॉलेट को साइलेंट-पेमेंट सपोर्ट चाहिए; नहीं तो डोनेशन एक नियमित Bitcoin transaction पर वापस आ जाता है।"
-          },
-          "receivingSpeed": {
-            "label": "पाने की गति",
-            "public": "Push-शैली। डोनेशन तुरंत कैंपेन पेज पर दिखते हैं।",
-            "silent": "मैनुअल scanning. आपके वॉलेट को इन्हें ढूँढने के लिए ब्लॉकचेन पर चलना पड़ता है। वॉलेट के अनुसार मिनटों से घंटों तक।"
-          },
-          "pushNotifications": {
-            "label": "Push नोटिफिकेशन",
-            "public": "हाँ। नए डोनेशन आते ही आप देख लेते हैं।",
-            "silent": "नहीं। वॉलेट खोलें और इन्हें खोजने के लिए scan trigger करें।"
-          },
-          "donorList": {
-            "label": "डोनर लिस्ट / कैंपेन कुल",
-            "public": "हमेशा के लिए सार्वजनिक। राशि और भेजने वाले एड्रेस किसी को भी दिखते हैं।",
-            "silent": "निजी। कैंपेन पेज साइलेंट-पेमेंट डोनेशन संख्या या कुल नहीं दिखा सकता।"
-          },
-          "ecosystem": {
-            "label": "Ecosystem की परिपक्वता",
-            "public": "परिपक्व। जमे हुए टूल।",
-            "silent": "Bleeding-edge. वॉलेट में अभी भी bug हैं; उम्मीद करें कि कुछ भुगतान चूकेंगे और बाद के scan में दिखेंगे।"
-          },
-          "bestFor": {
-            "label": "किसके लिए सबसे अच्छा",
-            "public": "खुले-तौर पर चलने वाले फंडरेज़र जहाँ सामाजिक प्रमाण और दृश्यता मदद करती है।",
-            "silent": "ऐसे कैंपेन जहाँ डोनर या प्राप्तकर्ता की प्राइवेसी दिखने वाले कुल से ज़्यादा मायने रखती है।"
-          },
-          "watchOutFor": {
-            "label": "किस बात का ध्यान रखें",
-            "public": "हर डोनर का स्थायी सार्वजनिक रिकॉर्ड।",
-            "silent": "आज UX में अड़चनें। कुछ डोनेशन तब तक नहीं दिखेंगे जब तक प्राप्तकर्ता scan न करे।"
-          }
-        }
-      }
+      "tldrEyebrow": "छोटा संस्करण"
     },
     "donor": {
       "tldr": {
@@ -2902,18 +2237,11 @@
             "title": "कैंपेन खोलें",
             "body": "आपको एक ही QR कोड दिखता है। अगर कैंपेन दोनों विकल्प स्वीकार करता है, तो यह दोनों endpoints encode करता है; आपका वॉलेट सही चुन लेता है।"
           },
-          "payFromAnyWallet": {
-            "title": "किसी भी वॉलेट से भुगतान करें",
-            "body": "Cash App, Coinbase, Strike, एक हार्डवेयर वॉलेट, कुछ भी। राशि और नेटवर्क फ़ीस का भुगतान करें।"
-          },
           "arrivesDirectly": {
             "title": "यह सीधे पहुँचता है",
             "body": "फंड सीधे प्राप्तकर्ता तक सेटल होते हैं। {{appName}} इन्हें रखता या route नहीं करता, और एड्रेस प्राप्तकर्ता की Nostr secret key से derive होता है।"
           }
         }
-      },
-      "comparison": {
-        "footnote": "कैंपेन केवल सार्वजनिक, केवल साइलेंट, या दोनों स्वीकार कर सकते हैं। अगर दोनों, तो QR कोड दोनों endpoints रखता है। आपका वॉलेट वह चुनता है जिसका वह उपयोग कर सकता है।"
       },
       "publicVisible": {
         "title": "सार्वजनिक डोनेशन हमेशा के लिए ऑन-चेन पर दिखते हैं",
@@ -2923,10 +2251,6 @@
         "heading": "निजी तौर पर डोनेट करना",
         "intro": "ये कदम **सार्वजनिक** डोनेशन के लिए सबसे ज़्यादा मायने रखते हैं, जहाँ हर transaction स्थायी रूप से एक ही एड्रेस से बंधा होता है। **साइलेंट** डोनेशन पाने वाले पक्ष को पहले ही छुपा लेते हैं, इसलिए जोखिम कम है। आपके भेजने वाले वॉलेट का targeted विश्लेषण फिर भी दोनों तरीक़ों से संभव है, इसलिए अगर आपका जोखिम ऊँचा है तो ये कदम उठाने लायक़ हैं। एक चुनें, या उन्हें मिलाएँ।",
         "options": {
-          "silentWallet": {
-            "name": "एक साइलेंट-पेमेंट वॉलेट इस्तेमाल करें",
-            "purpose": "एक Bitcoin वॉलेट से भुगतान करें जो BIP-352 सपोर्ट करता है। अगर कैंपेन साइलेंट पेमेंट स्वीकार करता है, तो आपका वॉलेट उस endpoint को अपने आप इस्तेमाल करता है।"
-          },
           "nonKyc": {
             "name": "Non-KYC Bitcoin ख़रीदें",
             "purpose": "Bitcoin को peer-to-peer ख़रीदें ताकि यह पहले से आपके सरकारी ID से बंधा न हो। सबसे मज़बूत प्राइवेसी की शुरुआत।"
@@ -2934,23 +2258,12 @@
           "coinjoin": {
             "name": "पहले coinjoin करें",
             "purpose": "अपने Bitcoin को दूसरों के coins के साथ मिलाएँ ताकि output को आपकी KYC ख़रीद से trace न किया जा सके। तब उपयोगी जब कैंपेन केवल सार्वजनिक स्वीकार करता है।"
-          },
-          "freshWallet": {
-            "name": "एक नया वॉलेट इस्तेमाल करें",
-            "purpose": "एक ऐसे वॉलेट से डोनेट करें जिसने कभी आपकी मुख्य पहचान या एक KYC एक्सचेंज को न छुआ हो।"
           }
         }
       },
       "consumerApps": {
         "title": "उपभोक्ता ऐप आपको गुमनाम नहीं बना सकते",
         "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance, और PayPal सब आपकी ID सत्यापित करते हैं। आप डोनेशन कैसे भी भेजें, हर transaction आपकी असली पहचान से बँधा रहता है। एक ऐसा non-custodial वॉलेट इस्तेमाल करें जिसे आप नियंत्रित करते हैं।"
-      },
-      "silentToday": {
-        "heading": "आज साइलेंट पेमेंट पर एक टिप्पणी",
-        "paragraphs": [
-          "साइलेंट पेमेंट Bitcoin को ऑन-चेन पर पाने का सबसे निजी तरीक़ा है, लेकिन ecosystem नया है। सबसे लोकप्रिय वॉलेट अभी साइलेंट-पेमेंट endpoint पर नहीं भेज सकते, इसलिए जब वॉलेट नहीं कर सकता, तो डोनेशन एक नियमित Bitcoin transaction के तौर पर कैंपेन के सार्वजनिक एड्रेस पर वापस चला जाता है (अगर कैंपेन दोनों स्वीकार करता है)।",
-          "प्राप्तकर्ताओं के लिए, साइलेंट-पेमेंट डोनेशन push नोटिफिकेशन के बिना भी पहुँचते हैं और तभी दिखते हैं जब प्राप्तकर्ता अपना वॉलेट scan करता है, जिसमें मिनटों से घंटों तक लग सकते हैं। इनमें से कुछ भी आपके फंड की सुरक्षा को प्रभावित नहीं करता; बस अनुभव को आकार देता है।"
-        ]
       }
     },
     "recipient": {
@@ -2980,20 +2293,6 @@
           "साइलेंट-पेमेंट डोनेशन उस रिकॉर्ड का हिस्सा नहीं हैं। ये बाहर के observers को नहीं दिखते और कैंपेन के सार्वजनिक कुल में नहीं दिखते; नए डोनर केवल वही देखते हैं जो आप कैंपेन की प्रगति के बारे में पब्लिश करते हैं।"
         ]
       },
-      "comparison": {
-        "footnote": "एक कैंपेन के स्वीकृत भुगतान विकल्प बनने के बाद बदले नहीं जा सकते। अगर आपका मन बदले, तो एक नया कैंपेन बनाएँ।"
-      },
-      "silentToday": {
-        "heading": "आज साइलेंट पेमेंट पर एक टिप्पणी",
-        "paragraphs": [
-          "साइलेंट पेमेंट Bitcoin को ऑन-चेन पर पाने का सबसे निजी तरीक़ा है, लेकिन ecosystem नया है। सबसे लोकप्रिय वॉलेट अभी साइलेंट-पेमेंट endpoint पर नहीं भेज सकते, इसलिए जब किसी डोनर का वॉलेट नहीं कर सकता, तो डोनेशन एक नियमित Bitcoin transaction के तौर पर आपके सार्वजनिक एड्रेस पर वापस चला जाता है (अगर आप दोनों स्वीकार करते हैं)।",
-          "साइलेंट-पेमेंट डोनेशन push नोटिफिकेशन के बिना पहुँचते हैं और तभी दिखते हैं जब आप अपना वॉलेट scan करते हैं, जिसमें मिनटों से घंटों तक लग सकते हैं। इनमें से कुछ भी आपके फंड की सुरक्षा को प्रभावित नहीं करता; बस रोज़मर्रा के अनुभव को आकार देता है।"
-        ]
-      },
-      "twoWallets": {
-        "title": "अपने Public और Private balances को अलग रखें",
-        "body": "आपका {{appName}} वॉलेट दो टैब दिखाता है: **Public** (आपका नियमित Bitcoin एड्रेस) और **Private** (साइलेंट पेमेंट)। इन्हें सख़्ती से अलग रखा जाता है, और ये दोनों balances कभी एक ही transaction में ख़र्च नहीं किए जा सकते — यही अलगाव आपके निजी डोनेशन को अनलिंक न होने योग्य बनाए रखता है। जब आप **Private** टैब से कैश आउट करते हैं, तो किसी साइलेंट-पेमेंट एड्रेस (**sp1…**) पर भेजें, जो निजी बना रहता है। अगर इसके बजाय आप निजी फंड को किसी सादे ऑन-चेन एड्रेस पर भेजते हैं, तो {{appName}} उसे जाँचता है: अगर एड्रेस पहले इस्तेमाल हो चुका है, या आपके अपने सार्वजनिक वॉलेट का है, तो यह आपको चेतावनी देता है और आपको **फिर भी भेजें** पर टैप करवाता है, क्योंकि ऐसा करने से आपके निजी फंड उस एड्रेस के सार्वजनिक इतिहास से जुड़ जाते हैं। किसी **sp1…** एड्रेस पर भेजने से कभी चेतावनी नहीं आती।"
-      },
       "movePromptly": {
         "heading": "डोनेशन को तुरंत आगे बढ़ाएँ",
         "steps": {
@@ -3011,14 +2310,6 @@
         "heading": "निजी तौर पर कैश आउट करना",
         "intro": "ऑन-चेन ख़र्च करने से एक सिलसिला बनता है जब तक आप उसे पहले न तोड़ें। साइलेंट-पेमेंट डोनेशन को अनलिंक न होने योग्य बनाए रखने के लिए **Private** टैब से कैश आउट करें — पहले किसी साइलेंट-पेमेंट वॉलेट में भेजें (एक **sp1…** एड्रेस), फिर आगे ख़र्च करें; यह छलाँग आपके कैंपेन और उसके बाद आने वाले के बीच का संबंध तोड़ देती है। निजी फंड किसी दोबारा इस्तेमाल किए गए या सार्वजनिक एड्रेस पर मत भेजें, जो उन्हें फिर से जोड़ देता है। नीचे के अन्य विकल्प भी काम करते हैं और उनके अपने समझौते हैं।",
         "options": {
-          "silentHop": {
-            "name": "साइलेंट-पेमेंट वॉलेट छलाँग",
-            "purpose": "अपने डोनेशन को एक साइलेंट-पेमेंट वॉलेट ([Ditto Wallet](https://ditto.pub), [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)) पर ले जाएँ। वहाँ से आपका आगे का ख़र्च कैंपेन से नहीं बँधा होता।"
-          },
-          "lightningSwap": {
-            "name": "Lightning swap",
-            "purpose": "ऑन-चेन Bitcoin को Lightning में atomic-swap करें। Lightning भुगतान सार्वजनिक ब्लॉकचेन पर नहीं दिखते।"
-          },
           "coinjoin": {
             "name": "Coinjoin",
             "purpose": "अपने Bitcoin को दूसरे यूज़र के coins के साथ मिलाएँ ताकि output को input से वापस न जोड़ा जा सके।"
@@ -3038,140 +2329,5 @@
         "body": "Custodial mixers आपके coins चुरा सकते हैं, log कर सकते हैं कि किसने क्या भेजा, या क़ानून-प्रवर्तन के honeypots निकल सकते हैं। इसके बजाय एक साइलेंट-पेमेंट छलाँग या एक non-custodial coinjoin इस्तेमाल करें।"
       }
     }
-  },
-  "walletMigrate": {
-    "seoTitle": "पुराना वॉलेट माइग्रेट करें",
-    "seoDescription": "अपने पुराने Agora वॉलेट (nsec-as-seed) से फंड नए BIP-39 वॉलेट में sweep करें।",
-    "title": "पुराना वॉलेट माइग्रेट करें",
-    "heading": "अपने नए वॉलेट में माइग्रेट करें",
-    "subheading": "Agora का Bitcoin वॉलेट अब एक BIP-39 seed phrase इस्तेमाल करता है ताकि यह किसी भी वॉलेट ऐप में इम्पोर्ट हो सके। आपके पुराने एड्रेस पर रखा फंड अब भी सुरक्षित है — यह पेज उसे एक ही transaction में आपके नए वॉलेट में sweep कर देता है।",
-    "backToWallet": "वॉलेट पर वापस",
-    "loading": "आपका पुराना वॉलेट जाँचा जा रहा है…",
-    "warning": "यह एक ही sweep transaction बनाता है जो आपके पुराने वॉलेट के हर UTXO को खपाता है और कुल राशि (एक छोटी नेटवर्क फ़ीस घटाकर) आपके नए वॉलेट के पहले रिसीव एड्रेस पर भेज देता है। एक बार ब्रॉडकास्ट होने पर यह कदम अंतिम है और इसे वापस नहीं लिया जा सकता।",
-    "startButton": "नए वॉलेट में sweep करें",
-    "loggedOut": {
-      "title": "माइग्रेट करने के लिए लॉग इन करें",
-      "description": "उस Nostr पहचान से लॉग इन करें जिसके पास पुराना वॉलेट है ताकि फंड आपके नए एड्रेस पर sweep हो सके।"
-    },
-    "unsupported": {
-      "title": "वॉलेट उपलब्ध नहीं",
-      "description": "माइग्रेशन केवल nsec लॉगिन के लिए काम करता है, क्योंकि पुराने वॉलेट की keys सीधे आपके nsec से derive होती थीं। ब्राउज़र-एक्सटेंशन और रिमोट-signer लॉगिन यह माइग्रेशन नहीं चला सकते।"
-    },
-    "noBlockbook": {
-      "title": "Blockbook कॉन्फ़िगर नहीं है",
-      "description": "माइग्रेशन को आपके पुराने एड्रेस scan करने और sweep transaction ब्रॉडकास्ट करने के लिए एक Blockbook indexer URL चाहिए।"
-    },
-    "noFunds": {
-      "title": "माइग्रेट करने के लिए कुछ नहीं",
-      "description": "आपके पुराने वॉलेट में कोई ख़र्च करने योग्य बैलेंस नहीं है। सब कुछ पहले से ही आपके नए वॉलेट में है।"
-    },
-    "detected": {
-      "title": "आपके पुराने वॉलेट में फंड",
-      "description": "ये फंड एक ही transaction में आपके नए वॉलेट में ले जाए जाएँगे।",
-      "bip86": "ऑन-चेन",
-      "sp": "साइलेंट पेमेंट",
-      "total": "कुल"
-    },
-    "destination": {
-      "title": "मंज़िल",
-      "description": "आपके नए वॉलेट का पहला रिसीव एड्रेस।"
-    },
-    "progress": {
-      "building": "transaction बनाई जा रही है…",
-      "signing": "inputs साइन हो रहे हैं…",
-      "broadcasting": "transaction ब्रॉडकास्ट हो रही है…",
-      "dontClose": "जब तक sweep चल रहा है, यह टैब बंद न करें।"
-    },
-    "success": {
-      "title": "माइग्रेशन पूरा हुआ",
-      "sent": "आपके नए वॉलेट में {{sats}} sats भेजे ({{fee}} sats फ़ीस)।",
-      "viewTx": "transaction देखें"
-    },
-    "error": {
-      "title": "माइग्रेशन विफल",
-      "tryAgain": "दोबारा कोशिश करें"
-    },
-    "errors": {
-      "noV1Account": "पुराने वॉलेट की keys तक पहुँचा नहीं जा सका।",
-      "noDestination": "आपके नए वॉलेट का अभी कोई रिसीव एड्रेस नहीं है। वॉलेट पेज लोड होने का इंतज़ार करें और दोबारा कोशिश करें।",
-      "noBlockbook": "Blockbook indexer कॉन्फ़िगर नहीं है। माइग्रेशन आपके पुराने एड्रेस scan नहीं कर सकता।",
-      "noFunds": "पुराने एड्रेस पर कोई ख़र्च करने योग्य फंड नहीं मिला।",
-      "sweepGeneric": "माइग्रेशन विफल। कृपया दोबारा कोशिश करें।"
-    },
-    "toast": {
-      "successTitle": "माइग्रेशन पूरा हुआ",
-      "successDesc": "{{sats}} sats आपके नए वॉलेट में ले जाए गए।"
-    }
-  },
-  "walletDoubleTweak": {
-    "seoTitle": "Double-tweak SP फ़िक्स",
-    "seoDescription": "पहले की किसी भेजने वाली bug से ऑन-चेन अटके रह गए साइलेंट पेमेंट रिकवर करें और उन्हें अपने वॉलेट में sweep करें।",
-    "title": "Double-tweak SP फ़िक्स",
-    "heading": "अटके हुए साइलेंट पेमेंट रिकवर करें",
-    "subheading": "Agora के एक पुराने वर्शन ने कुछ साइलेंट-पेमेंट outputs को ग़लत key पर encode कर दिया था, इसलिए वे कभी आपके वॉलेट में नहीं दिखे। यह टूल उन outputs के लिए chain को फिर से scan करता है और जो भी मिले उन्हें आपके वॉलेट में sweep कर देता है।",
-    "back": "वापस",
-    "loggedOut": "उस Nostr पहचान से लॉग इन करें जिसे साइलेंट पेमेंट मिले थे ताकि उन्हें रिकवर किया जा सके।",
-    "unsupported": {
-      "title": "वॉलेट उपलब्ध नहीं",
-      "description": "रिकवरी को ऐसा वॉलेट चाहिए जो लोकल रूप से साइन कर सके। जारी रखने के लिए अपने nsec से लॉग इन करें।"
-    },
-    "noIndexer": {
-      "title": "कोई साइलेंट-पेमेंट indexer कॉन्फ़िगर नहीं है",
-      "description": "अटके हुए पेमेंट scan करने के लिए एक BIP-352 indexer URL ज़रूरी है। वॉलेट सेटिंग्स में एक सेट करें और दोबारा कोशिश करें।"
-    },
-    "scan": {
-      "title": "अटके हुए पेमेंट के लिए scan करें",
-      "description": "scan शुरू करने के लिए block height चुनें। रिकवरी वहाँ से chain tip तक हर block जाँचती है।",
-      "fromHeightLabel": "शुरुआती block height",
-      "tipHint": "मौजूदा chain tip: {{tip}}",
-      "start": "Scan",
-      "cancel": "scan रद्द करें",
-      "progress": "{{to}} में से block {{current}} scan हो रहा है — {{found}} मिले",
-      "tipMissing": "chain tip पता किया जा रहा है…"
-    },
-    "noFunds": {
-      "title": "रिकवर करने के लिए कुछ नहीं",
-      "description": "scan की गई रेंज में कोई अटका हुआ साइलेंट पेमेंट नहीं मिला। अगर आपको फंड की उम्मीद थी तो कोई पुरानी शुरुआती height आज़माएँ।"
-    },
-    "found": {
-      "title": "अटके हुए पेमेंट मिले",
-      "description": "इन outputs को वापस आपके वॉलेट में sweep किया जा सकता है।",
-      "count": "Outputs",
-      "recoverable": "रिकवर करने योग्य"
-    },
-    "destination": {
-      "title": "फंड यहाँ भेजे जाएँगे",
-      "description": "आपके मौजूदा वॉलेट में एक नया रिसीव एड्रेस।"
-    },
-    "sweepButton": "फंड रिकवर करें",
-    "sweeping": "आपका फंड रिकवर हो रहा है…",
-    "dontClose": "रिकवरी पूरी होने तक यह पेज बंद न करें।",
-    "success": {
-      "title": "रिकवरी पूरी हुई",
-      "sent": "{{sats}} sats आपके वॉलेट में रिकवर हो गए।",
-      "viewTx": "transaction देखें"
-    },
-    "error": {
-      "title": "रिकवरी विफल",
-      "tryAgain": "दोबारा कोशिश करें"
-    },
-    "errors": {
-      "noDestination": "कोई मंज़िल एड्रेस उपलब्ध नहीं। पहले अपना वॉलेट खोलें।",
-      "noBlockbook": "कोई Blockbook सर्वर कॉन्फ़िगर नहीं है। वॉलेट सेटिंग्स में एक सेट करें।",
-      "sweepGeneric": "रिकवरी sweep पूरा नहीं हो सका।"
-    },
-    "toast": {
-      "successTitle": "फंड रिकवर हुआ",
-      "successDesc": "{{sats}} sats आपके वॉलेट में sweep किए गए।"
-    },
-    "footnote": "यह आपके मौजूदा वॉलेट में एक-तरफ़ा sweep है। केवल प्रभावित साइलेंट पेमेंट ही छुए जाते हैं; बाक़ी कुछ नहीं बदलता।"
-  },
-  "spAutoScan": {
-    "scanning": "scan हो रहा है… block {{current}} / {{to}}",
-    "caughtUp": "अप टू डेट",
-    "neverScanned": "अभी scan नहीं हुआ",
-    "lastScanned": "block {{height}} तक scan हुआ",
-    "paused": "अपने आप scan होना बंद है",
-    "manualLink": "scan विकल्प"
   }
 }

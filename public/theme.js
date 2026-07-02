@@ -2,7 +2,7 @@
 // preloader background before first paint. Runs as a blocking <script> so
 // there's no flash of the wrong theme.
 //
-// Agora's colors are hardcoded in src/index.css via :root {} and .dark {}
+// Eranos's colors are hardcoded in src/index.css via :root {} and .dark {}
 // blocks. There is no custom-theme branch; the only thing this script
 // does is set the right class on <html> and paint the preloader with the
 // matching background + primary color so the page doesn't flash white

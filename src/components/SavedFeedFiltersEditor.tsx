@@ -186,7 +186,7 @@ export function KindPicker({ value, options, onChange }: {
             {value === 'all'
               ? 'All kinds'
               : value === 'agora'
-                ? 'Agora content'
+                ? 'Eranos content'
                 : value === 'custom'
                   ? 'Custom...'
                   : (selected?.label ?? value)}
@@ -219,14 +219,14 @@ export function KindPicker({ value, options, onChange }: {
         <div ref={refCallback} className="overflow-y-auto flex-1 min-h-0" onScroll={onScroll}>
           {!search && (
             <>
-              <KindPickerItem icon={null} label="Agora content" active={value === 'agora'} onClick={() => handleSelect('agora')} />
+              <KindPickerItem icon={null} label="Eranos content" active={value === 'agora'} onClick={() => handleSelect('agora')} />
               <KindPickerItem icon={null} label="All kinds" active={value === 'all'} onClick={() => handleSelect('all')} />
             </>
           )}
           {!search && presetOptions.length > 0 && (
             <>
               <div className="px-2.5 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                Agora content
+                Eranos content
               </div>
               {presetOptions.map((opt) => (
                 <KindPickerItem key={opt.value} icon={opt.icon ?? null} label={opt.label} active={value === opt.value} onClick={() => handleSelect(opt.value)} />

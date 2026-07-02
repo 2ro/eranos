@@ -8,8 +8,6 @@ export interface TopAction {
   title: string;
   submissions: number;
   bounty: number;
-  /** Total zap amount in sats for this action's submissions. */
-  zapAmount: number;
 }
 
 export interface TopPoster {
@@ -22,18 +20,9 @@ export interface TrendingHashtag {
   count: number;
 }
 
-export interface TopContributor {
-  pubkey: string;
-  totalSats: number;
-  postCount: number;
-  avgSats: number;
-  zapCount: number;
-}
-
 export interface TopDonor {
   pubkey: string;
   totalSats: number;
-  zapCount: number;
 }
 
 // ── Timeframe + aggregate types ──────────────────────────────────────────────
@@ -41,12 +30,11 @@ export interface TopDonor {
 export type StatsTimeframe = '7d' | '30d' | '90d' | 'all';
 
 /** Aggregate count metric names. */
-export type StatName = 'commentCnt' | 'authorCnt' | 'zapAmount' | 'zapCnt' | 'submissionCnt';
+export type StatName = 'commentCnt' | 'authorCnt' | 'submissionCnt';
 
 export interface TimeframedStats {
   topPosters: TopPoster[];
   trendingHashtags: TrendingHashtag[];
-  topContributors: TopContributor[];
   topDonors: TopDonor[];
   topActions: TopAction[];
 }
@@ -77,13 +65,11 @@ function getRepeatedTags(tags: string[][], name: string): string[][] {
 const STAT_TAG_NAMES: Record<StatName, string> = {
   commentCnt: 'comment_cnt',
   authorCnt: 'author_cnt',
-  zapAmount: 'zap_amount',
-  zapCnt: 'zap_cnt',
   submissionCnt: 'submission_cnt',
 };
 
 const TIMEFRAMES: StatsTimeframe[] = ['7d', '30d', '90d', 'all'];
-const STAT_NAMES: StatName[] = ['commentCnt', 'authorCnt', 'zapAmount', 'zapCnt', 'submissionCnt'];
+const STAT_NAMES: StatName[] = ['commentCnt', 'authorCnt', 'submissionCnt'];
 
 function parseTimeframedStats(tags: string[][], tf: StatsTimeframe): TimeframedStats {
   // All-time leaderboards use the bare tag name; windowed ones use the suffix.
@@ -97,28 +83,11 @@ function parseTimeframedStats(tags: string[][], tf: StatsTimeframe): TimeframedS
     .filter((tag) => tag.length >= 3)
     .map((tag) => ({ tag: tag[1], count: parseInt(tag[2], 10) || 0 }));
 
-  const topContributors: TopContributor[] = getRepeatedTags(tags, `top_zapped${suffix}`)
-    .filter((tag) => tag.length >= 5)
-    .map((tag) => {
-      const totalSats = parseInt(tag[2], 10) || 0;
-      const avgSats = parseInt(tag[4], 10) || 0;
-      // zapCount was added later; derive from totalSats/avgSats for legacy events.
-      const zapCount = tag[5] ? parseInt(tag[5], 10) || 0 : (avgSats > 0 ? Math.round(totalSats / avgSats) : 0);
-      return {
-        pubkey: tag[1],
-        totalSats,
-        postCount: parseInt(tag[3], 10) || 0,
-        avgSats,
-        zapCount,
-      };
-    });
-
   const topDonors: TopDonor[] = getRepeatedTags(tags, `top_donor${suffix}`)
-    .filter((tag) => tag.length >= 4)
+    .filter((tag) => tag.length >= 3)
     .map((tag) => ({
       pubkey: tag[1],
       totalSats: parseInt(tag[2], 10) || 0,
-      zapCount: parseInt(tag[3], 10) || 0,
     }));
 
   const topActions: TopAction[] = getRepeatedTags(tags, `top_action${suffix}`)
@@ -128,10 +97,9 @@ function parseTimeframedStats(tags: string[][], tf: StatsTimeframe): TimeframedS
       title: tag[2],
       submissions: parseInt(tag[3], 10) || 0,
       bounty: parseInt(tag[4], 10) || 0,
-      zapAmount: tag[5] ? parseInt(tag[5], 10) || 0 : 0,
     }));
 
-  return { topPosters, trendingHashtags, topContributors, topDonors, topActions };
+  return { topPosters, trendingHashtags, topDonors, topActions };
 }
 
 /** Parse a kind 30385 community-stats event into a structured object. */

@@ -21,7 +21,6 @@ import { ProfileCard } from '@/components/ProfileCard';
 import { ProfileRightSidebar } from '@/components/ProfileRightSidebar';
 import { PageHeader } from '@/components/PageHeader';
 import { ImageCropDialog } from '@/components/ImageCropDialog';
-import { WalletBackupMnemonic } from '@/components/WalletBackupMnemonic';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
@@ -137,7 +136,7 @@ export function ProfileSettings() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '', about: '', picture: '', banner: '',
-      website: '', nip05: '', lud16: '', bot: false, fields: [],
+      website: '', nip05: '', bot: false, fields: [],
     },
   });
 
@@ -150,7 +149,6 @@ export function ProfileSettings() {
         banner: metadata.banner ?? '',
         website: metadata.website ?? '',
         nip05: metadata.nip05 ?? '',
-        lud16: metadata.lud16 ?? '',
         bot: metadata.bot ?? false,
         fields: parseFields(),
       });
@@ -167,7 +165,6 @@ export function ProfileSettings() {
     banner: watched.banner,
     website: watched.website,
     nip05: watched.nip05,
-    lud16: watched.lud16,
     bot: watched.bot,
   };
 
@@ -363,14 +360,6 @@ export function ProfileSettings() {
               {/* Your Key — private-key backup. Rendered inside Advanced but is not part of the form. */}
               <div className="pt-2">
                 <BackupKeySection />
-              </div>
-
-              {/* Wallet seed phrase — same secret material reachable as a
-                  BIP-39 mnemonic for importing the Bitcoin wallet into
-                  other wallet apps. Only shown for nsec logins (the
-                  component renders null otherwise). */}
-              <div className="pt-4 border-t">
-                <WalletBackupMnemonic />
               </div>
             </CollapsibleContent>
           </Collapsible>

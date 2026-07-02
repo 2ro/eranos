@@ -10,7 +10,7 @@ services:
     depends_on:
       - vite
     networks:
-      - agora-network
+      - eranos-network
 
   vite:
     image: node:22-alpine
@@ -22,9 +22,9 @@ services:
     environment:
       - NODE_ENV=development
     networks:
-      - agora-network
+      - eranos-network
     restart: unless-stopped
 
 networks:
-  agora-network:
+  eranos-network:
     driver: bridge

@@ -15,12 +15,6 @@ import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BioContent } from '@/components/BioContent';
 import { CampaignCard, CampaignCardSkeleton } from '@/components/CampaignCard';
@@ -34,7 +28,6 @@ import { useCampaignModeration } from '@/hooks/useCampaignModeration';
 import { useProfileOrganizations, type ProfileOrganization } from '@/hooks/useProfileOrganizations';
 import type { ProfileCampaignStats } from '@/hooks/useProfileCampaignStats';
 import type { ParsedCampaign } from '@/lib/campaign';
-import { formatCampaignAmount } from '@/lib/formatCampaignAmount';
 import { formatNumber } from '@/lib/formatNumber';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -73,8 +66,6 @@ interface ProfileIdentityRailProps {
    * newest by `createdAt` itself, so callers can pass the unsorted list.
    */
   pledges: Action[];
-  /** Spot BTC price for the Raised stat row. */
-  btcPrice: number | undefined;
 
   followersCount: number;
   followingCount: number;
@@ -88,7 +79,6 @@ interface ProfileIdentityRailProps {
   onFollowQROpen: () => void;
   onToggleFollow: () => void;
   onTabChange: (tabId: string) => void;
-  onDonate: (campaign: ParsedCampaign) => void;
   /** Whether the viewer can take any action (logged in). Disables follow when null. */
   canFollow: boolean;
 }
@@ -127,7 +117,6 @@ export function ProfileIdentityRail({
   campaigns,
   campaignStats,
   pledges,
-  btcPrice,
   followersCount,
   followingCount,
   isFollowing,
@@ -139,7 +128,6 @@ export function ProfileIdentityRail({
   onFollowQROpen,
   onToggleFollow,
   onTabChange,
-  onDonate,
   canFollow,
 }: ProfileIdentityRailProps) {
   if (isAuthorLoading) {
@@ -155,8 +143,6 @@ export function ProfileIdentityRail({
       : `https://${metadata.website}`;
     return sanitizeUrl(candidate);
   })();
-
-  const onchainCampaigns = campaigns.filter((c) => !!c.wallets?.onchain);
 
   return (
     // Two-layer structure so the rail can scroll independently on lg+
@@ -193,16 +179,11 @@ export function ProfileIdentityRail({
           canFollow={canFollow}
           followersCount={followersCount}
           followingCount={followingCount}
-          totalRaisedSats={campaignStats.totalRaisedSats}
-          btcPrice={btcPrice}
-          onchainCampaigns={onchainCampaigns}
           onToggleFollow={onToggleFollow}
           onMoreMenuOpen={onMoreMenuOpen}
           onFollowQROpen={onFollowQROpen}
-          onDonate={onDonate}
           onFollowersOpen={onFollowersOpen}
           onFollowingOpen={onFollowingOpen}
-          onTabChange={onTabChange}
         />
         <ProfileOverviewSections
           pubkey={pubkey}
@@ -210,7 +191,6 @@ export function ProfileIdentityRail({
           campaigns={campaigns}
           campaignStats={campaignStats}
           pledges={pledges}
-          btcPrice={btcPrice}
           onTabChange={onTabChange}
         />
       </div>
@@ -235,20 +215,15 @@ interface ProfileIdentityHeaderProps {
   canFollow: boolean;
   followersCount: number;
   followingCount: number;
-  totalRaisedSats: number;
-  btcPrice: number | undefined;
-  onchainCampaigns: ParsedCampaign[];
   onToggleFollow: () => void;
   onMoreMenuOpen: () => void;
   onFollowQROpen: () => void;
-  onDonate: (campaign: ParsedCampaign) => void;
   onFollowersOpen: () => void;
   onFollowingOpen: () => void;
-  onTabChange: (tabId: string) => void;
   className?: string;
   /**
    * Suppress the internal action bar (Edit Profile / QR / more, or
-   * Follow / Donate). The mobile layout sets this and renders its own
+   * Follow). The mobile layout sets this and renders its own
    * `ActionBar` on the avatar row so the buttons sit top-right beside the
    * avatar, Twitter/X-style, instead of in a full-width row below the bio.
    */
@@ -277,16 +252,11 @@ export function ProfileIdentityHeader({
   canFollow,
   followersCount,
   followingCount,
-  totalRaisedSats,
-  btcPrice,
-  onchainCampaigns,
   onToggleFollow,
   onMoreMenuOpen,
   onFollowQROpen,
-  onDonate,
   onFollowersOpen,
   onFollowingOpen,
-  onTabChange,
   className,
   hideActionBar = false,
 }: ProfileIdentityHeaderProps) {
@@ -319,11 +289,8 @@ export function ProfileIdentityHeader({
         <StatList
           followersCount={followersCount}
           followingCount={followingCount}
-          totalRaisedSats={totalRaisedSats}
-          btcPrice={btcPrice}
           onFollowersOpen={onFollowersOpen}
           onFollowingOpen={onFollowingOpen}
-          onTabChange={onTabChange}
         />
         {metadata?.about && (
           <p className="pt-1 text-sm whitespace-pre-wrap break-words text-foreground/90">
@@ -350,8 +317,6 @@ export function ProfileIdentityHeader({
           onToggleFollow={onToggleFollow}
           onMoreMenuOpen={onMoreMenuOpen}
           onFollowQROpen={onFollowQROpen}
-          onchainCampaigns={onchainCampaigns}
-          onDonate={onDonate}
         />
       )}
     </div>
@@ -366,7 +331,6 @@ interface ProfileOverviewSectionsProps {
   campaigns: ParsedCampaign[];
   campaignStats: ProfileCampaignStats;
   pledges: Action[];
-  btcPrice: number | undefined;
   onTabChange: (tabId: string) => void;
   /** Render the Organizations grid inline (default true). Set false on
    *  mobile when "Community" is a dedicated tab and orgs should not also
@@ -390,7 +354,6 @@ export function ProfileOverviewSections({
   campaigns,
   campaignStats,
   pledges,
-  btcPrice,
   onTabChange,
   showOrganizations = true,
   className,
@@ -411,7 +374,6 @@ export function ProfileOverviewSections({
       {campaigns.length === 0 && pledges.length > 0 && (
         <RailLatestPledgeSection
           pledges={pledges}
-          btcPrice={btcPrice}
           showSeeAll={pledges.length > 1}
           onSeeAll={() => onTabChange('pledges')}
         />
@@ -520,8 +482,6 @@ export function ActionBar({
   onToggleFollow,
   onMoreMenuOpen,
   onFollowQROpen,
-  onchainCampaigns,
-  onDonate,
   align = 'start',
 }: {
   pubkey: string;
@@ -532,8 +492,6 @@ export function ActionBar({
   onToggleFollow: () => void;
   onMoreMenuOpen: () => void;
   onFollowQROpen: () => void;
-  onchainCampaigns: ParsedCampaign[];
-  onDonate: (campaign: ParsedCampaign) => void;
   /**
    * `start` (default) — the primary button stretches to fill the row,
    * matching the narrow desktop rail. `end` — buttons size to their
@@ -592,40 +550,6 @@ export function ActionBar({
             onClick={onToggleFollow}
             disabled={!canFollow}
           />
-          {onchainCampaigns.length === 1 ? (
-            <Button
-              onClick={() => onDonate(onchainCampaigns[0])}
-              className="rounded-full font-bold gap-1.5"
-            >
-              <HandHeart className="size-4" />
-              {t('profile.header.donate')}
-            </Button>
-          ) : onchainCampaigns.length > 1 ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className="rounded-full font-bold gap-1.5">
-                  <HandHeart className="size-4" />
-                  {t('profile.header.donate')}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-72">
-                {onchainCampaigns.map((c) => (
-                  <DropdownMenuItem
-                    key={c.aTag}
-                    onClick={() => onDonate(c)}
-                    className="flex flex-col items-start gap-0.5"
-                  >
-                    <span className="font-medium truncate w-full">{c.title}</span>
-                    {c.goalUsd ? (
-                      <span className="text-xs text-muted-foreground">
-                        {t('profile.header.campaignGoal', { amount: c.goalUsd.toLocaleString() })}
-                      </span>
-                    ) : null}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : null}
           <Button
             variant="ghost"
             size="icon"
@@ -657,39 +581,21 @@ export function ActionBar({
 function StatList({
   followersCount,
   followingCount,
-  totalRaisedSats,
-  btcPrice,
   onFollowersOpen,
   onFollowingOpen,
-  onTabChange,
 }: {
   followersCount: number;
   followingCount: number;
-  totalRaisedSats: number;
-  btcPrice: number | undefined;
   onFollowersOpen: () => void;
   onFollowingOpen: () => void;
-  onTabChange: (id: string) => void;
 }) {
   const { t } = useTranslation();
-  const hasRaised = totalRaisedSats > 0;
-  const hasStats = hasRaised || followersCount > 0 || followingCount > 0;
+  const hasStats = followersCount > 0 || followingCount > 0;
   if (!hasStats) return null;
 
   return (
     <div>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
-        {hasRaised && (
-          <button
-            onClick={() => onTabChange('agora')}
-            className="flex items-baseline gap-1.5 hover:opacity-80 transition-opacity"
-          >
-            <span className="font-bold tabular-nums text-primary">
-              {formatCampaignAmount(totalRaisedSats, btcPrice)}
-            </span>
-            <span className="text-muted-foreground">{t('profile.stats.raised')}</span>
-          </button>
-        )}
         {followersCount > 0 && (
           <button
             onClick={onFollowersOpen}
@@ -783,12 +689,10 @@ function RailCampaignsSection({
  */
 function RailLatestPledgeSection({
   pledges,
-  btcPrice,
   showSeeAll,
   onSeeAll,
 }: {
   pledges: Action[];
-  btcPrice: number | undefined;
   showSeeAll: boolean;
   onSeeAll: () => void;
 }) {
@@ -805,7 +709,7 @@ function RailLatestPledgeSection({
         icon={<HandHeart className="size-4 text-primary" />}
         title={t('profile.sections.latestPledge')}
       />
-      <PledgeCard action={latest} btcPrice={btcPrice} variant="rail" />
+      <PledgeCard action={latest} variant="rail" />
       {showSeeAll && (
         <button
           type="button"

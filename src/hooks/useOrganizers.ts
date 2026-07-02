@@ -130,7 +130,7 @@ export function useOrganizers() {
       content: '',
       tags: [
         ['d', ORGANIZERS_D_TAG],
-        ['alt', 'Agora organizer appointments'],
+        ['alt', 'Eranos organizer appointments'],
         ...newPTags,
       ],
       prev: prev ?? undefined,

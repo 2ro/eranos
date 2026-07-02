@@ -9,16 +9,9 @@ import { nip19 } from 'nostr-tools';
 import {
   AlertTriangle,
   ArrowLeft,
-  ArrowRight,
-  Bitcoin,
-  Check,
-  EyeOff,
-  Globe,
   HandHeart,
   HelpCircle,
   Loader2,
-  ShieldCheck,
-  Wallet,
 } from 'lucide-react';
 
 import { CoverImageField } from '@/components/CoverImageField';
@@ -30,35 +23,29 @@ import { OrganizationContextChip } from '@/components/OrganizationContextChip';
 import { ProfileIdentityEditor } from '@/components/onboarding/ProfileIdentityEditor';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
 import { AutoGrowTextarea } from '@/components/ui/auto-grow-textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaign } from '@/hooks/useCampaign';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useHdWallet } from '@/hooks/useHdWallet';
 import { useManageableOrganizations } from '@/hooks/useManageableOrganizations';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { usePublishOrgProfile } from '@/hooks/usePublishOrgProfile';
 import { useOnboarding } from '@/contexts/onboardingContextDef';
 import { useToast } from '@/hooks/useToast';
-import { formatBTC, satsToUSD } from '@/lib/bitcoin';
 import {
   CAMPAIGN_KIND,
   buildCampaignSlug,
   encodeCampaignNaddr,
   parseCampaign,
-  parseCampaignWallet,
   sanitizeCampaignTitle,
 } from '@/lib/campaign';
 import { fetchFreshEvent } from '@/lib/fetchFreshEvent';
-import { genUserName } from '@/lib/genUserName';
+import { isValidSlatepackAddress } from '@/lib/grinProof';
 import { createOrganizationAssociationTags, decodeOrganizationParam } from '@/lib/organizationContext';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { withAgoraTag } from '@/lib/agoraNoteTags';
@@ -125,14 +112,8 @@ export function CreateCampaignPage() {
   const { mutateAsync: publishEvent } = useNostrPublish();
   const { role: onboardingRole, startSignup } = useOnboarding();
   const { toast } = useToast();
-  const hdWallet = useHdWallet();
-  const hdWalletAvailable = hdWallet.availability.status === 'available';
-  const silentPaymentSupported = hdWalletAvailable && !!hdWallet.silentPaymentAddress;
   const userAuthor = useAuthor(user?.pubkey);
   const userMetadata = userAuthor.data?.metadata;
-  const userDisplayName = user
-    ? (userMetadata?.name ?? userMetadata?.display_name ?? genUserName(user.pubkey))
-    : '';
 
   // Campaign creation requires an identifiable fundraiser profile. Donor
   // signup stays profile-free; this requirement is scoped to /campaigns/new.
@@ -145,42 +126,11 @@ export function CreateCampaignPage() {
   /** NIP-94-format tag pairs from the most recent banner upload, used to build the NIP-92 imeta tag on publish. */
   const [bannerNip94Tags, setBannerNip94Tags] = useState<string[][] | null>(null);
   const [coverUploading, setCoverUploading] = useState(false);
-  /**
-   * Wallet form state.
-   *
-   * - {@link walletSource} picks the top-level source: `'mine'` (the
-   *   user's HD wallet, only selectable when nsec is available) or
-   *   `'custom'` (paste any mainnet bech32(m) endpoint).
-   * - {@link mineAccept} picks which donation types the HD-wallet
-   *   campaign accepts:
-   *     - `'all'` — publishes both a fresh on-chain address and the
-   *       static silent-payment code.
-   *     - `'public'` — on-chain only (advances the HD receive cursor).
-   *     - `'private'` — silent-payment only.
-   * - {@link customOnchain} / {@link customSp} are the typed values
-   *   when {@link walletSource} is `'custom'`. At least one of them
-   *   must parse to a valid endpoint of the matching mode.
-   *
-   * Without nsec access the dropdown is hidden entirely; the user
-   * sees only the two custom inputs.
-   *
-   * Both fields are seeded from the synchronously-available HD-wallet
-   * availability on first render so the dropdown opens already showing
-   * the user's Agora wallet (and the matching `mineAccept` choice)
-   * instead of the empty "Choose a wallet" placeholder. The effect
-   * below still re-runs on availability changes for the edge case
-   * where the hook resolves a tick later, but the common nsec-login
-   * path no longer flickers through `'custom'` on mount.
-   */
-  const [walletSource, setWalletSource] = useState<'mine' | 'custom'>(
-    () => (hdWalletAvailable ? 'mine' : 'custom'),
-  );
-  const [mineAccept, setMineAccept] = useState<'all' | 'public' | 'private'>(
-    () => (hdWalletAvailable && !silentPaymentSupported ? 'public' : 'all'),
-  );
-  const [customOnchain, setCustomOnchain] = useState('');
-  const [customSp, setCustomSp] = useState('');
   const [goalUsd, setGoalUsd] = useState('');
+  // Grin receiving config (Plan 2, C1/C3) — both paths optional.
+  const [grinAddress, setGrinAddress] = useState('');
+  const [goblinPayEndpub, setGoblinPayEndpub] = useState('');
+  const [goblinPaySigner, setGoblinPaySigner] = useState('');
   const [countryQuery, setCountryQuery] = useState('');
   const [countryCode, setCountryCode] = useState('');
   /**
@@ -254,41 +204,6 @@ export function CreateCampaignPage() {
     }
   }, [isEditMode, user, userAuthor.isLoading, userMetadata]);
 
-  // When the HD wallet becomes available on a fresh campaign, default
-  // the source to "My wallet". Skipped in edit mode (we always start
-  // in 'custom' with the existing values pre-filled — see the
-  // edit-prepopulation effect below) and once the defaults have been
-  // applied, so re-renders that re-derive `hdWalletAvailable` don't
-  // override an explicit user choice.
-  const [walletDefaultsApplied, setWalletDefaultsApplied] = useState(false);
-  useEffect(() => {
-    if (isEditMode || walletDefaultsApplied) return;
-    if (!hdWalletAvailable) return;
-    setWalletSource('mine');
-    setMineAccept(silentPaymentSupported ? 'all' : 'public');
-    setWalletDefaultsApplied(true);
-  }, [isEditMode, walletDefaultsApplied, hdWalletAvailable, silentPaymentSupported]);
-
-  // Without nsec access, the dropdown is hidden and `walletSource` is
-  // pinned to `'custom'`. Guard against a stale `'mine'` from a prior
-  // logged-in session if the user signs out without unmounting the
-  // page.
-  useEffect(() => {
-    if (!hdWalletAvailable && walletSource !== 'custom') {
-      setWalletSource('custom');
-    }
-  }, [hdWalletAvailable, walletSource]);
-
-  // If silent-payment support disappears (e.g., login switched to a
-  // login type that can't derive SP), coerce a stale 'all' / 'private'
-  // selection to 'public' so the submit handler never has to
-  // apologize for a UI choice the user can't actually make.
-  useEffect(() => {
-    if (!silentPaymentSupported && mineAccept !== 'public') {
-      setMineAccept('public');
-    }
-  }, [silentPaymentSupported, mineAccept]);
-
   const editCampaignQuery = useCampaign({
     pubkey: editTarget?.pubkey ?? '',
     identifier: editTarget?.identifier ?? '',
@@ -307,17 +222,6 @@ export function CreateCampaignPage() {
   const derivedSlug = useMemo(() => buildCampaignSlug(title), [title]);
   const activeIdentifier = editCampaign?.identifier ?? derivedSlug.slug;
 
-  // Live-parsed custom inputs, used to drive disclaimers and inline
-  // validation. Empty strings parse to `null` (no inline error).
-  const parsedCustomOnchain = useMemo(
-    () => (customOnchain.trim() ? parseCampaignWallet(customOnchain) : null),
-    [customOnchain],
-  );
-  const parsedCustomSp = useMemo(
-    () => (customSp.trim() ? parseCampaignWallet(customSp) : null),
-    [customSp],
-  );
-
   useSeoMeta({
     title: `${isEditMode ? t('campaignsCreate.seoTitleEdit') : t('campaignsCreate.seoTitleCreate')} | ${config.appName}`,
     description: isEditMode
@@ -335,16 +239,10 @@ export function CreateCampaignPage() {
     // already on the event. We'll re-emit it from the original event
     // tags below if the URL is unchanged.
     setBannerNip94Tags(null);
-    // Edit mode always starts in 'custom' with the existing endpoints
-    // pre-filled. We don't try to auto-detect whether the stored `w`
-    // tags came from the user's HD wallet — switching wallets is an
-    // explicit choice the user must make, and the cursor must not be
-    // burned on a no-op edit.
-    setWalletSource('custom');
-    setCustomOnchain(editCampaign.wallets.onchain?.value ?? '');
-    setCustomSp(editCampaign.wallets.sp?.value ?? '');
-    setWalletDefaultsApplied(true);
     setGoalUsd(editCampaign.goalUsd !== undefined ? String(editCampaign.goalUsd) : '');
+    setGrinAddress(editCampaign.grinAddress ?? '');
+    setGoblinPayEndpub(editCampaign.goblinPayEndpub ?? '');
+    setGoblinPaySigner(editCampaign.goblinPaySignerPubkey ?? '');
     const editCountryCode = editCampaign.countryCode ?? '';
     setCountryCode(editCountryCode);
     setCountryQuery(editCountryCode ? (getCountryInfo(editCountryCode)?.subdivisionName ?? getCountryInfo(editCountryCode)?.name ?? editCountryCode) : '');
@@ -403,61 +301,6 @@ export function CreateCampaignPage() {
         throw new Error(t('campaignsCreate.errorSlugInvalid'));
       }
 
-      // Resolve the campaign's `w` endpoints.
-      //
-      // - 'mine'   → derive from the user's HD wallet. {@link mineAccept}
-      //   selects which modes are published. The on-chain receive
-      //   index is advanced later (just before the `w` tag is
-      //   appended) so a validation failure between here and there
-      //   doesn't burn an index.
-      // - 'custom' → validate the typed values up-front. At least one
-      //   must parse to its expected mode.
-      //
-      // `willUseHdOnchain` and `spWallet` are the resolved targets;
-      // `customOnchainWallet` is populated when 'custom' is selected
-      // and the bc1 field parses.
-      let customOnchainWallet = null as ReturnType<typeof parseCampaignWallet>;
-      let customSpWallet = null as ReturnType<typeof parseCampaignWallet>;
-      let willUseHdOnchain = false;
-      let spWallet = null as ReturnType<typeof parseCampaignWallet>;
-
-      if (walletSource === 'mine') {
-        if (!hdWalletAvailable) {
-          throw new Error(t('campaignsCreate.errorHdUnavailable'));
-        }
-        const wantsOnchain = mineAccept === 'all' || mineAccept === 'public';
-        const wantsSp = mineAccept === 'all' || mineAccept === 'private';
-        if (wantsSp && !silentPaymentSupported) {
-          throw new Error(t('campaignsCreate.errorSpUnavailable'));
-        }
-        willUseHdOnchain = wantsOnchain;
-        if (wantsSp && hdWallet.silentPaymentAddress) {
-          spWallet = parseCampaignWallet(hdWallet.silentPaymentAddress.address);
-        }
-      } else {
-        // 'custom'
-        const customOnchainTrimmed = customOnchain.trim();
-        const customSpTrimmed = customSp.trim();
-        if (customOnchainTrimmed) {
-          customOnchainWallet = parseCampaignWallet(customOnchainTrimmed);
-          if (!customOnchainWallet || customOnchainWallet.mode !== 'onchain') {
-            throw new Error(t('campaignsCreate.errorOnchainInvalid'));
-          }
-        }
-        if (customSpTrimmed) {
-          customSpWallet = parseCampaignWallet(customSpTrimmed);
-          if (!customSpWallet || customSpWallet.mode !== 'sp') {
-            throw new Error(t('campaignsCreate.errorSpInvalid'));
-          }
-        }
-        spWallet = customSpWallet;
-      }
-
-      // At least one endpoint must resolve.
-      if (!willUseHdOnchain && !customOnchainWallet && !spWallet) {
-        throw new Error(t('campaignsCreate.errorWalletRequired'));
-      }
-
       // Goal — integer USD (no unit, no currency conversion).
       let goalNum: number | undefined;
       const trimmedGoal = goalUsd.replace(/[, $]/g, '').trim();
@@ -499,6 +342,38 @@ export function CreateCampaignPage() {
         }
       }
 
+      // Grin receiving config — validate whatever was provided.
+      const trimmedGrin = grinAddress.trim().toLowerCase();
+      if (trimmedGrin && !isValidSlatepackAddress(trimmedGrin)) {
+        throw new Error(t('campaignsCreate.errorGrinAddressInvalid'));
+      }
+      const trimmedEndpub = goblinPayEndpub.trim();
+      if (trimmedEndpub) {
+        let ok = false;
+        try {
+          const decoded = nip19.decode(trimmedEndpub);
+          ok = decoded.type === 'npub' || decoded.type === 'nprofile';
+        } catch {
+          ok = false;
+        }
+        if (!ok) throw new Error(t('campaignsCreate.errorGoblinPayInvalid'));
+      }
+      const trimmedSigner = goblinPaySigner.trim();
+      let signerHex = '';
+      if (trimmedSigner) {
+        if (/^[0-9a-f]{64}$/i.test(trimmedSigner)) {
+          signerHex = trimmedSigner.toLowerCase();
+        } else {
+          try {
+            const decoded = nip19.decode(trimmedSigner);
+            if (decoded.type === 'npub') signerHex = decoded.data;
+          } catch {
+            // fall through to the error below
+          }
+          if (!signerHex) throw new Error(t('campaignsCreate.errorGoblinPaySignerInvalid'));
+        }
+      }
+
       // Validate banner URL (must be https).
       const trimmedBanner = bannerUrl.trim();
       const sanitizedBanner = trimmedBanner ? sanitizeUrl(trimmedBanner) : undefined;
@@ -534,32 +409,14 @@ export function CreateCampaignPage() {
       }
       tags.push(['alt', t('campaignsCreate.altText', { title: trimmedTitle })]);
 
-      // Last step before the `w` tags: advance the HD wallet cursor
-      // if the user chose 'mine' and the selected accept mode includes
-      // on-chain. Deliberately the *last* mutation we do before
-      // publishing so a validation failure earlier in this function
-      // doesn't burn an index.
-      let onchainWallet = customOnchainWallet;
-      if (!onchainWallet && willUseHdOnchain) {
-        const next = hdWallet.nextReceiveAddress();
-        if (!next) {
-          throw new Error(t('campaignsCreate.errorHdDeriveFailed'));
-        }
-        const parsed = parseCampaignWallet(next.address);
-        if (!parsed || parsed.mode !== 'onchain') {
-          throw new Error(t('campaignsCreate.errorHdDeriveInvalid'));
-        }
-        onchainWallet = parsed;
-      }
-
-      if (!onchainWallet && !spWallet) {
-        // Defense in depth — the earlier guard already covers this,
-        // but the type narrower can't see across the cursor advance.
-        throw new Error(t('campaignsCreate.errorWalletRequiredFallback'));
-      }
-      if (onchainWallet) tags.push(['w', onchainWallet.value]);
-      if (spWallet) tags.push(['w', spWallet.value]);
       if (goalNum !== undefined) tags.push(['goal', String(goalNum)]);
+      // Grin receiving tags (see lib/campaign.ts for the shapes).
+      if (trimmedGrin) tags.push(['grin', trimmedGrin]);
+      if (trimmedEndpub || signerHex) {
+        const goblinPayTag = ['goblinpay', trimmedEndpub];
+        if (signerHex) goblinPayTag.push(signerHex);
+        tags.push(goblinPayTag);
+      }
       if (resolvedCountryCode) {
         tags.push(['i', createCountryIdentifier(resolvedCountryCode)]);
         tags.push(['k', 'iso3166']);
@@ -770,29 +627,6 @@ export function CreateCampaignPage() {
     </FormSection>
   );
 
-  const walletSection = (
-    <FormSection title={t('campaignsCreate.wallet')} requirement="Required">
-      <WalletPicker
-        hdWalletAvailable={hdWalletAvailable}
-        silentPaymentSupported={silentPaymentSupported}
-        displayName={userDisplayName}
-        picture={userMetadata?.picture}
-        totalBalance={hdWallet.totalBalance}
-        balanceLoading={hdWalletAvailable && hdWallet.isLoading}
-        walletSource={walletSource}
-        onWalletSourceChange={setWalletSource}
-        mineAccept={mineAccept}
-        onMineAcceptChange={setMineAccept}
-        customOnchain={customOnchain}
-        onCustomOnchainChange={setCustomOnchain}
-        parsedCustomOnchain={parsedCustomOnchain}
-        customSp={customSp}
-        onCustomSpChange={setCustomSp}
-        parsedCustomSp={parsedCustomSp}
-      />
-    </FormSection>
-  );
-
   const countrySection = (
     <FormSection title={t('forms.country')} requirement="Recommended">
       <CountrySelect
@@ -938,6 +772,66 @@ export function CreateCampaignPage() {
     </FormSection>
   );
 
+  // Grin receiving config: how donations reach this campaign. Both paths
+  // are optional; without either, the campaign page shows no donate button
+  // (unless the instance itself runs a GoblinPay for its campaigns).
+  const grinSection = (
+    <FormSection title={t('campaignsCreate.grinHeading')} requirement="Recommended">
+      <div className="space-y-4">
+        <p className="text-xs text-muted-foreground">{t('campaignsCreate.grinNote')}</p>
+        <div className="space-y-1.5">
+          <label htmlFor="campaign-grin-address" className="text-xs font-medium text-muted-foreground">
+            {t('campaignsCreate.grinAddressLabel')}
+          </label>
+          <Input
+            id="campaign-grin-address"
+            type="text"
+            autoComplete="off"
+            spellCheck={false}
+            placeholder="grin1…"
+            value={grinAddress}
+            onChange={(e) => setGrinAddress(e.target.value)}
+            className="font-mono"
+            dir="ltr"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <label htmlFor="campaign-goblinpay-endpub" className="text-xs font-medium text-muted-foreground">
+            {t('campaignsCreate.goblinPayLabel')}
+          </label>
+          <Input
+            id="campaign-goblinpay-endpub"
+            type="text"
+            autoComplete="off"
+            spellCheck={false}
+            placeholder="npub1… / nprofile1…"
+            value={goblinPayEndpub}
+            onChange={(e) => setGoblinPayEndpub(e.target.value)}
+            className="font-mono"
+            dir="ltr"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <label htmlFor="campaign-goblinpay-signer" className="text-xs font-medium text-muted-foreground">
+            {t('campaignsCreate.goblinPaySignerLabel')}
+          </label>
+          <Input
+            id="campaign-goblinpay-signer"
+            type="text"
+            autoComplete="off"
+            spellCheck={false}
+            placeholder="npub1…"
+            value={goblinPaySigner}
+            onChange={(e) => setGoblinPaySigner(e.target.value)}
+            className="font-mono"
+            dir="ltr"
+          />
+          <p className="text-[11px] text-muted-foreground">{t('campaignsCreate.goblinPaySignerNote')}</p>
+        </div>
+      </div>
+    </FormSection>
+  );
+
   const header = (
     <div>
       <div className="flex items-center gap-2 -ml-2">
@@ -1005,12 +899,12 @@ export function CreateCampaignPage() {
 
           <div className="rounded-2xl bg-card/50 p-2">
             {titleSection}
-            {walletSection}
             {countrySection}
             {tagsSection}
             {bannerSection}
             {storySection}
             {goalSection}
+            {grinSection}
           </div>
 
           {errorAlert}
@@ -1055,11 +949,6 @@ export function CreateCampaignPage() {
       body: campaignIdentitySection,
     },
     {
-      title: t('campaignsCreate.wizard.walletStepTitle'),
-      subtitle: t('campaignsCreate.wizard.walletStepSubtitle'),
-      body: walletSection,
-    },
-    {
       title: t('campaignsCreate.wizard.storyStepTitle'),
       subtitle: t('campaignsCreate.wizard.storyStepSubtitle'),
       body: storySection,
@@ -1067,7 +956,12 @@ export function CreateCampaignPage() {
     {
       title: t('campaignsCreate.wizard.goalStepTitle'),
       subtitle: t('campaignsCreate.wizard.goalStepSubtitle'),
-      body: goalSection,
+      body: (
+        <>
+          {goalSection}
+          {grinSection}
+        </>
+      ),
     },
     {
       title: t('campaignsCreate.wizard.tagsStepTitle'),
@@ -1083,8 +977,6 @@ export function CreateCampaignPage() {
 
   // Required-field gates for the wizard's Next buttons. Profile is required
   // only for campaign creators missing name/avatar; title is always required.
-  // The wallet picker is validated at submit because its validity depends on
-  // which inputs the user touched.
   const titleProvided = title.trim().length > 0;
   const profileStep = needsCampaignProfile ? 1 : null;
   const titleStep = needsCampaignProfile ? 2 : 1;
@@ -1106,9 +998,7 @@ export function CreateCampaignPage() {
         return true;
       }}
       // The shortcut appears once the user has cleared the required
-      // title and wallet steps. Earlier steps don't
-      // even render the button because the wallet picker hasn't been
-      // shown yet — publishing without it would be a confusing error.
+      // title step — everything after it is optional polish.
       launchAvailableFromStep={launchStep}
       launchNowLabel={t('campaignsCreate.wizard.launchNow')}
       errorAlert={errorAlert}
@@ -1118,421 +1008,6 @@ export function CreateCampaignPage() {
       onClose={() => navigate(-1)}
       onBackFromFirstStep={onboardingRole === 'creator' ? () => startSignup() : undefined}
     />
-  );
-}
-
-
-// ─── Layout helpers ──────────────────────────────────────────────────────────
-
-/**
- * Wallet picker for the campaign form.
- *
- * Two modes selectable via a single inline toggle:
- *
- *  1. **My wallet** (`'mine'`, default when nsec is available) — a
- *     primary-tinted hero card (modelled on the onboarding "Save your
- *     key" surface) whose centerpiece is a linked-icon trio
- *     (campaign ↔ key ↔ wallet) explaining that donations land in the
- *     creator's own Agora wallet. An avatar + live USD/BTC balance
- *     chip confirms the exact destination, and a "Use a custom wallet"
- *     sub-link swaps into custom mode. The HD-wallet mode also
- *     surfaces a segmented "Accept" picker (All / Public / Private)
- *     that picks which donation types the campaign accepts.
- *  2. **Custom** (`'custom'`) — two address inputs (on-chain + silent
- *     payment). At least one must parse to a valid endpoint of its
- *     mode.
- *
- * Users without nsec access (extension / bunker logins) never see the
- * "mine" branch — `hdWalletAvailable` is false and we drop straight
- * to the custom inputs.
- */
-function WalletPicker({
-  hdWalletAvailable,
-  silentPaymentSupported,
-  displayName,
-  picture,
-  totalBalance,
-  balanceLoading,
-  walletSource,
-  onWalletSourceChange,
-  mineAccept,
-  onMineAcceptChange,
-  customOnchain,
-  onCustomOnchainChange,
-  parsedCustomOnchain,
-  customSp,
-  onCustomSpChange,
-  parsedCustomSp,
-}: {
-  hdWalletAvailable: boolean;
-  silentPaymentSupported: boolean;
-  displayName: string;
-  picture?: string;
-  /** Live HD-wallet balance in sats (confirmed + pending + SP). */
-  totalBalance: number;
-  /** True while the initial HD scan is still running — drives skeleton. */
-  balanceLoading: boolean;
-  walletSource: 'mine' | 'custom';
-  onWalletSourceChange: (value: 'mine' | 'custom') => void;
-  mineAccept: 'all' | 'public' | 'private';
-  onMineAcceptChange: (value: 'all' | 'public' | 'private') => void;
-  customOnchain: string;
-  onCustomOnchainChange: (value: string) => void;
-  parsedCustomOnchain: ReturnType<typeof parseCampaignWallet>;
-  customSp: string;
-  onCustomSpChange: (value: string) => void;
-  parsedCustomSp: ReturnType<typeof parseCampaignWallet>;
-}) {
-  const { t } = useTranslation();
-  const { data: btcPrice } = useBtcPrice();
-  const initial = displayName.charAt(0).toUpperCase() || '?';
-  const myWalletLabel = displayName
-    ? t('campaignsCreate.myWalletLabel', { name: displayName })
-    : t('campaignsCreate.myWalletDefault');
-
-  // When no HD wallet is available (extension / bunker login) there's
-  // no "mine" branch to choose — render only the custom inputs with a
-  // short intro line so the user understands what's expected.
-  if (!hdWalletAvailable) {
-    return (
-      <div className="space-y-3">
-        <p className="text-xs text-muted-foreground">
-          {t('campaignsCreate.customWalletIntro')}
-        </p>
-        <CustomWalletInput
-          id="campaign-wallet-onchain"
-          label={t('campaignsCreate.bitcoinAddress')}
-          placeholder={t('campaignsCreate.bitcoinAddressPlaceholder')}
-          value={customOnchain}
-          onChange={onCustomOnchainChange}
-          parsed={parsedCustomOnchain}
-          expectedMode="onchain"
-        />
-        <CustomWalletInput
-          id="campaign-wallet-sp"
-          label={t('campaignsCreate.silentPaymentCode')}
-          placeholder={t('campaignsCreate.silentPaymentCodePlaceholder')}
-          value={customSp}
-          onChange={onCustomSpChange}
-          parsed={parsedCustomSp}
-          expectedMode="sp"
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      {walletSource === 'mine' ? (
-        <>
-          {/* Hero card. Modelled on the onboarding "Save your key"
-              surface: a primary-tinted card whose visual centerpiece
-              is an icon pair (the campaign -> the wallet) so a
-              first-time creator instantly grasps that donations land
-              in their own Agora wallet. The avatar + live balance
-              below confirm the exact destination. */}
-          <div className="rounded-xl border-2 border-primary/30 bg-primary/10 p-5 space-y-4">
-            <div className="flex items-center justify-center gap-3">
-              <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-background shadow-sm ring-2 ring-primary/30">
-                <HandHeart className="size-7 text-primary" />
-              </div>
-              <ArrowRight className="size-5 shrink-0 text-primary rtl:rotate-180" />
-              <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-background shadow-sm ring-2 ring-primary/30">
-                <Wallet className="size-7 text-primary" />
-              </div>
-            </div>
-
-            <p className="whitespace-pre-line text-center text-sm leading-relaxed text-foreground">
-              {t('campaignsCreate.walletHeroNote')}
-            </p>
-
-            {/* Destination confirmation — avatar + live balance, framed
-                as a self-contained chip so it reads as "this exact
-                wallet" rather than incidental chrome. */}
-            <div className="flex items-center gap-3 rounded-lg border border-primary/20 bg-background/60 px-3 py-2.5">
-              <Avatar className="size-10 shrink-0">
-                <AvatarImage src={picture} alt={displayName} />
-                <AvatarFallback>{initial}</AvatarFallback>
-              </Avatar>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">{myWalletLabel}</p>
-                {balanceLoading ? (
-                  <Skeleton className="mt-1 h-4 w-24" />
-                ) : btcPrice ? (
-                  <p className="text-xs text-muted-foreground tabular-nums">
-                    <span className="font-medium text-foreground">
-                      {satsToUSD(totalBalance, btcPrice)}
-                    </span>
-                    <span className="mx-1.5 opacity-60">·</span>
-                    <span>{formatBTC(totalBalance)} BTC</span>
-                  </p>
-                ) : (
-                  <p className="text-xs text-muted-foreground tabular-nums">
-                    {formatBTC(totalBalance)} BTC
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2 border-t border-primary/20 pt-3">
-              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
-              <p className="text-xs leading-relaxed text-muted-foreground">
-                {t('campaignsCreate.walletHeroReassurance')}
-              </p>
-            </div>
-          </div>
-
-          {/* "Use a custom wallet" sub-link — the only affordance for
-              swapping to custom mode. */}
-          <button
-            type="button"
-            onClick={() => onWalletSourceChange('custom')}
-            className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:underline"
-          >
-            {t('campaignsCreate.walletUseCustom')}
-          </button>
-
-          {/* Accept-mode segmented picker. Default 'all' (HD + SP); the
-              non-SP options are only relevant if SP is unsupported. */}
-          <AcceptModePicker
-            value={mineAccept}
-            onChange={onMineAcceptChange}
-            silentPaymentSupported={silentPaymentSupported}
-          />
-        </>
-      ) : (
-        <>
-          {/* Header — name the current mode, then offer the swap back
-              on its own line beneath. Each child is wrapped in a block
-              `<div>` so the two inline-flex pieces don't end up
-              side-by-side on a wide enough viewport. */}
-          <div className="space-y-1">
-            <div>
-              <div className="inline-flex items-center gap-2 text-sm font-medium">
-                <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                  <Wallet className="size-3.5" />
-                </span>
-                {t('campaignsCreate.walletCustom')}
-              </div>
-            </div>
-            <div>
-              <button
-                type="button"
-                onClick={() => onWalletSourceChange('mine')}
-                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:underline"
-              >
-                <ArrowLeft className="h-3 w-3 rtl:rotate-180" />
-                {t('campaignsCreate.walletUseMine')}
-              </button>
-            </div>
-          </div>
-
-          {/* Restate the field-driven accept model in the same plain
-              voice as the "mine" branch's accept picker, so swapping to
-              custom mode doesn't drop the public/private hand-holding. */}
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            {t('campaignsCreate.customWalletIntro')}
-          </p>
-
-          <CustomWalletInput
-            id="campaign-wallet-onchain"
-            label={t('campaignsCreate.bitcoinAddress')}
-            placeholder={t('campaignsCreate.bitcoinAddressPlaceholder')}
-            value={customOnchain}
-            onChange={onCustomOnchainChange}
-            parsed={parsedCustomOnchain}
-            expectedMode="onchain"
-          />
-          <CustomWalletInput
-            id="campaign-wallet-sp"
-            label={t('campaignsCreate.silentPaymentCode')}
-            placeholder={t('campaignsCreate.silentPaymentCodePlaceholder')}
-            value={customSp}
-            onChange={onCustomSpChange}
-            parsed={parsedCustomSp}
-            expectedMode="sp"
-          />
-        </>
-      )}
-    </div>
-  );
-}
-
-/**
- * "What donations will you accept?" picker for the HD-wallet branch.
- *
- * Written for a first-time, possibly anxious creator: instead of three
- * terse jargon pills (Accept All / Public Only / Private Only) it
- * presents three full-width selectable cards, each with a friendly
- * icon, a plain-language title, and a one-line reassurance. The two
- * SP-dependent options are disabled (with a short note) when silent
- * payments aren't supported on this login (extension / bunker).
- */
-function AcceptModePicker({
-  value,
-  onChange,
-  silentPaymentSupported,
-}: {
-  value: 'all' | 'public' | 'private';
-  onChange: (next: 'all' | 'public' | 'private') => void;
-  silentPaymentSupported: boolean;
-}) {
-  const { t } = useTranslation();
-
-  const options: {
-    key: 'all' | 'public' | 'private';
-    icon: typeof Globe;
-    title: string;
-    description: string;
-    requiresSp?: boolean;
-  }[] = [
-    {
-      key: 'all',
-      icon: HandHeart,
-      title: t('campaignsCreate.acceptAllTitle'),
-      description: t('campaignsCreate.acceptAllHint'),
-      requiresSp: true,
-    },
-    {
-      key: 'public',
-      icon: Globe,
-      title: t('campaignsCreate.acceptPublicTitle'),
-      description: t('campaignsCreate.acceptPublicHint'),
-    },
-    {
-      key: 'private',
-      icon: EyeOff,
-      title: t('campaignsCreate.acceptPrivateTitle'),
-      description: t('campaignsCreate.acceptPrivateHint'),
-      requiresSp: true,
-    },
-  ];
-
-  return (
-    <div className="space-y-3">
-      <p className="text-sm font-medium">{t('campaignsCreate.acceptHeading')}</p>
-      <div className="space-y-2" role="radiogroup" aria-label={t('campaignsCreate.acceptHeading')}>
-        {options.map((option) => {
-          const Icon = option.icon;
-          const selected = value === option.key;
-          const disabled = option.requiresSp && !silentPaymentSupported;
-          return (
-            <button
-              key={option.key}
-              type="button"
-              role="radio"
-              aria-checked={selected}
-              disabled={disabled}
-              onClick={() => onChange(option.key)}
-              className={cn(
-                'flex w-full items-start gap-3 rounded-xl border-2 p-4 text-left transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                selected
-                  ? 'border-primary bg-primary/10'
-                  : 'border-border bg-background hover:border-primary/40 hover:bg-muted/40',
-                disabled && 'cursor-not-allowed opacity-50 hover:border-border hover:bg-background',
-              )}
-            >
-              <span
-                className={cn(
-                  'flex size-10 shrink-0 items-center justify-center rounded-full',
-                  selected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground',
-                )}
-              >
-                <Icon className="size-5" />
-              </span>
-              <span className="min-w-0 flex-1 space-y-0.5">
-                <span className="block text-sm font-semibold">{option.title}</span>
-                <span className="block text-xs leading-relaxed text-muted-foreground">
-                  {disabled ? t('campaignsCreate.acceptUnavailable') : option.description}
-                </span>
-              </span>
-              <span
-                className={cn(
-                  'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
-                  selected ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/30',
-                )}
-                aria-hidden="true"
-              >
-                {selected && <Check className="size-3" />}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-/**
- * Single labeled custom-wallet input. Mirrors the accept-picker
- * language so the field-driven custom flow keeps the same public /
- * private framing: a {@link Bitcoin}/{@link EyeOff} icon next to the
- * label and a one-line caption spell out what filling this field
- * means, so the user never has to infer "address = public,
- * code = private".
- *
- * The inline error fires only when a non-empty value either fails to
- * parse OR parses to a mode that doesn't match {@link expectedMode}
- * (e.g., an `sp1…` typed into the on-chain field).
- */
-function CustomWalletInput({
-  id,
-  label,
-  placeholder,
-  value,
-  onChange,
-  parsed,
-  expectedMode,
-}: {
-  id: string;
-  label: string;
-  placeholder: string;
-  value: string;
-  onChange: (value: string) => void;
-  parsed: ReturnType<typeof parseCampaignWallet>;
-  expectedMode: 'onchain' | 'sp';
-}) {
-  const { t } = useTranslation();
-  const trimmed = value.trim();
-  const hasError = trimmed.length > 0 && (!parsed || parsed.mode !== expectedMode);
-  const errorMessage =
-    expectedMode === 'onchain'
-      ? t('campaignsCreate.onchainInvalid')
-      : t('campaignsCreate.spInvalid');
-  const MeaningIcon = expectedMode === 'onchain' ? Bitcoin : EyeOff;
-  const meaning =
-    expectedMode === 'onchain'
-      ? t('campaignsCreate.customOnchainMeaning')
-      : t('campaignsCreate.customSpMeaning');
-  return (
-    <div className="space-y-1.5">
-      <div className="flex items-center gap-1.5">
-        <MeaningIcon className="size-3.5 shrink-0 text-muted-foreground" />
-        <label htmlFor={id} className="text-xs font-medium">
-          {label}
-        </label>
-      </div>
-      <div className="relative">
-        <Wallet className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value.trim())}
-          placeholder={placeholder}
-          className={cn('pl-9 font-mono text-xs', hasError && 'border-destructive focus-visible:ring-destructive')}
-          spellCheck={false}
-          autoComplete="off"
-          autoCorrect="off"
-          aria-invalid={hasError}
-        />
-      </div>
-      {hasError ? (
-        <p className="text-xs text-destructive">{errorMessage}</p>
-      ) : (
-        <p className="text-xs leading-relaxed text-muted-foreground">{meaning}</p>
-      )}
-    </div>
   );
 }
 

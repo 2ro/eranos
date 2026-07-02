@@ -23,10 +23,6 @@ import {
   BookContentHeader,
   CountryContentHeader,
 } from '@/components/ExternalContentHeader';
-import {
-  BitcoinTxHeader,
-  BitcoinAddressHeader,
-} from '@/components/BitcoinContentHeader';
 import { parseExternalUri, headerLabel, seoTitle, type ExternalContent } from '@/lib/externalContent';
 import { ratingToStars } from '@/lib/bookstr';
 import { formatNumber } from '@/lib/formatNumber';
@@ -258,7 +254,7 @@ export function ExternalContentPage() {
   useSeoMeta({ title: content ? (resolvedTitle ? `${resolvedTitle} | ${config.appName}` : seoTitle(content, config.appName)) : `External Content | ${config.appName}` });
 
   // Build the NIP-73 identifier for comments. NIP-73 identifiers with schemes
-  // (isbn:, iso3166:, bitcoin:, etc.) are URL objects so NIP-22 writes the
+  // (isbn:, iso3166:, etc.) are URL objects so NIP-22 writes the
   // protocol into the k/K tag instead of treating them as hashtags.
   const commentRootUrl = useMemo((): URL | undefined => {
     if (!content || content.type !== 'url') return undefined;
@@ -397,8 +393,6 @@ export function ExternalContentPage() {
         <div className="px-4 space-y-6 pb-4">
           {content.type === 'url' && <UrlContentHeader url={content.value} />}
           {content.type === 'isbn' && <BookContentHeader isbn={content.value} />}
-          {content.type === 'bitcoin-tx' && <BitcoinTxHeader txid={content.txid} />}
-          {content.type === 'bitcoin-address' && <BitcoinAddressHeader address={content.address} />}
           {content.type === 'unknown' && (
             <div className="rounded-2xl border border-border p-5 text-center">
               <Globe className="size-8 mx-auto mb-2 text-muted-foreground" />

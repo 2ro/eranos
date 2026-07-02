@@ -1,22 +1,21 @@
-# Agora
+# Eranos
 
 Power to the people.
 
-Agora is a Nostr client focused on community ownership, expressive identity, and censorship resistance. This repository (`agora-3`) is the Agora-branded app built from the Ditto codebase.
+Eranos is a Nostr client focused on community ownership, expressive identity, and censorship resistance. This repository is the Eranos-branded app, a Grin-only fork of Agora (itself built from the Ditto codebase). All Bitcoin and Lightning payment rails have been removed; Grin payments land in a later phase.
 
-**[agora.spot](https://agora.spot)** | **[Source](https://gitlab.com/soapbox-pub/agora-3)**
+**[eranos.fund](https://eranos.fund)** | **Upstream: [Agora](https://gitlab.com/soapbox-pub/agora-3)**
 
 ## What This Repo Is
 
-- Agora product identity (name, theme, assets, native IDs)
+- Eranos product identity (name, theme, assets, native IDs)
 - Ditto-derived implementation with broad Nostr feature coverage
-- Configurable deployment defaults via `agora.json`
+- Configurable deployment defaults via `eranos.json`
 
 ## Features
 
 - **Community-first social client**: notes, articles, comments, reposts, reactions, and rich event rendering
 - **Theming system**: built-in presets + custom color/font/background themes that can be shared as events
-- **Lightning support**: zaps with Nostr Wallet Connect and WebLN
 - **Private messaging**: NIP-04 and NIP-17 direct messages
 - **Mobile app shell**: Capacitor-powered Android/iOS wrappers
 - **Self-hostable**: static web build + configurable relay and upload infrastructure
@@ -31,8 +30,8 @@ Agora is a Nostr client focused on community ownership, expressive identity, and
 ### Development
 
 ```sh
-git clone https://gitlab.com/soapbox-pub/agora-3.git
-cd agora-3
+git clone <this-repo>
+cd eranos
 npm install
 npm run dev
 ```
@@ -44,8 +43,8 @@ Development server: `http://localhost:8080`
 Use Docker Compose when you want the nginx reverse-proxy stack (necessary if you want decryptable media in messages - kind 15s of NIP 17):
 
 ```sh
-git clone https://gitlab.com/soapbox-pub/agora-3.git
-cd agora-3
+git clone <this-repo>
+cd eranos
 cp .env.example .env
 docker compose up --build
 ```
@@ -87,7 +86,7 @@ This runs type-checking, linting, unit tests, and production build checks.
 
 ## Configuration
 
-Build-time config is read from `agora.json` (gitignored by default so each deployment can provide its own values).
+Build-time config is read from `eranos.json` (gitignored by default so each deployment can provide its own values).
 
 ```jsonc
 {
@@ -109,7 +108,7 @@ Build-time config is read from `agora.json` (gitignored by default so each deplo
 Configuration priority (highest first):
 
 1. User settings (local storage)
-2. Build config (`agora.json`)
+2. Build config (`eranos.json`)
 3. Hardcoded app defaults
 
 Use a custom config path:
@@ -120,7 +119,7 @@ CONFIG_FILE=./my-config.json npm run build
 
 ## Deployment
 
-Agora builds to static files and can be deployed to any static host.
+Eranos builds to static files and can be deployed to any static host.
 
 - GitLab/GitHub Pages
 - Netlify/Vercel
@@ -155,3 +154,5 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a merge request.
 ## License
 
 [AGPL-3.0](LICENSE)
+
+🤖 Built with AI pair-programming assistance (Claude)

@@ -3,7 +3,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
 
 /**
  * Invalidate the NIP-85 stats queries for a given event so that
- * reaction / repost / comment / zap counts update in the UI after the
+ * reaction / repost / comment counts update in the UI after the
  * user performs an action against it.
  *
  * Handles both regular events (`['nip85-event-stats', eventId, statsPubkey]`)

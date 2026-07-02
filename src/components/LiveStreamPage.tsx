@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Users, Radio, Zap, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { Users, Radio, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useSeoMeta } from '@unhead/react';
 
@@ -10,14 +10,11 @@ import { LiveStreamChat } from '@/components/LiveStreamChat';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ZapDialog } from '@/components/ZapDialog';
-import { Button } from '@/components/ui/button';
 import { ProfileHoverCard } from '@/components/ProfileHoverCard';
 import { EmojifiedText } from '@/components/CustomEmoji';
 import { Nip05Badge } from '@/components/Nip05Badge';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { getEffectiveStreamStatus } from '@/lib/streamStatus';
@@ -75,7 +72,6 @@ interface LiveStreamPageProps {
 export function LiveStreamPage({ event }: LiveStreamPageProps) {
   const { config } = useAppContext();
   const navigate = useNavigate();
-  const { user } = useCurrentUser();
   const [descExpanded, setDescExpanded] = useState(false);
 
   const title = getTag(event.tags, 'title') || 'Untitled Stream';
@@ -206,7 +202,7 @@ export function LiveStreamPage({ event }: LiveStreamPageProps) {
 
         {/* Stream compact info — always visible */}
         <div className="px-4 mt-2 sidebar:mt-4 space-y-2 sidebar:space-y-3 shrink-0">
-          {/* Title row with zap button on the right */}
+          {/* Title row */}
           <div className="flex items-start gap-3">
             <div className="flex-1 min-w-0 space-y-2">
               <h2 className="text-lg font-bold leading-snug">{title}</h2>
@@ -226,8 +222,6 @@ export function LiveStreamPage({ event }: LiveStreamPageProps) {
                 )}
               </div>
             </div>
-            {/* Zap button — right-aligned */}
-            {user && <ZapButton event={event} />}
           </div>
 
           {/* Author / Host — desktop only (on mobile it's inside the expandable details) */}
@@ -335,19 +329,6 @@ function StreamAuthorRow({ event, participants }: { event: NostrEvent; participa
         </div>
       </div>
     </div>
-  );
-}
-
-function ZapButton({ event }: { event: NostrEvent }) {
-  // ZapDialog handles the self-zap guard internally, so we only need to
-  // render the trigger. On-chain zaps are always available for any author;
-  // Lightning is an opt-in tab inside the dialog.
-  return (
-    <ZapDialog target={event}>
-      <Button variant="outline" size="icon" className="shrink-0 size-9 rounded-full text-amber-500 hover:text-amber-400 hover:bg-amber-500/10">
-        <Zap className="size-4" />
-      </Button>
-    </ZapDialog>
   );
 }
 

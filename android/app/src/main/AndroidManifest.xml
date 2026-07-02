@@ -24,12 +24,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Deep links: open agora.spot URLs in the app -->
+            <!-- Deep links: open eranos.fund URLs in the app -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="agora.spot" />
+                <data android:scheme="https" android:host="eranos.fund" />
             </intent-filter>
 
         </activity>

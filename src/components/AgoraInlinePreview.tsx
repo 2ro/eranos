@@ -1,20 +1,16 @@
 import type { NostrEvent } from '@nostrify/nostrify';
 import type { ReactNode } from 'react';
-import { useRef } from 'react';
-import { CalendarClock, HandHeart, MapPin, Megaphone, ShieldCheck, Users } from 'lucide-react';
+import { CalendarClock, HandHeart, MapPin, Megaphone, Users } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { useBtcPrice } from '@/hooks/useBtcPrice';
-import { useCampaignDonations } from '@/hooks/useCampaignDonations';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useInView } from '@/hooks/useInView';
 import { parseAction } from '@/hooks/useActions';
 import { getGeoDisplayName } from '@/lib/countries';
 import { parseCampaign, getCampaignCountryLabel } from '@/lib/campaign';
 import { parseCommunityEvent } from '@/lib/communityUtils';
-import { formatCampaignAmount, formatUsdGoal, satsToUsd } from '@/lib/formatCampaignAmount';
+import { formatUsdGoal } from '@/lib/formatCampaignAmount';
 import { formatCompactPledgeDeadline, formatPledgeAmount } from '@/lib/pledges';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 import { cn } from '@/lib/utils';
@@ -55,14 +51,8 @@ function InlineShell({
 }
 
 export function CampaignInlinePreview({ event }: { event: NostrEvent }) {
+  const { t } = useTranslation();
   const campaign = parseCampaign(event);
-  const { data: btcPrice } = useBtcPrice();
-  // Defer the Esplora-backed donation lookup until the preview scrolls into
-  // view — feeds can render many of these, and fetching all of them eagerly
-  // contributed to the Esplora rate-limiting storm.
-  const previewRef = useRef<HTMLAnchorElement>(null);
-  const inView = useInView(previewRef);
-  const { data: stats } = useCampaignDonations(campaign ?? undefined, { enabled: inView });
   const author = useAuthor(event.pubkey);
   if (!campaign) return null;
 
@@ -72,46 +62,27 @@ export function CampaignInlinePreview({ event }: { event: NostrEvent }) {
     ?? sanitizeUrl(authorMetadata?.picture);
   const naddr = nip19.naddrEncode({ kind: event.kind, pubkey: event.pubkey, identifier: campaign.identifier });
   const countryLabel = getCampaignCountryLabel(campaign);
-  const isSilentPayment = !campaign.wallets.onchain;
-  const goalLabel = campaign.goalUsd && campaign.goalUsd > 0 ? formatUsdGoal(campaign.goalUsd) : undefined;
-  const raisedSats = stats?.totalSats ?? 0;
-  const raisedLabel = isSilentPayment ? undefined : formatCampaignAmount(raisedSats, btcPrice);
-  const raisedUsd = isSilentPayment ? undefined : satsToUsd(raisedSats, btcPrice);
-  const progress = campaign.goalUsd && raisedUsd !== undefined
-    ? Math.min(100, Math.round((raisedUsd / campaign.goalUsd) * 100))
-    : 0;
+  const goalLabel = campaign.goalUsd && campaign.goalUsd > 0
+    ? t('campaignsDetail.target', { amount: formatUsdGoal(campaign.goalUsd) })
+    : undefined;
 
   return (
-    <Link ref={previewRef} to={`/${naddr}`} onClick={(e) => e.stopPropagation()} className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+    <Link to={`/${naddr}`} onClick={(e) => e.stopPropagation()} className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
       <InlineShell
         image={cover}
         fallbackIcon={<HandHeart className="size-12" />}
         title={campaign.title}
         description={campaign.story}
         meta={(
-          <div className="space-y-2 pt-1">
-            {campaign.goalUsd && !isSilentPayment ? (
-              <div className="h-1.5 overflow-hidden rounded-full bg-foreground/15">
-                <div className="h-full rounded-full bg-primary" style={{ width: `${progress}%` }} />
-              </div>
-            ) : null}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
-              {isSilentPayment ? (
-                <span className="inline-flex items-center gap-1.5">
-                  <ShieldCheck className="size-3.5" />
-                  {goalLabel ?? 'Private campaign'}
-                </span>
-              ) : (
-                <span className="font-semibold text-foreground">
-                  {raisedLabel}<span className="font-normal text-muted-foreground"> {goalLabel ? `/ ${goalLabel}` : 'raised'}</span>
-                </span>
-              )}
-              {countryLabel && (
-                <span className="inline-flex items-center gap-1.5">
-                  {countryLabel}
-                </span>
-              )}
-            </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-1 text-xs text-muted-foreground">
+            {goalLabel && (
+              <span className="font-semibold text-foreground">{goalLabel}</span>
+            )}
+            {countryLabel && (
+              <span className="inline-flex items-center gap-1.5">
+                {countryLabel}
+              </span>
+            )}
           </div>
         )}
       />
@@ -122,7 +93,6 @@ export function CampaignInlinePreview({ event }: { event: NostrEvent }) {
 export function PledgeInlinePreview({ event }: { event: NostrEvent }) {
   const { t } = useTranslation();
   const pledge = parseAction(event);
-  const { data: btcPrice } = useBtcPrice();
   if (!pledge) return null;
 
   const naddr = nip19.naddrEncode({ kind: 36639, pubkey: pledge.pubkey, identifier: pledge.id });
@@ -140,7 +110,7 @@ export function PledgeInlinePreview({ event }: { event: NostrEvent }) {
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-1 text-xs text-muted-foreground">
             <span className="inline-flex items-baseline gap-1.5">
               <span className="font-semibold uppercase tracking-wide text-primary">{t('pledges.card.pledged')}</span>
-              <span className="text-sm font-bold text-foreground">{formatPledgeAmount(pledge.bounty, btcPrice)}</span>
+              <span className="text-sm font-bold text-foreground">{formatPledgeAmount(pledge.bounty)}</span>
             </span>
             {countryLabel && (
               <span className="inline-flex items-center gap-1.5">

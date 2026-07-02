@@ -127,8 +127,8 @@ export function useAddrEvent(addr: AddrCoords | undefined, relays?: string[]) {
       // For Zapstore kinds, try the canonical relay first for fastest results
       if (ZAPSTORE_KINDS.includes(addr.kind)) {
         try {
-          const zapEvents = await nostr.relay(ZAPSTORE_RELAY).query(filter, { signal: AbortSignal.timeout(5000) });
-          if (zapEvents.length > 0) return zapEvents[0];
+          const storeEvents = await nostr.relay(ZAPSTORE_RELAY).query(filter, { signal: AbortSignal.timeout(5000) });
+          if (storeEvents.length > 0) return storeEvents[0];
         } catch {
           // zapstore relay failed — fall through to normal flow
         }

@@ -77,7 +77,6 @@
     "language": "Language",
     "dashboard": "Dashboard",
     "myDashboard": "My Dashboard",
-    "wallet": "Wallet",
     "notifications": "Notifications",
     "messages": "Messages",
     "profile": "Profile",
@@ -120,7 +119,7 @@
     "showAllConversations": "Show all conversations",
     "friendsEmpty": "No messages from people you follow.",
     "translateDialogTitle": "Translate private messages?",
-    "translateDialogDescription": "Received messages will be sent to your configured translation service. Sent messages will not be translated. Agora will remember this choice on this device.",
+    "translateDialogDescription": "Received messages will be sent to your configured translation service. Sent messages will not be translated. Eranos will remember this choice on this device.",
     "confirmTranslate": "Translate messages",
     "newMessage": "New message",
     "newMessageTitle": "New message",
@@ -200,7 +199,7 @@
     "secure": {
       "title": "Save your key",
       "subtitle": "Download the file and store it somewhere safe. A password manager works well.",
-      "couplingNote": "Your account and your wallet share this key. It signs your Nostr posts and opens your Bitcoin wallet on Agora.",
+      "couplingNote": "Your account and your wallet share this key. It signs your Nostr posts and opens your Bitcoin wallet on Eranos.",
       "permanenceHeadline": "There's no way to recover this key if you lose it.",
       "permanenceBody": "No reset, no support line, no email recovery. Save it before continuing.",
       "button": "Download & continue",
@@ -279,19 +278,19 @@
       "global": "Global"
     },
     "empty": {
-      "homeAgora": "Quiet moment on Agora. New campaigns, pledges, donations, and posts will appear here as they happen.",
-      "homeFollowingLoggedIn": "Your follow feed is empty. Follow some people to see what they're up to, or switch to Agora or Global.",
+      "homeAgora": "Quiet moment on Eranos. New campaigns, pledges, donations, and posts will appear here as they happen.",
+      "homeFollowingLoggedIn": "Your follow feed is empty. Follow some people to see what they're up to, or switch to Eranos or Global.",
       "homeFollowingLoggedOut": "Log in to see posts from people you follow.",
       "homeOther": "Nothing to show. Check your relay connections or try again in a moment.",
       "follows": "Your feed is empty. Follow some people to see their posts here.",
       "global": "No posts found. Check your relay connections or come back soon.",
-      "browseAgora": "Browse the Agora feed",
+      "browseAgora": "Browse the Eranos feed",
       "browseGlobal": "Browse the Global feed",
       "discoverPeople": "Discover people to follow",
       "logIn": "Log in"
     },
     "modeSwitcher": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "allNostr": "Global",
       "following": "Following",
       "ariaLabel": "Feed mode: {{label}}. Click to change.",
@@ -308,7 +307,6 @@
       "repost": "Repost",
       "undoRepost": "Undo repost",
       "react": "React",
-      "zap": "Zap",
       "share": "Share",
       "more": "More",
       "linkCopied": "Link copied to clipboard"
@@ -417,12 +415,6 @@
     "reacted": "reacted",
     "reposted": "reposted",
     "voted": "voted",
-    "zap": {
-      "donatedTo": "Donated to",
-      "donatedAmountTo": "Donated {{amount}} to",
-      "sat_one": "{{formattedCount}} sat",
-      "sat_other": "{{formattedCount}} sats"
-    },
     "stream": {
       "untitled": "Untitled Stream",
       "live": "LIVE",
@@ -493,7 +485,6 @@
       "nsiteDeployed": "deployed an",
       "nsiteRedeployed": "redeployed an",
       "nsiteNoun": "nsite",
-      "zapped": "zapped",
       "pledgeCreated": "created a",
       "pledgeUpdated": "updated a",
       "pledgeNoun": "pledge",
@@ -663,60 +654,12 @@
         "body": "Funds arrive at the recipient directly. They keep custody, they keep control. Move it, swap it, or spend it; the guides below explain how to do it privately and safely."
       }
     },
-    "twoWays": {
-      "eyebrow": "Bitcoin · One QR, two options",
-      "title": "Two ways to get paid.",
-      "lede": "Both options are Bitcoin. The difference is what you trade off for privacy. When a recipient creates a campaign, they choose which options to accept. If both, the donation page shows a single QR code that works for any wallet.",
-      "public": {
-        "kicker": "Bitcoin Public Payments",
-        "tagline": "Universal · Fast · Transparent",
-        "title": "Works with every wallet on earth.",
-        "description": "Donations land at a regular Bitcoin address the recipient controls. Anyone with any Bitcoin wallet can send. No new app, no new account, no learning curve.",
-        "bullet1": "Works in every Bitcoin wallet: Cash App, Coinbase, Strike, hardware",
-        "bullet2": "Fastest settlement: Bitcoin confirmations only",
-        "bullet3": "Verifiable on-chain: anyone can see what a recipient has received",
-        "tradeoffTitle": "Trade-off: Public on-chain.",
-        "tradeoffIntro": "Every donation is public on the Bitcoin blockchain and on Nostr. {{appName}} is recommended only for above-ground campaigns. If you or your donors require extreme privacy, including from state actors, read the <0>Donor Guide</0> and <1>Recipient Guide</1> before participating."
-      },
-      "silent": {
-        "kicker": "Bitcoin Silent Payments",
-        "tagline": "Unlinkable · Direct · BIP-352",
-        "title": "Unlinkable, on-chain, direct.",
-        "description": "Donations are sent as BIP-352 silent payments. Each one lands at a fresh, unlinkable Bitcoin output that an observer staring at the blockchain can't tie back to the campaign.",
-        "bullet1": "Donation trail can't be reconstructed on-chain",
-        "bullet2": "Protects recipients facing serious adversaries",
-        "bullet3": "Kept in a separate private balance, never mixed with public funds",
-        "tradeoffTitle": "Trade-off: Silent payments are early.",
-        "tradeoffIntro": "The most private way to receive Bitcoin on-chain, but the ecosystem is young and rough today:",
-        "tradeoffBullet1": "Few wallets support it.",
-        "tradeoffBullet2": "Receiving is slow.",
-        "tradeoffBullet3": "No push notifications.",
-        "tradeoffBullet4": "Wallets are still buggy.",
-        "tradeoffBullet5": "Donation counts aren't public."
-      },
-      "noCustody": {
-        "title": "No custody. No middleman.",
-        "body": "{{appName}} never holds funds. Donations move wallet-to-wallet on Bitcoin. There's no server standing between donor and recipient on either option. If {{appName}} disappeared tomorrow, every campaign would keep working.",
-        "gofundme": {
-          "heading": "Unlike GoFundMe",
-          "body": "No platform can freeze your donations, demand refunds, or terminate your campaign over policy disagreements."
-        },
-        "givesendgo": {
-          "heading": "Unlike GiveSendGo",
-          "body": "No payment processor sits in the middle, so no Stripe, no Visa, no bank can cut you off mid-campaign."
-        },
-        "otherBitcoin": {
-          "heading": "Unlike other ‘Bitcoin’ platforms",
-          "body": "No central Lightning node, custodian, or LSP to fail or go offline. Funds settle directly on-chain to a wallet you control."
-        }
-      }
-    },
     "faq": {
       "eyebrow": "Questions",
       "title": "Frequently asked.",
       "chapter1": {
         "label": "Getting started",
-        "description": "What Agora is, who built it, and what it costs."
+        "description": "What Eranos is, who built it, and what it costs."
       },
       "chapter2": {
         "label": "Bitcoin donations",
@@ -724,7 +667,7 @@
       },
       "chapter3": {
         "label": "About Nostr",
-        "description": "The open protocol Agora is built on, and how your account works."
+        "description": "The open protocol Eranos is built on, and how your account works."
       }
     },
     "guides": {
@@ -738,7 +681,6 @@
         "description": "Send Bitcoin directly to recipients and movements anywhere in the world, without asking a payment processor for permission.",
         "bullet1": "Use any Bitcoin wallet you already have.",
         "bullet2": "Donations land directly with the recipient. No custodian, no middleman.",
-        "bullet3": "For privacy, use a wallet that supports silent payments.",
         "cta": "Read the Donor Guide"
       },
       "recipient": {
@@ -747,8 +689,6 @@
         "title": "Get funded without permission.",
         "description": "Receive support directly from people who believe in your cause. No bank account, no application form, no company in the middle.",
         "bullet1": "Start receiving donations as soon as you sign up.",
-        "bullet2": "Pick which payment types to accept: public, silent payments, or both.",
-        "bullet3": "For private cash-out, send to a silent-payments wallet first, then forward anywhere.",
         "cta": "Read the Recipient Guide"
       },
       "stillStuck": "Still stuck?",
@@ -791,7 +731,7 @@
       "lede": "Pick the level of involvement that fits your company — or combine all three.",
       "seedFund": {
         "kicker": "01 · Direct support",
-        "title": "Donate to the Agora Seed Fund",
+        "title": "Donate to the Eranos Seed Fund",
         "description": "Make an unrestricted gift to the {{appName}} Seed Fund. The Seed Fund seeds new and high-need campaigns across the platform, getting verified causes off the ground when they need it most.",
         "bullet1": "Give in Bitcoin (BTC) or US dollars (USD)",
         "bullet2": "Unrestricted — directed where the need is greatest",
@@ -1013,7 +953,6 @@
       "noSubmissionsHint": "Be the first to reply with proof, evidence, or completed work.",
       "funded": "funded",
       "ofPledged": "of {{amount}} pledged",
-      "trustNote": "This pledge is trust-based. Funding progress sums zaps and donation receipts on top-level submissions.",
       "share": "Share",
       "storyHeading": "The pledge",
       "storyEmpty": "The pledger hasn't written details for this pledge yet."
@@ -1175,32 +1114,6 @@
     "headingEdit": "Edit campaign",
     "title": "Title",
     "titlePlaceholder": "Save the Last Bookstore",
-    "wallet": "Bitcoin wallet",
-    "myWalletLabel": "{{name}}'s wallet",
-    "myWalletDefault": "My wallet",
-    "walletHeroNote": "Donations flow straight into your own Agora wallet.\nNo middleman.",
-    "walletHeroReassurance": "You hold the key, so you hold the funds. Withdraw any time from the wallet tab.",
-    "walletChoose": "Choose a wallet",
-    "walletCustom": "Custom wallet",
-    "walletUseCustom": "Use a custom wallet instead",
-    "walletUseMine": "Use my Agora wallet",
-    "acceptHeading": "What donations will you accept?",
-    "acceptUnavailable": "Not available with this login.",
-    "acceptAllTitle": "Any donation",
-    "acceptPublicTitle": "Public donations only",
-    "acceptPrivateTitle": "Private donations only",
-    "acceptAllHint": "Take both public and private donations.",
-    "acceptPublicHint": "Donors give to a regular Bitcoin address. These donations are visible to anyone.",
-    "acceptPrivateHint": "Donors give privately, so their identity stays hidden from the public.",
-    "customWalletIntro": "Fill in whichever donations you want to accept: a public address, a private code, or both. At least one is required.",
-    "customOnchainMeaning": "Public. Anyone can see these donations.",
-    "customSpMeaning": "Private. The donor's identity stays hidden.",
-    "bitcoinAddress": "Bitcoin address",
-    "bitcoinAddressPlaceholder": "bc1q… or bc1p…",
-    "silentPaymentCode": "Silent-payment code",
-    "silentPaymentCodePlaceholder": "sp1…",
-    "onchainInvalid": "Not a recognized mainnet Bitcoin address (bc1q… / bc1p…).",
-    "spInvalid": "Not a recognized BIP-352 silent-payment code (sp1…).",
     "country": "Country",
     "countryPlaceholder": "Search countries",
     "tags": "Tags",
@@ -1228,7 +1141,7 @@
     "storyPlaceholder": "Share the background, who benefits, and how funds will be used.",
     "goal": "Goal",
     "goalPlaceholder": "25,000",
-    "goalNote": "Whole US Dollars. Donors pay in Bitcoin; clients estimate the USD-equivalent at view time.",
+    "goalNote": "Whole US Dollars. Donors pay in Grin; clients estimate the USD-equivalent at view time.",
     "submitCreate": "Launch campaign",
     "submitEdit": "Update campaign",
     "publishing": "Publishing…",
@@ -1247,24 +1160,14 @@
     "errorTitleRequired": "Title is required.",
     "errorTitleInvalid": "Title must include letters or numbers so a campaign URL can be created.",
     "errorSlugInvalid": "Identifier must be lowercase letters, numbers, and hyphens.",
-    "errorHdUnavailable": "Built-in wallet is unavailable for this login.",
-    "errorSpUnavailable": "Silent-payment address is unavailable for this login.",
-    "errorOnchainInvalid": "The on-chain address is not a recognized mainnet bech32(m) address (bc1q… / bc1p…).",
-    "errorSpInvalid": "The silent-payment code is not a recognized BIP-352 code (sp1…).",
-    "errorWalletRequired": "Provide at least one wallet endpoint — a Bitcoin mainnet address (bc1q… / bc1p…) or a silent-payment code (sp1…).",
     "errorGoalInvalid": "Goal must be a positive whole-dollar amount.",
     "errorEditLatestMissing": "Could not find the latest version of this campaign to update.",
     "errorSlugCollision": "You already have a campaign with the identifier \"{{slug}}\". Choose another.",
     "errorBannerInvalid": "Banner must be a valid https:// URL.",
-    "errorHdDeriveFailed": "Could not derive a fresh on-chain address from your wallet.",
-    "errorHdDeriveInvalid": "Derived wallet address failed validation. Please add a custom address instead.",
-    "errorWalletRequiredFallback": "Wallet endpoint is required.",
     "errorPublishedInvalid": "Published event failed validation. Please refresh and try again.",
     "wizard": {
       "titleStepTitle": "Name your campaign",
       "titleStepSubtitle": "A short, clear name and a striking banner donors will recognize.",
-      "walletStepTitle": "Where do donations go?",
-      "walletStepSubtitle": "Pick your Agora wallet or paste your own address.",
       "bannerStepTitle": "Add a banner",
       "bannerStepSubtitle": "One striking image carries the campaign on every card.",
       "storyStepTitle": "Tell your story",
@@ -1277,7 +1180,16 @@
       "back": "Back",
       "skip": "Skip",
       "launchNow": "Skip Next & Launch"
-    }
+    },
+    "grinHeading": "Receiving Grin",
+    "grinNote": "How donations reach you. Add a Grin address so anyone can pay you directly from their own wallet, and/or the GoblinPay receiving identity this instance assigned to your campaign. Both are optional, but without one the campaign page cannot show a donate button.",
+    "grinAddressLabel": "Grin address (grin1…)",
+    "goblinPayLabel": "GoblinPay receiving identity (npub or nprofile)",
+    "goblinPaySignerLabel": "GoblinPay receipt key (npub, optional)",
+    "goblinPaySignerNote": "The GoblinPay server key whose signed receipts count toward your raised total when donors record them. Ask the instance operator for it.",
+    "errorGrinAddressInvalid": "The Grin address is not a valid grin1… Slatepack address.",
+    "errorGoblinPayInvalid": "The GoblinPay receiving identity must be an npub1… or nprofile1… string.",
+    "errorGoblinPaySignerInvalid": "The GoblinPay receipt key must be an npub1… or 64-character hex key."
   },
   "campaignsDetail": {
     "seoTitle": "{{title}} | {{appName}} Fundraisers",
@@ -1304,43 +1216,19 @@
     "like_one": "<0>{{formattedCount}}</0> Like",
     "like_other": "<0>{{formattedCount}}</0> Likes",
     "tabComments": "Comments & donations",
-    "tabLedger": "Ledger",
-    "ledger": {
-      "publicAddress": "Public address",
-      "viewOnMempool": "View on mempool.space",
-      "openOnMempool": "Open transaction on mempool.space",
-      "received": "Received",
-      "sent": "Sent",
-      "unconfirmed": "Unconfirmed",
-      "block": "Block {{height}}",
-      "btcUnit": "BTC",
-      "empty": "No on-chain activity yet for this address.",
-      "error": "Couldn't load on-chain activity. Try again in a moment.",
-      "loadMore": "Load more",
-      "loadingMore": "Loading…"
-    },
     "noCommentsTitle": "No comments yet",
     "noCommentsHint": "Be the first to leave a message of support.",
     "deleteDialogTitle": "Delete this campaign?",
     "deleteDialogBody": "This publishes a NIP-09 deletion request. Well-behaved relays will drop the campaign from feeds and direct links. Past donation receipts stay on-chain regardless. This action cannot be undone — to keep accepting donations, edit the campaign instead.",
     "storyHeading": "The story",
-    "donate": "Donate",
     "share": "Share",
     "target": "Target: {{amount}}",
     "raised": "raised",
     "ofGoal": "of {{amount}} goal",
-    "donationCount_one": "{{count}} donation",
-    "donationCount_other": "{{count}} donations",
-    "openExternalWallet": "Open external wallet",
-    "openInWallet": "Open in wallet",
-    "payWithAgoraWallet": "Pay with Agora"
-  },
-  "noBitcoin": {
-    "trigger": "Don't have Bitcoin?",
-    "title": "No Bitcoin yet?",
-    "description": "Buy Bitcoin in Cash App, then send it to this campaign.",
-    "getItOn": "Get it on",
-    "getCashApp": "Get Cash App"
+    "donate": "Donate with Grin",
+    "raisedGrin": "{{amount}} GRIN raised",
+    "raisedCount_one": "{{count}} verified donation",
+    "raisedCount_other": "{{count}} verified donations"
   },
   "campaignVerification": {
     "verifiedBy": "Verified by",
@@ -1461,25 +1349,6 @@
       "yourCampaignsDesc": "Your campaigns are live on Nostr and donations work via the campaign link. Browse all campaigns at /campaigns; the {{appName}} team features a curated selection on the homepage.",
       "empty": "No campaigns yet",
       "emptyHint": "Be the first to start a fundraiser on {{appName}}. Tell your story, choose your beneficiaries, and share the link.",
-      "venezuelaRelief": {
-        "title": "Venezuela needs <0>you</0>",
-        "body": "A powerful earthquake has struck northern Venezuela, hitting Caracas and La Guaira hardest. Families there can't get through this alone. Your donation goes straight to relief campaigns on the ground, turning your compassion into shelter, food, and hope today.",
-        "donate": "Donate to relief",
-        "credit": "Photos from Caracas, Venezuela. (AP; AFP via Getty Images)",
-        "share": "Share",
-        "shareTitle": "Venezuela earthquake relief on Agora",
-        "linkCopied": "Link copied to clipboard",
-        "learnMore": "Learn more",
-        "popupBody": "A powerful earthquake has struck northern Venezuela, hitting Caracas and La Guaira hardest. Your donation goes straight to relief campaigns on the ground, turning compassion into shelter, food, and hope today.",
-        "seoTitle": "Venezuela Earthquake Relief",
-        "seoDescription": "A powerful earthquake has struck northern Venezuela. Donate Bitcoin directly to on-the-ground relief campaigns on Agora. No platform, no custodian, no permission required.",
-        "pageEyebrow": "Emergency appeal",
-        "pageHow": "How your donation helps",
-        "pageHowBody": "Agora is non-custodial: your Bitcoin goes straight from your wallet to a relief campaign's address. No platform takes a cut, no custodian holds the funds, and no one needs permission to give or receive. Every campaign below is run by people responding to the quake on the ground.",
-        "showcaseTitle": "Relief campaigns",
-        "campaignCount_one": "{{count}} relief campaign",
-        "campaignCount_other": "{{count}} relief campaigns"
-      },
       "whyDifferent": {
         "eyebrow": "Why {{appName}}",
         "title": "Built different.",
@@ -1498,21 +1367,13 @@
           "bullet2": "Settles on-chain to a wallet you own",
           "bullet3": "Works even if {{appName}} vanishes"
         },
-        "block3": {
-          "heading": "Public or private. Your choice.",
-          "body": "Recipients pick the receiving option that matches their threat model. Donors see a single QR; the wallet picks the right protocol.",
-          "publicLabel": "Public",
-          "publicSummary": "Works in every Bitcoin wallet. Fast and verifiable on-chain.",
-          "privateLabel": "Private",
-          "privateSummary": "BIP-352 silent payments. Donations land at unlinkable outputs."
-        },
         "readMore": "Read the full breakdown"
       }
     },
     "all": {
       "title": "Campaigns",
       "seoTitle": "All campaigns",
-      "description": "Browse every campaign published on Agora.",
+      "description": "Browse every campaign published on Eranos.",
       "sectionTagline": "Featured campaigns first, then the rest of the network. Search or sort to refine.",
       "heroKicker": "Campaigns",
       "heroHeading": "Every cause,",
@@ -1680,7 +1541,6 @@
       "title": "Advanced",
       "subtitle": "Wallet connections, system configuration, and other advanced options for power users.",
       "intro": "Wallet connections, system configuration, and other advanced options.",
-      "wallet": "Wallet",
       "torHeading": "Tor",
       "torToggle": "Route traffic through Tor",
       "torToggleDesc": "Connects to relays and loads media over the Tor network for stronger privacy. Expect slower performance and a short delay while Tor connects.",
@@ -1688,10 +1548,6 @@
       "torStatusLabel": "Status:",
       "torExitIp": "Tor exit IP:",
       "torCheckAgain": "Check again"
-    },
-    "wallet": {
-      "title": "Wallet",
-      "subtitle": "Manage wallet connections and payments"
     }
   },
   "language": {
@@ -1843,423 +1699,6 @@
     "adminRequired": "Admin access required",
     "adminRequiredDesc": "Only platform admins can appoint or remove organizers."
   },
-  "wallet": {
-    "seoTitle": "Wallet",
-    "seoDescription": "Hierarchical-deterministic Bitcoin wallet derived from your Nostr nsec.",
-    "loggedOut": {
-      "title": "Bitcoin Wallet",
-      "description": "A hierarchical wallet derived from your Nostr identity. Fresh address per receive, full transaction history, no address reuse.",
-      "requiresNsec": "Requires login with an nsec (your Nostr private key)."
-    },
-    "unsupported": {
-      "title": "Wallet unavailable",
-      "extension": "Your browser extension keeps your secret key isolated, so we can't derive child keys for your wallet.",
-      "bunker": "Your remote signer (NIP-46 bunker) keeps your secret key on the bunker side, so we can't derive child keys for your wallet.",
-      "other": "Your login type doesn't expose the secret key needed to derive your wallet.",
-      "instructions": "Log out and sign in again with your nsec to use the wallet."
-    },
-    "scanFailed": "Failed to scan wallet",
-    "retry": "Retry",
-    "refreshBalance": "Refresh balance",
-    "refreshBalanceTitle": "Click to refresh balance",
-    "amountPending": "{{amount}} pending",
-    "pending": "pending",
-    "send": "Send",
-    "sendPublic": "Send",
-    "sendPrivate": "Send privately",
-    "transactions": "Transactions",
-    "tabs": {
-      "public": "Public",
-      "private": "Private"
-    },
-    "receiveDialog": {
-      "title": "Receive Bitcoin",
-      "description": "Share an address to receive bitcoin.",
-      "addressIndex": "Address #{{index}}",
-      "scanForNew": "Check for new payments"
-    },
-    "tx": {
-      "pending": "Pending",
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "daysAgo_one": "{{count}}d ago",
-      "daysAgo_other": "{{count}}d ago",
-      "received": "Received",
-      "sent": "Sent",
-      "silentBadge": "silent",
-      "silentDetectedTitle": "Detected via BIP-352 silent payment scan"
-    },
-    "openMenu": "Wallet menu"
-  },
-  "walletSettings": {
-    "backup": {
-      "label": "Back up wallet"
-    },
-    "legacy": {
-      "label": "Legacy wallet recovery"
-    }
-  },
-  "walletLegacy": {
-    "seoTitle": "Legacy Wallet Recovery",
-    "seoDescription": "Recover funds from previous Agora wallet generations.",
-    "title": "Legacy wallet recovery",
-    "subtitle": "Pick the previous wallet you used and sweep its balance into your current wallet.",
-    "loggedOut": "Log in with your Nostr identity to look up funds in your old wallets.",
-    "scanning": "Scanning the V2 beta wallet for funds…",
-    "v2Detected": {
-      "title": "Funds found in the V2 Prelaunch Beta Wallet",
-      "body": "We found <0>{{amount}}</0> at addresses from your old V2 beta wallet. Open the V2 sweep below to move them into your current wallet."
-    },
-    "options": {
-      "v2Beta": {
-        "label": "V2 Prelaunch Beta Wallet",
-        "description": "Sweep funds from the nsec-as-seed BIP-86 wallet that shipped before BIP-39 derivation."
-      },
-      "v1Breeze": {
-        "label": "V1 Breeze Wallet",
-        "description": "Sweep the on-chain balance from the legacy Lightning custody."
-      },
-      "doubleTweak": {
-        "label": "Double-tweak SP Fix",
-        "description": "Recover silent payments stranded by an earlier sending bug and sweep them back into your wallet."
-      }
-    },
-    "footnote": "Each option is a one-way sweep into your current wallet. The legacy wallet itself is not restored — only the funds it held are recovered."
-  },
-  "walletRecovery": {
-    "seoTitle": "Recover Old Wallet",
-    "seoDescription": "Recover funds from a previous Lightning wallet and transfer them to your Nostr-derived Bitcoin address.",
-    "title": "Recover Old Wallet",
-    "heading": "Recover your old wallet",
-    "subheading": "If you previously held funds in the Lightning wallet, you can sweep them to your Nostr-derived Bitcoin address. Your old wallet is not restored — this is a one-time, one-way transfer.",
-    "backToWallet": "Back to wallet",
-    "loggedOut": {
-      "title": "Log in to recover",
-      "description": "Log in with the Nostr identity that owned the old Lightning wallet so the funds can be swept to its Bitcoin address."
-    },
-    "destination": {
-      "title": "Funds will be sent to",
-      "description": "Your Nostr-derived Taproot address."
-    },
-    "phrase": {
-      "title": "Recovery phrase",
-      "description": "Paste the 12-word recovery phrase from your old wallet.",
-      "checkingRelays": "Checking your relays for an encrypted backup…",
-      "backupFoundTitle": "Backup found on your relays",
-      "backupFoundDesc": "We found an encrypted backup of your old wallet's recovery phrase published from this account.",
-      "decryptAndUse": "Decrypt and use it",
-      "placeholder": "word1 word2 word3 …",
-      "warning": "Only paste a recovery phrase you trust. Anyone with this phrase can spend the funds. After the sweep completes, delete it from any place you copied it from.",
-      "sweepButton": "Sweep funds to my Bitcoin address"
-    },
-    "sweeping": {
-      "working": "Working…",
-      "dontClose": "Don't close this tab. This can take up to a minute while the old wallet syncs and the transaction is broadcast."
-    },
-    "success": {
-      "title": "Recovery complete",
-      "sent": "Sent {{sats}} sats to your Bitcoin address.",
-      "viewTransaction": "View transaction"
-    },
-    "error": {
-      "title": "Recovery failed",
-      "tryAgain": "Try again"
-    },
-    "errors": {
-      "noNip44": "Your signer does not support NIP-44 decryption, which is required to read the relay backup. Paste your 12-word recovery phrase manually instead.",
-      "decryptFailed": "Could not decrypt the relay backup. Paste your 12-word recovery phrase manually instead.",
-      "decryptGeneric": "Failed to decrypt relay backup.",
-      "invalidWordCount": "Recovery phrase must be 12 or 24 words.",
-      "noBalance": "Your old wallet has no spendable balance. There is nothing to recover.",
-      "sweepGeneric": "Recovery failed. Please try again."
-    },
-    "progress": {
-      "loadingSdk": "Loading wallet SDK…",
-      "connecting": "Connecting to your old wallet…",
-      "checkingBalance": "Checking balance…",
-      "preparingTransfer": "Preparing transfer of {{sats}} sats…",
-      "broadcasting": "Broadcasting transaction…"
-    },
-    "toast": {
-      "backupLoadedTitle": "Backup loaded",
-      "backupLoadedDesc": "Recovery phrase decrypted from your relays."
-    }
-  },
-  "walletBackup": {
-    "heading": "Wallet seed phrase",
-    "dialogDescription": "You can access your Agora wallet in any Bitcoin wallet by importing this 24-word backup.",
-    "hidden": "Tap to display your 24-word seed phrase.",
-    "revealAria": "Reveal seed phrase",
-    "hideAria": "Hide seed phrase",
-    "warning": "Anyone with these words can spend your Bitcoin. Never share them, never type them into a website, never store them in plaintext outside a password manager."
-  },
-  "walletMigrate": {
-    "seoTitle": "Migrate Old Wallet",
-    "seoDescription": "Sweep funds from your legacy Agora wallet (nsec-as-seed) into the new BIP-39 wallet.",
-    "title": "Migrate Old Wallet",
-    "heading": "Migrate to your new wallet",
-    "subheading": "Agora's Bitcoin wallet now uses a BIP-39 seed phrase so it imports into any wallet app. Funds at your old addresses are still safe — this page sweeps them into your new wallet in one transaction.",
-    "backToWallet": "Back to wallet",
-    "loading": "Checking your old wallet…",
-    "warning": "This builds a single sweep transaction that consumes every UTXO from your old wallet and sends the total (minus a small network fee) to your new wallet's first receive address. Once broadcast, the move is final and cannot be undone.",
-    "startButton": "Sweep to new wallet",
-    "loggedOut": {
-      "title": "Log in to migrate",
-      "description": "Log in with the Nostr identity that owns the old wallet so the funds can be swept to your new address."
-    },
-    "unsupported": {
-      "title": "Wallet not available",
-      "description": "Migration only works for nsec logins, because the old wallet's keys were derived directly from your nsec. Browser-extension and remote-signer logins cannot run this migration."
-    },
-    "noBlockbook": {
-      "title": "Blockbook not configured",
-      "description": "Migration needs a Blockbook indexer URL to scan your old addresses and broadcast the sweep transaction."
-    },
-    "noFunds": {
-      "title": "Nothing to migrate",
-      "description": "Your old wallet has no spendable balance. Everything is already in your new wallet."
-    },
-    "detected": {
-      "title": "Funds in your old wallet",
-      "description": "These funds will be moved to your new wallet in one transaction.",
-      "bip86": "On-chain",
-      "sp": "Silent payments",
-      "total": "Total"
-    },
-    "destination": {
-      "title": "Destination",
-      "description": "Your new wallet's first receive address."
-    },
-    "progress": {
-      "building": "Building transaction…",
-      "signing": "Signing inputs…",
-      "broadcasting": "Broadcasting transaction…",
-      "dontClose": "Don't close this tab while the sweep is in progress."
-    },
-    "success": {
-      "title": "Migration complete",
-      "sent": "Sent {{sats}} sats to your new wallet ({{fee}} sats fee).",
-      "viewTx": "View transaction"
-    },
-    "error": {
-      "title": "Migration failed",
-      "tryAgain": "Try again"
-    },
-    "errors": {
-      "noV1Account": "Could not access the old wallet's keys.",
-      "noDestination": "Your new wallet has no receive address yet. Wait for the wallet page to load and try again.",
-      "noBlockbook": "Blockbook indexer is not configured. Migration cannot scan your old addresses.",
-      "noFunds": "No spendable funds found at the old addresses.",
-      "sweepGeneric": "Migration failed. Please try again."
-    },
-    "toast": {
-      "successTitle": "Migration complete",
-      "successDesc": "{{sats}} sats moved to your new wallet."
-    }
-  },
-  "walletDoubleTweak": {
-    "seoTitle": "Double-tweak SP Fix",
-    "seoDescription": "Recover silent payments stranded on-chain by an earlier sending bug and sweep them into your wallet.",
-    "title": "Double-tweak SP Fix",
-    "heading": "Recover stranded silent payments",
-    "subheading": "An earlier version of Agora encoded some silent-payment outputs to the wrong key, so they never showed up in your wallet. This tool re-scans the chain for those outputs and sweeps any it finds into your wallet.",
-    "back": "Back",
-    "loggedOut": "Log in with the Nostr identity that received the silent payments so they can be recovered.",
-    "unsupported": {
-      "title": "Wallet unavailable",
-      "description": "Recovery needs a wallet that can sign locally. Log in with your nsec to continue."
-    },
-    "noIndexer": {
-      "title": "No silent-payment indexer configured",
-      "description": "A BIP-352 indexer URL is required to scan for stranded payments. Set one in wallet settings and try again."
-    },
-    "scan": {
-      "title": "Scan for stranded payments",
-      "description": "Choose the block height to start scanning from. Recovery checks every block from there to the chain tip.",
-      "fromHeightLabel": "Start block height",
-      "tipHint": "Current chain tip: {{tip}}",
-      "start": "Scan",
-      "cancel": "Cancel scan",
-      "progress": "Scanning block {{current}} of {{to}} — {{found}} found",
-      "tipMissing": "Resolving chain tip…"
-    },
-    "noFunds": {
-      "title": "Nothing to recover",
-      "description": "No stranded silent payments were found in the scanned range. Try an earlier start height if you expected funds."
-    },
-    "found": {
-      "title": "Stranded payments found",
-      "description": "These outputs can be swept back into your wallet.",
-      "count": "Outputs",
-      "recoverable": "Recoverable"
-    },
-    "destination": {
-      "title": "Funds will be sent to",
-      "description": "A fresh receive address in your current wallet."
-    },
-    "sweepButton": "Recover funds",
-    "sweeping": "Recovering your funds…",
-    "dontClose": "Don't close this page until the recovery finishes.",
-    "success": {
-      "title": "Recovery complete",
-      "sent": "{{sats}} sats recovered to your wallet.",
-      "viewTx": "View transaction"
-    },
-    "error": {
-      "title": "Recovery failed",
-      "tryAgain": "Try again"
-    },
-    "errors": {
-      "noDestination": "No destination address available. Open your wallet first.",
-      "noBlockbook": "No Blockbook server configured. Set one in wallet settings.",
-      "sweepGeneric": "Could not complete the recovery sweep."
-    },
-    "toast": {
-      "successTitle": "Funds recovered",
-      "successDesc": "{{sats}} sats swept into your wallet."
-    },
-    "footnote": "This is a one-way sweep into your current wallet. Only affected silent payments are touched; nothing else changes."
-  },
-  "walletConnect": {
-    "status": "Status",
-    "ready": "Ready",
-    "notFound": "Not Found",
-    "none": "None",
-    "add": "Add",
-    "active": "Active",
-    "connectionLabel": "NWC Connection",
-    "defaultWalletName": "Lightning Wallet",
-    "setActiveTitle": "Set as active",
-    "removeTitle": "Remove wallet",
-    "helpText": "Install a WebLN browser extension or connect a NWC wallet to send zaps.",
-    "webln": {
-      "name": "WebLN",
-      "description": "Browser extension"
-    },
-    "nwc": {
-      "name": "Nostr Wallet Connect",
-      "description": "Remote wallet connection",
-      "connectedCount_one": "{{count}} wallet connected",
-      "connectedCount_other": "{{count}} wallets connected"
-    },
-    "empty": {
-      "title": "No wallets connected",
-      "description": "Add an NWC connection to enable instant zaps."
-    },
-    "dialog": {
-      "title": "Connect NWC Wallet",
-      "description": "Paste a connection string from your NWC-compatible wallet.",
-      "aliasPlaceholder": "Wallet name (optional)",
-      "connect": "Connect",
-      "connecting": "Connecting..."
-    },
-    "toast": {
-      "uriRequiredTitle": "Connection URI required",
-      "uriRequiredDesc": "Please enter a valid NWC connection URI.",
-      "activeChangedTitle": "Active wallet changed",
-      "activeChangedDesc": "The selected wallet is now active for zaps."
-    }
-  },
-  "walletSend": {
-    "title": "Send Bitcoin",
-    "titlePublic": "Send Bitcoin",
-    "titlePrivate": "Send privately",
-    "send": "Send Bitcoin",
-    "max": "MAX",
-    "notEnoughBitcoin": "Not enough Bitcoin",
-    "tapAgainToConfirm": "Tap again to confirm",
-    "satPerVB": "{{rate}} sat/vB",
-    "reuse": {
-      "checking": "Checking address…",
-      "sendAnyway": "Send anyway",
-      "acknowledge": "I understand the risk — send anyway",
-      "historyWarning": "This address has already been used on-chain. Sending your private funds here links them to its existing transaction history and undoes the privacy of your silent payments. Use a silent payment address (sp1…) instead, or send anyway.",
-      "ownPublicWarning": "This is an address from your own public wallet. Sending your private funds to it merges the two wallets and links them together. Use a silent payment address (sp1…) instead, or send anyway."
-    },
-    "ownSilentPaymentBlocked": "This is your own silent payment address. You can't send from your public wallet to your private wallet — doing so co-mingles your private silent payment funds with coins already exposed on the public ledger, linking your private wallet to a known identity and destroying its privacy. Send to a different address instead.",
-    "recipient": {
-      "placeholder": "bc1…, sp1…",
-      "scan": "Scan QR code",
-      "sendToOnchain": "Send to Bitcoin address",
-      "sendToSilentPayment": "Send to silent payment address",
-      "bitcoinAddress": "Bitcoin address",
-      "silentPayment": "Silent payment address",
-      "toLabel": "To",
-      "clear": "Clear recipient",
-      "choosePaymentMethod": "Choose a payment method to continue"
-    },
-    "feeSpeed": {
-      "fastest": "~10 min",
-      "halfHour": "~30 min",
-      "hour": "~1 hour",
-      "economy": "~1 day",
-      "custom": "Custom"
-    },
-    "fee": {
-      "loading": "loading…",
-      "unavailable": "unavailable",
-      "loadFailed": "Couldn't load fee rates.",
-      "retry": "Retry",
-      "orCustom": "Or enter a custom rate below.",
-      "loadingTiers": "Loading fee rates…",
-      "customPlaceholder": "e.g. 5",
-      "customAriaLabel": "Custom fee rate in sat/vB"
-    },
-    "progress": {
-      "building": "Building transaction…",
-      "signing": "Signing…",
-      "broadcasting": "Broadcasting…",
-      "sending": "Sending…"
-    },
-    "errors": {
-      "unavailable": "HD wallet is not available for this login type.",
-      "enterRecipient": "Enter a Bitcoin address or sp1… silent payment address.",
-      "noSpendable": "No spendable Bitcoin in this wallet.",
-      "feesNotLoaded": "Fee rates not loaded.",
-      "feesNotLoadedYet": "Fee rates haven't loaded yet.",
-      "feeRateTooLow": "Enter a fee rate of at least 1 sat/vB.",
-      "enterAmount": "Enter an amount.",
-      "insufficient": "Not enough Bitcoin for this amount + network fee.",
-      "waitingPrice": "Waiting for BTC price…",
-      "noneYet": "You don't have any Bitcoin yet."
-    },
-    "scanError": {
-      "title": "Couldn't read that QR code",
-      "description": "Expected a Bitcoin address, a silent payment address (sp1…), or a bitcoin: URI."
-    },
-    "toast": {
-      "failedTitle": "Transaction failed"
-    },
-    "broadcastError": {
-      "feeTooLowTitle": "Network fee too low",
-      "feeTooLowBodyWithMin": "The Bitcoin network is rejecting this fee. The minimum right now is about {{min}} sat/vB.",
-      "feeTooLowBody": "The Bitcoin network is rejecting this fee. Pick a faster tier or raise your custom rate.",
-      "rbfTitle": "Replacement needs a higher fee",
-      "rbfBody": "The replacement transaction must pay more than the original. Raise the fee and try again.",
-      "mempoolFullTitle": "Bitcoin network is congested",
-      "mempoolFullBody": "The mempool is full and your fee isn't competitive. Raise the fee to get through.",
-      "networkTitle": "Couldn't reach the Bitcoin network",
-      "networkBody": "Check your connection and try again.",
-      "mempoolConflictTitle": "Conflicting transaction",
-      "mempoolConflictBody": "One of the inputs has already been spent or is being spent by another transaction.",
-      "tooLongChainTitle": "Too many unconfirmed transactions",
-      "tooLongChainBody": "You have a long chain of unconfirmed transactions. Wait for one to confirm and try again.",
-      "badInputsTitle": "Transaction was rejected",
-      "badInputsBody": "The network rejected this transaction. Adjust the amount or recipient and try again.",
-      "absurdlyHighFeeTitle": "Fee is unusually high",
-      "absurdlyHighFeeBody": "The estimated fee is suspiciously high. Reload fee rates and try again.",
-      "unknownTitle": "Transaction failed",
-      "useHigherFee": "Use a higher fee",
-      "tryAgain": "Try again",
-      "atMaxFeeTier": "You're already on the fastest tier."
-    },
-    "success": {
-      "title": "Bitcoin sent",
-      "satsAmount": "{{sats}} sats",
-      "viewTransaction": "View transaction",
-      "done": "Done"
-    }
-  },
   "qrScanner": {
     "title": "Scan QR code",
     "close": "Close",
@@ -2277,72 +1716,6 @@
       "overconstrained": "This device's camera doesn't support the requested settings.",
       "didntStart": "Camera didn't start. Another app may be using it, or your browser may have blocked the scanner."
     }
-  },
-  "bitcoinPublic": {
-    "lead": "Money you send is public and can be traced back to you.",
-    "learnMore": "Learn more",
-    "body": "Bitcoin is a public ledger. Transactions you send can be traced back to you forever, even after being exchanged by multiple people. Send it only to those you wish to support publicly.",
-    "bodyWithCashOut": "Bitcoin is a public ledger. Transactions you send can be traced back to you forever, even after being exchanged by multiple people. Send it only to those you wish to support publicly, or cash out at an exchange.",
-    "iUnderstand": "I understand this transaction is public."
-  },
-  "spScan": {
-    "title": "Check for new payments",
-    "subtitle": "Scan the blockchain for private payments",
-    "descriptionHelp": "More info",
-    "description": "Walks the configured BIP-352 indexer block-by-block to detect incoming silent payments.",
-    "since": "Since",
-    "preset": {
-      "lastHour": "Last hour",
-      "last3h": "Last 3 hours",
-      "last24h": "Last 24 hours",
-      "lastWeek": "Last week",
-      "lastMonth": "Last month",
-      "custom": "Custom…"
-    },
-    "customHours": "Hours",
-    "customHoursPlaceholder": "e.g. 12",
-    "advanced": "Advanced",
-    "connectingIndexer": "Connecting to indexer…",
-    "upToDate": "You're already up to date.",
-    "fromBlock": "From block",
-    "indexerTip": "Indexer tip",
-    "lastFullyScanned": "Last fully scanned",
-    "never": "never",
-    "includeSpent": "Include already-spent",
-    "includeSpentDesc": "Also detect silent payments that have since been spent. Use when rebuilding receive history after a missed scan or a reset.",
-    "blockProgress": "Block {{current}} / {{to}}",
-    "matches_one": "{{count}} match",
-    "matches_other": "{{count}} matches",
-    "scannedRange": "Scanned blocks {{from}} → {{to}}.",
-    "foundOutputs_one": "Found {{count}} new output.",
-    "foundOutputs_other": "Found {{count}} new outputs.",
-    "noNewPayments": "No new payments.",
-    "startScan": "Start scan",
-    "resolveFailed": {
-      "title": "Couldn't look up the start block",
-      "description": "mempool.space is unreachable right now. Enter a starting block under Advanced → From block to scan anyway."
-    },
-    "reconcile": {
-      "title": "Reconcile spent UTXOs",
-      "description": "Checks each stored silent-payment UTXO against Blockbook and removes any that have been spent. Use this if the balance is higher than it should be after a send.",
-      "checking": "Checking {{checked}} / {{total}}…",
-      "checked_one": "Checked {{count}} UTXO · pruned {{pruned}}.",
-      "checked_other": "Checked {{count}} UTXOs · pruned {{pruned}}.",
-      "reconciling": "Reconciling…",
-      "reconcileNow": "Reconcile now"
-    },
-    "autoScan": {
-      "label": "Scan automatically",
-      "description": "Keep checking for new private payments in the background, even when you leave this page."
-    }
-  },
-  "spAutoScan": {
-    "scanning": "Scanning… block {{current}} / {{to}}",
-    "caughtUp": "Up to date",
-    "neverScanned": "Not scanned yet",
-    "lastScanned": "Scanned to block {{height}}",
-    "paused": "Automatic scanning is off",
-    "manualLink": "Scan options"
   },
   "notifications": {
     "seoTitle": "Notifications",
@@ -2365,8 +1738,6 @@
     "actions": {
       "reactedToYour": "reacted to your {{noun}}",
       "repostedYour": "reposted your {{noun}}",
-      "zappedYou": "zapped you",
-      "zappedYouWithAmount": "zapped you {{sats}} sats",
       "repliedToYourNote": "replied to your note",
       "mentionedYou": "mentioned you",
       "repliedToYourComment": "replied to your comment",
@@ -2408,14 +1779,11 @@
       "emojiPack": "emoji pack",
       "podcastEpisode": "podcast episode",
       "podcastTrailer": "podcast trailer",
-      "zapstoreAsset": "Zapstore asset",
-      "zapstoreRelease": "Zapstore release",
       "stream": "stream",
       "status": "status",
       "repository": "repository",
       "customNip": "custom NIP",
       "calendarEvent": "calendar event",
-      "zapstoreApp": "Zapstore app",
       "playlist": "playlist",
       "divine": "divine",
       "community": "community",
@@ -2468,10 +1836,6 @@
         "label": "Reposts",
         "description": "When someone reposts your notes"
       },
-      "zaps": {
-        "label": "Zaps",
-        "description": "When someone sends you a lightning or on-chain zap"
-      },
       "mentions": {
         "label": "Mentions",
         "description": "When someone mentions you in a note"
@@ -2505,7 +1869,7 @@
     "inputPlaceholder": "Search",
     "filtersAria": "Search filters",
     "tabs": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "nostr": "Nostr",
       "accounts": "Users"
     },
@@ -2582,8 +1946,8 @@
       "postsPrompt": "Enter a search query to find Nostr content.",
       "accounts": "No users found matching your search.",
       "followsPrompt": "Search for people by name or NIP-05 address.",
-      "agora": "No Agora campaigns, pledges, or groups found matching your search.",
-      "agoraPrompt": "Search Agora campaigns, pledges, and groups, or browse the latest.",
+      "agora": "No Eranos campaigns, pledges, or groups found matching your search.",
+      "agoraPrompt": "Search Eranos campaigns, pledges, and groups, or browse the latest.",
       "activeFilters": "Active filters:",
       "clearAll": "Clear all filters"
     }
@@ -2607,7 +1971,6 @@
       "editProfile": "Edit",
       "shareFollowLink": "Share follow link",
       "moreOptions": "More options",
-      "donate": "Donate",
       "campaignGoal": "Goal ${{amount}}"
     },
     "stats": {
@@ -2650,7 +2013,6 @@
       "addToList": "Add to list",
       "shareFollowLink": "Share follow link",
       "profileRecovery": "Profile recovery",
-      "zap": "Zap",
       "awardBadge": "Award badge",
       "writeLetter": "Write a letter",
       "mute": "Mute @{{name}}",
@@ -2732,8 +2094,6 @@
       "heading": "Profile Fields",
       "website": "Website",
       "websitePlaceholder": "https://yourwebsite.com",
-      "lightning": "Lightning",
-      "lightningPlaceholder": "you@walletofsatoshi.com",
       "labelPlaceholder": "Label",
       "tickerPlaceholder": "Ticker",
       "addressPlaceholder": "Address",
@@ -2763,11 +2123,6 @@
         "defaultLabel": "Email",
         "description": "Contact email address",
         "valuePlaceholder": "you@example.com"
-      },
-      "wallet": {
-        "label": "Wallet",
-        "description": "Cryptocurrency wallet address",
-        "valuePlaceholder": "Address"
       },
       "link": {
         "label": "Link",
@@ -2837,10 +2192,10 @@
   "faq": {
     "categories": {
       "getting-started": {
-        "label": "About Agora"
+        "label": "About Eranos"
       },
       "payments": {
-        "label": "Bitcoin Donations on Agora"
+        "label": "Bitcoin Donations on Eranos"
       },
       "about-nostr": {
         "label": "About Nostr"
@@ -2869,51 +2224,6 @@
           "{{appName}} is built by [Soapbox](https://soapbox.pub), an open-source team building tools for the Nostr ecosystem, in collaboration with the [World Liberty Congress](https://worldlibertycongress.org/)."
         ]
       },
-      "send-bitcoin-onchain": {
-        "question": "How does sending Bitcoin work?",
-        "answer": [
-          "When a recipient creates a campaign, they choose what kinds of payments to accept: **public**, **private**, or **both**.",
-          "**Public** donations are real Bitcoin on-chain. They settle on the public blockchain, work in every Bitcoin wallet, and are visible to anyone.",
-          "**Private** donations use **silent payments** (BIP-352). They settle on-chain too, but the transaction can't be linked back to the recipient's donation code — so they stay out of public donor lists and totals. The donor needs a wallet that supports silent payments — we recommend [Ditto Wallet](https://ditto.pub) or [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
-          "When a campaign accepts **both**, {{appName}} shows a single QR code that encodes both endpoints. Silent-payment wallets read it as private; other wallets fall back to the public address. Donors don't have to choose — their wallet picks the right path automatically.",
-          "Either way, the payment goes straight to the recipient. {{appName}} never touches the funds."
-        ]
-      },
-      "connect-wallet": {
-        "question": "What is the wallet on {{appName}}?",
-        "answer": [
-          "Your {{appName}} wallet is a **self-custodial** Bitcoin wallet, built from your Nostr key. {{appName}} never holds your funds — the wallet runs in your browser and signs transactions locally with a key only you control. It can receive Bitcoin both ways — as a public address that any Bitcoin wallet can pay, and as a silent-payments code that capable wallets can pay privately. There's nothing to sign up for; it exists the moment you have an account.",
-          "The wallet has two tabs: **Public** (your regular Bitcoin address) and **Private** (silent payments). The two balances are kept strictly separate and can never be spent together — that isolation is what keeps private donations unlinkable on-chain. When you create a campaign, you pick whether to accept public payments, private payments, or both. To spend what you receive, see the **Recipient Guide**.",
-          "You can also export your wallet's 24-word seed phrase and import it into any standard Bitcoin wallet — see \"Can I export my {{appName}} wallet to another Bitcoin wallet?\" below."
-        ]
-      },
-      "export-wallet": {
-        "question": "Can I export my {{appName}} wallet to another Bitcoin wallet?",
-        "answer": [
-          "Yes. Your {{appName}} wallet is fully self-custodial. {{appName}} never holds your Bitcoin and never sees your keys — the wallet runs entirely in your browser, signing transactions locally with a key derived from your Nostr secret key (nsec).",
-          "Open the wallet from the menu, tap the three-dot menu in the top right, and choose **Back up wallet**. You'll see a 24-word BIP-39 seed phrase. Write it down somewhere safe (or save it in a password manager) — **anyone with these words can spend your Bitcoin.**",
-          "You can import those 24 words into any standard Bitcoin wallet: **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, a **Trezor**, or a **Ledger**. {{appName}} uses standard BIP-86 (Taproot) and BIP-352 (silent payments) derivation paths, so no special configuration is needed.",
-          "After importing, the other wallet shows the same balance and history as your {{appName}} wallet — they're the same wallet, just two views of it.",
-          "Seed-phrase export is only available when you sign in with an nsec. Browser-extension and remote-signer (bunker) logins keep your secret key isolated, so {{appName}} can't derive the seed in those modes."
-        ]
-      },
-      "donations-are-public-general": {
-        "question": "Are donations on {{appName}} public?",
-        "answer": [
-          "It depends on which kind of payment the recipient accepts.",
-          "**Public donations** are recorded on the Bitcoin blockchain and on Nostr. Anyone can see the amounts, timing, and addresses.",
-          "**Private donations** use silent payments. They're not publicly linkable to the recipient's donation code, don't appear in donor lists, and don't count toward public totals.",
-          "When a campaign accepts both, the donor's wallet decides which path to use — silent-payment-capable wallets pay privately, others pay the public address. Read the **Donor Guide** and **Recipient Guide** for the full picture."
-        ]
-      },
-      "why-donations-pending": {
-        "question": "Why do some donations say \"pending\"?",
-        "answer": [
-          "A **pending** donation is real Bitcoin that's already been sent — it's just waiting to be confirmed by the network. The donor's wallet has broadcast the transaction, but it hasn't been included in a block yet.",
-          "Bitcoin produces a new block roughly every 10 minutes, and miners pick transactions based on the fee the donor paid. Most donations confirm within an hour; lower-fee ones can take longer when the network is busy. {{appName}} re-checks confirmation status automatically, so the **pending** label disappears on its own once a block lands.",
-          "The funds are on the way — the recipient will see the donation count toward the campaign total as soon as it confirms. There's nothing the recipient or {{appName}} can do to speed it up; only the donor's wallet can bump the fee."
-        ]
-      },
       "censorship-resistance": {
         "question": "What does \"censorship-resistant\" mean here?",
         "answer": [
@@ -2927,22 +2237,6 @@
           "Bitcoin is the most widely supported and censorship-resistant payment rail in the world. Every Bitcoin wallet can send it.",
           "On {{appName}}, recipients choose how to receive: **public** (a regular Bitcoin address) for maximum reach, **private** (silent payments) for unlinkable donations, or **both** so each donor's wallet picks the right path automatically. Donors who only have a consumer Bitcoin app can still contribute; donors with a silent-payments wallet get privacy by default.",
           "The tradeoff is that public Bitcoin transactions are visible on the blockchain and pay a miner fee. The Donor and Recipient guides explain how to handle both."
-        ]
-      },
-      "why-not-silent-payments": {
-        "question": "Does {{appName}} support silent payments?",
-        "answer": [
-          "Yes — on both sides. {{appName}}'s built-in Bitcoin wallet supports BIP-352, so when you send Bitcoin from your {{appName}} wallet you can pay any silent-payment address (`sp1…`) directly. And when a recipient creates a campaign, they can accept silent payments alongside, or instead of, public Bitcoin payments.",
-          "Silent-payment donations still settle on-chain, but the transaction can't be linked back to the recipient's donation code — so they don't appear in public donor lists or totals.",
-          "Sending a silent payment from outside {{appName}} requires a wallet that supports BIP-352. Most consumer apps don't yet, but [Ditto Wallet](https://ditto.pub) and [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) do.",
-          "When a campaign accepts both kinds of payment, {{appName}} encodes them in a single QR code. Silent-payment-capable wallets pay privately; everyone else pays the public address. No donor is shut out, and no recipient is forced to choose between reach and privacy."
-        ]
-      },
-      "why-not-lightning": {
-        "question": "Why doesn't {{appName}} use Lightning?",
-        "answer": [
-          "Lightning requires a Lightning wallet. The easiest ones (Wallet of Satoshi, Strike, Breez) are **custodial** — a company holds the funds and can be shut down, geo-blocked, or pressured into freezing accounts. Non-custodial Lightning is technically demanding and unreliable for newcomers.",
-          "We want {{appName}} to work for someone whose only Bitcoin experience is a regular consumer app like Cash App, Coinbase, Strike, Venmo, or PayPal. On-chain Bitcoin works with every wallet on the planet."
         ]
       },
       "why-not-rotating-addresses": {
@@ -2988,19 +2282,6 @@
           "For a full guide, see [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys)."
         ]
       },
-      "send-bitcoin-lightning": {
-        "question": "How does sending Bitcoin over Lightning work?",
-        "answer": [
-          "If a recipient has a Lightning address on their profile, you can send to that. Lightning settles in seconds and fees are tiny.",
-          "Lightning sends don't use {{appName}}'s donation address — they go straight to whatever Lightning wallet the recipient set up themselves. {{appName}}'s own donation flow is on-chain only."
-        ]
-      },
-      "what-are-zaps": {
-        "question": "What are zaps?",
-        "answer": [
-          "Zaps are small Lightning tips on Nostr, separate from {{appName}}'s on-chain donation flow."
-        ]
-      },
       "fyp": {
         "question": "How does the feed work?",
         "answer": [
@@ -3041,74 +2322,7 @@
   },
   "guides": {
     "shared": {
-      "tldrEyebrow": "The short version",
-      "paymentBadge": {
-        "public": "Public Payments",
-        "silent": "Silent Payments"
-      },
-      "paymentComparison": {
-        "donorHeader": "When you donate",
-        "recipientHeader": "When you create",
-        "donorRows": {
-          "whatYouSee": {
-            "label": "What you see",
-            "public": "A regular Bitcoin address you can pay from anywhere.",
-            "silent": "The same QR. Your wallet picks the silent-payment endpoint if it supports BIP-352."
-          },
-          "walletSupport": {
-            "label": "Wallet support",
-            "public": "Every Bitcoin wallet. Cash App, Coinbase, Strike, hardware, anything.",
-            "silent": "Few wallets today. Most fall back to a regular Bitcoin transaction."
-          },
-          "privacy": {
-            "label": "Privacy of the donation",
-            "public": "Public on-chain. Your sending address is permanently linked to the campaign.",
-            "silent": "Receiving side is unlinkable on-chain. Your sending wallet's trail is still public."
-          },
-          "settlement": {
-            "label": "Settlement",
-            "public": "Normal Bitcoin confirmations.",
-            "silent": "Same on-chain confirmations, but the recipient has to scan their wallet to find it."
-          }
-        },
-        "recipientRows": {
-          "whatDonorsSee": {
-            "label": "What donors see",
-            "public": "A regular Bitcoin address. Works with every wallet on earth.",
-            "silent": "A BIP-352 endpoint. Donors' wallets need silent-payments support; otherwise the donation falls back to a regular Bitcoin transaction."
-          },
-          "receivingSpeed": {
-            "label": "Receiving speed",
-            "public": "Push-style. Donations show up immediately on the campaign page.",
-            "silent": "Manual scanning. Your wallet has to walk the blockchain looking for them. Minutes to hours, depending on the wallet."
-          },
-          "pushNotifications": {
-            "label": "Push notifications",
-            "public": "Yes. You see new donations the moment they arrive.",
-            "silent": "No. Open the wallet and trigger a scan to discover them."
-          },
-          "donorList": {
-            "label": "Donor list / campaign totals",
-            "public": "Public forever. Amounts and sending addresses are visible to anyone.",
-            "silent": "Private. The campaign page can't show silent-payments donation counts or totals."
-          },
-          "ecosystem": {
-            "label": "Ecosystem maturity",
-            "public": "Mature. Settled tooling.",
-            "silent": "Bleeding-edge. Wallets are still buggy; expect missed payments that show up on a later scan."
-          },
-          "bestFor": {
-            "label": "Best for",
-            "public": "Above-ground fundraisers where social proof and visibility help.",
-            "silent": "Campaigns where donor or recipient privacy matters more than the visible total."
-          },
-          "watchOutFor": {
-            "label": "Watch out for",
-            "public": "Permanent public record of every donor.",
-            "silent": "Bumpy UX today. Some donations won't show until the recipient scans."
-          }
-        }
-      }
+      "tldrEyebrow": "The short version"
     },
     "donor": {
       "tldr": {
@@ -3126,18 +2340,11 @@
             "title": "Open the campaign",
             "body": "You see a single QR code. If the campaign accepts both options, it encodes both endpoints; your wallet picks the right one."
           },
-          "payFromAnyWallet": {
-            "title": "Pay it from any wallet",
-            "body": "Cash App, Coinbase, Strike, a hardware wallet, anything. Pay the amount plus the network fee."
-          },
           "arrivesDirectly": {
             "title": "It arrives directly",
             "body": "Funds settle straight to the recipient. {{appName}} doesn't hold or route them, and the address is derived from the recipient's Nostr secret key."
           }
         }
-      },
-      "comparison": {
-        "footnote": "Campaigns can accept Public only, Silent only, or both. If both, the QR code carries both endpoints. Your wallet picks the one it can use."
       },
       "publicVisible": {
         "title": "Public donations are visible on-chain forever",
@@ -3147,10 +2354,6 @@
         "heading": "Donating privately",
         "intro": "These steps matter most for **Public** donations, where every transaction is permanently tied to a single address. **Silent** donations already hide the receiving side, so the risk is lower. Targeted analysis of your sending wallet is still possible either way, so if your risk is high these steps are worth taking. Pick one, or stack them.",
         "options": {
-          "silentWallet": {
-            "name": "Use a silent-payments wallet",
-            "purpose": "Pay with a Bitcoin wallet that supports BIP-352. If the campaign accepts silent payments, your wallet uses that endpoint automatically."
-          },
           "nonKyc": {
             "name": "Buy non-KYC Bitcoin",
             "purpose": "Buy Bitcoin peer-to-peer so it isn't linked to your government ID in the first place. Strongest privacy starting point."
@@ -3158,23 +2361,12 @@
           "coinjoin": {
             "name": "Coinjoin first",
             "purpose": "Mix your Bitcoin with other people's coins so the output can't be traced to your KYC purchase. Useful when the campaign only accepts public."
-          },
-          "freshWallet": {
-            "name": "Use a fresh wallet",
-            "purpose": "Donate from a wallet that has never touched your main identity or a KYC exchange."
           }
         }
       },
       "consumerApps": {
         "title": "Consumer apps can't make you anonymous",
         "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance, and PayPal all verify your ID. No matter how you send the donation, every transaction stays tied to your real identity. Use a non-custodial wallet you control."
-      },
-      "silentToday": {
-        "heading": "A note on silent payments today",
-        "paragraphs": [
-          "Silent payments are the most private way to receive Bitcoin on-chain, but the ecosystem is young. Most popular wallets can't send to a silent-payment endpoint yet, so when a wallet can't, the donation falls back to a regular Bitcoin transaction to the campaign's public address (if the campaign accepts both).",
-          "For recipients, silent-payment donations also arrive without push notifications and only appear after the recipient scans their wallet, which can take minutes to hours. None of this affects the safety of your funds; it just shapes the experience."
-        ]
       }
     },
     "recipient": {
@@ -3204,20 +2396,6 @@
           "Silent-payment donations aren't part of that record. They're invisible to outside observers and don't show in the campaign's public totals; new donors only see whatever you publish about the campaign's progress."
         ]
       },
-      "comparison": {
-        "footnote": "You can't switch a campaign's accepted payment options after it's created. If you change your mind, make a new campaign."
-      },
-      "silentToday": {
-        "heading": "A note on silent payments today",
-        "paragraphs": [
-          "Silent payments are the most private way to receive Bitcoin on-chain, but the ecosystem is young. Most popular wallets can't send to a silent-payment endpoint yet, so when a donor's wallet can't, the donation falls back to a regular Bitcoin transaction to your public address (if you accept both).",
-          "Silent-payment donations also arrive without push notifications and only appear after you scan your wallet, which can take minutes to hours. None of this affects the safety of your funds; it just shapes the day-to-day experience."
-        ]
-      },
-      "twoWallets": {
-        "title": "Keep your Public and Private balances separate",
-        "body": "Your {{appName}} wallet shows two tabs: **Public** (your regular Bitcoin address) and **Private** (silent payments). They're kept strictly apart, and the two balances can never be spent in the same transaction — that isolation is what keeps your private donations unlinkable. When you cash out from the **Private** tab, send to a silent-payment address (**sp1…**), which stays private. If you instead send private funds to a bare on-chain address, {{appName}} checks it: if the address has been used before, or belongs to your own public wallet, it warns you and makes you tap **Send anyway**, because doing so links your private funds to that address's public history. Sending to an **sp1…** address never triggers the warning."
-      },
       "movePromptly": {
         "heading": "Move donations promptly",
         "steps": {
@@ -3235,14 +2413,6 @@
         "heading": "Cashing out privately",
         "intro": "Spending on-chain creates a trail unless you break it first. Cash out from the **Private** tab to keep silent-payment donations unlinkable — send to a silent-payments wallet first (an **sp1…** address), then spend onward; the hop breaks the link between your campaign and what comes next. Don't send private funds to a reused or public address, which re-links them. The other options below also work and have their own trade-offs.",
         "options": {
-          "silentHop": {
-            "name": "Silent-payments wallet hop",
-            "purpose": "Move your donations to a silent-payments wallet ([Ditto Wallet](https://ditto.pub), [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)). From there your downstream spending isn't tied to the campaign."
-          },
-          "lightningSwap": {
-            "name": "Lightning swap",
-            "purpose": "Atomic-swap on-chain Bitcoin to Lightning. Lightning payments don't hit the public blockchain."
-          },
           "coinjoin": {
             "name": "Coinjoin",
             "purpose": "Mix your Bitcoin with other users' coins so the output can't be linked back to the input."
@@ -3262,5 +2432,50 @@
         "body": "Custodial mixers can steal your coins, log who sent what, or turn out to be law-enforcement honeypots. Use a silent-payments hop or a non-custodial coinjoin instead."
       }
     }
+  },
+  "grinPay": {
+    "title": "Donate to {{title}}",
+    "subtitle": "Grin only. Direct, private, verifiable.",
+    "goblinPayTab": "GoblinPay",
+    "grinAddressTab": "Grin address",
+    "goblinPayHelp": "Pay in-app with a Goblin wallet: enter an amount, scan the QR, and the payment travels as an encrypted slatepack over Nostr. Confirmation is automatic.",
+    "amountLabel": "Amount in GRIN",
+    "amountPlaceholder": "2.5",
+    "createInvoice": "Continue",
+    "invoiceMemo": "Eranos donation: {{title}}",
+    "scanToPay": "Scan with a Goblin wallet to pay {{amount}}.",
+    "copyNprofile": "Copy receiving identity",
+    "copyAddress": "Copy Grin address",
+    "copySlatepack": "Copy slatepack",
+    "openCheckout": "Open hosted checkout",
+    "statusWaiting": "Waiting for payment…",
+    "statusReceived": "Payment received — waiting for on-chain confirmation…",
+    "statusConfirmed": "Confirmed: {{amount}} GRIN received.",
+    "statusExpired": "This invoice expired. Close and start again.",
+    "manualToggle": "Trouble paying? Use the manual slatepack fallback",
+    "manualHelp": "Create the payment in your Grin wallet, paste the slatepack it gives you (S1) below, and you will get a response slatepack (S2) to finalize and post from your wallet.",
+    "manualSubmit": "Submit slatepack",
+    "manualResponseHelp": "Copy this response back into your wallet, then finalize and post the transaction.",
+    "endpubHelp": "Scan with a Goblin wallet to pay this campaign directly over Nostr. Any amount.",
+    "grinAddressHelp": "Pay from any Grin wallet (Goblin, grin-wallet) to this Slatepack address — interactively over Tor or by exchanging slatepacks. Your wallet handles the transport.",
+    "proofTitle": "Already donated? Record it",
+    "proofHelp": "Export the payment proof from your wallet and paste it here. It is verified locally (receiver signature and on-chain kernel) and published so the campaign total counts your donation. The proof reveals the amount and the kernel, not your identity.",
+    "proofPlaceholder": "{ \"amount\": …, \"excess\": …, \"recipient_sig\": … }",
+    "proofSubmit": "Verify & record donation",
+    "proofLoginRequired": "Log in to record a donation toward the campaign total.",
+    "proofInvalid": "Proof could not be verified",
+    "proofNotJson": "That does not look like a payment proof (expected JSON).",
+    "proofBadSignature": "The receiver signature does not verify.",
+    "proofNotForCampaign": "This proof was not paid to this campaign's Grin address.",
+    "proofKernelMissing": "The transaction kernel is not on-chain (yet). Wait for confirmation and try again.",
+    "proofPublished": "Donation recorded",
+    "publishReceipt": "Record my donation publicly",
+    "receiptPublished": "Donation recorded",
+    "receiptPublishedDesc": "The signed receipt was published; the campaign total will include it.",
+    "donationRecorded": "Your donation now counts toward the verified campaign total.",
+    "errorCreateInvoice": "Could not create the invoice",
+    "errorManual": "Manual receive failed",
+    "errorPublish": "Could not publish",
+    "notConfigured": "This campaign has not published a Grin receiving address yet."
   }
 }

@@ -87,7 +87,7 @@ export function useCampaignListActions() {
         ['title', input.title],
         ['icon', input.icon],
         ['t', CAMPAIGN_LIST_HASHTAG],
-        ['alt', `Agora campaign list: ${input.title}`],
+        ['alt', `Eranos campaign list: ${input.title}`],
       ];
       if (input.description) {
         tags.push(['description', input.description]);
@@ -221,7 +221,7 @@ export function useCampaignListActions() {
     async (orderedRefs: string[], prev: NostrEvent | null) => {
       const tags: string[][] = [
         ['d', CAMPAIGN_LIST_INDEX_D],
-        ['title', 'Agora Campaign Lists — display order'],
+        ['title', 'Eranos Campaign Lists — display order'],
         ['t', CAMPAIGN_LIST_INDEX_HASHTAG],
         ['alt', 'Order of curated campaign lists'],
       ];

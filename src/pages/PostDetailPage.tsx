@@ -13,7 +13,6 @@ import {
   Package,
   Rocket,
   Star,
-  Zap,
 } from "lucide-react";
 import { nip19 } from "nostr-tools";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -149,7 +148,6 @@ function shellTitleForKind(kind?: number): string {
   if (kind === 6 || kind === 16) return "Repost";
   if (kind === 7) return "Reaction";
   if (kind === 1018) return "Poll Vote";
-  if (kind === 9735) return "Zap";
   if (kind === 0) return "Profile";
   return "Post Details";
 }
@@ -167,7 +165,7 @@ import { Nip05Badge } from "@/components/Nip05Badge";
 import { ProfileHoverCard } from "@/components/ProfileHoverCard";
 import { useAuthor } from "@/hooks/useAuthor";
 import { useComments } from "@/hooks/useComments";
-import { useEventInteractions, extractZapAmount, extractZapSender, extractZapMessage } from "@/hooks/useEventInteractions";
+import { useEventInteractions } from "@/hooks/useEventInteractions";
 import { useMuteList } from "@/hooks/useMuteList";
 import { useProfileUrl } from "@/hooks/useProfileUrl";
 import { useReplies } from "@/hooks/useReplies";
@@ -950,13 +948,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   const nip05 = metadata?.nip05;
   const profileUrl = useProfileUrl(event.pubkey, metadata);
 
-  // For kind 9735 zap receipts, look up the sender's profile (from P/description tag)
-  const zapSenderPubkeyRaw = useMemo(() => event.kind === 9735 ? extractZapSender(event) : '', [event]);
-  const zapSenderAuthor = useAuthor(zapSenderPubkeyRaw || undefined);
-  const zapSenderMeta = zapSenderAuthor.data?.metadata;
-  const zapSenderDisplayName = getDisplayName(zapSenderMeta, zapSenderPubkeyRaw);
-  const zapSenderProfileUrl = useProfileUrl(zapSenderPubkeyRaw, zapSenderMeta);
-
   const pollVoteLabel = usePollVoteLabel(event);
 
   // Community moderation context — resolves from event's A tag. When
@@ -995,8 +986,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   const isEncryptedDM = event.kind === 4;
   const isLetter = event.kind === 8211;
   const isVanish = event.kind === VANISH_KIND;
-  const isZap = event.kind === 9735;
-  const isZapGoal = event.kind === 9041;
+  const isFundraisingGoal = event.kind === 9041;
   const isProfile = event.kind === 0;
   const isBadgeAward = event.kind === BADGE_AWARD_KIND;
   const isDevKind = isGitRepo || isPatch || isPullRequest || isCustomNip || isNsite;
@@ -1026,8 +1016,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
     !isEncryptedDM &&
     !isLetter &&
     !isVanish &&
-    !isZap &&
-    !isZapGoal &&
+    !isFundraisingGoal &&
     !isProfile &&
     !isBadgeAward;
   const { translatedEvent: displayEvent, translateAction } = useEventTranslation(event, { includePlainContent: isTextNote });
@@ -1239,8 +1228,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
           commentCount: Math.max(prev?.commentCount ?? 0, count),
           repostCount: prev?.repostCount ?? 0,
           reactionCount: prev?.reactionCount ?? 0,
-          zapCount: prev?.zapCount ?? 0,
-          zapAmount: prev?.zapAmount ?? 0,
         }));
       }
     }
@@ -1253,8 +1240,8 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
     useState<InteractionTab>("reposts");
 
   const parentHints = useMemo(
-    () => (isTextNote || isReaction || isRepost || isZap || isPollVote ? getParentEventHints(event) : undefined),
-    [event, isTextNote, isReaction, isRepost, isZap, isPollVote],
+    () => (isTextNote || isReaction || isRepost || isPollVote ? getParentEventHints(event) : undefined),
+    [event, isTextNote, isReaction, isRepost, isPollVote],
   );
   const parentEventId = parentHints?.id;
 
@@ -1396,8 +1383,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
   const hasStats = !!(
     stats?.reposts ||
     quoteCount ||
-    stats?.reactions ||
-    stats?.zapCount
+    stats?.reactions
   );
 
   return (
@@ -1424,7 +1410,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
             eventId={parentEventId}
             relays={parentHints?.relayHint ? [parentHints.relayHint] : undefined}
             authorHint={parentHints?.authorHint}
-            collapseAfter={isReaction || isRepost || isZap || isPollVote ? 0 : undefined}
+            collapseAfter={isReaction || isRepost || isPollVote ? 0 : undefined}
           />
         </div>
       )}
@@ -1583,81 +1569,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
         </article>
       )}
 
-      {/* Kind 9735 — Zap receipt: mirrors reaction card layout exactly */}
-      {isZap && (() => {
-        const zapAmountSats = Math.floor(extractZapAmount(event) / 1000);
-        const zapMsg = extractZapMessage(event);
-        return (
-          <article ref={focusedPostRef} className="px-4 pt-3 pb-0">
-            <div className="flex items-center gap-3">
-              {/* Zap icon bubble — same size/position as reaction emoji bubble */}
-              <div className="flex items-center justify-center size-10 rounded-full bg-amber-500/10 shrink-0">
-                <Zap className="size-5 text-amber-500 fill-amber-500" />
-              </div>
-
-              {/* Sender + "zapped" + amount + timestamp — identical structure to reaction row */}
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                {zapSenderAuthor.isLoading ? (
-                  <>
-                    <Skeleton className="size-6 rounded-full shrink-0" />
-                    <Skeleton className="h-4 w-28" />
-                  </>
-                ) : (
-                  <>
-                    {zapSenderPubkeyRaw && (
-                      <ProfileHoverCard pubkey={zapSenderPubkeyRaw} asChild>
-                        <Link to={zapSenderProfileUrl} className="shrink-0">
-                          <Avatar className="size-6">
-                            <AvatarImage src={zapSenderMeta?.picture} alt={zapSenderDisplayName} />
-                            <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
-                              {zapSenderDisplayName[0]?.toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                        </Link>
-                      </ProfileHoverCard>
-                    )}
-                    {zapSenderPubkeyRaw && (
-                      <ProfileHoverCard pubkey={zapSenderPubkeyRaw} asChild>
-                        <Link to={zapSenderProfileUrl} className="font-bold text-sm hover:underline truncate">
-                          {zapSenderAuthor.data?.event ? (
-                            <EmojifiedText tags={zapSenderAuthor.data.event.tags}>{zapSenderDisplayName}</EmojifiedText>
-                          ) : zapSenderDisplayName}
-                        </Link>
-                      </ProfileHoverCard>
-                    )}
-                    <span className="text-sm text-muted-foreground">zapped</span>
-                    {zapAmountSats > 0 && (
-                      <span className="text-sm font-semibold text-amber-500 shrink-0">
-                        {formatNumber(zapAmountSats)} {zapAmountSats === 1 ? 'sat' : 'sats'}
-                      </span>
-                    )}
-                    <span className="text-xs text-muted-foreground ml-auto shrink-0">
-                      {formatFullDate(event.created_at)}
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {zapMsg && (
-              <p className="text-sm text-muted-foreground italic pl-[52px]">"{zapMsg}"</p>
-            )}
-
-            {/* Action buttons — identical to reaction card */}
-            <PostActionBar
-              event={event}
-              onReply={() => setReplyOpen(true)}
-              onMore={() => setMoreMenuOpen(true)}
-              className="mt-2 pt-3 border-t border-border/60"
-            />
-
-            <NoteMoreMenu event={event} open={moreMenuOpen} onOpenChange={setMoreMenuOpen} />
-            <ReplyComposeModal event={event} open={replyOpen} onOpenChange={setReplyOpen} />
-            <InteractionsModal eventId={event.id} open={interactionsOpen} onOpenChange={setInteractionsOpen} initialTab={interactionsTab} />
-          </article>
-        );
-      })()}
-
       {/* Kind 0 — Profile: show the ProfileCard directly, no action header */}
       {isProfile && (() => {
         let parsedMeta: Record<string, unknown> = {};
@@ -1769,7 +1680,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
       )}
 
       {/* Main post — expanded Ditto-style view */}
-      {!isReaction && !isRepost && !isVanish && !isZap && !isProfile && !isPollVote && (
+      {!isReaction && !isRepost && !isVanish && !isProfile && !isPollVote && (
         <article ref={focusedPostRef} className="px-4 pt-3 pb-0">
           {/* Kind action header for app handlers */}
           {isAppHandler && (
@@ -1914,7 +1825,7 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
               <EncryptedMessageContent event={event} />
             ) : isLetter ? (
               <EncryptedLetterContent event={event} />
-            ) : isZapGoal ? (
+            ) : isFundraisingGoal ? (
               <GoalCard event={event} />
             ) : isBadgeAward ? (
               <BadgeAwardCard event={event} />
@@ -1990,17 +1901,6 @@ function PostDetailContent({ event }: { event: NostrEvent }) {
                   ) : (
                     `Like${stats.reactions !== 1 ? "s" : ""}`
                   )}
-                </button>
-              ) : null}
-              {stats?.zapCount ? (
-                <button
-                  onClick={() => openInteractions("zaps")}
-                  className="hover:underline transition-colors"
-                >
-                  <span className="font-bold text-foreground">
-                    {formatNumber(stats.zapCount)}
-                  </span>{" "}
-                  Zap{stats.zapCount !== 1 ? "s" : ""}
                 </button>
               ) : null}
               <span className="ml-auto shrink-0 flex items-center gap-1.5">

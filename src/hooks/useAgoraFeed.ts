@@ -16,10 +16,8 @@ const COMMUNITY_KIND = 34550;
 const POLL_KIND = 1068;
 const COMMENT_KIND = 1111;
 const NOTE_KIND = 1;
-const ONCHAIN_ZAP_KIND = 8333;
-const LIGHTNING_ZAP_KIND = 9735;
 
-const AGORA_ENTITY_KINDS = [CAMPAIGN_KIND, PLEDGE_KIND, COMMUNITY_KIND, ONCHAIN_ZAP_KIND];
+const AGORA_ENTITY_KINDS = [CAMPAIGN_KIND, PLEDGE_KIND, COMMUNITY_KIND];
 const COMMENT_ROOT_KINDS = [String(CAMPAIGN_KIND), String(PLEDGE_KIND), String(COMMUNITY_KIND)];
 const WORLD_K_TAGS = ['iso3166', 'geo'];
 const AGORA_T_TAGS = ['agora', 'Agora'];
@@ -131,44 +129,7 @@ function isRelevantAgoraEvent(event: NostrEvent): boolean {
     return true; // already verified `t:agora` above
   }
 
-  if (event.kind === ONCHAIN_ZAP_KIND || event.kind === LIGHTNING_ZAP_KIND) {
-    return hasTagValue(event, 'K', COMMENT_ROOT_KINDS) || tagValues(event, 'a').some(isAgoraAddress);
-  }
-
   return false;
-}
-
-function isAgoraAddress(value: string): boolean {
-  const kind = value.split(':')[0];
-  return kind === String(CAMPAIGN_KIND) || kind === String(PLEDGE_KIND) || kind === String(COMMUNITY_KIND);
-}
-
-function getAddressableCoordinate(event: NostrEvent): string | undefined {
-  if (event.kind < 30000 || event.kind >= 40000) return undefined;
-  const d = event.tags.find(([name]) => name === 'd')?.[1];
-  if (!d) return undefined;
-  return `${event.kind}:${event.pubkey}:${d}`;
-}
-
-function extractDonationTargets(events: NostrEvent[]): { coordinates: string[]; eventIds: string[] } {
-  const coordinates = new Set<string>();
-  const eventIds = new Set<string>();
-
-  for (const event of events) {
-    const coord = getAddressableCoordinate(event);
-    if (coord && (event.kind === CAMPAIGN_KIND || event.kind === PLEDGE_KIND)) {
-      coordinates.add(coord);
-    }
-
-    if (event.kind === COMMENT_KIND && hasTagValue(event, 'K', [String(PLEDGE_KIND)])) {
-      eventIds.add(event.id);
-    }
-  }
-
-  return {
-    coordinates: Array.from(coordinates).slice(0, 40),
-    eventIds: Array.from(eventIds).slice(0, 40),
-  };
 }
 
 interface UseAgoraFeedOptions {
@@ -197,7 +158,7 @@ interface UseAgoraFeedOptions {
   includeAuthorNotes?: boolean;
 }
 
-/** Strict Agora activity feed: campaigns, pledges, communities, world posts, #Agora notes, and donations. */
+/** Strict Agora activity feed: campaigns, pledges, communities, world posts, and #Agora notes. */
 export function useAgoraFeed(enabled: boolean, options?: UseAgoraFeedOptions) {
   const { nostr } = useNostr();
   const { muteItems } = useMuteList();
@@ -273,29 +234,9 @@ export function useAgoraFeed(enabled: boolean, options?: UseAgoraFeedOptions) {
         if (shouldHideFeedEvent(event)) return false;
         return authorSet.has(event.pubkey);
       });
-      const { coordinates, eventIds } = extractDonationTargets(filtered);
-
-      // Donation enrichment: pull lightning + onchain zaps that reference
-      // the Agora entities visible on this page. Donation events must also
-      // carry the Agora marker to be included (per `isRelevantAgoraEvent`).
-      const donationFilters: NostrFilter[] = [];
-      if (coordinates.length > 0) {
-        donationFilters.push({ kinds: [LIGHTNING_ZAP_KIND, ONCHAIN_ZAP_KIND], '#t': AGORA_T_TAGS, '#a': coordinates, limit: coordinates.length * 10 });
-      }
-      if (eventIds.length > 0) {
-        donationFilters.push({ kinds: [LIGHTNING_ZAP_KIND, ONCHAIN_ZAP_KIND], '#t': AGORA_T_TAGS, '#e': eventIds, limit: eventIds.length * 10 });
-      }
-
-      const donationEvents = donationFilters.length > 0
-        ? await nostr.query(donationFilters, { signal })
-        : [];
 
       const seen = new Set<string>();
-      const combined = [
-        ...filtered,
-        // Donation enrichment is already scoped by exact #a/#e targets from this page.
-        ...donationEvents.filter((event) => !shouldHideFeedEvent(event) && hasAgoraTag(event)),
-      ]
+      const combined = filtered
         .filter((event) => {
           if (seen.has(event.id)) return false;
           seen.add(event.id);

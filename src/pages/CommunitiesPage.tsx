@@ -2,12 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronUp, EyeOff, Globe2, HandHeart, PlusCircle, Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, EyeOff, Globe2, PlusCircle, Users } from 'lucide-react';
 
 import { HeroAtmosphere } from '@/components/HeroAtmosphere';
 import { HeroBanner } from '@/components/HeroBanner';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityGrid } from '@/components/discovery/CommunityGrid';
 import {
   CommunityMiniCard,
@@ -23,11 +22,9 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDiscoverCommunities } from '@/hooks/useDiscoverCommunities';
 import { useFeaturedOrganizations } from '@/hooks/useFeaturedOrganizations';
 import { useGlobalActivity } from '@/hooks/useGlobalActivity';
-import { useGlobalDonations } from '@/hooks/useGlobalDonations';
 import { useOrganizationModeration } from '@/hooks/useOrganizationModeration';
 import { useToast } from '@/hooks/useToast';
 import { useUserOrganizations } from '@/hooks/useUserOrganizations';
-import { formatSatsShort } from '@/lib/formatCampaignAmount';
 import type { ParsedCommunity } from '@/lib/communityUtils';
 
 /**
@@ -163,7 +160,6 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
   const { t } = useTranslation();
   const { data: featured } = useFeaturedOrganizations();
   const { data: activityByCountry } = useGlobalActivity();
-  const { data: donations, isLoading: donationsLoading } = useGlobalDonations();
   const [hueIndex, setHueIndex] = useState(0);
 
   useEffect(() => {
@@ -178,14 +174,6 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
   const stats = useMemo<TickerStat[]>(() => {
     const items: TickerStat[] = [];
 
-    if (donations && donations.totalSats > 0) {
-      items.push({
-        id: 'sats',
-        value: formatSatsShort(donations.totalSats),
-        label: t('groups.list.tickerCampaignsRaised', { count: donations.campaignCount }),
-        icon: <HandHeart className="size-5" aria-hidden />,
-      });
-    }
     if (featured && featured.length > 0) {
       items.push({
         id: 'groups',
@@ -203,7 +191,7 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
       });
     }
     return items;
-  }, [donations, featured, activityByCountry, t]);
+  }, [featured, activityByCountry, t]);
 
   const [tickerIndex, setTickerIndex] = useState(0);
   useEffect(() => {
@@ -277,17 +265,9 @@ function CommunitiesHero({ onCreateCommunity }: CommunitiesHeroProps) {
             </div>
           ) : (
             <div className="flex items-center justify-center gap-3">
-              {donationsLoading ? (
-                <>
-                  <Skeleton className="size-5 rounded-full" />
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-3 w-32" />
-                </>
-              ) : (
-                <span className="text-xs text-white/85 drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
-                  {t('groups.list.connectingRelays')}
-                </span>
-              )}
+              <span className="text-xs text-white/85 drop-shadow-[0_1px_4px_rgb(0_0_0/0.5)]">
+                {t('groups.list.connectingRelays')}
+              </span>
             </div>
           )}
         </div>

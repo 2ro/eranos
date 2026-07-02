@@ -149,11 +149,11 @@ export function VerifyTutorial({
  * fields directly instead of fetching the event.
  */
 const DEMO_CAMPAIGN = {
-  title: 'Agora App Development Fund',
+  title: 'Eranos App Development Fund',
   organizer: 'Team Soapbox',
   organizerPicture:
     'https://blossom.primal.net/e93f617f8331509acdddde3df0c1cd23cda1803d92c70815fc96e2d5f8d48ac8.png',
-  story: 'Help fund the development of Agora!',
+  story: 'Help fund the development of Eranos!',
   banner:
     'https://blossom.primal.net/aade02e86584a7ab269550992d0266bae31059a34e6e08fddba1f6f5acb6e7d6.jpg',
   goalLabel: '$1,000',

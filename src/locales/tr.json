@@ -77,7 +77,6 @@
     "language": "Dil",
     "dashboard": "Panel",
     "myDashboard": "Panelim",
-    "wallet": "Cüzdan",
     "notifications": "Bildirimler",
     "messages": "Mesajlar",
     "profile": "Profil",
@@ -119,7 +118,7 @@
     "showAllConversations": "Tüm sohbetleri göster",
     "friendsEmpty": "Takip ettiğiniz kişilerden mesaj yok.",
     "translateDialogTitle": "Özel mesajlar çevrilsin mi?",
-    "translateDialogDescription": "Alınan mesajlar yapılandırdığınız çeviri hizmetine gönderilecek. Gönderilen mesajlar çevrilmeyecek. Agora bu tercihi bu cihazda hatırlayacak.",
+    "translateDialogDescription": "Alınan mesajlar yapılandırdığınız çeviri hizmetine gönderilecek. Gönderilen mesajlar çevrilmeyecek. Eranos bu tercihi bu cihazda hatırlayacak.",
     "confirmTranslate": "Mesajları çevir",
     "newMessage": "Yeni mesaj",
     "newMessageTitle": "Yeni mesaj",
@@ -199,7 +198,7 @@
     "secure": {
       "title": "Anahtarınızı kaydedin",
       "subtitle": "Dosyayı indirin ve güvenli bir yerde saklayın. Bir parola yöneticisi işe yarar.",
-      "couplingNote": "Hesabınız ve cüzdanınız bu anahtarı paylaşır. Nostr paylaşımlarınızı imzalar ve Agora üzerindeki Bitcoin cüzdanınızı açar.",
+      "couplingNote": "Hesabınız ve cüzdanınız bu anahtarı paylaşır. Nostr paylaşımlarınızı imzalar ve Eranos üzerindeki Bitcoin cüzdanınızı açar.",
       "permanenceHeadline": "Bu anahtarı kaybederseniz kurtarmanın bir yolu yoktur.",
       "permanenceBody": "Sıfırlama yok, destek hattı yok, e-posta kurtarma yok. Devam etmeden önce kaydedin.",
       "button": "İndir ve devam et",
@@ -278,19 +277,19 @@
       "global": "Küresel"
     },
     "empty": {
-      "homeAgora": "Agora şu an sakin. Yeni kampanyalar, taahhütler, bağışlar ve gönderiler oluştukça burada görünecek.",
-      "homeFollowingLoggedIn": "Takip akışınız boş. Ne yaptıklarını görmek için birilerini takip edin ya da Agora veya Küresel sekmesine geçin.",
+      "homeAgora": "Eranos şu an sakin. Yeni kampanyalar, taahhütler, bağışlar ve gönderiler oluştukça burada görünecek.",
+      "homeFollowingLoggedIn": "Takip akışınız boş. Ne yaptıklarını görmek için birilerini takip edin ya da Eranos veya Küresel sekmesine geçin.",
       "homeFollowingLoggedOut": "Takip ettiğiniz kişilerin gönderilerini görmek için giriş yapın.",
       "homeOther": "Gösterilecek bir şey yok. Röle bağlantılarınızı kontrol edin ya da biraz sonra tekrar deneyin.",
       "follows": "Akışınız boş. Gönderilerini burada görmek için birilerini takip edin.",
       "global": "Gönderi bulunamadı. Röle bağlantılarınızı kontrol edin ya da yakında tekrar gelin.",
-      "browseAgora": "Agora akışına göz at",
+      "browseAgora": "Eranos akışına göz at",
       "browseGlobal": "Küresel akışa göz at",
       "discoverPeople": "Takip edilecek insanları keşfet",
       "logIn": "Giriş yap"
     },
     "modeSwitcher": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "allNostr": "Küresel",
       "following": "Takip ediliyor",
       "ariaLabel": "Akış modu: {{label}}. Değiştirmek için tıklayın.",
@@ -307,7 +306,6 @@
       "repost": "Yeniden paylaş",
       "undoRepost": "Paylaşımı geri al",
       "react": "Tepki ver",
-      "zap": "Zap",
       "share": "Paylaş",
       "more": "Daha fazla",
       "linkCopied": "Bağlantı panoya kopyalandı"
@@ -416,12 +414,6 @@
     "reacted": "tepki verdi",
     "reposted": "yeniden paylaştı",
     "voted": "oy verdi",
-    "zap": {
-      "donatedTo": "Şuraya bağışladı:",
-      "donatedAmountTo": "{{amount}} bağışladı, alıcı:",
-      "sat_one": "{{formattedCount}} sat",
-      "sat_other": "{{formattedCount}} sat"
-    },
     "stream": {
       "untitled": "Başlıksız Yayın",
       "live": "CANLI",
@@ -492,7 +484,6 @@
       "nsiteDeployed": "bir",
       "nsiteRedeployed": "bir",
       "nsiteNoun": "nsite dağıttı",
-      "zapped": "zapladı",
       "pledgeCreated": "bir",
       "pledgeUpdated": "bir",
       "pledgeNoun": "taahhüt oluşturdu",
@@ -662,60 +653,12 @@
         "body": "Fonlar doğrudan alıcıya ulaşır. Saklama da kontrol de alıcıda kalır. Taşı, takas et veya harca; aşağıdaki rehberler bunu gizlilik içinde ve güvenle nasıl yapacağınızı anlatıyor."
       }
     },
-    "twoWays": {
-      "eyebrow": "Bitcoin · Tek QR, iki seçenek",
-      "title": "Ödeme almanın iki yolu.",
-      "lede": "Her iki seçenek de Bitcoin. Aradaki fark, gizlilik için neyi takas ettiğiniz. Bir alıcı kampanya oluştururken hangi seçenekleri kabul edeceğini seçer. İkisini birden seçerse, bağış sayfası herhangi bir cüzdanla çalışan tek bir QR kod gösterir.",
-      "public": {
-        "kicker": "Bitcoin Açık Ödemeler",
-        "tagline": "Evrensel · Hızlı · Şeffaf",
-        "title": "Dünyadaki her cüzdanla çalışır.",
-        "description": "Bağışlar, alıcının kontrolündeki normal bir Bitcoin adresine ulaşır. Herhangi bir Bitcoin cüzdanı olan herkes gönderebilir. Yeni uygulama yok, yeni hesap yok, öğrenme eğrisi yok.",
-        "bullet1": "Her Bitcoin cüzdanında çalışır: Cash App, Coinbase, Strike, donanım",
-        "bullet2": "En hızlı uzlaşma: yalnızca Bitcoin onayları",
-        "bullet3": "Zincir üstünde doğrulanabilir: herkes bir alıcının ne aldığını görebilir",
-        "tradeoffTitle": "Takas: Zincir üstünde açık.",
-        "tradeoffIntro": "Her bağış, Bitcoin blok zincirinde ve Nostr'da açıktır. {{appName}}, yalnızca açıkça yürütülen aktivizm için önerilir. Siz veya bağışçılarınız devlet aktörleri dahil aşırı gizlilik gerektiriyorsanız, katılmadan önce <0>Bağışçı Rehberi</0>'ni ve <1>Alıcı Rehberi</1>'ni okuyun."
-      },
-      "silent": {
-        "kicker": "Bitcoin Sessiz Ödemeler",
-        "tagline": "İzlenemez · Doğrudan · BIP-352",
-        "title": "İzlenemez, zincir üstünde, doğrudan.",
-        "description": "Bağışlar BIP-352 sessiz ödemeler olarak gönderilir. Her biri, blok zincirine bakan bir gözlemcinin kampanyaya bağlayamayacağı yeni ve izlenemez bir Bitcoin çıkışına ulaşır.",
-        "bullet1": "Bağış izi zincir üstünde yeniden kurulamaz",
-        "bullet2": "Ciddi hasımlarla karşılaşan alıcıları korur",
-        "bullet3": "Ayrı bir gizli bakiyede tutulur, açık fonlarla asla karıştırılmaz",
-        "tradeoffTitle": "Takas: Sessiz ödemeler henüz yeni.",
-        "tradeoffIntro": "Zincir üstünde Bitcoin almanın en gizli yolu, ancak ekosistem genç ve bugün hâlâ pürüzlü:",
-        "tradeoffBullet1": "Çok az cüzdan destekliyor.",
-        "tradeoffBullet2": "Alım yavaş.",
-        "tradeoffBullet3": "Anlık bildirim yok.",
-        "tradeoffBullet4": "Cüzdanlarda hâlâ hatalar var.",
-        "tradeoffBullet5": "Bağış sayıları herkese açık değil."
-      },
-      "noCustody": {
-        "title": "Saklama yok. Aracı yok.",
-        "body": "{{appName}} hiçbir zaman fon tutmaz. Bağışlar, Bitcoin üzerinden cüzdandan cüzdana hareket eder. İki seçenekte de bağışçı ile alıcı arasında bir sunucu yoktur. {{appName}} yarın yok olsa bile her kampanya çalışmaya devam eder.",
-        "gofundme": {
-          "heading": "GoFundMe'den farkı",
-          "body": "Hiçbir platform bağışlarınızı donduramaz, iade talep edemez veya politika anlaşmazlıkları nedeniyle kampanyanızı sonlandıramaz."
-        },
-        "givesendgo": {
-          "heading": "GiveSendGo'dan farkı",
-          "body": "Arada hiçbir ödeme işlemcisi yok; yani Stripe yok, Visa yok, hiçbir banka kampanyanızın ortasında sizi kesemez."
-        },
-        "otherBitcoin": {
-          "heading": "Diğer 'Bitcoin' platformlarından farkı",
-          "body": "Başarısız olabilecek veya çevrimdışı olabilecek merkezi bir Lightning düğümü, saklayıcı ya da LSP yok. Fonlar, kontrolünüzdeki bir cüzdana doğrudan zincir üstünde uzlaşır."
-        }
-      }
-    },
     "faq": {
       "eyebrow": "Sorular",
       "title": "Sıkça sorulanlar.",
       "chapter1": {
         "label": "Başlangıç",
-        "description": "Agora nedir, kim yaptı ve ne kadara mal olur."
+        "description": "Eranos nedir, kim yaptı ve ne kadara mal olur."
       },
       "chapter2": {
         "label": "Bitcoin bağışları",
@@ -723,7 +666,7 @@
       },
       "chapter3": {
         "label": "Nostr hakkında",
-        "description": "Agora'nın üzerine kurulduğu açık protokol ve hesabınızın nasıl çalıştığı."
+        "description": "Eranos'nın üzerine kurulduğu açık protokol ve hesabınızın nasıl çalıştığı."
       }
     },
     "guides": {
@@ -737,7 +680,6 @@
         "description": "Bir ödeme işlemcisinden izin istemeden, dünyanın herhangi bir yerindeki alıcılara ve hareketlere doğrudan Bitcoin gönderin.",
         "bullet1": "Zaten sahip olduğunuz herhangi bir Bitcoin cüzdanını kullanın.",
         "bullet2": "Bağışlar doğrudan alıcıya ulaşır. Saklayıcı yok, aracı yok.",
-        "bullet3": "Gizlilik için sessiz ödemeleri destekleyen bir cüzdan kullanın.",
         "cta": "Bağışçı Rehberi'ni oku"
       },
       "recipient": {
@@ -746,8 +688,6 @@
         "title": "İzin almadan fonlanın.",
         "description": "Davanıza inanan insanlardan doğrudan destek alın. Banka hesabı yok, başvuru formu yok, arada şirket yok.",
         "bullet1": "Kayıt olur olmaz bağış almaya başlayın.",
-        "bullet2": "Hangi ödeme türlerini kabul edeceğinizi seçin: açık, sessiz ödemeler veya her ikisi.",
-        "bullet3": "Gizli nakit çıkışı için fonu önce bir sessiz ödeme cüzdanına gönderin, sonra istediğiniz yere iletin.",
         "cta": "Alıcı Rehberi'ni oku"
       },
       "stillStuck": "Hâlâ takıldınız mı?",
@@ -924,7 +864,6 @@
       "noSubmissionsHint": "Kanıt, belge veya tamamlanmış çalışmayla yanıt veren ilk kişi olun.",
       "funded": "fonlandı",
       "ofPledged": "/ {{amount}} taahhüt",
-      "trustNote": "Bu taahhüt güvene dayalıdır. Fonlama ilerlemesi, üst düzey gönderilerdeki zap'leri ve bağış makbuzlarını toplar.",
       "share": "Paylaş",
       "storyHeading": "Taahhüt",
       "storyEmpty": "Taahhüdü açan kişi henüz ayrıntıları yazmadı."
@@ -1086,32 +1025,6 @@
     "headingEdit": "Kampanyayı düzenle",
     "title": "Başlık",
     "titlePlaceholder": "Son Kitapçıyı Kurtarın",
-    "wallet": "Bitcoin cüzdanı",
-    "myWalletLabel": "{{name}} cüzdanı",
-    "myWalletDefault": "Cüzdanım",
-    "walletHeroNote": "Bağışlar doğrudan kendi Agora cüzdanınıza akar.\nAracı yok.",
-    "walletHeroReassurance": "Anahtar sizde olduğu için para da sizde. Cüzdan sekmesinden istediğiniz zaman çekebilirsiniz.",
-    "walletChoose": "Bir cüzdan seçin",
-    "walletCustom": "Özel",
-    "walletUseCustom": "Bunun yerine özel bir cüzdan kullan",
-    "walletUseMine": "Agora cüzdanımı kullan",
-    "acceptHeading": "Hangi bağışları kabul edeceksiniz?",
-    "acceptUnavailable": "Bu girişle kullanılamaz.",
-    "acceptAllTitle": "Her türlü bağış",
-    "acceptPublicTitle": "Yalnızca açık bağışlar",
-    "acceptPrivateTitle": "Yalnızca gizli bağışlar",
-    "acceptAllHint": "Hem açık hem de gizli bağışları kabul edin.",
-    "acceptPublicHint": "Bağışçılar normal bir Bitcoin adresine gönderir. Bu bağışlar herkese görünür.",
-    "acceptPrivateHint": "Bağışçılar gizlice gönderir, böylece kimlikleri herkesten gizli kalır.",
-    "customWalletIntro": "Kabul etmek istediğiniz bağışları girin: açık bir adres, gizli bir kod ya da her ikisi. En az biri gereklidir.",
-    "customOnchainMeaning": "Açık. Bu bağışları herkes görebilir.",
-    "customSpMeaning": "Gizli. Bağışçının kimliği gizli kalır.",
-    "bitcoinAddress": "Bitcoin adresi",
-    "bitcoinAddressPlaceholder": "bc1q… veya bc1p…",
-    "silentPaymentCode": "Sessiz ödeme kodu",
-    "silentPaymentCodePlaceholder": "sp1…",
-    "onchainInvalid": "Tanınan bir mainnet Bitcoin adresi değil (bc1q… / bc1p…).",
-    "spInvalid": "Tanınan bir BIP-352 sessiz ödeme kodu değil (sp1…).",
     "country": "Ülke",
     "countryPlaceholder": "Ülke ara",
     "tags": "Etiketler",
@@ -1139,7 +1052,6 @@
     "storyPlaceholder": "Arka planı, kimlerin yararlanacağını ve fonların nasıl kullanılacağını paylaşın.",
     "goal": "Hedef",
     "goalPlaceholder": "25.000",
-    "goalNote": "Tam ABD Doları. Bağışçılar Bitcoin ile öder; istemciler görüntüleme anında USD karşılığını tahmin eder.",
     "submitCreate": "Kampanyayı başlat",
     "submitEdit": "Kampanyayı güncelle",
     "publishing": "Yayımlanıyor…",
@@ -1158,24 +1070,14 @@
     "errorTitleRequired": "Başlık zorunludur.",
     "errorTitleInvalid": "Kampanya URL'inin oluşturulabilmesi için başlığın harf veya rakam içermesi gerekir.",
     "errorSlugInvalid": "Tanımlayıcı yalnızca küçük harf, rakam ve tire içermelidir.",
-    "errorHdUnavailable": "Bu giriş türü için yerleşik cüzdan kullanılamıyor.",
-    "errorSpUnavailable": "Bu giriş türü için sessiz ödeme adresi kullanılamıyor.",
-    "errorOnchainInvalid": "Zincir üstü adres tanınan bir mainnet bech32(m) adresi değil (bc1q… / bc1p…).",
-    "errorSpInvalid": "Sessiz ödeme kodu tanınan bir BIP-352 kodu değil (sp1…).",
-    "errorWalletRequired": "En az bir cüzdan uç noktası sağlayın — bir Bitcoin mainnet adresi (bc1q… / bc1p…) ya da bir sessiz ödeme kodu (sp1…).",
     "errorGoalInvalid": "Hedef pozitif bir tam dolar tutarı olmalıdır.",
     "errorEditLatestMissing": "Bu kampanyanın güncellemek için en son sürümü bulunamadı.",
     "errorSlugCollision": "\"{{slug}}\" tanımlayıcısına sahip bir kampanyanız zaten var. Başkasını seçin.",
     "errorBannerInvalid": "Pankart geçerli bir https:// URL'i olmalıdır.",
-    "errorHdDeriveFailed": "Cüzdanınızdan yeni bir zincir üstü adres türetilemedi.",
-    "errorHdDeriveInvalid": "Türetilen cüzdan adresi doğrulamadan geçemedi. Lütfen bunun yerine özel bir adres ekleyin.",
-    "errorWalletRequiredFallback": "Cüzdan uç noktası zorunludur.",
     "errorPublishedInvalid": "Yayımlanan event doğrulamadan geçemedi. Lütfen yenileyin ve tekrar deneyin.",
     "wizard": {
       "titleStepTitle": "Kampanyanıza isim verin",
       "titleStepSubtitle": "Bağışçıların tanıyacağı kısa ve net bir ad.",
-      "walletStepTitle": "Bağışlar nereye gidecek?",
-      "walletStepSubtitle": "Agora cüzdanınızı seçin ya da kendi adresinizi yapıştırın.",
       "bannerStepTitle": "Bir pankart ekleyin",
       "bannerStepSubtitle": "Çarpıcı tek bir görsel, kampanyayı her kartta öne çıkarır.",
       "storyStepTitle": "Hikâyenizi anlatın",
@@ -1215,43 +1117,15 @@
     "like_one": "<0>{{formattedCount}}</0> Beğeni",
     "like_other": "<0>{{formattedCount}}</0> Beğeni",
     "tabComments": "Yorumlar ve bağışlar",
-    "tabLedger": "Defter",
-    "ledger": {
-      "publicAddress": "Genel adres",
-      "viewOnMempool": "mempool.space'de görüntüle",
-      "openOnMempool": "İşlemi mempool.space'de aç",
-      "received": "Alınan",
-      "sent": "Gönderilen",
-      "unconfirmed": "Onaylanmadı",
-      "block": "Blok {{height}}",
-      "btcUnit": "BTC",
-      "empty": "Bu adres için henüz zincir üstü etkinlik yok.",
-      "error": "Zincir üstü etkinlik yüklenemedi. Birazdan tekrar deneyin.",
-      "loadMore": "Daha fazla yükle",
-      "loadingMore": "Yükleniyor…"
-    },
     "noCommentsTitle": "Henüz yorum yok",
     "noCommentsHint": "Destek mesajı bırakan ilk kişi olun.",
     "deleteDialogTitle": "Bu kampanya silinsin mi?",
     "deleteDialogBody": "Bu, bir NIP-09 silme isteği yayımlar. Düzgün davranan röleler kampanyayı akışlardan ve doğrudan bağlantılardan kaldırır. Geçmiş bağış makbuzları yine zincir üstünde kalır. Bu işlem geri alınamaz — bağış almaya devam etmek için kampanyayı düzenleyin.",
     "storyHeading": "Hikaye",
-    "donate": "Bağışla",
     "share": "Paylaş",
     "target": "Hedef: {{amount}}",
     "raised": "toplandı",
-    "ofGoal": "/ {{amount}} hedef",
-    "donationCount_one": "{{count}} bağış",
-    "donationCount_other": "{{count}} bağış",
-    "openInWallet": "Cüzdanda aç",
-    "payWithAgoraWallet": "Agora ile öde",
-    "openExternalWallet": "Harici cüzdanı aç"
-  },
-  "noBitcoin": {
-    "trigger": "Bitcoin'iniz yok mu?",
-    "title": "Henüz Bitcoin'iniz yok mu?",
-    "description": "Cash App'ten Bitcoin satın alın, ardından bu kampanyaya gönderin.",
-    "getItOn": "Şuradan edinin:",
-    "getCashApp": "Cash App'i edinin"
+    "ofGoal": "/ {{amount}} hedef"
   },
   "campaignVerification": {
     "verifiedBy": "Doğrulayan",
@@ -1371,25 +1245,6 @@
       "searchAriaLabel": "Kampanyaları ara",
       "noMatch": "“{{query}}” ile eşleşen kampanya yok",
       "noMatchHint": "Farklı bir arama terimi deneyin ya da aramayı temizleyin.",
-      "venezuelaRelief": {
-        "title": "Venezuela <0>size</0> ihtiyaç duyuyor",
-        "body": "Kuzey Venezuela'yı şiddetli bir deprem vurdu; en ağır darbeyi Caracas ve La Guaira aldı. Oradaki aileler bu acıyı tek başlarına atlatamaz. Bağışınız doğrudan sahadaki yardım kampanyalarına ulaşır ve şefkatinizi bugün barınağa, gıdaya ve umuda dönüştürür.",
-        "donate": "Yardıma bağış yap",
-        "credit": "Fotoğraf: Caracas'ta çöken bir binanın yakınında kucaklaşan halk. (AFP via Getty Images)",
-        "share": "Paylaş",
-        "shareTitle": "Agora'da Venezuela deprem yardımı",
-        "linkCopied": "Bağlantı panoya kopyalandı",
-        "learnMore": "Daha fazla bilgi",
-        "popupBody": "Kuzey Venezuela'yı şiddetli bir deprem vurdu; en ağır darbeyi Caracas ve La Guaira aldı. Bağışınız doğrudan sahadaki yardım kampanyalarına ulaşır ve şefkati bugün barınağa, gıdaya ve umuda dönüştürür.",
-        "seoTitle": "Venezuela Deprem Yardımı",
-        "seoDescription": "Kuzey Venezuela'yı şiddetli bir deprem vurdu. Agora üzerinden doğrudan sahadaki yardım kampanyalarına Bitcoin bağışlayın. Platform yok, emanetçi yok, izin gerekmiyor.",
-        "pageEyebrow": "Acil çağrı",
-        "pageHow": "Bağışınız nasıl yardımcı olur",
-        "pageHowBody": "Agora emanetsizdir: Bitcoin'iniz cüzdanınızdan doğrudan bir yardım kampanyasının adresine gider. Hiçbir platform pay almaz, hiçbir emanetçi parayı tutmaz ve vermek ya da almak için kimsenin iznine ihtiyaç yoktur. Aşağıdaki her kampanya, sahada depreme yanıt veren insanlar tarafından yürütülüyor.",
-        "showcaseTitle": "Yardım kampanyaları",
-        "campaignCount_one": "{{count}} yardım kampanyası",
-        "campaignCount_other": "{{count}} yardım kampanyası"
-      },
       "whyDifferent": {
         "eyebrow": "Neden {{appName}}",
         "title": "Farklı inşa edildi.",
@@ -1408,14 +1263,6 @@
           "bullet2": "Size ait cüzdana on-chain aktarım",
           "bullet3": "{{appName}} yok olsa bile çalışır"
         },
-        "block3": {
-          "heading": "Herkese açık veya özel. Seçim sizin.",
-          "body": "Alıcılar tehdit modellerine uygun alım seçeneğini seçer. Bağışçılar tek bir QR görür; cüzdan doğru protokolü seçer.",
-          "publicLabel": "Herkese açık",
-          "publicSummary": "Her Bitcoin cüzdanında çalışır. Hızlıdır ve on-chain doğrulanabilir.",
-          "privateLabel": "Özel",
-          "privateSummary": "BIP-352 silent payments. Bağışlar ilişkilendirilemeyen çıktılara ulaşır."
-        },
         "readMore": "Tam dökümü oku"
       },
       "verifyCampaigns": "Kampanyaları doğrula"
@@ -1423,7 +1270,7 @@
     "all": {
       "title": "Kampanyalar",
       "seoTitle": "Tüm kampanyalar",
-      "description": "Agora'da yayımlanmış her kampanyaya göz atın.",
+      "description": "Eranos'da yayımlanmış her kampanyaya göz atın.",
       "sectionTagline": "Önce öne çıkan kampanyalar, ardından ağın geri kalanı. Daraltmak için arama yapın veya sıralayın.",
       "searchAriaLabel": "Kampanyaları ara",
       "searchPlaceholder": "Kampanya ara…",
@@ -1591,7 +1438,6 @@
       "title": "Gelişmiş",
       "subtitle": "Cüzdan bağlantıları, sistem yapılandırması ve ileri kullanıcılar için diğer gelişmiş seçenekler.",
       "intro": "Cüzdan bağlantıları, sistem yapılandırması ve diğer gelişmiş seçenekler.",
-      "wallet": "Cüzdan",
       "torHeading": "Tor",
       "torToggle": "Trafiği Tor üzerinden yönlendir",
       "torToggleDesc": "Daha güçlü gizlilik için Tor ağı üzerinden rölelere bağlanır ve medya yükler. Daha yavaş bir performans ve Tor bağlanırken kısa bir bekleme süresi bekleyin.",
@@ -1599,10 +1445,6 @@
       "torStatusLabel": "Durum:",
       "torExitIp": "Tor çıkış IP:",
       "torCheckAgain": "Tekrar kontrol et"
-    },
-    "wallet": {
-      "title": "Cüzdan",
-      "subtitle": "Cüzdan bağlantılarını ve ödemeleri yönetin"
     }
   },
   "language": {
@@ -1754,296 +1596,6 @@
     "adminRequired": "Yönetici erişimi gerekli",
     "adminRequiredDesc": "Yalnızca platform yöneticileri organizatör atayabilir veya kaldırabilir."
   },
-  "wallet": {
-    "seoTitle": "Cüzdan",
-    "seoDescription": "Nostr nsec'inizden türetilmiş hiyerarşik deterministik Bitcoin cüzdanı.",
-    "loggedOut": {
-      "title": "Bitcoin Cüzdanı",
-      "description": "Nostr kimliğinizden türetilmiş hiyerarşik bir cüzdan. Her alımda yeni adres, tam işlem geçmişi, adres yeniden kullanımı yok.",
-      "requiresNsec": "Bir nsec ile (Nostr özel anahtarınız) giriş yapılması gerekir."
-    },
-    "unsupported": {
-      "title": "Cüzdan kullanılamıyor",
-      "extension": "Tarayıcı uzantınız gizli anahtarınızı izole tutuyor, bu nedenle cüzdanınız için alt anahtarlar türetilemiyor.",
-      "bunker": "Uzak imzalayıcınız (NIP-46 bunker) gizli anahtarınızı bunker tarafında tutuyor, bu nedenle cüzdanınız için alt anahtarlar türetilemiyor.",
-      "other": "Giriş türünüz cüzdanınızı türetmek için gerekli olan gizli anahtarı sunmuyor.",
-      "instructions": "Cüzdanı kullanmak için çıkış yapın ve nsec'inizle tekrar giriş yapın."
-    },
-    "scanFailed": "Cüzdan taranamadı",
-    "retry": "Tekrar dene",
-    "refreshBalance": "Bakiyeyi yenile",
-    "refreshBalanceTitle": "Bakiyeyi yenilemek için tıklayın",
-    "amountPending": "{{amount}} beklemede",
-    "pending": "beklemede",
-    "send": "Gönder",
-    "transactions": "İşlemler",
-    "receiveDialog": {
-      "title": "Bitcoin Al",
-      "description": "Bitcoin almak için bir adres paylaşın.",
-      "addressIndex": "Adres #{{index}}",
-      "scanForNew": "Yeni ödemeleri kontrol et"
-    },
-    "tx": {
-      "pending": "Beklemede",
-      "today": "Bugün",
-      "yesterday": "Dün",
-      "daysAgo_one": "{{count}}g önce",
-      "daysAgo_other": "{{count}}g önce",
-      "received": "Alındı",
-      "sent": "Gönderildi",
-      "silentBadge": "sessiz",
-      "silentDetectedTitle": "BIP-352 sessiz ödeme taramasıyla algılandı"
-    },
-    "openMenu": "Cüzdan menüsü",
-    "sendPublic": "Gönder",
-    "sendPrivate": "Gizlice gönder",
-    "tabs": {
-      "public": "Herkese açık",
-      "private": "Gizli"
-    }
-  },
-  "walletSettings": {
-    "backup": {
-      "label": "Cüzdanı yedekle"
-    },
-    "legacy": {
-      "label": "Eski cüzdan kurtarma"
-    }
-  },
-  "walletLegacy": {
-    "seoTitle": "Eski Cüzdan Kurtarma",
-    "seoDescription": "Önceki Agora cüzdan kuşaklarından fonları kurtarın.",
-    "title": "Eski cüzdan kurtarma",
-    "subtitle": "Daha önce kullandığınız cüzdanı seçin ve bakiyesini mevcut cüzdanınıza toplayın.",
-    "loggedOut": "Eski cüzdanlarınızdaki fonları aramak için Nostr kimliğinizle giriş yapın.",
-    "scanning": "V2 beta cüzdanında fonlar taranıyor…",
-    "v2Detected": {
-      "title": "V2 Lansman Öncesi Beta Cüzdanında fonlar bulundu",
-      "body": "Eski V2 beta cüzdanınızdaki adreslerde <0>{{amount}}</0> bulduk. Bunları mevcut cüzdanınıza taşımak için aşağıdaki V2 toplama işlemini açın."
-    },
-    "options": {
-      "v2Beta": {
-        "label": "V2 Lansman Öncesi Beta Cüzdanı",
-        "description": "BIP-39 türetilmesinden önce gelen, tohum olarak nsec kullanan BIP-86 cüzdanındaki fonları toplayın."
-      },
-      "v1Breeze": {
-        "label": "V1 Breeze Cüzdanı",
-        "description": "Eski Lightning saklama hizmetinden zincir üstü bakiyeyi toplayın."
-      },
-      "doubleTweak": {
-        "label": "Çift Tweak SP Düzeltmesi",
-        "description": "Önceki bir gönderim hatası nedeniyle takılı kalan sessiz ödemeleri kurtarın ve tekrar cüzdanınıza toplayın."
-      }
-    },
-    "footnote": "Her seçenek, mevcut cüzdanınıza tek yönlü bir toplamadır. Eski cüzdanın kendisi geri yüklenmez — yalnızca tuttuğu fonlar kurtarılır."
-  },
-  "walletRecovery": {
-    "seoTitle": "Eski Cüzdanı Kurtar",
-    "seoDescription": "Önceki bir Lightning cüzdanından fonları kurtarın ve Nostr'dan türetilmiş Bitcoin adresinize aktarın.",
-    "title": "Eski Cüzdanı Kurtar",
-    "heading": "Eski cüzdanınızı kurtarın",
-    "subheading": "Daha önce Lightning cüzdanında fon tuttuysanız, bunları Nostr'dan türetilmiş Bitcoin adresinize toplayabilirsiniz. Eski cüzdanınız geri yüklenmez — bu tek seferlik, tek yönlü bir transferdir.",
-    "backToWallet": "Cüzdana dön",
-    "loggedOut": {
-      "title": "Kurtarmak için giriş yapın",
-      "description": "Fonların Bitcoin adresine toplanabilmesi için eski Lightning cüzdanına sahip olan Nostr kimliğiyle giriş yapın."
-    },
-    "destination": {
-      "title": "Fonlar şuraya gönderilecek:",
-      "description": "Nostr'dan türetilmiş Taproot adresiniz."
-    },
-    "phrase": {
-      "title": "Kurtarma ifadesi",
-      "description": "Eski cüzdanınızdan 12 kelimelik kurtarma ifadesini yapıştırın.",
-      "checkingRelays": "Şifreli yedek için röleleriniz kontrol ediliyor…",
-      "backupFoundTitle": "Rölelerinizde yedek bulundu",
-      "backupFoundDesc": "Eski cüzdanınızın kurtarma ifadesinin bu hesaptan yayımlanmış şifreli bir yedeğini bulduk.",
-      "decryptAndUse": "Şifresini çöz ve kullan",
-      "placeholder": "kelime1 kelime2 kelime3 …",
-      "warning": "Yalnızca güvendiğiniz bir kurtarma ifadesini yapıştırın. Bu ifadeye sahip olan herkes fonları harcayabilir. Toplama işlemi bittikten sonra, kopyaladığınız her yerden silin.",
-      "sweepButton": "Fonları Bitcoin adresime topla"
-    },
-    "sweeping": {
-      "working": "Çalışıyor…",
-      "dontClose": "Bu sekmeyi kapatmayın. Eski cüzdan senkronize edilirken ve işlem yayınlanırken bu işlem bir dakika kadar sürebilir."
-    },
-    "success": {
-      "title": "Kurtarma tamamlandı",
-      "sent": "Bitcoin adresinize {{sats}} sat gönderildi.",
-      "viewTransaction": "İşlemi görüntüle"
-    },
-    "error": {
-      "title": "Kurtarma başarısız",
-      "tryAgain": "Tekrar dene"
-    },
-    "errors": {
-      "noNip44": "İmzalayıcınız röle yedeğini okumak için gereken NIP-44 şifre çözmeyi desteklemiyor. Bunun yerine 12 kelimelik kurtarma ifadenizi elle yapıştırın.",
-      "decryptFailed": "Röle yedeğinin şifresi çözülemedi. Bunun yerine 12 kelimelik kurtarma ifadenizi elle yapıştırın.",
-      "decryptGeneric": "Röle yedeğinin şifresi çözülemedi.",
-      "invalidWordCount": "Kurtarma ifadesi 12 veya 24 kelime olmalıdır.",
-      "noBalance": "Eski cüzdanınızda harcanabilir bakiye yok. Kurtaracak bir şey yok.",
-      "sweepGeneric": "Kurtarma başarısız. Lütfen tekrar deneyin."
-    },
-    "progress": {
-      "loadingSdk": "Cüzdan SDK'si yükleniyor…",
-      "connecting": "Eski cüzdanınıza bağlanılıyor…",
-      "checkingBalance": "Bakiye kontrol ediliyor…",
-      "preparingTransfer": "{{sats}} sat'lık transfer hazırlanıyor…",
-      "broadcasting": "İşlem yayınlanıyor…"
-    },
-    "toast": {
-      "backupLoadedTitle": "Yedek yüklendi",
-      "backupLoadedDesc": "Kurtarma ifadesinin rölelerinizden şifresi çözüldü."
-    }
-  },
-  "walletBackup": {
-    "heading": "Cüzdan kurtarma ifadesi",
-    "dialogDescription": "Bu 24 kelimelik yedeği içe aktararak Agora cüzdanınıza herhangi bir Bitcoin cüzdanından erişebilirsiniz.",
-    "hidden": "24 kelimelik kurtarma ifadenizi görüntülemek için dokunun.",
-    "revealAria": "Kurtarma ifadesini göster",
-    "hideAria": "Kurtarma ifadesini gizle",
-    "warning": "Bu kelimelere sahip olan herkes Bitcoin'lerinizi harcayabilir. Onları asla paylaşmayın, asla bir web sitesine yazmayın, bir parola yöneticisi dışında asla düz metin olarak saklamayın."
-  },
-  "walletConnect": {
-    "status": "Durum",
-    "ready": "Hazır",
-    "notFound": "Bulunamadı",
-    "none": "Yok",
-    "add": "Ekle",
-    "active": "Aktif",
-    "connectionLabel": "NWC Bağlantısı",
-    "defaultWalletName": "Lightning Cüzdanı",
-    "setActiveTitle": "Aktif olarak ayarla",
-    "removeTitle": "Cüzdanı kaldır",
-    "helpText": "Zap göndermek için bir WebLN tarayıcı uzantısı kurun veya bir NWC cüzdanı bağlayın.",
-    "webln": {
-      "name": "WebLN",
-      "description": "Tarayıcı uzantısı"
-    },
-    "nwc": {
-      "name": "Nostr Wallet Connect",
-      "description": "Uzak cüzdan bağlantısı",
-      "connectedCount_one": "{{count}} cüzdan bağlandı",
-      "connectedCount_other": "{{count}} cüzdan bağlandı"
-    },
-    "empty": {
-      "title": "Bağlı cüzdan yok",
-      "description": "Anlık zapleri etkinleştirmek için bir NWC bağlantısı ekleyin."
-    },
-    "dialog": {
-      "title": "NWC Cüzdanı Bağla",
-      "description": "NWC uyumlu cüzdanınızdan bir bağlantı dizesi yapıştırın.",
-      "aliasPlaceholder": "Cüzdan adı (isteğe bağlı)",
-      "connect": "Bağlan",
-      "connecting": "Bağlanılıyor..."
-    },
-    "toast": {
-      "uriRequiredTitle": "Bağlantı URI'si gerekli",
-      "uriRequiredDesc": "Lütfen geçerli bir NWC bağlantı URI'si girin.",
-      "activeChangedTitle": "Aktif cüzdan değişti",
-      "activeChangedDesc": "Seçilen cüzdan artık zapler için aktif."
-    }
-  },
-  "walletSend": {
-    "title": "Bitcoin Gönder",
-    "send": "Bitcoin Gönder",
-    "max": "MAX",
-    "tapAgainToConfirm": "Onaylamak için tekrar dokunun",
-    "satPerVB": "{{rate}} sat/vB",
-    "notEnoughBitcoin": "Yetersiz Bitcoin",
-    "recipient": {
-      "placeholder": "bc1…, sp1…",
-      "scan": "QR kodu tara",
-      "sendToOnchain": "Bitcoin adresine gönder",
-      "sendToSilentPayment": "Sessiz ödeme adresine gönder",
-      "bitcoinAddress": "Bitcoin adresi",
-      "silentPayment": "Sessiz ödeme adresi",
-      "toLabel": "Alıcı",
-      "clear": "Alıcıyı temizle",
-      "choosePaymentMethod": "Devam etmek için bir ödeme yöntemi seçin"
-    },
-    "feeSpeed": {
-      "fastest": "~10 dk",
-      "halfHour": "~30 dk",
-      "hour": "~1 saat",
-      "economy": "~1 gün",
-      "custom": "Özel"
-    },
-    "fee": {
-      "loading": "yükleniyor…",
-      "unavailable": "kullanılamıyor",
-      "loadFailed": "Ücret oranları yüklenemedi.",
-      "retry": "Yeniden dene",
-      "orCustom": "Ya da aşağıya özel bir oran girin.",
-      "loadingTiers": "Ücret oranları yükleniyor…",
-      "customPlaceholder": "örn. 5",
-      "customAriaLabel": "sat/vB cinsinden özel ücret oranı"
-    },
-    "progress": {
-      "building": "İşlem oluşturuluyor…",
-      "signing": "İmzalanıyor…",
-      "broadcasting": "Yayınlanıyor…",
-      "sending": "Gönderiliyor…"
-    },
-    "errors": {
-      "unavailable": "HD cüzdan bu giriş türü için kullanılamıyor.",
-      "enterRecipient": "Bir Bitcoin adresi ya da sp1… sessiz ödeme adresi girin.",
-      "noSpendable": "Bu cüzdanda harcanabilir Bitcoin yok.",
-      "feesNotLoaded": "Ücret oranları yüklenmedi.",
-      "enterAmount": "Bir tutar girin.",
-      "insufficient": "Bu tutar + ağ ücreti için yeterli Bitcoin yok.",
-      "waitingPrice": "BTC fiyatı bekleniyor…",
-      "noneYet": "Henüz Bitcoin'iniz yok.",
-      "feesNotLoadedYet": "Ücret oranları henüz yüklenmedi.",
-      "feeRateTooLow": "En az 1 sat/vB ücret oranı girin."
-    },
-    "toast": {
-      "failedTitle": "İşlem başarısız"
-    },
-    "broadcastError": {
-      "feeTooLowTitle": "Ağ ücreti çok düşük",
-      "feeTooLowBodyWithMin": "Bitcoin ağı bu ücreti reddediyor. Şu an için minimum yaklaşık {{min}} sat/vB.",
-      "feeTooLowBody": "Bitcoin ağı bu ücreti reddediyor. Daha hızlı bir kademe seçin ya da özel oranınızı yükseltin.",
-      "rbfTitle": "Yerine geçen işlem daha yüksek bir ücret gerektiriyor",
-      "rbfBody": "Yerine geçen işlemin orijinalinden daha fazla ödemesi gerekir. Ücreti yükseltip tekrar deneyin.",
-      "mempoolFullTitle": "Bitcoin ağı tıkanmış",
-      "mempoolFullBody": "Mempool dolu ve ücretiniz rekabetçi değil. Geçebilmek için ücreti yükseltin.",
-      "networkTitle": "Bitcoin ağına ulaşılamadı",
-      "networkBody": "Bağlantınızı kontrol edip tekrar deneyin.",
-      "mempoolConflictTitle": "Çakışan işlem",
-      "mempoolConflictBody": "Girdilerden biri zaten harcanmış ya da başka bir işlem tarafından harcanıyor.",
-      "tooLongChainTitle": "Çok fazla onaylanmamış işlem",
-      "tooLongChainBody": "Uzun bir onaylanmamış işlem zinciriniz var. Birinin onaylanmasını bekleyip tekrar deneyin.",
-      "badInputsTitle": "İşlem reddedildi",
-      "badInputsBody": "Ağ bu işlemi reddetti. Tutarı ya da alıcıyı ayarlayıp tekrar deneyin.",
-      "absurdlyHighFeeTitle": "Ücret olağandışı derecede yüksek",
-      "absurdlyHighFeeBody": "Tahmini ücret şüpheli ölçüde yüksek. Ücret oranlarını yeniden yükleyip tekrar deneyin.",
-      "unknownTitle": "İşlem başarısız",
-      "useHigherFee": "Daha yüksek bir ücret kullan",
-      "tryAgain": "Tekrar dene",
-      "atMaxFeeTier": "Zaten en hızlı kademedesiniz."
-    },
-    "success": {
-      "title": "Bitcoin gönderildi",
-      "satsAmount": "{{sats}} sat",
-      "viewTransaction": "İşlemi görüntüle",
-      "done": "Tamam"
-    },
-    "scanError": {
-      "title": "Bu QR kodu okunamadı",
-      "description": "Bir Bitcoin adresi, sessiz ödeme adresi (sp1…) veya bitcoin: URI'si bekleniyordu."
-    },
-    "titlePublic": "Bitcoin Gönder",
-    "titlePrivate": "Gizlice gönder",
-    "reuse": {
-      "checking": "Adres kontrol ediliyor…",
-      "sendAnyway": "Yine de gönder",
-      "acknowledge": "Riski anlıyorum — yine de gönder",
-      "historyWarning": "Bu adres zincir üstünde daha önce kullanılmış. Gizli fonlarınızı buraya göndermek, onları mevcut işlem geçmişiyle ilişkilendirir ve sessiz ödemelerinizin gizliliğini ortadan kaldırır. Bunun yerine bir sessiz ödeme adresi (sp1…) kullanın ya da yine de gönderin.",
-      "ownPublicWarning": "Bu, kendi herkese açık cüzdanınızdan bir adres. Gizli fonlarınızı ona göndermek iki cüzdanı birleştirir ve birbirine bağlar. Bunun yerine bir sessiz ödeme adresi (sp1…) kullanın ya da yine de gönderin."
-    },
-    "ownSilentPaymentBlocked": "Bu, kendi sessiz ödeme adresiniz. Herkese açık cüzdanınızdan gizli cüzdanınıza gönderemezsiniz — bunu yapmak, gizli sessiz ödeme fonlarınızı herkese açık defterde zaten açığa çıkmış paralarla birleştirir, gizli cüzdanınızı bilinen bir kimliğe bağlar ve gizliliğini ortadan kaldırır. Bunun yerine farklı bir adrese gönderin."
-  },
   "qrScanner": {
     "title": "QR kodu tara",
     "close": "Kapat",
@@ -2060,64 +1612,6 @@
       "busy": "Başka bir uygulama kamerayı kullanıyor. Onu kapatıp tekrar deneyin.",
       "overconstrained": "Bu cihazın kamerası istenen ayarları desteklemiyor.",
       "didntStart": "Kamera başlamadı. Başka bir uygulama kullanıyor olabilir ya da tarayıcınız tarayıcıyı engellemiş olabilir."
-    }
-  },
-  "bitcoinPublic": {
-    "lead": "Gönderdiğiniz para herkese açıktır ve size kadar izlenebilir.",
-    "learnMore": "Daha fazla bilgi",
-    "body": "Bitcoin herkese açık bir defterdir. Gönderdiğiniz işlemler, birden fazla kişi tarafından el değiştirdikten sonra bile sonsuza dek size kadar izlenebilir. Yalnızca açıkça desteklemek istediğiniz kişilere gönderin.",
-    "bodyWithCashOut": "Bitcoin herkese açık bir defterdir. Gönderdiğiniz işlemler, birden fazla kişi tarafından el değiştirdikten sonra bile sonsuza dek size kadar izlenebilir. Yalnızca açıkça desteklemek istediğiniz kişilere gönderin ya da bir borsada nakde çevirin.",
-    "iUnderstand": "Bu işlemin herkese açık olduğunu anlıyorum."
-  },
-  "spScan": {
-    "title": "Yeni ödemeleri kontrol et",
-    "subtitle": "Özel ödemeler için blok zincirini tara",
-    "descriptionHelp": "Daha fazla bilgi",
-    "description": "Gelen sessiz ödemeleri algılamak için yapılandırılmış BIP-352 indeksleyiciyi blok blok dolaşır.",
-    "since": "Şu tarihten itibaren",
-    "preset": {
-      "lastHour": "Son bir saat",
-      "last3h": "Son 3 saat",
-      "last24h": "Son 24 saat",
-      "lastWeek": "Geçen hafta",
-      "lastMonth": "Geçen ay",
-      "custom": "Özel…"
-    },
-    "customHours": "Saat",
-    "customHoursPlaceholder": "örn. 12",
-    "advanced": "Gelişmiş",
-    "connectingIndexer": "İndeksleyiciye bağlanılıyor…",
-    "upToDate": "Zaten güncelsiniz.",
-    "fromBlock": "Başlangıç bloğu",
-    "indexerTip": "İndeksleyici ucu",
-    "lastFullyScanned": "En son tam tarama",
-    "never": "hiç",
-    "includeSpent": "Harcanmış olanları da dahil et",
-    "includeSpentDesc": "Daha sonra harcanmış olan sessiz ödemeleri de algıla. Kaçırılmış bir taramadan veya sıfırlamadan sonra alım geçmişini yeniden kurarken kullanın.",
-    "blockProgress": "Blok {{current}} / {{to}}",
-    "matches_one": "{{count}} eşleşme",
-    "matches_other": "{{count}} eşleşme",
-    "scannedRange": "{{from}} → {{to}} blokları tarandı.",
-    "foundOutputs_one": "{{count}} yeni çıkış bulundu.",
-    "foundOutputs_other": "{{count}} yeni çıkış bulundu.",
-    "noNewPayments": "Yeni ödeme yok.",
-    "startScan": "Taramayı başlat",
-    "resolveFailed": {
-      "title": "Başlangıç bloğu sorgulanamadı",
-      "description": "mempool.space şu anda erişilemez durumda. Yine de taramak için Gelişmiş → Başlangıç bloğu altında bir başlangıç bloğu girin."
-    },
-    "reconcile": {
-      "title": "Harcanan UTXO'ları uzlaştır",
-      "description": "Saklanan her sessiz ödeme UTXO'sunu Blockbook'a karşı kontrol eder ve harcanmış olanları kaldırır. Bir gönderimden sonra bakiye olması gerekenden yüksekse bunu kullanın.",
-      "checking": "Kontrol ediliyor: {{checked}} / {{total}}…",
-      "checked_one": "{{count}} UTXO kontrol edildi · {{pruned}} kaldırıldı.",
-      "checked_other": "{{count}} UTXO kontrol edildi · {{pruned}} kaldırıldı.",
-      "reconciling": "Uzlaştırılıyor…",
-      "reconcileNow": "Şimdi uzlaştır"
-    },
-    "autoScan": {
-      "label": "Otomatik tara",
-      "description": "Bu sayfadan ayrılsanız bile arka planda yeni özel ödemeleri kontrol etmeyi sürdürün."
     }
   },
   "notifications": {
@@ -2141,8 +1635,6 @@
     "actions": {
       "reactedToYour": "{{noun}} adlı içeriğinize tepki verdi",
       "repostedYour": "{{noun}} adlı içeriğinizi yeniden paylaştı",
-      "zappedYou": "size zap gönderdi",
-      "zappedYouWithAmount": "size {{sats}} sat zap gönderdi",
       "repliedToYourNote": "notunuza yanıt verdi",
       "mentionedYou": "sizden bahsetti",
       "repliedToYourComment": "yorumunuza yanıt verdi",
@@ -2184,14 +1676,11 @@
       "emojiPack": "emoji paketi",
       "podcastEpisode": "podcast bölümü",
       "podcastTrailer": "podcast fragmanı",
-      "zapstoreAsset": "Zapstore varlığı",
-      "zapstoreRelease": "Zapstore sürümü",
       "stream": "yayın",
       "status": "durum",
       "repository": "depo",
       "customNip": "özel NIP",
       "calendarEvent": "takvim etkinliği",
-      "zapstoreApp": "Zapstore uygulaması",
       "playlist": "çalma listesi",
       "divine": "divine",
       "community": "topluluk",
@@ -2244,10 +1733,6 @@
         "label": "Yeniden Paylaşımlar",
         "description": "Biri notlarınızı yeniden paylaştığında"
       },
-      "zaps": {
-        "label": "Zapler",
-        "description": "Biri size lightning veya zincir üstü zap gönderdiğinde"
-      },
       "mentions": {
         "label": "Bahsetmeler",
         "description": "Biri bir notta sizden bahsettiğinde"
@@ -2281,7 +1766,7 @@
     "inputPlaceholder": "Ara",
     "filtersAria": "Arama filtreleri",
     "tabs": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "nostr": "Nostr",
       "accounts": "Kullanıcılar"
     },
@@ -2358,8 +1843,8 @@
       "postsPrompt": "Nostr içeriği bulmak için bir arama sorgusu girin.",
       "accounts": "Aramanızla eşleşen kullanıcı bulunamadı.",
       "followsPrompt": "İnsanları ada veya NIP-05 adresine göre arayın.",
-      "agora": "Aramanızla eşleşen Agora kampanyası, taahhüdü veya grubu bulunamadı.",
-      "agoraPrompt": "Agora kampanyalarını, taahhütlerini ve gruplarını arayın ya da en yenilere göz atın.",
+      "agora": "Aramanızla eşleşen Eranos kampanyası, taahhüdü veya grubu bulunamadı.",
+      "agoraPrompt": "Eranos kampanyalarını, taahhütlerini ve gruplarını arayın ya da en yenilere göz atın.",
       "activeFilters": "Aktif filtreler:",
       "clearAll": "Tüm filtreleri temizle"
     }
@@ -2383,7 +1868,6 @@
       "editProfile": "Düzenle",
       "shareFollowLink": "Takip bağlantısını paylaş",
       "moreOptions": "Daha fazla seçenek",
-      "donate": "Bağışla",
       "campaignGoal": "Hedef ${{amount}}"
     },
     "stats": {
@@ -2426,7 +1910,6 @@
       "addToList": "Listeye ekle",
       "shareFollowLink": "Takip bağlantısını paylaş",
       "profileRecovery": "Profil kurtarma",
-      "zap": "Zap",
       "awardBadge": "Rozet ver",
       "writeLetter": "Mektup yaz",
       "mute": "@{{name}} kullanıcısını sessize al",
@@ -2508,8 +1991,6 @@
       "heading": "Profil Alanları",
       "website": "Web sitesi",
       "websitePlaceholder": "https://websiteniz.com",
-      "lightning": "Lightning",
-      "lightningPlaceholder": "siz@walletofsatoshi.com",
       "labelPlaceholder": "Etiket",
       "tickerPlaceholder": "Sembol",
       "addressPlaceholder": "Adres",
@@ -2539,11 +2020,6 @@
         "defaultLabel": "E-posta",
         "description": "İletişim e-posta adresi",
         "valuePlaceholder": "siz@ornek.com"
-      },
-      "wallet": {
-        "label": "Cüzdan",
-        "description": "Kripto para cüzdan adresi",
-        "valuePlaceholder": "Adres"
       },
       "link": {
         "label": "Bağlantı",
@@ -2613,10 +2089,10 @@
   "faq": {
     "categories": {
       "getting-started": {
-        "label": "Agora Hakkında"
+        "label": "Eranos Hakkında"
       },
       "payments": {
-        "label": "Agora'da Bitcoin Bağışları"
+        "label": "Eranos'da Bitcoin Bağışları"
       },
       "about-nostr": {
         "label": "Nostr Hakkında"
@@ -2645,51 +2121,6 @@
           "{{appName}}, [Soapbox](https://soapbox.pub) tarafından, Nostr ekosistemi için açık kaynak araçlar geliştiren bir ekiple, [World Liberty Congress](https://worldlibertycongress.org/) işbirliğiyle yapılmıştır."
         ]
       },
-      "send-bitcoin-onchain": {
-        "question": "Bitcoin göndermek nasıl çalışır?",
-        "answer": [
-          "Bir alıcı kampanya oluşturduğunda hangi tür ödemeleri kabul edeceğini seçer: **açık**, **gizli** ya da **her ikisi**.",
-          "**Açık** bağışlar zincir üstündeki gerçek Bitcoin'lerdir. Herkese açık blok zincirinde uzlaşır, her Bitcoin cüzdanında çalışır ve herkese görünürdür.",
-          "**Gizli** bağışlar **sessiz ödemeleri** (BIP-352) kullanır. Bunlar da zincir üstünde uzlaşır, ancak işlem alıcının bağış koduna bağlanamaz — bu nedenle herkese açık bağışçı listelerinin ve toplamların dışında kalırlar. Bağışçının sessiz ödemeleri destekleyen bir cüzdana ihtiyacı vardır — [Ditto Wallet](https://ditto.pub) veya [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) öneriyoruz.",
-          "Bir kampanya **her ikisini** kabul ettiğinde, {{appName}} her iki uç noktayı kodlayan tek bir QR kod gösterir. Sessiz ödeme cüzdanları bunu gizli olarak okur; diğer cüzdanlar açık adrese geri döner. Bağışçıların seçim yapmasına gerek yoktur — cüzdanları otomatik olarak doğru yolu seçer.",
-          "Her durumda ödeme doğrudan alıcıya gider. {{appName}} fonlara hiçbir zaman dokunmaz."
-        ]
-      },
-      "connect-wallet": {
-        "question": "{{appName}}'daki cüzdan nedir?",
-        "answer": [
-          "{{appName}} cüzdanınız, Nostr anahtarınızdan oluşturulan **öz-saklamalı** bir Bitcoin cüzdanıdır. {{appName}} fonlarınızı asla tutmaz — cüzdan tarayıcınızda çalışır ve işlemleri yalnızca sizin kontrol ettiğiniz bir anahtarla yerel olarak imzalar. Bitcoin'i iki şekilde alabilir — herhangi bir Bitcoin cüzdanının ödeme yapabileceği bir açık adres olarak ve uygun cüzdanların gizli olarak ödeme yapabileceği bir sessiz ödeme kodu olarak. Kaydolacak bir şey yoktur; hesabınız olduğu anda var olur.",
-          "Cüzdanın iki sekmesi vardır: **Açık** (normal Bitcoin adresiniz) ve **Gizli** (sessiz ödemeler). İki bakiye kesin biçimde ayrı tutulur ve asla birlikte harcanamaz — gizli bağışları zincir üstünde izlenemez tutan şey bu yalıtımdır. Bir kampanya oluşturduğunuzda açık ödemeleri mi, gizli ödemeleri mi yoksa her ikisini mi kabul edeceğinizi seçersiniz. Aldıklarınızı harcamak için **Alıcı Rehberi**'ne bakın.",
-          "Cüzdanınızın 24 kelimelik tohum cümlesini dışa aktarıp herhangi bir standart Bitcoin cüzdanına aktarabilirsiniz — aşağıdaki \"{{appName}} cüzdanımı başka bir Bitcoin cüzdanına aktarabilir miyim?\" bölümüne bakın."
-        ]
-      },
-      "export-wallet": {
-        "question": "{{appName}} cüzdanımı başka bir Bitcoin cüzdanına aktarabilir miyim?",
-        "answer": [
-          "Evet. {{appName}} cüzdanınız tamamen öz-saklamalıdır. {{appName}} Bitcoin'inizi asla tutmaz ve anahtarlarınızı asla görmez — cüzdan tamamen tarayıcınızda çalışır ve işlemleri Nostr gizli anahtarınızdan (nsec) türetilen bir anahtarla yerel olarak imzalar.",
-          "Menüden cüzdanı açın, sağ üstteki üç noktalı menüye dokunun ve **Cüzdanı yedekle** seçeneğini seçin. 24 kelimelik bir BIP-39 tohum cümlesi göreceksiniz. Onu güvenli bir yere yazın (veya bir parola yöneticisine kaydedin) — **bu kelimelere sahip olan herkes Bitcoin'inizi harcayabilir.**",
-          "Bu 24 kelimeyi herhangi bir standart Bitcoin cüzdanına aktarabilirsiniz: **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, bir **Trezor** veya bir **Ledger**. {{appName}} standart BIP-86 (Taproot) ve BIP-352 (sessiz ödemeler) türetme yollarını kullanır, bu nedenle özel bir yapılandırma gerekmez.",
-          "Aktarımdan sonra diğer cüzdan, {{appName}} cüzdanınızla aynı bakiyeyi ve geçmişi gösterir — aynı cüzdandır, sadece onun iki görünümüdür.",
-          "Tohum cümlesi dışa aktarımı yalnızca bir nsec ile giriş yaptığınızda kullanılabilir. Tarayıcı uzantısı ve uzak imzalayıcı (bunker) girişleri gizli anahtarınızı yalıtık tutar, bu nedenle {{appName}} bu modlarda tohumu türetemez."
-        ]
-      },
-      "donations-are-public-general": {
-        "question": "{{appName}}'daki bağışlar herkese açık mı?",
-        "answer": [
-          "Alıcının hangi tür ödemeyi kabul ettiğine bağlıdır.",
-          "**Açık bağışlar** Bitcoin blok zincirinde ve Nostr'da kaydedilir. Herkes tutarları, zamanlamayı ve adresleri görebilir.",
-          "**Gizli bağışlar** sessiz ödemeleri kullanır. Bunlar herkese açık olarak alıcının bağış koduna bağlanabilir değildir, bağışçı listelerinde görünmez ve herkese açık toplamlara sayılmaz.",
-          "Bir kampanya her ikisini de kabul ettiğinde, hangi yolun kullanılacağına bağışçının cüzdanı karar verir — sessiz ödemeleri destekleyen cüzdanlar gizli olarak öder, diğerleri açık adrese öder. Tam görüntü için **Bağışçı Rehberi**'ni ve **Alıcı Rehberi**'ni okuyun."
-        ]
-      },
-      "why-donations-pending": {
-        "question": "Bazı bağışlar neden \"beklemede\" görünüyor?",
-        "answer": [
-          "**Beklemede** olan bir bağış, zaten gönderilmiş gerçek Bitcoin'dir — yalnızca ağ tarafından onaylanmayı beklemektedir. Bağışçının cüzdanı işlemi yayımlamıştır, ancak işlem henüz bir bloğa dahil edilmemiştir.",
-          "Bitcoin yaklaşık her 10 dakikada bir yeni bir blok üretir ve madenciler işlemleri bağışçının ödediği ücrete göre seçer. Bağışların çoğu bir saat içinde onaylanır; düşük ücretli olanlar ağ yoğun olduğunda daha uzun sürebilir. {{appName}} onay durumunu otomatik olarak yeniden kontrol eder, bu yüzden bir blok geldiğinde **beklemede** etiketi kendiliğinden kaybolur.",
-          "Fonlar yoldadır — bağış onaylandığı anda alıcı, bağışın kampanya toplamına eklendiğini görecektir. Alıcının veya {{appName}}'in işlemi hızlandırmak için yapabileceği hiçbir şey yoktur; yalnızca bağışçının cüzdanı ücreti artırabilir."
-        ]
-      },
       "censorship-resistance": {
         "question": "Buradaki \"sansüre dayanıklı\" ne anlama geliyor?",
         "answer": [
@@ -2703,22 +2134,6 @@
           "Bitcoin dünyadaki en yaygın desteklenen ve sansüre en dayanıklı ödeme altyapısıdır. Her Bitcoin cüzdanı bunu gönderebilir.",
           "{{appName}}'da alıcılar nasıl alacaklarını seçer: maksimum erişim için **açık** (normal bir Bitcoin adresi), izlenemez bağışlar için **gizli** (sessiz ödemeler) ya da her bağışçının cüzdanı doğru yolu otomatik seçsin diye **her ikisi**. Yalnızca tüketici düzeyinde bir Bitcoin uygulaması olan bağışçılar da katkıda bulunabilir; sessiz ödeme cüzdanı olan bağışçılar varsayılan olarak gizlilik elde eder.",
           "Takas, açık Bitcoin işlemlerinin blok zincirinde görünür olması ve bir madenci ücreti ödemesidir. Bağışçı ve Alıcı rehberleri her iki durumun nasıl yönetileceğini açıklar."
-        ]
-      },
-      "why-not-silent-payments": {
-        "question": "{{appName}} sessiz ödemeleri destekliyor mu?",
-        "answer": [
-          "Evet — her iki tarafta da. {{appName}}'nın yerleşik Bitcoin cüzdanı BIP-352'yi destekler, bu nedenle {{appName}} cüzdanınızdan Bitcoin gönderdiğinizde herhangi bir sessiz ödeme adresine (`sp1…`) doğrudan ödeme yapabilirsiniz. Bir alıcı kampanya oluşturduğunda da, sessiz ödemeleri açık Bitcoin ödemelerinin yanında ya da onların yerine kabul edebilir.",
-          "Sessiz ödeme bağışları yine zincir üstünde uzlaşır, ancak işlem alıcının bağış koduna bağlanamaz — bu nedenle herkese açık bağışçı listelerinde veya toplamlarda görünmezler.",
-          "{{appName}} dışından sessiz ödeme göndermek BIP-352'yi destekleyen bir cüzdan gerektirir. Tüketici uygulamalarının çoğu henüz desteklemiyor, ancak [Ditto Wallet](https://ditto.pub) ve [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) destekliyor.",
-          "Bir kampanya her iki tür ödemeyi de kabul ettiğinde, {{appName}} bunları tek bir QR kodda kodlar. Sessiz ödemeleri destekleyen cüzdanlar gizli olarak öder; diğer herkes açık adrese öder. Hiçbir bağışçı dışlanmaz ve hiçbir alıcı erişim ile gizlilik arasında seçim yapmaya zorlanmaz."
-        ]
-      },
-      "why-not-lightning": {
-        "question": "{{appName}} neden Lightning kullanmıyor?",
-        "answer": [
-          "Lightning, bir Lightning cüzdanı gerektirir. En kolay olanlar (Wallet of Satoshi, Strike, Breez) **saklayıcıdır** — bir şirket fonları tutar ve kapatılabilir, coğrafi olarak engellenebilir ya da hesapları dondurmaya zorlanabilir. Saklayıcı olmayan Lightning ise yeni başlayanlar için teknik olarak zorlu ve güvenilmezdir.",
-          "{{appName}}'nın yalnızca Cash App, Coinbase, Strike, Venmo veya PayPal gibi sıradan bir tüketici uygulamasıyla Bitcoin deneyimi olan biri için çalışmasını istiyoruz. Zincir üstü Bitcoin gezegendeki her cüzdanla çalışır."
         ]
       },
       "why-not-rotating-addresses": {
@@ -2764,19 +2179,6 @@
           "Tam rehber için [Nostr Anahtarlarınızı Yönetmek](https://soapbox.pub/blog/managing-nostr-keys) yazısına bakın."
         ]
       },
-      "send-bitcoin-lightning": {
-        "question": "Bitcoin'i Lightning üzerinden göndermek nasıl çalışır?",
-        "answer": [
-          "Bir alıcının profilinde Lightning adresi varsa oraya gönderebilirsiniz. Lightning saniyeler içinde uzlaşır ve ücretler oldukça küçüktür.",
-          "Lightning gönderimleri {{appName}}'nın bağış adresini kullanmaz — alıcının kendisinin kurduğu Lightning cüzdanına doğrudan gider. {{appName}}'nın kendi bağış akışı yalnızca zincir üstüdür."
-        ]
-      },
-      "what-are-zaps": {
-        "question": "Zapler nedir?",
-        "answer": [
-          "Zapler, Nostr'da küçük Lightning bahşişleridir; {{appName}}'nın zincir üstü bağış akışından ayrıdır."
-        ]
-      },
       "fyp": {
         "question": "Akış nasıl çalışır?",
         "answer": [
@@ -2817,74 +2219,7 @@
   },
   "guides": {
     "shared": {
-      "tldrEyebrow": "Kısa versiyon",
-      "paymentBadge": {
-        "public": "Açık Ödemeler",
-        "silent": "Sessiz Ödemeler"
-      },
-      "paymentComparison": {
-        "donorHeader": "Bağış yaparken",
-        "recipientHeader": "Oluştururken",
-        "donorRows": {
-          "whatYouSee": {
-            "label": "Gördüğünüz",
-            "public": "Her yerden ödeme yapabileceğiniz normal bir Bitcoin adresi.",
-            "silent": "Aynı QR. Cüzdanınız BIP-352'yi destekliyorsa sessiz ödeme uç noktasını seçer."
-          },
-          "walletSupport": {
-            "label": "Cüzdan desteği",
-            "public": "Her Bitcoin cüzdanı. Cash App, Coinbase, Strike, donanım, her şey.",
-            "silent": "Bugün çok az cüzdan. Çoğu, normal bir Bitcoin işlemine geri döner."
-          },
-          "privacy": {
-            "label": "Bağışın gizliliği",
-            "public": "Zincir üstünde açık. Gönderim adresiniz kampanyaya kalıcı olarak bağlıdır.",
-            "silent": "Alıcı taraf zincir üstünde izlenemez. Gönderim cüzdanınızın izi yine de herkese açıktır."
-          },
-          "settlement": {
-            "label": "Uzlaşma",
-            "public": "Normal Bitcoin onayları.",
-            "silent": "Aynı zincir üstü onaylar, ancak alıcı bulmak için cüzdanını taramak zorundadır."
-          }
-        },
-        "recipientRows": {
-          "whatDonorsSee": {
-            "label": "Bağışçıların gördüğü",
-            "public": "Normal bir Bitcoin adresi. Dünyadaki her cüzdanla çalışır.",
-            "silent": "Bir BIP-352 uç noktası. Bağışçıların cüzdanlarının sessiz ödeme desteğine ihtiyacı vardır; yoksa bağış normal bir Bitcoin işlemine geri döner."
-          },
-          "receivingSpeed": {
-            "label": "Alma hızı",
-            "public": "Push tarzı. Bağışlar kampanya sayfasında hemen görünür.",
-            "silent": "Elle tarama. Cüzdanınızın onları aramak için blok zincirini dolaşması gerekir. Cüzdana göre dakikalardan saatlere kadar sürer."
-          },
-          "pushNotifications": {
-            "label": "Anlık bildirimler",
-            "public": "Evet. Yeni bağışları geldikleri anda görürsünüz.",
-            "silent": "Hayır. Cüzdanı açıp keşfetmek için tarama başlatın."
-          },
-          "donorList": {
-            "label": "Bağışçı listesi / kampanya toplamları",
-            "public": "Sonsuza dek açık. Tutarlar ve gönderim adresleri herkese görünür.",
-            "silent": "Gizli. Kampanya sayfası sessiz ödeme bağış sayılarını veya toplamlarını gösteremez."
-          },
-          "ecosystem": {
-            "label": "Ekosistem olgunluğu",
-            "public": "Olgun. Yerleşmiş araç seti.",
-            "silent": "En son sürüm. Cüzdanlarda hâlâ hatalar var; daha sonraki bir taramada görünen kaçırılmış ödemeler bekleyin."
-          },
-          "bestFor": {
-            "label": "Şunun için en iyisi",
-            "public": "Sosyal kanıt ve görünürlüğün yardımcı olduğu açıkça yürütülen fon toplama.",
-            "silent": "Bağışçı veya alıcı gizliliğinin, görünür toplamdan daha önemli olduğu kampanyalar."
-          },
-          "watchOutFor": {
-            "label": "Dikkat",
-            "public": "Her bağışçının kalıcı, herkese açık kaydı.",
-            "silent": "Bugün sarsıntılı kullanıcı deneyimi. Bazı bağışlar alıcı tarama yapana kadar görünmez."
-          }
-        }
-      }
+      "tldrEyebrow": "Kısa versiyon"
     },
     "donor": {
       "tldr": {
@@ -2902,18 +2237,11 @@
             "title": "Kampanyayı açın",
             "body": "Tek bir QR kod görürsünüz. Kampanya her iki seçeneği de kabul ediyorsa, her iki uç noktayı kodlar; cüzdanınız doğru olanı seçer."
           },
-          "payFromAnyWallet": {
-            "title": "Herhangi bir cüzdandan ödeyin",
-            "body": "Cash App, Coinbase, Strike, donanım cüzdanı, her şey. Tutarı artı ağ ücretini ödeyin."
-          },
           "arrivesDirectly": {
             "title": "Doğrudan ulaşır",
             "body": "Fonlar doğrudan alıcıya uzlaşır. {{appName}} bunları tutmaz veya yönlendirmez ve adres alıcının Nostr gizli anahtarından türetilir."
           }
         }
-      },
-      "comparison": {
-        "footnote": "Kampanyalar yalnızca Açık, yalnızca Sessiz ya da her ikisini birden kabul edebilir. Her ikisi de seçiliyse, QR kod her iki uç noktayı taşır. Cüzdanınız kullanabileceği olanı seçer."
       },
       "publicVisible": {
         "title": "Açık bağışlar zincir üstünde sonsuza dek görünürdür",
@@ -2923,10 +2251,6 @@
         "heading": "Gizli bağış yapmak",
         "intro": "Bu adımlar en çok **Açık** bağışlar için önemlidir; çünkü her işlem tek bir adrese kalıcı olarak bağlıdır. **Sessiz** bağışlar alıcı tarafı zaten gizler, bu yüzden risk daha düşüktür. Gönderim cüzdanınız üzerinde hedefli analiz yine de her iki durumda da mümkündür, bu yüzden riskiniz yüksekse bu adımlar yararlıdır. Birini seçin ya da birden fazlasını birleştirin.",
         "options": {
-          "silentWallet": {
-            "name": "Bir sessiz ödeme cüzdanı kullanın",
-            "purpose": "BIP-352'yi destekleyen bir Bitcoin cüzdanıyla ödeyin. Kampanya sessiz ödemeleri kabul ediyorsa, cüzdanınız o uç noktayı otomatik kullanır."
-          },
           "nonKyc": {
             "name": "KYC dışı Bitcoin satın alın",
             "purpose": "Bitcoin'i kişiden kişiye satın alarak en baştan devlet kimliğinize bağlanmamasını sağlayın. En güçlü gizlilik başlangıç noktası."
@@ -2934,23 +2258,12 @@
           "coinjoin": {
             "name": "Önce coinjoin yapın",
             "purpose": "Bitcoin'inizi başka insanların paralarıyla karıştırarak çıkışın KYC alımınıza kadar izlenemez olmasını sağlayın. Kampanya yalnızca açık kabul ediyorsa kullanışlıdır."
-          },
-          "freshWallet": {
-            "name": "Yeni bir cüzdan kullanın",
-            "purpose": "Ana kimliğinize ya da bir KYC borsasına hiç dokunmamış bir cüzdandan bağış yapın."
           }
         }
       },
       "consumerApps": {
         "title": "Tüketici uygulamaları sizi anonim yapamaz",
         "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance ve PayPal kimliğinizi doğrular. Bağışı nasıl gönderirseniz gönderin, her işlem gerçek kimliğinize bağlı kalır. Kontrol ettiğiniz saklayıcı olmayan bir cüzdan kullanın."
-      },
-      "silentToday": {
-        "heading": "Bugünkü sessiz ödemeler hakkında bir not",
-        "paragraphs": [
-          "Sessiz ödemeler zincir üstünde Bitcoin almanın en gizli yoludur, ancak ekosistem gençtir. Popüler cüzdanların çoğu henüz bir sessiz ödeme uç noktasına gönderemez, bu yüzden bir cüzdan gönderemediğinde bağış kampanyanın açık adresine normal bir Bitcoin işlemine geri döner (kampanya her ikisini de kabul ediyorsa).",
-          "Alıcılar için de sessiz ödeme bağışları anlık bildirimsiz ulaşır ve yalnızca alıcı cüzdanını taradıktan sonra görünür; bu da dakikalardan saatlere kadar sürebilir. Bunların hiçbiri fonlarınızın güvenliğini etkilemez; yalnızca deneyimi şekillendirir."
-        ]
       }
     },
     "recipient": {
@@ -2980,20 +2293,6 @@
           "Sessiz ödeme bağışları bu kaydın parçası değildir. Dış gözlemcilere görünmezler ve kampanyanın herkese açık toplamlarında gösterilmezler; yeni bağışçılar yalnızca kampanyanın ilerlemesi hakkında yayımladıklarınızı görür."
         ]
       },
-      "comparison": {
-        "footnote": "Bir kampanya oluşturulduktan sonra kabul edilen ödeme seçenekleri değiştirilemez. Fikrinizi değiştirirseniz yeni bir kampanya oluşturun."
-      },
-      "silentToday": {
-        "heading": "Bugünkü sessiz ödemeler hakkında bir not",
-        "paragraphs": [
-          "Sessiz ödemeler zincir üstünde Bitcoin almanın en gizli yoludur, ancak ekosistem gençtir. Popüler cüzdanların çoğu henüz bir sessiz ödeme uç noktasına gönderemez, bu yüzden bir bağışçının cüzdanı gönderemediğinde, bağış açık adresinize normal bir Bitcoin işlemine geri döner (her ikisini de kabul ediyorsanız).",
-          "Sessiz ödeme bağışları da anlık bildirimsiz ulaşır ve yalnızca siz cüzdanınızı taradıktan sonra görünür; bu da dakikalardan saatlere kadar sürebilir. Bunların hiçbiri fonlarınızın güvenliğini etkilemez; yalnızca günlük deneyimi şekillendirir."
-        ]
-      },
-      "twoWallets": {
-        "title": "Açık ve Gizli bakiyelerinizi ayrı tutun",
-        "body": "{{appName}} cüzdanınız iki sekme gösterir: **Açık** (normal Bitcoin adresiniz) ve **Gizli** (sessiz ödemeler). Bunlar kesin biçimde ayrı tutulur ve iki bakiye asla aynı işlemde harcanamaz — gizli bağışlarınızı izlenemez tutan şey bu yalıtımdır. **Gizli** sekmesinden nakde çevirdiğinizde, gizli kalan bir sessiz ödeme adresine (**sp1…**) gönderin. Bunun yerine gizli fonları çıplak bir zincir üstü adrese gönderirseniz, {{appName}} bunu denetler: adres daha önce kullanılmışsa veya kendi açık cüzdanınıza aitse, sizi uyarır ve **Yine de gönder**'e dokunmanızı ister, çünkü bunu yapmak gizli fonlarınızı o adresin açık geçmişine bağlar. Bir **sp1…** adresine göndermek uyarıyı asla tetiklemez."
-      },
       "movePromptly": {
         "heading": "Bağışları hızlıca taşıyın",
         "steps": {
@@ -3011,14 +2310,6 @@
         "heading": "Gizli olarak nakde çevirmek",
         "intro": "Zincir üstünde harcamak, izi önce kırmazsanız bir iz bırakır. Sessiz ödeme bağışlarını izlenemez tutmak için **Gizli** sekmesinden nakde çevirin — önce bir sessiz ödeme cüzdanına gönderin (bir **sp1…** adresi), sonra ileri harcayın; bu adım kampanyanızla sonra gelenler arasındaki bağı kırar. Gizli fonları yeniden kullanılmış veya açık bir adrese göndermeyin, bu onları yeniden bağlar. Aşağıdaki diğer seçenekler de işe yarar ve kendi takasları vardır.",
         "options": {
-          "silentHop": {
-            "name": "Sessiz ödeme cüzdan adımı",
-            "purpose": "Bağışlarınızı bir sessiz ödeme cüzdanına ([Ditto Wallet](https://ditto.pub), [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)) taşıyın. Oradan yapacağınız harcamalar kampanyaya bağlı olmaz."
-          },
-          "lightningSwap": {
-            "name": "Lightning takası",
-            "purpose": "Zincir üstü Bitcoin'i Lightning'e atomik takasla çevirin. Lightning ödemeleri herkese açık blok zincirine ulaşmaz."
-          },
           "coinjoin": {
             "name": "Coinjoin",
             "purpose": "Bitcoin'inizi diğer kullanıcıların paralarıyla karıştırın, böylece çıkış girişe geri bağlanamaz."
@@ -3038,140 +2329,5 @@
         "body": "Saklayıcı karıştırıcılar paranızı çalabilir, kimin neyi gönderdiğini kayıt altına alabilir ya da kolluk kuvvetlerinin bal tuzakları çıkabilir. Bunun yerine sessiz ödeme adımı veya saklayıcı olmayan bir coinjoin kullanın."
       }
     }
-  },
-  "walletMigrate": {
-    "seoTitle": "Eski Cüzdanı Taşı",
-    "seoDescription": "Eski Agora cüzdanınızdaki (tohum olarak nsec) fonları yeni BIP-39 cüzdanına toplayın.",
-    "title": "Eski Cüzdanı Taşı",
-    "heading": "Yeni cüzdanınıza taşıyın",
-    "subheading": "Agora'nın Bitcoin cüzdanı artık BIP-39 tohum ifadesi kullanıyor, böylece herhangi bir cüzdan uygulamasına içe aktarılabiliyor. Eski adreslerinizdeki fonlar hâlâ güvende — bu sayfa onları tek bir işlemle yeni cüzdanınıza toplar.",
-    "backToWallet": "Cüzdana dön",
-    "loading": "Eski cüzdanınız kontrol ediliyor…",
-    "warning": "Bu, eski cüzdanınızdaki her UTXO'yu tüketen ve toplamı (küçük bir ağ ücreti düşülerek) yeni cüzdanınızın ilk alım adresine gönderen tek bir toplama işlemi oluşturur. Yayınlandıktan sonra bu işlem kesindir ve geri alınamaz.",
-    "startButton": "Yeni cüzdana topla",
-    "loggedOut": {
-      "title": "Taşımak için giriş yapın",
-      "description": "Fonların yeni adresinize toplanabilmesi için eski cüzdana sahip olan Nostr kimliğiyle giriş yapın."
-    },
-    "unsupported": {
-      "title": "Cüzdan kullanılamıyor",
-      "description": "Taşıma yalnızca nsec girişlerinde çalışır, çünkü eski cüzdanın anahtarları doğrudan nsec'inizden türetilmişti. Tarayıcı uzantısı ve uzak imzalayıcı girişleri bu taşımayı çalıştıramaz."
-    },
-    "noBlockbook": {
-      "title": "Blockbook yapılandırılmamış",
-      "description": "Taşıma, eski adreslerinizi taramak ve toplama işlemini yayınlamak için bir Blockbook indeksleyici URL'ine ihtiyaç duyar."
-    },
-    "noFunds": {
-      "title": "Taşınacak bir şey yok",
-      "description": "Eski cüzdanınızda harcanabilir bakiye yok. Her şey zaten yeni cüzdanınızda."
-    },
-    "detected": {
-      "title": "Eski cüzdanınızdaki fonlar",
-      "description": "Bu fonlar tek bir işlemle yeni cüzdanınıza taşınacak.",
-      "bip86": "Zincir üstü",
-      "sp": "Sessiz ödemeler",
-      "total": "Toplam"
-    },
-    "destination": {
-      "title": "Hedef",
-      "description": "Yeni cüzdanınızın ilk alım adresi."
-    },
-    "progress": {
-      "building": "İşlem oluşturuluyor…",
-      "signing": "Girdiler imzalanıyor…",
-      "broadcasting": "İşlem yayınlanıyor…",
-      "dontClose": "Toplama işlemi sürerken bu sekmeyi kapatmayın."
-    },
-    "success": {
-      "title": "Taşıma tamamlandı",
-      "sent": "Yeni cüzdanınıza {{sats}} sat gönderildi ({{fee}} sat ücret).",
-      "viewTx": "İşlemi görüntüle"
-    },
-    "error": {
-      "title": "Taşıma başarısız",
-      "tryAgain": "Tekrar dene"
-    },
-    "errors": {
-      "noV1Account": "Eski cüzdanın anahtarlarına erişilemedi.",
-      "noDestination": "Yeni cüzdanınızda henüz alım adresi yok. Cüzdan sayfasının yüklenmesini bekleyip tekrar deneyin.",
-      "noBlockbook": "Blockbook indeksleyici yapılandırılmamış. Taşıma, eski adreslerinizi tarayamaz.",
-      "noFunds": "Eski adreslerde harcanabilir fon bulunamadı.",
-      "sweepGeneric": "Taşıma başarısız. Lütfen tekrar deneyin."
-    },
-    "toast": {
-      "successTitle": "Taşıma tamamlandı",
-      "successDesc": "{{sats}} sat yeni cüzdanınıza taşındı."
-    }
-  },
-  "walletDoubleTweak": {
-    "seoTitle": "Çift Tweak SP Düzeltmesi",
-    "seoDescription": "Önceki bir gönderim hatası nedeniyle zincir üstünde takılı kalan sessiz ödemeleri kurtarın ve cüzdanınıza toplayın.",
-    "title": "Çift Tweak SP Düzeltmesi",
-    "heading": "Takılı kalan sessiz ödemeleri kurtarın",
-    "subheading": "Agora'nın önceki bir sürümü bazı sessiz ödeme çıkışlarını yanlış anahtara kodladı, bu yüzden cüzdanınızda hiç görünmediler. Bu araç, o çıkışlar için zinciri yeniden tarar ve bulduklarını cüzdanınıza toplar.",
-    "back": "Geri",
-    "loggedOut": "Sessiz ödemelerin kurtarılabilmesi için onları alan Nostr kimliğiyle giriş yapın.",
-    "unsupported": {
-      "title": "Cüzdan kullanılamıyor",
-      "description": "Kurtarma, yerel olarak imzalayabilen bir cüzdana ihtiyaç duyar. Devam etmek için nsec'inizle giriş yapın."
-    },
-    "noIndexer": {
-      "title": "Sessiz ödeme indeksleyicisi yapılandırılmamış",
-      "description": "Takılı kalan ödemeleri taramak için bir BIP-352 indeksleyici URL'i gereklidir. Cüzdan ayarlarından bir tane belirleyip tekrar deneyin."
-    },
-    "scan": {
-      "title": "Takılı kalan ödemeleri tara",
-      "description": "Taramaya başlanacak blok yüksekliğini seçin. Kurtarma, oradan zincirin ucuna kadar her bloğu kontrol eder.",
-      "fromHeightLabel": "Başlangıç blok yüksekliği",
-      "tipHint": "Mevcut zincir ucu: {{tip}}",
-      "start": "Tara",
-      "cancel": "Taramayı iptal et",
-      "progress": "Blok {{current}} / {{to}} taranıyor — {{found}} bulundu",
-      "tipMissing": "Zincir ucu çözümleniyor…"
-    },
-    "noFunds": {
-      "title": "Kurtarılacak bir şey yok",
-      "description": "Taranan aralıkta takılı kalan sessiz ödeme bulunamadı. Fon beklediyseniz daha erken bir başlangıç yüksekliği deneyin."
-    },
-    "found": {
-      "title": "Takılı kalan ödemeler bulundu",
-      "description": "Bu çıkışlar tekrar cüzdanınıza toplanabilir.",
-      "count": "Çıkışlar",
-      "recoverable": "Kurtarılabilir"
-    },
-    "destination": {
-      "title": "Fonlar şuraya gönderilecek:",
-      "description": "Mevcut cüzdanınızda yeni bir alım adresi."
-    },
-    "sweepButton": "Fonları kurtar",
-    "sweeping": "Fonlarınız kurtarılıyor…",
-    "dontClose": "Kurtarma bitene kadar bu sayfayı kapatmayın.",
-    "success": {
-      "title": "Kurtarma tamamlandı",
-      "sent": "Cüzdanınıza {{sats}} sat kurtarıldı.",
-      "viewTx": "İşlemi görüntüle"
-    },
-    "error": {
-      "title": "Kurtarma başarısız",
-      "tryAgain": "Tekrar dene"
-    },
-    "errors": {
-      "noDestination": "Kullanılabilir hedef adres yok. Önce cüzdanınızı açın.",
-      "noBlockbook": "Yapılandırılmış Blockbook sunucusu yok. Cüzdan ayarlarından bir tane belirleyin.",
-      "sweepGeneric": "Kurtarma toplaması tamamlanamadı."
-    },
-    "toast": {
-      "successTitle": "Fonlar kurtarıldı",
-      "successDesc": "{{sats}} sat cüzdanınıza toplandı."
-    },
-    "footnote": "Bu, mevcut cüzdanınıza tek yönlü bir toplamadır. Yalnızca etkilenen sessiz ödemelere dokunulur; başka hiçbir şey değişmez."
-  },
-  "spAutoScan": {
-    "scanning": "Taranıyor… blok {{current}} / {{to}}",
-    "caughtUp": "Güncel",
-    "neverScanned": "Henüz taranmadı",
-    "lastScanned": "Blok {{height}}'a kadar tarandı",
-    "paused": "Otomatik tarama kapalı",
-    "manualLink": "Tarama seçenekleri"
   }
 }

@@ -1,11 +1,11 @@
 {
-  "name": "Agora",
-  "short_name": "Agora",
+  "name": "Eranos",
+  "short_name": "Eranos",
   "description": "Power to the people. Organize, create, and connect across the open Nostr network.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0c14",
-  "theme_color": "#ff6600",
+  "theme_color": "#faa805",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -38,12 +38,6 @@
       "purpose": "any"
     }
   ],
-  "related_applications": [
-    {
-      "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=spot.agora.app",
-      "id": "spot.agora.app"
-    }
-  ],
+  "related_applications": [],
   "prefer_related_applications": false
 }

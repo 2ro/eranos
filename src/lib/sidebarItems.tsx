@@ -39,7 +39,6 @@ import {
   Users,
   Vote,
   WalletMinimal,
-  Zap,
 } from "lucide-react";
 import { VERIFIED_PAGE_PATH } from "@/lib/agoraDefaults";
 import { CardsIcon } from "@/components/icons/CardsIcon";
@@ -198,7 +197,6 @@ export const CONTENT_KIND_ICONS: Record<string, IconComponent> = {
   reposts: Repeat2,
   "generic-reposts": Repeat2,
   reactions: SmilePlus,
-  zaps: Zap,
   voice: Mic,
   "custom-emojis": Smile,
   statuses: SmilePlus,

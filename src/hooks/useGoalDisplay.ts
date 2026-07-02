@@ -1,27 +1,19 @@
 import { useMemo } from 'react';
 import { nip19 } from 'nostr-tools';
-import type { NostrEvent, NostrMetadata } from '@nostrify/nostrify';
+import type { NostrMetadata } from '@nostrify/nostrify';
 
 import { isGoalExpired, parseCommunityATag, type ParsedGoal } from '@/lib/goalUtils';
 import { genUserName } from '@/lib/genUserName';
 import { useAddrEvent } from '@/hooks/useEvent';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useGoalProgress } from '@/hooks/useGoalProgress';
 import { useNow } from '@/hooks/useNow';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
 
 interface GoalDisplayData {
   expired: boolean;
-  funded: boolean;
-  currentSats: number;
-  percentage: number;
-  progressLoading: boolean;
-  /** True when the zap tally hit the safety cap — the displayed total is a lower bound. */
-  progressIsPartial: boolean;
   metadata: NostrMetadata | undefined;
   displayName: string;
   profileUrl: string;
-  lightningAddress: string | undefined;
   deadlineLabel: string | null;
   communityName: string | undefined;
   communityUrl: string | undefined;
@@ -32,20 +24,20 @@ interface GoalDisplayData {
 /**
  * Consolidates all display-related hooks and derived state for a goal event.
  * Used by GoalCard inside NoteCard feeds and PostDetailPage.
+ *
+ * Note: the raised-amount tally is intentionally not computed here — the
+ * Grin-based tally arrives in a later phase. The card shows the goal target
+ * without a progress figure until then.
  */
-export function useGoalDisplay(event: NostrEvent, goal: ParsedGoal): GoalDisplayData {
+export function useGoalDisplay(goal: ParsedGoal): GoalDisplayData {
   const now = useNow(60_000);
   const expired = isGoalExpired(goal);
-  const { currentSats, percentage, isLoading: progressLoading, isPartial: progressIsPartial } =
-    useGoalProgress(event, goal);
-  const funded = percentage >= 100;
 
   // Recipient info
   const author = useAuthor(goal.beneficiary);
   const metadata: NostrMetadata | undefined = author.data?.metadata;
   const displayName = metadata?.display_name || metadata?.name || genUserName(goal.beneficiary);
   const profileUrl = useProfileUrl(goal.beneficiary, metadata);
-  const lightningAddress = metadata?.lud16 || metadata?.lud06 || undefined;
 
   // Deadline label — `now` dependency ensures it refreshes every minute
   const deadlineLabel = useMemo(() => {
@@ -83,15 +75,9 @@ export function useGoalDisplay(event: NostrEvent, goal: ParsedGoal): GoalDisplay
 
   return {
     expired,
-    funded,
-    currentSats,
-    percentage,
-    progressLoading,
-    progressIsPartial,
     metadata,
     displayName,
     profileUrl,
-    lightningAddress,
     deadlineLabel,
     communityName,
     communityUrl,

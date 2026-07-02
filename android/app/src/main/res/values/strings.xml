@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Agora</string>
-    <string name="title_activity_main">Agora</string>
-    <string name="package_name">spot.agora.app</string>
-    <string name="custom_url_scheme">spot.agora.app</string>
+    <string name="app_name">Eranos</string>
+    <string name="title_activity_main">Eranos</string>
+    <string name="package_name">fund.eranos.app</string>
+    <string name="custom_url_scheme">fund.eranos.app</string>
 </resources>

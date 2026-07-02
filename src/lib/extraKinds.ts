@@ -114,20 +114,6 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     agora: true,
   },
   {
-    kind: 9735,
-    id: 'zaps',
-    feedKey: 'feedIncludeZaps',
-    // Combine Lightning (9735) and on-chain Bitcoin (8333) zaps into a single
-    // toggle so users don't have to think about which rail was used.
-    extraFeedKinds: [8333],
-    label: 'Zaps',
-    description: 'Bitcoin tips sent to posts',
-    addressable: false,
-    section: 'feed',
-    feedOnly: true,
-    agora: true,
-  },
-  {
     kind: 30023,
     id: 'articles',
     showKey: 'showArticles',
@@ -165,7 +151,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     addressable: false,
     section: 'media',
     blurb: 'Watch and discover videos and live streams in a YouTube/Twitch-style interface.',
-    sites: [{ url: 'https://zap.stream', name: 'zap.stream' }, { url: 'https://vidstr.shakespeare.wtf', name: 'Vidstr' }],
+    sites: [{ url: 'https://vidstr.shakespeare.wtf', name: 'Vidstr' }],
     agora: true,
     subKinds: [
       {
@@ -221,7 +207,7 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     addressable: true,
     section: 'media',
     blurb: 'Discover and listen to music tracks and playlists shared on Nostr. Upload music and create playlists from a dedicated music app.',
-    sites: [{ url: 'https://nodecast.xyz' }, { url: 'https://zaptrax.app', name: 'ZapTrax' }, { url: 'https://sunami.app', name: 'Sunami' }],
+    sites: [{ url: 'https://nodecast.xyz' }, { url: 'https://sunami.app', name: 'Sunami' }],
     subKinds: [
       {
         kind: 36787,

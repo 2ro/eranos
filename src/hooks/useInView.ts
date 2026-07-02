@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react';
  *
  * Designed for "render the card immediately, but defer the card's
  * expensive data fetching until it's actually on screen" patterns — most
- * importantly the campaign grids, where eagerly running
- * {@link useCampaignDonations} for all ~200 cards at once produced a burst
- * of Esplora `/address` + `/tx` calls that rate-limited every backend.
+ * importantly the campaign grids, where eagerly fetching data for all
+ * ~200 cards at once produced a burst of per-card network calls that
+ * rate-limited every backend.
  *
  * Behaviour:
  *

@@ -7,7 +7,6 @@ import { DiscoverySearchToolbar } from '@/components/DiscoverySearchToolbar';
 import { ModerationOverlay } from '@/components/moderation';
 import { PledgeCard, PledgeCardSkeleton } from '@/components/PledgeCard';
 import { parseAction, useActions, type Action } from '@/hooks/useActions';
-import { useBtcPrice } from '@/hooks/useBtcPrice';
 import { useCampaignModerators } from '@/hooks/useCampaignModerators';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDiscoveryFilters } from '@/hooks/useDiscoveryFilters';
@@ -62,7 +61,6 @@ export function PledgesDiscoverySection({
 }: PledgesDiscoverySectionProps) {
   const { t } = useTranslation();
   const { user } = useCurrentUser();
-  const { data: btcPrice } = useBtcPrice();
   const { data: moderators } = useCampaignModerators();
   const isMod = !!user && !!moderators && moderators.includes(user.pubkey);
 
@@ -207,7 +205,6 @@ export function PledgesDiscoverySection({
     <PledgeCard
       key={`${action.pubkey}:${action.id}`}
       action={action}
-      btcPrice={btcPrice}
       showAuthor
       showTranslate
       topRight={

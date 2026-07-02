@@ -3,7 +3,7 @@ import { useInView } from 'react-intersection-observer';
 import { useSeoMeta } from '@unhead/react';
 import { useTranslation, Trans } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { Zap, AtSign, MessageSquare, MessageCircle, Highlighter, Loader2, Award, Mail, Bell } from 'lucide-react';
+import { AtSign, MessageSquare, MessageCircle, Highlighter, Loader2, Award, Mail, Bell } from 'lucide-react';
 import { RepostIcon } from '@/components/icons/RepostIcon';
 import { Link, useNavigate } from 'react-router-dom';
 import { PullToRefresh } from '@/components/PullToRefresh';
@@ -25,8 +25,6 @@ import { genUserName } from '@/lib/genUserName';
 import { nip19 } from 'nostr-tools';
 import { isReplyEvent } from '@/lib/nostrEvents';
 import { useProfileUrl } from '@/hooks/useProfileUrl';
-import { formatNumber } from '@/lib/formatNumber';
-import { getZapAmountSats, getZapAmountSatsForRecipient, getZapSenderPubkey } from '@/lib/zapHelpers';
 import { encodeEventAddress } from '@/lib/encodeEvent';
 import { cn } from '@/lib/utils';
 import { ProfileHoverCard } from '@/components/ProfileHoverCard';
@@ -302,11 +300,6 @@ function GroupedNotificationView({ group }: { group: GroupedNotificationItem }) 
       return solo
         ? <RepostNotification item={group.actors[0]} isNew={group.isNew} />
         : <RepostNotificationGroup group={group} />;
-    case 9735:
-    case 8333:
-      return solo
-        ? <ZapNotification item={group.actors[0]} isNew={group.isNew} />
-        : <ZapNotificationGroup group={group} />;
     case 1:
       return <MentionNotification item={group.actors[0]} isNew={group.isNew} />;
     case 1111:
@@ -532,13 +525,9 @@ function RepostNotification({ item, isNew }: { item: NotificationItem; isNew: bo
   );
 }
 
-// ──────────────────────────────────────
-// Zap Notification (single actor)
-// ──────────────────────────────────────
-
 /**
  * Renders a notification action verb that links to the underlying event
- * (the reaction, repost, or zap) on the /:nip19 detail page. Falls back
+ * (the reaction or repost) on the /:nip19 detail page. Falls back
  * to a plain span when `event` is undefined.
  */
 function ActionLink({ event, children }: { event: NostrEvent | undefined; children: React.ReactNode }) {
@@ -548,39 +537,6 @@ function ActionLink({ event, children }: { event: NostrEvent | undefined; childr
     <Link to={href} className="hover:underline">
       {children}
     </Link>
-  );
-}
-
-function ZapNotification({ item, isNew }: { item: NotificationItem; isNew: boolean }) {
-  const { t } = useTranslation();
-  const { event } = item;
-  const { user } = useCurrentUser();
-
-  // For kind 8333 multi-recipient receipts (campaign donations, batch zaps),
-  // attribute only the viewer's share of the total — otherwise the
-  // notification would credit the user with the full multi-recipient
-  // donation.
-  const zapAmount = useMemo(
-    () => (user ? getZapAmountSatsForRecipient(event, user.pubkey) : getZapAmountSats(event)),
-    [event, user],
-  );
-  const senderPubkey = useMemo(() => getZapSenderPubkey(event), [event]);
-
-  const actionText = zapAmount > 0
-    ? t('notifications.actions.zappedYouWithAmount', { sats: formatNumber(zapAmount) })
-    : t('notifications.actions.zappedYou');
-
-  return (
-    <NotificationWrapper isNew={isNew}>
-      <div className="px-4 pt-3">
-        <NotificationHeader
-          actorPubkey={senderPubkey}
-          icon={<Zap className="size-4 text-amber-500 fill-amber-500" />}
-          action={<ActionLink event={event}>{actionText}</ActionLink>}
-        />
-      </div>
-      <ReferencedNoteCard item={item} />
-    </NotificationWrapper>
   );
 }
 
@@ -624,53 +580,6 @@ function RepostNotificationGroup({ group }: { group: GroupedNotificationItem }) 
         actors={group.actors}
         icon={<RepostIcon className="size-4 text-accent" />}
         action={<ActionLink event={group.actors[0].event}>{t('notifications.actions.repostedYour', { noun })}</ActionLink>}
-      />
-      <ReferencedNoteCard item={group.actors[0]} />
-    </NotificationWrapper>
-  );
-}
-
-// ──────────────────────────────────────
-// Zap Notification (grouped)
-// ──────────────────────────────────────
-function ZapNotificationGroup({ group }: { group: GroupedNotificationItem }) {
-  const { t } = useTranslation();
-  const { user } = useCurrentUser();
-  // Sum zap amounts across all actors in the group. Mixes lightning (9735)
-  // and on-chain (8333) zaps — both contribute their sat value to the total.
-  // For multi-recipient kind 8333 events we attribute only the viewer's
-  // slice of the total (not the full donation across N recipients).
-  const totalSats = useMemo(() => {
-    let total = 0;
-    for (const item of group.actors) {
-      total += user
-        ? getZapAmountSatsForRecipient(item.event, user.pubkey)
-        : getZapAmountSats(item.event);
-    }
-    return total;
-  }, [group.actors, user]);
-
-  // Extract sender pubkeys from zap events to use as the actor pubkeys
-  // (for 9735 the receipt is signed by the LNURL provider; for 8333 the
-  // sender already authors the event).
-  const zapActors = useMemo<NotificationItem[]>(() => {
-    return group.actors.map((item) => {
-      const senderPubkey = getZapSenderPubkey(item.event);
-      if (senderPubkey === item.event.pubkey) return item;
-      return { ...item, event: { ...item.event, pubkey: senderPubkey } };
-    });
-  }, [group.actors]);
-
-  const actionText = totalSats > 0
-    ? t('notifications.actions.zappedYouWithAmount', { sats: formatNumber(totalSats) })
-    : t('notifications.actions.zappedYou');
-
-  return (
-    <NotificationWrapper isNew={group.isNew}>
-      <GroupHeader
-        actors={zapActors}
-        icon={<Zap className="size-4 text-amber-500 fill-amber-500" />}
-        action={<ActionLink event={group.actors[0].event}>{actionText}</ActionLink>}
       />
       <ReferencedNoteCard item={group.actors[0]} />
     </NotificationWrapper>

@@ -83,15 +83,8 @@ const FAQ_STRUCTURE: FAQCategoryStructure[] = [
   {
     id: 'payments',
     items: [
-      { id: 'send-bitcoin-onchain' },
-      { id: 'connect-wallet' },
-      { id: 'export-wallet' },
-      { id: 'donations-are-public-general' },
-      { id: 'why-donations-pending' },
       { id: 'censorship-resistance' },
       { id: 'why-onchain' },
-      { id: 'why-not-silent-payments' },
-      { id: 'why-not-lightning' },
       { id: 'why-not-rotating-addresses' },
       { id: 'why-not-other-crypto' },
     ],
@@ -111,8 +104,6 @@ const FAQ_STRUCTURE: FAQCategoryStructure[] = [
     id: 'legacy',
     hidden: true,
     items: [
-      { id: 'send-bitcoin-lightning' },
-      { id: 'what-are-zaps' },
       { id: 'fyp' },
       { id: 'what-are-relays' },
       { id: 'what-are-blossom' },
@@ -208,8 +199,8 @@ export { TEAM_SOAPBOX as TEAM_SOAPBOX_PACK } from '@/lib/agoraDefaults';
  * dedicated component from `@/components/guide/`. The page just
  * dispatches on `block.kind`.
  *
- * The structure (block order, block kinds, paymentComparison audience,
- * callout variant, optionGrid hrefs and chips) lives in this file. The
+ * The structure (block order, block kinds, callout variant, optionGrid
+ * hrefs and chips) lives in this file. The
  * user-visible strings live under the `guides.donor.*` and
  * `guides.recipient.*` namespaces in `src/locales/*.json`, keyed by the
  * `id` on each structural block below.
@@ -226,17 +217,6 @@ export { TEAM_SOAPBOX as TEAM_SOAPBOX_PACK } from '@/lib/agoraDefaults';
  */
 
 /**
- * The two payment options a campaign can offer. Used by table headers
- * and inline badges.
- *
- * - `'public'`: a regular Bitcoin address. Visible on-chain, every
- *   wallet can pay it.
- * - `'silent'`: a BIP-352 silent-payments endpoint. The receiving side
- *   is unlinkable on-chain, but most wallets can't send to it yet.
- */
-export type PaymentMode = 'public' | 'silent';
-
-/**
  * Top-of-page summary card. One-sentence lede, plus 2 to 3 chip-style
  * next-actions that orient the reader without making them scroll.
  */
@@ -251,20 +231,6 @@ export interface GuideStepsBlock {
   kind: 'steps';
   heading: string;
   steps: { title: string; body: string }[];
-}
-
-/**
- * Side-by-side comparison of Public Payments vs. Silent Payments.
- * Rendered as a real two-column table on desktop and as two stacked
- * tinted cards on mobile (no sideways scroll). Audience controls row
- * copy: donors see "what to expect when paying," recipients see "what
- * to choose."
- */
-export interface GuidePaymentComparisonBlock {
-  kind: 'paymentComparison';
-  audience: 'donor' | 'recipient';
-  /** Optional one-line footnote rendered under the table. */
-  footnote?: string;
 }
 
 /** Single-line callout block with a tinted background and an icon. */
@@ -305,7 +271,6 @@ export interface GuideOptionGridBlock {
 export type GuideBlock =
   | GuideTldrBlock
   | GuideStepsBlock
-  | GuidePaymentComparisonBlock
   | GuideCalloutBlock
   | GuideProseBlock
   | GuideOptionGridBlock;
@@ -324,7 +289,6 @@ export type GuideBlock =
 type GuideBlockStructure =
   | { kind: 'tldr'; id: string }
   | { kind: 'steps'; id: string; stepIds: string[] }
-  | { kind: 'paymentComparison'; id: string; audience: 'donor' | 'recipient'; hasFootnote?: boolean }
   | { kind: 'callout'; id: string; variant: 'info' | 'warning' | 'danger' | 'success' }
   | { kind: 'prose'; id: string; paragraphCount: number; hasHeading?: boolean }
   | {
@@ -345,20 +309,14 @@ const DONOR_GUIDE_STRUCTURE: GuideBlockStructure[] = [
   {
     kind: 'steps',
     id: 'flow',
-    stepIds: ['openCampaign', 'payFromAnyWallet', 'arrivesDirectly'],
+    stepIds: ['openCampaign', 'arrivesDirectly'],
   },
-  { kind: 'paymentComparison', id: 'comparison', audience: 'donor', hasFootnote: true },
   { kind: 'callout', id: 'publicVisible', variant: 'warning' },
   {
     kind: 'optionGrid',
     id: 'privacy',
     hasIntro: true,
     options: [
-      {
-        id: 'silentWallet',
-        chips: ['non-custodial', 'easiest', 'BIP-352'],
-        href: 'https://ditto.pub',
-      },
       {
         id: 'nonKyc',
         chips: ['peer-to-peer', 'no ID'],
@@ -369,24 +327,15 @@ const DONOR_GUIDE_STRUCTURE: GuideBlockStructure[] = [
         chips: ['non-custodial', 'breaks history'],
         href: 'https://wasabiwallet.io',
       },
-      {
-        id: 'freshWallet',
-        chips: ['free', 'non-custodial', 'easiest'],
-        href: 'https://sparrowwallet.com',
-      },
     ],
   },
   { kind: 'callout', id: 'consumerApps', variant: 'danger' },
-  { kind: 'prose', id: 'silentToday', paragraphCount: 2, hasHeading: true },
 ];
 
 const RECIPIENT_GUIDE_STRUCTURE: GuideBlockStructure[] = [
   { kind: 'tldr', id: 'tldr' },
   { kind: 'prose', id: 'howReceiving', paragraphCount: 6, hasHeading: true },
   { kind: 'prose', id: 'whatEveryoneSees', paragraphCount: 2, hasHeading: true },
-  { kind: 'paymentComparison', id: 'comparison', audience: 'recipient', hasFootnote: true },
-  { kind: 'prose', id: 'silentToday', paragraphCount: 2, hasHeading: true },
-  { kind: 'callout', id: 'twoWallets', variant: 'info' },
   {
     kind: 'steps',
     id: 'movePromptly',
@@ -397,16 +346,6 @@ const RECIPIENT_GUIDE_STRUCTURE: GuideBlockStructure[] = [
     id: 'cashout',
     hasIntro: true,
     options: [
-      {
-        id: 'silentHop',
-        chips: ['non-custodial', 'easiest', 'low fees'],
-        href: 'https://ditto.pub',
-      },
-      {
-        id: 'lightningSwap',
-        chips: ['non-custodial', 'easy', 'low fees'],
-        href: 'https://boltz.exchange',
-      },
       {
         id: 'coinjoin',
         chips: ['non-custodial', 'high privacy'],
@@ -459,16 +398,6 @@ function resolveGuideBlock(
         body: i18n.t(`${base}.steps.${sid}.body`, params),
       }));
       return { kind: 'steps', heading, steps };
-    }
-    case 'paymentComparison': {
-      const footnote = structure.hasFootnote
-        ? i18n.t(`${base}.footnote`, params)
-        : undefined;
-      return {
-        kind: 'paymentComparison',
-        audience: structure.audience,
-        footnote,
-      };
     }
     case 'callout': {
       const title = i18n.t(`${base}.title`, params);

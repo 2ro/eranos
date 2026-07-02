@@ -77,7 +77,6 @@
     "language": "Bahasa",
     "dashboard": "Dasbor",
     "myDashboard": "Dasbor Saya",
-    "wallet": "Dompet",
     "notifications": "Notifikasi",
     "messages": "Pesan",
     "profile": "Profil",
@@ -119,7 +118,7 @@
     "showAllConversations": "Tampilkan semua percakapan",
     "friendsEmpty": "Tidak ada pesan dari orang yang Anda ikuti.",
     "translateDialogTitle": "Terjemahkan pesan pribadi?",
-    "translateDialogDescription": "Pesan yang diterima akan dikirim ke layanan terjemahan yang Anda konfigurasi. Pesan terkirim tidak akan diterjemahkan. Agora akan mengingat pilihan ini di perangkat ini.",
+    "translateDialogDescription": "Pesan yang diterima akan dikirim ke layanan terjemahan yang Anda konfigurasi. Pesan terkirim tidak akan diterjemahkan. Eranos akan mengingat pilihan ini di perangkat ini.",
     "confirmTranslate": "Terjemahkan pesan",
     "newMessage": "Pesan baru",
     "newMessageTitle": "Pesan baru",
@@ -199,7 +198,7 @@
     "secure": {
       "title": "Simpan kunci Anda",
       "subtitle": "Unduh berkas dan simpan di tempat yang aman. Pengelola kata sandi bisa digunakan.",
-      "couplingNote": "Akun dan dompet Anda berbagi kunci ini. Kunci ini menandatangani unggahan Nostr Anda dan membuka dompet Bitcoin Anda di Agora.",
+      "couplingNote": "Akun dan dompet Anda berbagi kunci ini. Kunci ini menandatangani unggahan Nostr Anda dan membuka dompet Bitcoin Anda di Eranos.",
       "permanenceHeadline": "Tidak ada cara untuk memulihkan kunci ini jika hilang.",
       "permanenceBody": "Tidak ada reset, tidak ada saluran dukungan, tidak ada pemulihan lewat email. Simpan sebelum melanjutkan.",
       "button": "Unduh & lanjutkan",
@@ -278,19 +277,19 @@
       "global": "Global"
     },
     "empty": {
-      "homeAgora": "Suasana tenang di Agora. Kampanye, ikrar, donasi, dan unggahan baru akan muncul di sini saat terjadi.",
-      "homeFollowingLoggedIn": "Feed orang yang Anda ikuti kosong. Ikuti beberapa orang untuk melihat aktivitas mereka, atau beralih ke Agora atau Global.",
+      "homeAgora": "Suasana tenang di Eranos. Kampanye, ikrar, donasi, dan unggahan baru akan muncul di sini saat terjadi.",
+      "homeFollowingLoggedIn": "Feed orang yang Anda ikuti kosong. Ikuti beberapa orang untuk melihat aktivitas mereka, atau beralih ke Eranos atau Global.",
       "homeFollowingLoggedOut": "Masuk untuk melihat unggahan dari orang yang Anda ikuti.",
       "homeOther": "Tidak ada yang ditampilkan. Periksa koneksi relay Anda atau coba lagi sebentar lagi.",
       "follows": "Feed Anda kosong. Ikuti beberapa orang untuk melihat unggahan mereka di sini.",
       "global": "Tidak ada unggahan ditemukan. Periksa koneksi relay Anda atau kembali lagi nanti.",
-      "browseAgora": "Jelajahi feed Agora",
+      "browseAgora": "Jelajahi feed Eranos",
       "browseGlobal": "Jelajahi feed Global",
       "discoverPeople": "Temukan orang untuk diikuti",
       "logIn": "Masuk"
     },
     "modeSwitcher": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "allNostr": "Global",
       "following": "Mengikuti",
       "ariaLabel": "Mode feed: {{label}}. Klik untuk mengubah.",
@@ -307,7 +306,6 @@
       "repost": "Repost",
       "undoRepost": "Batalkan repost",
       "react": "Reaksi",
-      "zap": "Zap",
       "share": "Bagikan",
       "more": "Lainnya",
       "linkCopied": "Tautan disalin ke papan klip"
@@ -416,12 +414,6 @@
     "reacted": "bereaksi",
     "reposted": "merepost",
     "voted": "memilih",
-    "zap": {
-      "donatedTo": "Berdonasi kepada",
-      "donatedAmountTo": "Berdonasi {{amount}} kepada",
-      "sat_one": "{{formattedCount}} sat",
-      "sat_other": "{{formattedCount}} sats"
-    },
     "stream": {
       "untitled": "Streaming Tanpa Judul",
       "live": "LIVE",
@@ -492,7 +484,6 @@
       "nsiteDeployed": "menerbitkan",
       "nsiteRedeployed": "menerbitkan ulang",
       "nsiteNoun": "nsite",
-      "zapped": "memberi zap",
       "pledgeCreated": "membuat",
       "pledgeUpdated": "memperbarui",
       "pledgeNoun": "ikrar",
@@ -662,60 +653,12 @@
         "body": "Dana sampai ke penerima langsung. Mereka tetap memegang kendali, mereka tetap memegang kontrol. Pindahkan, tukarkan, atau belanjakan; panduan di bawah menjelaskan cara melakukannya secara privat dan aman."
       }
     },
-    "twoWays": {
-      "eyebrow": "Bitcoin · Satu QR, dua opsi",
-      "title": "Dua cara untuk dibayar.",
-      "lede": "Kedua opsi adalah Bitcoin. Perbedaannya adalah apa yang Anda korbankan demi privasi. Saat seorang penerima membuat kampanye, mereka memilih opsi mana yang diterima. Jika keduanya, halaman donasi menampilkan satu kode QR yang berfungsi untuk dompet apa pun.",
-      "public": {
-        "kicker": "Pembayaran Bitcoin Publik",
-        "tagline": "Universal · Cepat · Transparan",
-        "title": "Berfungsi dengan setiap dompet di bumi.",
-        "description": "Donasi mendarat di alamat Bitcoin biasa yang dikendalikan penerima. Siapa pun dengan dompet Bitcoin apa pun bisa mengirim. Tanpa aplikasi baru, tanpa akun baru, tanpa kurva belajar.",
-        "bullet1": "Berfungsi di setiap dompet Bitcoin: Cash App, Coinbase, Strike, perangkat keras",
-        "bullet2": "Penyelesaian tercepat: hanya konfirmasi Bitcoin",
-        "bullet3": "Dapat diverifikasi on-chain: siapa pun bisa melihat apa yang diterima penerima",
-        "tradeoffTitle": "Konsekuensi: Publik di on-chain.",
-        "tradeoffIntro": "Setiap donasi bersifat publik di blockchain Bitcoin dan di Nostr. {{appName}} direkomendasikan hanya untuk kampanye terbuka. Jika Anda atau donatur Anda membutuhkan privasi ekstrem, termasuk dari aktor negara, baca <0>Panduan Donatur</0> dan <1>Panduan Penerima</1> sebelum berpartisipasi."
-      },
-      "silent": {
-        "kicker": "Pembayaran Bitcoin Silent",
-        "tagline": "Tak Terhubungkan · Langsung · BIP-352",
-        "title": "Tak terhubungkan, on-chain, langsung.",
-        "description": "Donasi dikirim sebagai silent payments BIP-352. Setiap donasi mendarat di output Bitcoin yang baru dan tak terhubungkan, yang tidak bisa dikaitkan kembali ke kampanye oleh pengamat yang menatap blockchain.",
-        "bullet1": "Jejak donasi tidak bisa direkonstruksi di on-chain",
-        "bullet2": "Melindungi penerima yang menghadapi musuh serius",
-        "bullet3": "Disimpan dalam saldo privat terpisah, tidak pernah dicampur dengan dana publik",
-        "tradeoffTitle": "Konsekuensi: Silent payments masih dini.",
-        "tradeoffIntro": "Cara paling privat untuk menerima Bitcoin secara on-chain, namun ekosistemnya masih muda dan kasar saat ini:",
-        "tradeoffBullet1": "Sedikit dompet yang mendukungnya.",
-        "tradeoffBullet2": "Penerimaan lambat.",
-        "tradeoffBullet3": "Tanpa notifikasi push.",
-        "tradeoffBullet4": "Dompet masih sering bermasalah.",
-        "tradeoffBullet5": "Jumlah donasi tidak publik."
-      },
-      "noCustody": {
-        "title": "Tanpa kustodi. Tanpa perantara.",
-        "body": "{{appName}} tidak pernah menyimpan dana. Donasi berpindah dari dompet ke dompet di Bitcoin. Tidak ada server yang berdiri di antara donatur dan penerima di kedua opsi. Jika {{appName}} hilang besok, setiap kampanye akan tetap berjalan.",
-        "gofundme": {
-          "heading": "Tidak seperti GoFundMe",
-          "body": "Tidak ada platform yang bisa membekukan donasi Anda, menuntut pengembalian dana, atau menutup kampanye Anda karena perbedaan kebijakan."
-        },
-        "givesendgo": {
-          "heading": "Tidak seperti GiveSendGo",
-          "body": "Tidak ada prosesor pembayaran yang duduk di tengah, jadi tidak ada Stripe, tidak ada Visa, tidak ada bank yang bisa memutus Anda di tengah kampanye."
-        },
-        "otherBitcoin": {
-          "heading": "Tidak seperti platform 'Bitcoin' lainnya",
-          "body": "Tidak ada node Lightning pusat, kustodian, atau LSP yang bisa gagal atau offline. Dana diselesaikan langsung on-chain ke dompet yang Anda kendalikan."
-        }
-      }
-    },
     "faq": {
       "eyebrow": "Pertanyaan",
       "title": "Sering ditanyakan.",
       "chapter1": {
         "label": "Memulai",
-        "description": "Apa itu Agora, siapa yang membangunnya, dan berapa biayanya."
+        "description": "Apa itu Eranos, siapa yang membangunnya, dan berapa biayanya."
       },
       "chapter2": {
         "label": "Donasi Bitcoin",
@@ -723,7 +666,7 @@
       },
       "chapter3": {
         "label": "Tentang Nostr",
-        "description": "Protokol terbuka yang menjadi fondasi Agora, dan cara kerja akun Anda."
+        "description": "Protokol terbuka yang menjadi fondasi Eranos, dan cara kerja akun Anda."
       }
     },
     "guides": {
@@ -737,7 +680,6 @@
         "description": "Kirim Bitcoin langsung ke penerima dan gerakan di mana pun di dunia, tanpa meminta izin kepada prosesor pembayaran.",
         "bullet1": "Gunakan dompet Bitcoin apa pun yang sudah Anda miliki.",
         "bullet2": "Donasi mendarat langsung ke penerima. Tanpa kustodian, tanpa perantara.",
-        "bullet3": "Untuk privasi, gunakan dompet yang mendukung silent payments.",
         "cta": "Baca Panduan Donatur"
       },
       "recipient": {
@@ -746,8 +688,6 @@
         "title": "Dapatkan pendanaan tanpa izin.",
         "description": "Terima dukungan langsung dari orang-orang yang percaya pada perjuangan Anda. Tanpa rekening bank, tanpa formulir aplikasi, tanpa perusahaan di tengah.",
         "bullet1": "Mulai menerima donasi segera setelah Anda mendaftar.",
-        "bullet2": "Pilih jenis pembayaran yang diterima: publik, silent payments, atau keduanya.",
-        "bullet3": "Untuk pencairan privat, kirim ke dompet silent-payments dulu, lalu teruskan ke mana saja.",
         "cta": "Baca Panduan Penerima"
       },
       "stillStuck": "Masih bingung?",
@@ -924,7 +864,6 @@
       "noSubmissionsHint": "Jadilah yang pertama membalas dengan bukti, kesaksian, atau pekerjaan yang telah selesai.",
       "funded": "didanai",
       "ofPledged": "dari {{amount}} diikrarkan",
-      "trustNote": "Ikrar ini berbasis kepercayaan. Kemajuan pendanaan dijumlah dari zap dan tanda terima donasi pada kiriman tingkat atas.",
       "share": "Bagikan",
       "storyHeading": "Tentang ikrar",
       "storyEmpty": "Pemberi ikrar belum menulis detail untuk ikrar ini."
@@ -1086,32 +1025,6 @@
     "headingEdit": "Ubah kampanye",
     "title": "Judul",
     "titlePlaceholder": "Selamatkan Toko Buku Terakhir",
-    "wallet": "Dompet Bitcoin",
-    "myWalletLabel": "Dompet {{name}}",
-    "myWalletDefault": "Dompet saya",
-    "walletHeroNote": "Donasi langsung masuk ke dompet Agora Anda sendiri.\nTanpa perantara.",
-    "walletHeroReassurance": "Anda yang memegang kuncinya, jadi Anda yang memegang dananya. Tarik kapan saja dari tab dompet.",
-    "walletChoose": "Pilih dompet",
-    "walletCustom": "Kustom",
-    "walletUseCustom": "Gunakan dompet kustom",
-    "walletUseMine": "Gunakan dompet Agora saya",
-    "acceptHeading": "Donasi apa yang akan Anda terima?",
-    "acceptUnavailable": "Tidak tersedia dengan login ini.",
-    "acceptAllTitle": "Donasi apa pun",
-    "acceptPublicTitle": "Hanya donasi publik",
-    "acceptPrivateTitle": "Hanya donasi privat",
-    "acceptAllHint": "Terima donasi publik maupun privat.",
-    "acceptPublicHint": "Donatur memberi ke alamat Bitcoin biasa. Donasi ini terlihat oleh siapa saja.",
-    "acceptPrivateHint": "Donatur memberi secara privat, sehingga identitas mereka tetap tersembunyi dari publik.",
-    "customWalletIntro": "Isi donasi mana saja yang ingin Anda terima: alamat publik, kode privat, atau keduanya. Setidaknya satu wajib diisi.",
-    "customOnchainMeaning": "Publik. Siapa saja dapat melihat donasi ini.",
-    "customSpMeaning": "Privat. Identitas donatur tetap tersembunyi.",
-    "bitcoinAddress": "Alamat Bitcoin",
-    "bitcoinAddressPlaceholder": "bc1q… atau bc1p…",
-    "silentPaymentCode": "Kode silent-payment",
-    "silentPaymentCodePlaceholder": "sp1…",
-    "onchainInvalid": "Bukan alamat Bitcoin mainnet yang dikenal (bc1q… / bc1p…).",
-    "spInvalid": "Bukan kode silent-payment BIP-352 yang dikenal (sp1…).",
     "country": "Negara",
     "countryPlaceholder": "Cari negara",
     "tags": "Tag",
@@ -1139,7 +1052,6 @@
     "storyPlaceholder": "Bagikan latar belakang, siapa yang diuntungkan, dan bagaimana dana akan digunakan.",
     "goal": "Target",
     "goalPlaceholder": "25,000",
-    "goalNote": "Dalam USD utuh. Donatur membayar dalam Bitcoin; klien memperkirakan nilai setara USD saat dilihat.",
     "submitCreate": "Luncurkan kampanye",
     "submitEdit": "Perbarui kampanye",
     "publishing": "Memublikasikan…",
@@ -1158,24 +1070,14 @@
     "errorTitleRequired": "Judul wajib diisi.",
     "errorTitleInvalid": "Judul harus mengandung huruf atau angka agar URL kampanye bisa dibuat.",
     "errorSlugInvalid": "Pengenal harus berupa huruf kecil, angka, dan tanda hubung.",
-    "errorHdUnavailable": "Dompet bawaan tidak tersedia untuk login ini.",
-    "errorSpUnavailable": "Alamat silent-payment tidak tersedia untuk login ini.",
-    "errorOnchainInvalid": "Alamat on-chain bukan alamat bech32(m) mainnet yang dikenal (bc1q… / bc1p…).",
-    "errorSpInvalid": "Kode silent-payment bukan kode BIP-352 yang dikenal (sp1…).",
-    "errorWalletRequired": "Sediakan setidaknya satu titik dompet — alamat Bitcoin mainnet (bc1q… / bc1p…) atau kode silent-payment (sp1…).",
     "errorGoalInvalid": "Target harus berupa nilai dolar utuh yang positif.",
     "errorEditLatestMissing": "Tidak dapat menemukan versi terbaru kampanye ini untuk diperbarui.",
     "errorSlugCollision": "Anda sudah memiliki kampanye dengan pengenal \"{{slug}}\". Pilih yang lain.",
     "errorBannerInvalid": "Banner harus berupa URL https:// yang valid.",
-    "errorHdDeriveFailed": "Tidak dapat menurunkan alamat on-chain baru dari dompet Anda.",
-    "errorHdDeriveInvalid": "Alamat dompet turunan gagal validasi. Silakan tambahkan alamat kustom sebagai gantinya.",
-    "errorWalletRequiredFallback": "Titik dompet wajib diisi.",
     "errorPublishedInvalid": "Event yang dipublikasikan gagal validasi. Silakan muat ulang dan coba lagi.",
     "wizard": {
       "titleStepTitle": "Beri nama kampanye Anda",
       "titleStepSubtitle": "Nama singkat dan jelas yang mudah dikenali donatur.",
-      "walletStepTitle": "Ke mana donasi akan masuk?",
-      "walletStepSubtitle": "Pilih dompet Agora Anda atau tempel alamat Anda sendiri.",
       "bannerStepTitle": "Tambahkan banner",
       "bannerStepSubtitle": "Satu gambar menarik membawa kampanye di setiap kartu.",
       "storyStepTitle": "Ceritakan kisah Anda",
@@ -1215,43 +1117,15 @@
     "like_one": "<0>{{formattedCount}}</0> Suka",
     "like_other": "<0>{{formattedCount}}</0> Suka",
     "tabComments": "Komentar & donasi",
-    "tabLedger": "Buku besar",
-    "ledger": {
-      "publicAddress": "Alamat publik",
-      "viewOnMempool": "Lihat di mempool.space",
-      "openOnMempool": "Buka transaksi di mempool.space",
-      "received": "Diterima",
-      "sent": "Terkirim",
-      "unconfirmed": "Belum dikonfirmasi",
-      "block": "Blok {{height}}",
-      "btcUnit": "BTC",
-      "empty": "Belum ada aktivitas on-chain untuk alamat ini.",
-      "error": "Tidak dapat memuat aktivitas on-chain. Coba lagi sebentar.",
-      "loadMore": "Muat lebih banyak",
-      "loadingMore": "Memuat…"
-    },
     "noCommentsTitle": "Belum ada komentar",
     "noCommentsHint": "Jadilah yang pertama meninggalkan pesan dukungan.",
     "deleteDialogTitle": "Hapus kampanye ini?",
     "deleteDialogBody": "Ini akan memublikasikan permintaan penghapusan NIP-09. Relay yang berperilaku baik akan menghapus kampanye dari feed dan tautan langsung. Tanda terima donasi sebelumnya tetap on-chain apa pun yang terjadi. Tindakan ini tidak dapat dibatalkan — untuk tetap menerima donasi, ubah kampanye sebagai gantinya.",
     "storyHeading": "Ceritanya",
-    "donate": "Donasi",
     "share": "Bagikan",
     "target": "Target: {{amount}}",
     "raised": "terkumpul",
-    "ofGoal": "dari target {{amount}}",
-    "donationCount_one": "{{count}} donasi",
-    "donationCount_other": "{{count}} donasi",
-    "openInWallet": "Buka di dompet",
-    "payWithAgoraWallet": "Bayar dengan Agora",
-    "openExternalWallet": "Buka dompet eksternal"
-  },
-  "noBitcoin": {
-    "trigger": "Tidak punya Bitcoin?",
-    "title": "Belum punya Bitcoin?",
-    "description": "Beli Bitcoin di Cash App, lalu kirimkan ke kampanye ini.",
-    "getItOn": "Dapatkan di",
-    "getCashApp": "Dapatkan Cash App"
+    "ofGoal": "dari target {{amount}}"
   },
   "campaignVerification": {
     "verifiedBy": "Diverifikasi oleh",
@@ -1371,25 +1245,6 @@
       "searchAriaLabel": "Cari kampanye",
       "noMatch": "Tidak ada kampanye yang cocok dengan “{{query}}”",
       "noMatchHint": "Coba kata pencarian lain, atau bersihkan pencarian.",
-      "venezuelaRelief": {
-        "title": "Venezuela membutuhkan <0>Anda</0>",
-        "body": "Gempa bumi dahsyat telah mengguncang Venezuela bagian utara, dengan dampak terparah di Caracas dan La Guaira. Keluarga-keluarga di sana tidak bisa melewati cobaan ini sendirian. Donasi Anda langsung mengalir ke kampanye bantuan di lapangan, mengubah belas kasih Anda menjadi tempat berlindung, makanan, dan harapan hari ini.",
-        "donate": "Donasi untuk bantuan",
-        "credit": "Foto dari Caracas, Venezuela. (AP; AFP via Getty Images)",
-        "share": "Bagikan",
-        "shareTitle": "Bantuan gempa Venezuela di Agora",
-        "linkCopied": "Tautan disalin ke papan klip",
-        "learnMore": "Pelajari selengkapnya",
-        "popupBody": "Gempa bumi dahsyat telah mengguncang Venezuela bagian utara, dengan dampak terparah di Caracas dan La Guaira. Donasi Anda langsung mengalir ke kampanye bantuan di lapangan, mengubah belas kasih menjadi tempat berlindung, makanan, dan harapan hari ini.",
-        "seoTitle": "Bantuan Gempa Venezuela",
-        "seoDescription": "Gempa bumi dahsyat telah mengguncang Venezuela bagian utara. Donasikan Bitcoin langsung ke kampanye bantuan di lapangan melalui Agora. Tanpa platform, tanpa kustodian, tanpa perlu izin.",
-        "pageEyebrow": "Seruan darurat",
-        "pageHow": "Bagaimana donasi Anda membantu",
-        "pageHowBody": "Agora bersifat non-kustodial: Bitcoin Anda langsung mengalir dari dompet Anda ke alamat kampanye bantuan. Tidak ada platform yang mengambil potongan, tidak ada kustodian yang menahan dana, dan tidak ada yang perlu izin untuk memberi atau menerima. Setiap kampanye di bawah ini dijalankan oleh orang-orang yang merespons gempa di lapangan.",
-        "showcaseTitle": "Kampanye bantuan",
-        "campaignCount_one": "{{count}} kampanye bantuan",
-        "campaignCount_other": "{{count}} kampanye bantuan"
-      },
       "whyDifferent": {
         "eyebrow": "Mengapa {{appName}}",
         "title": "Dibangun berbeda.",
@@ -1408,14 +1263,6 @@
           "bullet2": "Diselesaikan on-chain ke dompet milik Anda",
           "bullet3": "Tetap berfungsi meski {{appName}} menghilang"
         },
-        "block3": {
-          "heading": "Publik atau privat. Pilihan Anda.",
-          "body": "Penerima memilih opsi penerimaan yang sesuai dengan model ancaman mereka. Donor melihat satu QR; dompet memilih protokol yang tepat.",
-          "publicLabel": "Publik",
-          "publicSummary": "Berfungsi di setiap dompet Bitcoin. Cepat dan dapat diverifikasi on-chain.",
-          "privateLabel": "Privat",
-          "privateSummary": "Silent payments BIP-352. Donasi masuk ke output yang tidak dapat ditautkan."
-        },
         "readMore": "Baca uraian lengkap"
       },
       "verifyCampaigns": "Verifikasi kampanye"
@@ -1423,7 +1270,7 @@
     "all": {
       "title": "Kampanye",
       "seoTitle": "Semua kampanye",
-      "description": "Telusuri setiap kampanye yang dipublikasikan di Agora.",
+      "description": "Telusuri setiap kampanye yang dipublikasikan di Eranos.",
       "sectionTagline": "Kampanye unggulan dulu, kemudian sisanya dari jaringan. Cari atau urutkan untuk menyaring.",
       "heroKicker": "Kampanye",
       "heroHeading": "Setiap aksi,",
@@ -1591,7 +1438,6 @@
       "title": "Lanjutan",
       "subtitle": "Koneksi dompet, konfigurasi sistem, dan opsi lanjutan lainnya untuk pengguna mahir.",
       "intro": "Koneksi dompet, konfigurasi sistem, dan opsi lanjutan lainnya.",
-      "wallet": "Dompet",
       "torHeading": "Tor",
       "torToggle": "Arahkan lalu lintas melalui Tor",
       "torToggleDesc": "Terhubung ke relay dan memuat media melalui jaringan Tor untuk privasi yang lebih kuat. Performa lebih lambat dan ada jeda singkat saat Tor terhubung.",
@@ -1599,10 +1445,6 @@
       "torStatusLabel": "Status:",
       "torExitIp": "IP keluar Tor:",
       "torCheckAgain": "Periksa lagi"
-    },
-    "wallet": {
-      "title": "Dompet",
-      "subtitle": "Kelola koneksi dompet dan pembayaran"
     }
   },
   "language": {
@@ -1754,296 +1596,6 @@
     "adminRequired": "Akses admin diperlukan",
     "adminRequiredDesc": "Hanya admin platform yang dapat menunjuk atau menghapus organizer."
   },
-  "wallet": {
-    "seoTitle": "Dompet",
-    "seoDescription": "Dompet Bitcoin hierarchical-deterministic yang diturunkan dari nsec Nostr Anda.",
-    "loggedOut": {
-      "title": "Dompet Bitcoin",
-      "description": "Dompet hierarkis yang diturunkan dari identitas Nostr Anda. Alamat baru per penerimaan, riwayat transaksi lengkap, tanpa penggunaan ulang alamat.",
-      "requiresNsec": "Membutuhkan login dengan nsec (kunci privat Nostr Anda)."
-    },
-    "unsupported": {
-      "title": "Dompet tidak tersedia",
-      "extension": "Ekstensi browser Anda menjaga kunci rahasia Anda tetap terisolasi, sehingga kami tidak bisa menurunkan kunci anak untuk dompet Anda.",
-      "bunker": "Penandatangan jarak jauh Anda (NIP-46 bunker) menyimpan kunci rahasia Anda di sisi bunker, jadi kami tidak bisa menurunkan kunci anak untuk dompet Anda.",
-      "other": "Jenis login Anda tidak mengekspos kunci rahasia yang diperlukan untuk menurunkan dompet Anda.",
-      "instructions": "Keluar dan masuk lagi dengan nsec Anda untuk menggunakan dompet."
-    },
-    "scanFailed": "Gagal memindai dompet",
-    "retry": "Coba lagi",
-    "refreshBalance": "Muat ulang saldo",
-    "refreshBalanceTitle": "Klik untuk memuat ulang saldo",
-    "amountPending": "{{amount}} tertunda",
-    "pending": "tertunda",
-    "send": "Kirim",
-    "transactions": "Transaksi",
-    "receiveDialog": {
-      "title": "Terima Bitcoin",
-      "description": "Bagikan alamat untuk menerima bitcoin.",
-      "addressIndex": "Alamat #{{index}}",
-      "scanForNew": "Periksa pembayaran baru"
-    },
-    "tx": {
-      "pending": "Tertunda",
-      "today": "Hari ini",
-      "yesterday": "Kemarin",
-      "daysAgo_one": "{{count}} hari lalu",
-      "daysAgo_other": "{{count}} hari lalu",
-      "received": "Diterima",
-      "sent": "Terkirim",
-      "silentBadge": "silent",
-      "silentDetectedTitle": "Terdeteksi melalui pemindaian silent payment BIP-352"
-    },
-    "openMenu": "Menu dompet",
-    "sendPublic": "Kirim",
-    "sendPrivate": "Kirim secara privat",
-    "tabs": {
-      "public": "Publik",
-      "private": "Privat"
-    }
-  },
-  "walletSettings": {
-    "backup": {
-      "label": "Cadangkan dompet"
-    },
-    "legacy": {
-      "label": "Pemulihan dompet lawas"
-    }
-  },
-  "walletLegacy": {
-    "seoTitle": "Pemulihan Dompet Lawas",
-    "seoDescription": "Pulihkan dana dari generasi dompet Agora sebelumnya.",
-    "title": "Pemulihan dompet lawas",
-    "subtitle": "Pilih dompet sebelumnya yang Anda gunakan dan sapu saldonya ke dompet Anda saat ini.",
-    "loggedOut": "Masuk dengan identitas Nostr Anda untuk mencari dana di dompet lama Anda.",
-    "scanning": "Memindai dompet V2 beta untuk dana…",
-    "v2Detected": {
-      "title": "Dana ditemukan di V2 Prelaunch Beta Wallet",
-      "body": "Kami menemukan <0>{{amount}}</0> di alamat dari dompet V2 beta lama Anda. Buka penyapuan V2 di bawah untuk memindahkannya ke dompet Anda saat ini."
-    },
-    "options": {
-      "v2Beta": {
-        "label": "V2 Prelaunch Beta Wallet",
-        "description": "Sapu dana dari dompet BIP-86 berbasis nsec-sebagai-seed yang dirilis sebelum penurunan BIP-39."
-      },
-      "v1Breeze": {
-        "label": "V1 Breeze Wallet",
-        "description": "Sapu saldo on-chain dari kustodian Lightning lawas."
-      },
-      "doubleTweak": {
-        "label": "Perbaikan SP Double-tweak",
-        "description": "Pulihkan silent payment yang terdampar akibat bug pengiriman sebelumnya dan sapu kembali ke dompet Anda."
-      }
-    },
-    "footnote": "Setiap opsi adalah penyapuan satu arah ke dompet Anda saat ini. Dompet lawas itu sendiri tidak dipulihkan — hanya dana yang dimilikinya yang dipulihkan."
-  },
-  "walletRecovery": {
-    "seoTitle": "Pulihkan Dompet Lama",
-    "seoDescription": "Pulihkan dana dari dompet Lightning sebelumnya dan transfer ke alamat Bitcoin turunan Nostr Anda.",
-    "title": "Pulihkan Dompet Lama",
-    "heading": "Pulihkan dompet lama Anda",
-    "subheading": "Jika Anda sebelumnya memegang dana di dompet Lightning, Anda bisa menyapunya ke alamat Bitcoin turunan Nostr Anda. Dompet lama Anda tidak dipulihkan — ini adalah transfer sekali jalan, satu arah.",
-    "backToWallet": "Kembali ke dompet",
-    "loggedOut": {
-      "title": "Masuk untuk memulihkan",
-      "description": "Masuk dengan identitas Nostr yang memiliki dompet Lightning lama agar dana bisa disapu ke alamat Bitcoin-nya."
-    },
-    "destination": {
-      "title": "Dana akan dikirim ke",
-      "description": "Alamat Taproot turunan Nostr Anda."
-    },
-    "phrase": {
-      "title": "Frasa pemulihan",
-      "description": "Tempel frasa pemulihan 12 kata dari dompet lama Anda.",
-      "checkingRelays": "Memeriksa relay Anda untuk cadangan terenkripsi…",
-      "backupFoundTitle": "Cadangan ditemukan di relay Anda",
-      "backupFoundDesc": "Kami menemukan cadangan terenkripsi dari frasa pemulihan dompet lama Anda yang dipublikasikan dari akun ini.",
-      "decryptAndUse": "Dekripsi dan gunakan",
-      "placeholder": "kata1 kata2 kata3 …",
-      "warning": "Hanya tempel frasa pemulihan yang Anda percayai. Siapa pun dengan frasa ini bisa membelanjakan dana. Setelah penyapuan selesai, hapus dari tempat mana pun Anda menyalinnya.",
-      "sweepButton": "Sapu dana ke alamat Bitcoin saya"
-    },
-    "sweeping": {
-      "working": "Memproses…",
-      "dontClose": "Jangan tutup tab ini. Ini bisa memakan waktu hingga satu menit saat dompet lama menyinkronkan dan transaksi disiarkan."
-    },
-    "success": {
-      "title": "Pemulihan selesai",
-      "sent": "Mengirim {{sats}} sats ke alamat Bitcoin Anda.",
-      "viewTransaction": "Lihat transaksi"
-    },
-    "error": {
-      "title": "Pemulihan gagal",
-      "tryAgain": "Coba lagi"
-    },
-    "errors": {
-      "noNip44": "Penandatangan Anda tidak mendukung dekripsi NIP-44, yang diperlukan untuk membaca cadangan relay. Tempel frasa pemulihan 12 kata Anda secara manual sebagai gantinya.",
-      "decryptFailed": "Tidak dapat mendekripsi cadangan relay. Tempel frasa pemulihan 12 kata Anda secara manual sebagai gantinya.",
-      "decryptGeneric": "Gagal mendekripsi cadangan relay.",
-      "invalidWordCount": "Frasa pemulihan harus 12 atau 24 kata.",
-      "noBalance": "Dompet lama Anda tidak memiliki saldo yang bisa dibelanjakan. Tidak ada yang bisa dipulihkan.",
-      "sweepGeneric": "Pemulihan gagal. Silakan coba lagi."
-    },
-    "progress": {
-      "loadingSdk": "Memuat SDK dompet…",
-      "connecting": "Menghubungkan ke dompet lama Anda…",
-      "checkingBalance": "Memeriksa saldo…",
-      "preparingTransfer": "Menyiapkan transfer {{sats}} sats…",
-      "broadcasting": "Menyiarkan transaksi…"
-    },
-    "toast": {
-      "backupLoadedTitle": "Cadangan dimuat",
-      "backupLoadedDesc": "Frasa pemulihan didekripsi dari relay Anda."
-    }
-  },
-  "walletBackup": {
-    "heading": "Frasa pemulihan dompet",
-    "dialogDescription": "Anda dapat mengakses dompet Agora Anda di dompet Bitcoin mana pun dengan mengimpor cadangan 24 kata ini.",
-    "hidden": "Ketuk untuk menampilkan frasa pemulihan 24 kata Anda.",
-    "revealAria": "Tampilkan frasa pemulihan",
-    "hideAria": "Sembunyikan frasa pemulihan",
-    "warning": "Siapa pun yang memiliki kata-kata ini dapat membelanjakan Bitcoin Anda. Jangan pernah membagikannya, jangan pernah mengetikkannya ke situs web, jangan pernah menyimpannya dalam teks biasa di luar pengelola kata sandi."
-  },
-  "walletConnect": {
-    "status": "Status",
-    "ready": "Siap",
-    "notFound": "Tidak Ditemukan",
-    "none": "Tidak ada",
-    "add": "Tambah",
-    "active": "Aktif",
-    "connectionLabel": "Koneksi NWC",
-    "defaultWalletName": "Dompet Lightning",
-    "setActiveTitle": "Tetapkan sebagai aktif",
-    "removeTitle": "Hapus dompet",
-    "helpText": "Pasang ekstensi browser WebLN atau hubungkan dompet NWC untuk mengirim zap.",
-    "webln": {
-      "name": "WebLN",
-      "description": "Ekstensi browser"
-    },
-    "nwc": {
-      "name": "Nostr Wallet Connect",
-      "description": "Koneksi dompet jarak jauh",
-      "connectedCount_one": "{{count}} dompet terhubung",
-      "connectedCount_other": "{{count}} dompet terhubung"
-    },
-    "empty": {
-      "title": "Tidak ada dompet terhubung",
-      "description": "Tambahkan koneksi NWC untuk mengaktifkan zap instan."
-    },
-    "dialog": {
-      "title": "Hubungkan Dompet NWC",
-      "description": "Tempel string koneksi dari dompet yang kompatibel dengan NWC.",
-      "aliasPlaceholder": "Nama dompet (opsional)",
-      "connect": "Hubungkan",
-      "connecting": "Menghubungkan..."
-    },
-    "toast": {
-      "uriRequiredTitle": "URI koneksi diperlukan",
-      "uriRequiredDesc": "Masukkan URI koneksi NWC yang valid.",
-      "activeChangedTitle": "Dompet aktif berubah",
-      "activeChangedDesc": "Dompet yang dipilih sekarang aktif untuk zap."
-    }
-  },
-  "walletSend": {
-    "title": "Kirim Bitcoin",
-    "send": "Kirim Bitcoin",
-    "max": "MAX",
-    "tapAgainToConfirm": "Ketuk lagi untuk konfirmasi",
-    "satPerVB": "{{rate}} sat/vB",
-    "notEnoughBitcoin": "Bitcoin tidak mencukupi",
-    "recipient": {
-      "placeholder": "bc1…, sp1…",
-      "scan": "Pindai kode QR",
-      "sendToOnchain": "Kirim ke alamat Bitcoin",
-      "sendToSilentPayment": "Kirim ke alamat silent payment",
-      "bitcoinAddress": "Alamat Bitcoin",
-      "silentPayment": "Alamat silent payment",
-      "toLabel": "Kepada",
-      "clear": "Hapus penerima",
-      "choosePaymentMethod": "Pilih metode pembayaran untuk melanjutkan"
-    },
-    "feeSpeed": {
-      "fastest": "~10 menit",
-      "halfHour": "~30 menit",
-      "hour": "~1 jam",
-      "economy": "~1 hari",
-      "custom": "Khusus"
-    },
-    "fee": {
-      "loading": "memuat…",
-      "unavailable": "tidak tersedia",
-      "loadFailed": "Tidak bisa memuat tarif biaya.",
-      "retry": "Coba lagi",
-      "orCustom": "Atau masukkan tarif khusus di bawah.",
-      "loadingTiers": "Memuat tarif biaya…",
-      "customPlaceholder": "misal 5",
-      "customAriaLabel": "Tarif biaya khusus dalam sat/vB"
-    },
-    "progress": {
-      "building": "Membangun transaksi…",
-      "signing": "Menandatangani…",
-      "broadcasting": "Menyiarkan…",
-      "sending": "Mengirim…"
-    },
-    "errors": {
-      "unavailable": "Dompet HD tidak tersedia untuk jenis login ini.",
-      "enterRecipient": "Masukkan alamat Bitcoin atau alamat silent payment sp1….",
-      "noSpendable": "Tidak ada Bitcoin yang bisa dibelanjakan di dompet ini.",
-      "feesNotLoaded": "Tarif biaya belum dimuat.",
-      "enterAmount": "Masukkan jumlah.",
-      "insufficient": "Bitcoin tidak cukup untuk jumlah ini + biaya jaringan.",
-      "waitingPrice": "Menunggu harga BTC…",
-      "noneYet": "Anda belum punya Bitcoin.",
-      "feesNotLoadedYet": "Tarif biaya belum dimuat.",
-      "feeRateTooLow": "Masukkan tarif biaya minimal 1 sat/vB."
-    },
-    "scanError": {
-      "title": "Tidak bisa membaca kode QR itu",
-      "description": "Diharapkan alamat Bitcoin, alamat silent payment (sp1…), atau URI bitcoin:."
-    },
-    "toast": {
-      "failedTitle": "Transaksi gagal"
-    },
-    "broadcastError": {
-      "feeTooLowTitle": "Biaya jaringan terlalu rendah",
-      "feeTooLowBodyWithMin": "Jaringan Bitcoin menolak biaya ini. Minimum saat ini sekitar {{min}} sat/vB.",
-      "feeTooLowBody": "Jaringan Bitcoin menolak biaya ini. Pilih tingkat yang lebih cepat atau naikkan tarif khusus Anda.",
-      "rbfTitle": "Pengganti butuh biaya lebih tinggi",
-      "rbfBody": "Transaksi pengganti harus membayar lebih dari yang asli. Naikkan biayanya dan coba lagi.",
-      "mempoolFullTitle": "Jaringan Bitcoin sedang padat",
-      "mempoolFullBody": "Mempool penuh dan biaya Anda tidak kompetitif. Naikkan biaya agar bisa lolos.",
-      "networkTitle": "Tidak bisa menjangkau jaringan Bitcoin",
-      "networkBody": "Periksa koneksi Anda dan coba lagi.",
-      "mempoolConflictTitle": "Transaksi berbenturan",
-      "mempoolConflictBody": "Salah satu input sudah dibelanjakan atau sedang dibelanjakan oleh transaksi lain.",
-      "tooLongChainTitle": "Terlalu banyak transaksi yang belum terkonfirmasi",
-      "tooLongChainBody": "Anda punya rantai panjang transaksi yang belum terkonfirmasi. Tunggu sampai ada yang terkonfirmasi dan coba lagi.",
-      "badInputsTitle": "Transaksi ditolak",
-      "badInputsBody": "Jaringan menolak transaksi ini. Sesuaikan jumlah atau penerima dan coba lagi.",
-      "absurdlyHighFeeTitle": "Biaya luar biasa tinggi",
-      "absurdlyHighFeeBody": "Estimasi biaya mencurigakan tinggi. Muat ulang tarif biaya dan coba lagi.",
-      "unknownTitle": "Transaksi gagal",
-      "useHigherFee": "Gunakan biaya lebih tinggi",
-      "tryAgain": "Coba lagi",
-      "atMaxFeeTier": "Anda sudah di tingkat tercepat."
-    },
-    "success": {
-      "title": "Bitcoin terkirim",
-      "satsAmount": "{{sats}} sats",
-      "viewTransaction": "Lihat transaksi",
-      "done": "Selesai"
-    },
-    "titlePublic": "Kirim Bitcoin",
-    "titlePrivate": "Kirim secara privat",
-    "reuse": {
-      "checking": "Memeriksa alamat…",
-      "sendAnyway": "Tetap kirim",
-      "acknowledge": "Saya memahami risikonya — tetap kirim",
-      "historyWarning": "Alamat ini sudah pernah digunakan on-chain. Mengirim dana privat Anda ke sini menautkannya ke riwayat transaksi yang ada dan menghapus privasi silent payment Anda. Gunakan alamat silent payment (sp1…), atau tetap kirim.",
-      "ownPublicWarning": "Ini adalah alamat dari dompet publik Anda sendiri. Mengirim dana privat ke alamat ini menggabungkan kedua dompet dan menautkannya. Gunakan alamat silent payment (sp1…), atau tetap kirim."
-    },
-    "ownSilentPaymentBlocked": "Ini adalah alamat silent payment Anda sendiri. Anda tidak bisa mengirim dari dompet publik ke dompet privat Anda — melakukannya menggabungkan dana silent payment privat Anda dengan koin yang sudah terekspos di ledger publik, menautkan dompet privat Anda ke identitas yang diketahui dan menghancurkan privasinya. Kirim ke alamat lain saja."
-  },
   "qrScanner": {
     "title": "Pindai kode QR",
     "close": "Tutup",
@@ -2060,64 +1612,6 @@
       "busy": "Aplikasi lain sedang menggunakan kamera. Tutup dan coba lagi.",
       "overconstrained": "Kamera perangkat ini tidak mendukung pengaturan yang diminta.",
       "didntStart": "Kamera tidak menyala. Mungkin aplikasi lain sedang menggunakannya, atau peramban Anda memblokir pemindai."
-    }
-  },
-  "bitcoinPublic": {
-    "lead": "Uang yang Anda kirim bersifat publik dan bisa dilacak kembali ke Anda.",
-    "learnMore": "Pelajari lebih lanjut",
-    "body": "Bitcoin adalah buku besar publik. Transaksi yang Anda kirim bisa dilacak kembali ke Anda selamanya, bahkan setelah ditukar oleh beberapa orang. Kirim hanya kepada mereka yang ingin Anda dukung secara publik.",
-    "bodyWithCashOut": "Bitcoin adalah buku besar publik. Transaksi yang Anda kirim bisa dilacak kembali ke Anda selamanya, bahkan setelah ditukar oleh beberapa orang. Kirim hanya kepada mereka yang ingin Anda dukung secara publik, atau cairkan di bursa.",
-    "iUnderstand": "Saya memahami transaksi ini bersifat publik."
-  },
-  "spScan": {
-    "title": "Periksa pembayaran baru",
-    "subtitle": "Pindai blockchain untuk pembayaran privat",
-    "descriptionHelp": "Info selengkapnya",
-    "description": "Menelusuri indexer BIP-352 yang dikonfigurasi blok per blok untuk mendeteksi silent payment masuk.",
-    "since": "Sejak",
-    "preset": {
-      "lastHour": "Satu jam terakhir",
-      "last3h": "3 jam terakhir",
-      "last24h": "24 jam terakhir",
-      "lastWeek": "Pekan lalu",
-      "lastMonth": "Bulan lalu",
-      "custom": "Khusus…"
-    },
-    "customHours": "Jam",
-    "customHoursPlaceholder": "misal 12",
-    "advanced": "Lanjutan",
-    "connectingIndexer": "Menghubungkan ke indexer…",
-    "upToDate": "Anda sudah mutakhir.",
-    "fromBlock": "Dari blok",
-    "indexerTip": "Tip indexer",
-    "lastFullyScanned": "Terakhir dipindai penuh",
-    "never": "tidak pernah",
-    "includeSpent": "Sertakan yang sudah dibelanjakan",
-    "includeSpentDesc": "Juga deteksi silent payment yang sudah dibelanjakan. Gunakan saat membangun ulang riwayat penerimaan setelah pemindaian terlewat atau setel ulang.",
-    "blockProgress": "Blok {{current}} / {{to}}",
-    "matches_one": "{{count}} cocok",
-    "matches_other": "{{count}} cocok",
-    "scannedRange": "Dipindai blok {{from}} → {{to}}.",
-    "foundOutputs_one": "Menemukan {{count}} output baru.",
-    "foundOutputs_other": "Menemukan {{count}} output baru.",
-    "noNewPayments": "Tidak ada pembayaran baru.",
-    "startScan": "Mulai pindai",
-    "resolveFailed": {
-      "title": "Tidak bisa mencari blok awal",
-      "description": "mempool.space tidak dapat dijangkau saat ini. Masukkan blok awal di Lanjutan → Dari blok untuk tetap memindai."
-    },
-    "reconcile": {
-      "title": "Rekonsiliasi UTXO yang dibelanjakan",
-      "description": "Memeriksa setiap UTXO silent-payment yang tersimpan terhadap Blockbook dan menghapus yang sudah dibelanjakan. Gunakan ini jika saldo lebih tinggi dari seharusnya setelah pengiriman.",
-      "checking": "Memeriksa {{checked}} / {{total}}…",
-      "checked_one": "Memeriksa {{count}} UTXO · dipangkas {{pruned}}.",
-      "checked_other": "Memeriksa {{count}} UTXO · dipangkas {{pruned}}.",
-      "reconciling": "Merekonsiliasi…",
-      "reconcileNow": "Rekonsiliasi sekarang"
-    },
-    "autoScan": {
-      "label": "Pindai otomatis",
-      "description": "Terus memeriksa pembayaran privat baru di latar belakang, bahkan saat Anda meninggalkan halaman ini."
     }
   },
   "notifications": {
@@ -2141,8 +1635,6 @@
     "actions": {
       "reactedToYour": "bereaksi terhadap {{noun}} Anda",
       "repostedYour": "merepost {{noun}} Anda",
-      "zappedYou": "memberi Anda zap",
-      "zappedYouWithAmount": "memberi Anda zap {{sats}} sats",
       "repliedToYourNote": "membalas catatan Anda",
       "mentionedYou": "menyebut Anda",
       "repliedToYourComment": "membalas komentar Anda",
@@ -2184,14 +1676,11 @@
       "emojiPack": "paket emoji",
       "podcastEpisode": "episode podcast",
       "podcastTrailer": "trailer podcast",
-      "zapstoreAsset": "aset Zapstore",
-      "zapstoreRelease": "rilis Zapstore",
       "stream": "streaming",
       "status": "status",
       "repository": "repositori",
       "customNip": "NIP kustom",
       "calendarEvent": "acara kalender",
-      "zapstoreApp": "aplikasi Zapstore",
       "playlist": "daftar putar",
       "divine": "divine",
       "community": "komunitas",
@@ -2244,10 +1733,6 @@
         "label": "Repost",
         "description": "Ketika seseorang merepost catatan Anda"
       },
-      "zaps": {
-        "label": "Zap",
-        "description": "Ketika seseorang mengirim zap Lightning atau on-chain kepada Anda"
-      },
       "mentions": {
         "label": "Sebutan",
         "description": "Ketika seseorang menyebut Anda dalam catatan"
@@ -2281,7 +1766,7 @@
     "inputPlaceholder": "Cari",
     "filtersAria": "Filter pencarian",
     "tabs": {
-      "agora": "Agora",
+      "agora": "Eranos",
       "nostr": "Nostr",
       "accounts": "Pengguna"
     },
@@ -2358,8 +1843,8 @@
       "postsPrompt": "Masukkan kueri pencarian untuk menemukan konten Nostr.",
       "accounts": "Tidak ada pengguna yang cocok dengan pencarian Anda.",
       "followsPrompt": "Cari orang berdasarkan nama atau alamat NIP-05.",
-      "agora": "Tidak ada kampanye, ikrar, atau grup Agora yang cocok dengan pencarian Anda.",
-      "agoraPrompt": "Cari kampanye, ikrar, dan grup Agora, atau telusuri yang terbaru.",
+      "agora": "Tidak ada kampanye, ikrar, atau grup Eranos yang cocok dengan pencarian Anda.",
+      "agoraPrompt": "Cari kampanye, ikrar, dan grup Eranos, atau telusuri yang terbaru.",
       "activeFilters": "Filter aktif:",
       "clearAll": "Bersihkan semua filter"
     }
@@ -2383,7 +1868,6 @@
       "editProfile": "Ubah",
       "shareFollowLink": "Bagikan tautan follow",
       "moreOptions": "Opsi lainnya",
-      "donate": "Donasi",
       "campaignGoal": "Target ${{amount}}"
     },
     "stats": {
@@ -2426,7 +1910,6 @@
       "addToList": "Tambah ke daftar",
       "shareFollowLink": "Bagikan tautan follow",
       "profileRecovery": "Pemulihan profil",
-      "zap": "Zap",
       "awardBadge": "Beri lencana",
       "writeLetter": "Tulis surat",
       "mute": "Bisukan @{{name}}",
@@ -2508,8 +1991,6 @@
       "heading": "Bidang Profil",
       "website": "Situs web",
       "websitePlaceholder": "https://situswebanda.com",
-      "lightning": "Lightning",
-      "lightningPlaceholder": "anda@walletofsatoshi.com",
       "labelPlaceholder": "Label",
       "tickerPlaceholder": "Ticker",
       "addressPlaceholder": "Alamat",
@@ -2539,11 +2020,6 @@
         "defaultLabel": "Email",
         "description": "Alamat email kontak",
         "valuePlaceholder": "anda@example.com"
-      },
-      "wallet": {
-        "label": "Dompet",
-        "description": "Alamat dompet kripto",
-        "valuePlaceholder": "Alamat"
       },
       "link": {
         "label": "Tautan",
@@ -2613,10 +2089,10 @@
   "faq": {
     "categories": {
       "getting-started": {
-        "label": "Tentang Agora"
+        "label": "Tentang Eranos"
       },
       "payments": {
-        "label": "Donasi Bitcoin di Agora"
+        "label": "Donasi Bitcoin di Eranos"
       },
       "about-nostr": {
         "label": "Tentang Nostr"
@@ -2645,51 +2121,6 @@
           "{{appName}} dibangun oleh [Soapbox](https://soapbox.pub), tim sumber terbuka yang membangun alat untuk ekosistem Nostr, bekerja sama dengan [World Liberty Congress](https://worldlibertycongress.org/)."
         ]
       },
-      "send-bitcoin-onchain": {
-        "question": "Bagaimana cara kerja pengiriman Bitcoin?",
-        "answer": [
-          "Saat seorang penerima membuat kampanye, mereka memilih jenis pembayaran apa yang diterima: **publik**, **privat**, atau **keduanya**.",
-          "Donasi **publik** adalah Bitcoin asli di on-chain. Mereka diselesaikan di blockchain publik, berfungsi di setiap dompet Bitcoin, dan terlihat oleh siapa pun.",
-          "Donasi **privat** menggunakan **silent payments** (BIP-352). Mereka juga diselesaikan on-chain, tetapi transaksinya tidak bisa dihubungkan kembali ke kode donasi penerima — sehingga tetap di luar daftar donatur publik dan jumlah total. Donatur perlu dompet yang mendukung silent payments — kami merekomendasikan [Ditto Wallet](https://ditto.pub) atau [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk).",
-          "Saat kampanye menerima **keduanya**, {{appName}} menampilkan satu kode QR yang mengencode kedua titik. Dompet silent-payment membacanya sebagai privat; dompet lain kembali ke alamat publik. Donatur tidak perlu memilih — dompet mereka memilih jalur yang tepat secara otomatis.",
-          "Dengan cara apa pun, pembayaran langsung ke penerima. {{appName}} tidak pernah menyentuh dananya."
-        ]
-      },
-      "connect-wallet": {
-        "question": "Apa itu dompet di {{appName}}?",
-        "answer": [
-          "Dompet {{appName}} Anda adalah dompet Bitcoin **self-custodial**, dibangun dari kunci Nostr Anda. {{appName}} tidak pernah menahan dana Anda — dompet berjalan di peramban Anda dan menandatangani transaksi secara lokal dengan kunci yang hanya Anda kendalikan. Ia dapat menerima Bitcoin dengan kedua cara — sebagai alamat publik yang bisa dibayar dompet Bitcoin apa pun, dan sebagai kode silent-payments yang bisa dibayar oleh dompet yang mendukung secara privat. Tidak ada yang perlu didaftarkan; dompet ada sejak Anda memiliki akun.",
-          "Dompet memiliki dua tab: **Publik** (alamat Bitcoin biasa Anda) dan **Privat** (silent payments). Kedua saldo dipisahkan secara ketat dan tidak pernah bisa dibelanjakan bersama — isolasi itulah yang menjaga donasi privat tetap tak terhubungkan di on-chain. Saat Anda membuat kampanye, Anda memilih apakah menerima pembayaran publik, pembayaran privat, atau keduanya. Untuk membelanjakan apa yang Anda terima, lihat **Panduan Penerima**.",
-          "Anda juga bisa mengekspor frasa seed 24 kata dari dompet Anda dan mengimpornya ke dompet Bitcoin standar apa pun — lihat \"Bisakah saya mengekspor dompet {{appName}} saya ke dompet Bitcoin lain?\" di bawah."
-        ]
-      },
-      "export-wallet": {
-        "question": "Bisakah saya mengekspor dompet {{appName}} saya ke dompet Bitcoin lain?",
-        "answer": [
-          "Ya. Dompet {{appName}} Anda sepenuhnya self-custodial. {{appName}} tidak pernah menahan Bitcoin Anda dan tidak pernah melihat kunci Anda — dompet berjalan sepenuhnya di peramban Anda, menandatangani transaksi secara lokal dengan kunci yang diturunkan dari kunci rahasia Nostr Anda (nsec).",
-          "Buka dompet dari menu, ketuk menu tiga titik di kanan atas, dan pilih **Cadangkan dompet**. Anda akan melihat frasa seed BIP-39 24 kata. Tuliskan di tempat yang aman (atau simpan di pengelola kata sandi) — **siapa pun yang memiliki kata-kata ini bisa membelanjakan Bitcoin Anda.**",
-          "Anda bisa mengimpor 24 kata tersebut ke dompet Bitcoin standar apa pun: **Sparrow**, **Electrum**, **BlueWallet**, **Phoenix**, **Trezor**, atau **Ledger**. {{appName}} menggunakan jalur derivasi standar BIP-86 (Taproot) dan BIP-352 (silent payments), jadi tidak diperlukan konfigurasi khusus.",
-          "Setelah diimpor, dompet lain menampilkan saldo dan riwayat yang sama dengan dompet {{appName}} Anda — keduanya adalah dompet yang sama, hanya dua tampilan darinya.",
-          "Ekspor frasa seed hanya tersedia saat Anda masuk dengan nsec. Login melalui ekstensi peramban dan remote-signer (bunker) menjaga kunci rahasia Anda tetap terisolasi, sehingga {{appName}} tidak bisa menurunkan seed dalam mode tersebut."
-        ]
-      },
-      "donations-are-public-general": {
-        "question": "Apakah donasi di {{appName}} publik?",
-        "answer": [
-          "Itu tergantung jenis pembayaran apa yang diterima penerima.",
-          "**Donasi publik** dicatat di blockchain Bitcoin dan di Nostr. Siapa pun bisa melihat jumlah, waktu, dan alamatnya.",
-          "**Donasi privat** menggunakan silent payments. Mereka tidak bisa dihubungkan secara publik ke kode donasi penerima, tidak muncul dalam daftar donatur, dan tidak dihitung dalam jumlah total publik.",
-          "Saat kampanye menerima keduanya, dompet donatur memutuskan jalur mana yang digunakan — dompet yang mendukung silent payments membayar secara privat, yang lain membayar alamat publik. Baca **Panduan Donatur** dan **Panduan Penerima** untuk gambaran lengkap."
-        ]
-      },
-      "why-donations-pending": {
-        "question": "Mengapa beberapa donasi tertulis \"pending\"?",
-        "answer": [
-          "Donasi **pending** adalah Bitcoin asli yang sudah dikirim — ia hanya menunggu untuk dikonfirmasi oleh jaringan. Dompet donatur telah menyiarkan transaksinya, tetapi belum dimasukkan ke dalam blok.",
-          "Bitcoin menghasilkan blok baru kira-kira setiap 10 menit, dan penambang memilih transaksi berdasarkan biaya yang dibayar donatur. Sebagian besar donasi terkonfirmasi dalam satu jam; donasi dengan biaya lebih rendah bisa memakan waktu lebih lama saat jaringan sedang sibuk. {{appName}} memeriksa ulang status konfirmasi secara otomatis, sehingga label **pending** hilang dengan sendirinya begitu blok masuk.",
-          "Dananya sedang dalam perjalanan — penerima akan melihat donasi tersebut dihitung ke dalam total kampanye segera setelah terkonfirmasi. Tidak ada yang bisa dilakukan penerima atau {{appName}} untuk mempercepatnya; hanya dompet donatur yang bisa menaikkan fee."
-        ]
-      },
       "censorship-resistance": {
         "question": "Apa yang dimaksud dengan \"anti-sensor\" di sini?",
         "answer": [
@@ -2703,22 +2134,6 @@
           "Bitcoin adalah jalur pembayaran yang paling didukung secara luas dan paling anti-sensor di dunia. Setiap dompet Bitcoin bisa mengirimnya.",
           "Di {{appName}}, penerima memilih cara menerima: **publik** (alamat Bitcoin biasa) untuk jangkauan maksimum, **privat** (silent payments) untuk donasi tak terhubungkan, atau **keduanya** sehingga dompet setiap donatur memilih jalur yang tepat secara otomatis. Donatur yang hanya memiliki aplikasi Bitcoin konsumen masih bisa berkontribusi; donatur dengan dompet silent-payments mendapat privasi secara default.",
           "Konsekuensinya adalah transaksi Bitcoin publik terlihat di blockchain dan membayar biaya penambang. Panduan Donatur dan Penerima menjelaskan cara menangani keduanya."
-        ]
-      },
-      "why-not-silent-payments": {
-        "question": "Apakah {{appName}} mendukung silent payments?",
-        "answer": [
-          "Ya — di kedua sisi. Dompet Bitcoin bawaan {{appName}} mendukung BIP-352, jadi saat Anda mengirim Bitcoin dari dompet {{appName}} Anda bisa membayar alamat silent-payment apa pun (`sp1…`) secara langsung. Dan saat seorang penerima membuat kampanye, mereka bisa menerima silent payments bersama dengan, atau sebagai pengganti, pembayaran Bitcoin publik.",
-          "Donasi silent-payment tetap diselesaikan on-chain, tetapi transaksinya tidak bisa dihubungkan kembali ke kode donasi penerima — jadi mereka tidak muncul di daftar donatur publik atau jumlah total.",
-          "Mengirim silent payment dari luar {{appName}} membutuhkan dompet yang mendukung BIP-352. Sebagian besar aplikasi konsumen belum mendukung, tetapi [Ditto Wallet](https://ditto.pub) dan [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk) mendukung.",
-          "Saat kampanye menerima kedua jenis pembayaran, {{appName}} mengencode keduanya dalam satu kode QR. Dompet yang mendukung silent-payment membayar secara privat; yang lain membayar alamat publik. Tidak ada donatur yang tertutup, dan tidak ada penerima yang dipaksa memilih antara jangkauan dan privasi."
-        ]
-      },
-      "why-not-lightning": {
-        "question": "Mengapa {{appName}} tidak menggunakan Lightning?",
-        "answer": [
-          "Lightning membutuhkan dompet Lightning. Yang paling mudah (Wallet of Satoshi, Strike, Breez) bersifat **kustodial** — sebuah perusahaan memegang dana dan bisa ditutup, dibatasi secara geografis, atau ditekan untuk membekukan akun. Lightning non-kustodial menuntut teknis tinggi dan tidak andal untuk pemula.",
-          "Kami ingin {{appName}} berfungsi untuk seseorang yang pengalaman Bitcoin satu-satunya adalah aplikasi konsumen biasa seperti Cash App, Coinbase, Strike, Venmo, atau PayPal. Bitcoin on-chain berfungsi dengan setiap dompet di planet ini."
         ]
       },
       "why-not-rotating-addresses": {
@@ -2764,19 +2179,6 @@
           "Untuk panduan lengkap, lihat [Mengelola Kunci Nostr Anda](https://soapbox.pub/blog/managing-nostr-keys)."
         ]
       },
-      "send-bitcoin-lightning": {
-        "question": "Bagaimana cara kerja pengiriman Bitcoin melalui Lightning?",
-        "answer": [
-          "Jika penerima memiliki alamat Lightning di profil mereka, Anda bisa mengirim ke sana. Lightning diselesaikan dalam hitungan detik dan biayanya sangat kecil.",
-          "Pengiriman Lightning tidak menggunakan alamat donasi {{appName}} — mereka langsung ke dompet Lightning apa pun yang penerima atur sendiri. Alur donasi {{appName}} sendiri hanya on-chain."
-        ]
-      },
-      "what-are-zaps": {
-        "question": "Apa itu zap?",
-        "answer": [
-          "Zap adalah tip Lightning kecil di Nostr, terpisah dari alur donasi on-chain {{appName}}."
-        ]
-      },
       "fyp": {
         "question": "Bagaimana cara kerja feed?",
         "answer": [
@@ -2817,74 +2219,7 @@
   },
   "guides": {
     "shared": {
-      "tldrEyebrow": "Versi singkat",
-      "paymentBadge": {
-        "public": "Pembayaran Publik",
-        "silent": "Silent Payments"
-      },
-      "paymentComparison": {
-        "donorHeader": "Saat Anda berdonasi",
-        "recipientHeader": "Saat Anda membuat",
-        "donorRows": {
-          "whatYouSee": {
-            "label": "Apa yang Anda lihat",
-            "public": "Alamat Bitcoin biasa yang bisa Anda bayar dari mana saja.",
-            "silent": "QR yang sama. Dompet Anda memilih titik silent-payment jika mendukung BIP-352."
-          },
-          "walletSupport": {
-            "label": "Dukungan dompet",
-            "public": "Setiap dompet Bitcoin. Cash App, Coinbase, Strike, perangkat keras, apa saja.",
-            "silent": "Sedikit dompet saat ini. Kebanyakan kembali ke transaksi Bitcoin biasa."
-          },
-          "privacy": {
-            "label": "Privasi donasi",
-            "public": "Publik di on-chain. Alamat pengirim Anda terhubung permanen ke kampanye.",
-            "silent": "Sisi penerima tak terhubungkan di on-chain. Jejak dompet pengirim Anda tetap publik."
-          },
-          "settlement": {
-            "label": "Penyelesaian",
-            "public": "Konfirmasi Bitcoin biasa.",
-            "silent": "Konfirmasi on-chain yang sama, tetapi penerima harus memindai dompet mereka untuk menemukannya."
-          }
-        },
-        "recipientRows": {
-          "whatDonorsSee": {
-            "label": "Apa yang donatur lihat",
-            "public": "Alamat Bitcoin biasa. Berfungsi dengan setiap dompet di bumi.",
-            "silent": "Titik BIP-352. Dompet donatur perlu dukungan silent-payments; jika tidak, donasi kembali ke transaksi Bitcoin biasa."
-          },
-          "receivingSpeed": {
-            "label": "Kecepatan penerimaan",
-            "public": "Gaya push. Donasi muncul segera di halaman kampanye.",
-            "silent": "Pemindaian manual. Dompet Anda harus menelusuri blockchain mencarinya. Menit hingga jam, tergantung dompet."
-          },
-          "pushNotifications": {
-            "label": "Notifikasi push",
-            "public": "Ya. Anda melihat donasi baru saat tiba.",
-            "silent": "Tidak. Buka dompet dan picu pemindaian untuk menemukannya."
-          },
-          "donorList": {
-            "label": "Daftar donatur / jumlah total kampanye",
-            "public": "Publik selamanya. Jumlah dan alamat pengirim terlihat oleh siapa pun.",
-            "silent": "Privat. Halaman kampanye tidak bisa menampilkan jumlah atau total donasi silent-payments."
-          },
-          "ecosystem": {
-            "label": "Kematangan ekosistem",
-            "public": "Matang. Perangkat yang sudah mapan.",
-            "silent": "Bleeding-edge. Dompet masih sering bermasalah; harapkan pembayaran terlewat yang muncul pada pemindaian berikutnya."
-          },
-          "bestFor": {
-            "label": "Terbaik untuk",
-            "public": "Penggalangan dana terbuka di mana bukti sosial dan visibilitas membantu.",
-            "silent": "Kampanye di mana privasi donatur atau penerima lebih penting daripada total yang terlihat."
-          },
-          "watchOutFor": {
-            "label": "Perhatikan",
-            "public": "Rekaman publik permanen dari setiap donatur.",
-            "silent": "UX yang masih kasar saat ini. Beberapa donasi tidak akan muncul sampai penerima memindai."
-          }
-        }
-      }
+      "tldrEyebrow": "Versi singkat"
     },
     "donor": {
       "tldr": {
@@ -2902,18 +2237,11 @@
             "title": "Buka kampanye",
             "body": "Anda melihat satu kode QR. Jika kampanye menerima kedua opsi, ia mengencode kedua titik; dompet Anda memilih yang tepat."
           },
-          "payFromAnyWallet": {
-            "title": "Bayar dari dompet apa pun",
-            "body": "Cash App, Coinbase, Strike, dompet perangkat keras, apa saja. Bayar jumlahnya ditambah biaya jaringan."
-          },
           "arrivesDirectly": {
             "title": "Tiba langsung",
             "body": "Dana langsung diselesaikan ke penerima. {{appName}} tidak menahan atau merutekannya, dan alamatnya diturunkan dari kunci rahasia Nostr penerima."
           }
         }
-      },
-      "comparison": {
-        "footnote": "Kampanye bisa menerima Publik saja, Silent saja, atau keduanya. Jika keduanya, kode QR membawa kedua titik. Dompet Anda memilih yang bisa digunakan."
       },
       "publicVisible": {
         "title": "Donasi publik terlihat di on-chain selamanya",
@@ -2923,10 +2251,6 @@
         "heading": "Berdonasi secara privat",
         "intro": "Langkah-langkah ini paling penting untuk donasi **Publik**, di mana setiap transaksi terikat permanen ke satu alamat. Donasi **Silent** sudah menyembunyikan sisi penerima, sehingga risikonya lebih rendah. Analisis terarah terhadap dompet pengirim Anda tetap mungkin terjadi dengan cara apa pun, jadi jika risiko Anda tinggi, langkah-langkah ini layak diambil. Pilih salah satu, atau gabungkan.",
         "options": {
-          "silentWallet": {
-            "name": "Gunakan dompet silent-payments",
-            "purpose": "Bayar dengan dompet Bitcoin yang mendukung BIP-352. Jika kampanye menerima silent payments, dompet Anda menggunakan titik itu secara otomatis."
-          },
           "nonKyc": {
             "name": "Beli Bitcoin non-KYC",
             "purpose": "Beli Bitcoin peer-to-peer agar tidak terhubung dengan ID pemerintah Anda sejak awal. Titik awal privasi terkuat."
@@ -2934,23 +2258,12 @@
           "coinjoin": {
             "name": "Coinjoin terlebih dahulu",
             "purpose": "Campurkan Bitcoin Anda dengan koin orang lain sehingga outputnya tidak bisa dilacak ke pembelian KYC Anda. Berguna saat kampanye hanya menerima publik."
-          },
-          "freshWallet": {
-            "name": "Gunakan dompet baru",
-            "purpose": "Berdonasi dari dompet yang tidak pernah menyentuh identitas utama Anda atau bursa KYC."
           }
         }
       },
       "consumerApps": {
         "title": "Aplikasi konsumen tidak bisa membuat Anda anonim",
         "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance, dan PayPal semuanya memverifikasi ID Anda. Bagaimanapun Anda mengirim donasi, setiap transaksi tetap terikat ke identitas asli Anda. Gunakan dompet non-kustodial yang Anda kendalikan."
-      },
-      "silentToday": {
-        "heading": "Catatan tentang silent payments saat ini",
-        "paragraphs": [
-          "Silent payments adalah cara paling privat untuk menerima Bitcoin secara on-chain, tetapi ekosistemnya masih muda. Sebagian besar dompet populer belum bisa mengirim ke titik silent-payment, jadi saat dompet tidak bisa, donasi kembali ke transaksi Bitcoin biasa ke alamat publik kampanye (jika kampanye menerima keduanya).",
-          "Untuk penerima, donasi silent-payment juga tiba tanpa notifikasi push dan hanya muncul setelah penerima memindai dompet mereka, yang bisa memakan menit hingga jam. Semua ini tidak memengaruhi keamanan dana Anda; ini hanya membentuk pengalaman."
-        ]
       }
     },
     "recipient": {
@@ -2980,20 +2293,6 @@
           "Donasi silent-payment bukan bagian dari catatan itu. Mereka tidak terlihat oleh pengamat luar dan tidak muncul dalam jumlah total publik kampanye; donatur baru hanya melihat apa pun yang Anda publikasikan tentang kemajuan kampanye."
         ]
       },
-      "comparison": {
-        "footnote": "Anda tidak bisa mengubah opsi pembayaran yang diterima kampanye setelah dibuat. Jika berubah pikiran, buat kampanye baru."
-      },
-      "silentToday": {
-        "heading": "Catatan tentang silent payments saat ini",
-        "paragraphs": [
-          "Silent payments adalah cara paling privat untuk menerima Bitcoin secara on-chain, tetapi ekosistemnya masih muda. Sebagian besar dompet populer belum bisa mengirim ke titik silent-payment, jadi saat dompet donatur tidak bisa, donasi kembali ke transaksi Bitcoin biasa ke alamat publik Anda (jika Anda menerima keduanya).",
-          "Donasi silent-payment juga tiba tanpa notifikasi push dan hanya muncul setelah Anda memindai dompet, yang bisa memakan menit hingga jam. Semua ini tidak memengaruhi keamanan dana Anda; ini hanya membentuk pengalaman sehari-hari."
-        ]
-      },
-      "twoWallets": {
-        "title": "Pisahkan saldo Publik dan Privat Anda",
-        "body": "Dompet {{appName}} Anda menampilkan dua tab: **Publik** (alamat Bitcoin biasa Anda) dan **Privat** (silent payments). Keduanya dipisahkan secara ketat, dan kedua saldo tidak pernah bisa dibelanjakan dalam transaksi yang sama — isolasi itulah yang menjaga donasi privat Anda tetap tak terhubungkan. Saat Anda mencairkan dari tab **Privat**, kirim ke alamat silent-payment (**sp1…**), yang tetap privat. Jika Anda malah mengirim dana privat ke alamat on-chain biasa, {{appName}} memeriksanya: jika alamat itu pernah dipakai sebelumnya, atau milik dompet publik Anda sendiri, {{appName}} memperingatkan Anda dan mengharuskan Anda menekan **Tetap kirim**, karena melakukannya menautkan dana privat Anda ke riwayat publik alamat tersebut. Mengirim ke alamat **sp1…** tidak pernah memicu peringatan itu."
-      },
       "movePromptly": {
         "heading": "Pindahkan donasi segera",
         "steps": {
@@ -3011,14 +2310,6 @@
         "heading": "Mencairkan secara privat",
         "intro": "Membelanjakan secara on-chain menciptakan jejak kecuali Anda memutuskannya dulu. Cairkan dari tab **Privat** agar donasi silent-payment tetap tak terhubungkan — kirim ke dompet silent-payments terlebih dahulu (alamat **sp1…**), lalu belanjakan lebih lanjut; lompatan itu memutus tautan antara kampanye Anda dan apa yang datang berikutnya. Jangan kirim dana privat ke alamat yang dipakai ulang atau alamat publik, yang akan menautkannya kembali. Opsi lain di bawah juga berfungsi dan memiliki konsekuensinya sendiri.",
         "options": {
-          "silentHop": {
-            "name": "Lompatan dompet silent-payments",
-            "purpose": "Pindahkan donasi Anda ke dompet silent-payments ([Ditto Wallet](https://ditto.pub), [Dana](https://github.com/cygnet3/dana/releases/download/v0.7.4/app-live-release.apk)). Dari sana pengeluaran hilir Anda tidak terikat ke kampanye."
-          },
-          "lightningSwap": {
-            "name": "Tukar Lightning",
-            "purpose": "Atomic-swap Bitcoin on-chain ke Lightning. Pembayaran Lightning tidak masuk ke blockchain publik."
-          },
           "coinjoin": {
             "name": "Coinjoin",
             "purpose": "Campurkan Bitcoin Anda dengan koin pengguna lain sehingga outputnya tidak bisa dihubungkan kembali ke inputnya."
@@ -3038,140 +2329,5 @@
         "body": "Mixer kustodial bisa mencuri koin Anda, mencatat siapa mengirim apa, atau ternyata adalah honeypot penegak hukum. Gunakan lompatan silent-payments atau coinjoin non-kustodial sebagai gantinya."
       }
     }
-  },
-  "walletMigrate": {
-    "seoTitle": "Migrasikan Dompet Lama",
-    "seoDescription": "Sapu dana dari dompet Agora lawas Anda (nsec-sebagai-seed) ke dompet BIP-39 yang baru.",
-    "title": "Migrasikan Dompet Lama",
-    "heading": "Migrasikan ke dompet baru Anda",
-    "subheading": "Dompet Bitcoin Agora kini menggunakan frasa seed BIP-39 sehingga bisa diimpor ke aplikasi dompet mana pun. Dana di alamat lama Anda tetap aman — halaman ini menyapunya ke dompet baru Anda dalam satu transaksi.",
-    "backToWallet": "Kembali ke dompet",
-    "loading": "Memeriksa dompet lama Anda…",
-    "warning": "Ini membangun satu transaksi penyapuan yang menghabiskan setiap UTXO dari dompet lama Anda dan mengirim totalnya (dikurangi biaya jaringan kecil) ke alamat penerimaan pertama dompet baru Anda. Setelah disiarkan, pemindahan ini bersifat final dan tidak dapat dibatalkan.",
-    "startButton": "Sapu ke dompet baru",
-    "loggedOut": {
-      "title": "Masuk untuk migrasi",
-      "description": "Masuk dengan identitas Nostr yang memiliki dompet lama agar dana bisa disapu ke alamat baru Anda."
-    },
-    "unsupported": {
-      "title": "Dompet tidak tersedia",
-      "description": "Migrasi hanya berfungsi untuk login nsec, karena kunci dompet lama diturunkan langsung dari nsec Anda. Login ekstensi browser dan penandatangan jarak jauh tidak bisa menjalankan migrasi ini."
-    },
-    "noBlockbook": {
-      "title": "Blockbook belum dikonfigurasi",
-      "description": "Migrasi memerlukan URL indexer Blockbook untuk memindai alamat lama Anda dan menyiarkan transaksi penyapuan."
-    },
-    "noFunds": {
-      "title": "Tidak ada yang perlu dimigrasikan",
-      "description": "Dompet lama Anda tidak memiliki saldo yang bisa dibelanjakan. Semuanya sudah ada di dompet baru Anda."
-    },
-    "detected": {
-      "title": "Dana di dompet lama Anda",
-      "description": "Dana ini akan dipindahkan ke dompet baru Anda dalam satu transaksi.",
-      "bip86": "On-chain",
-      "sp": "Silent payment",
-      "total": "Total"
-    },
-    "destination": {
-      "title": "Tujuan",
-      "description": "Alamat penerimaan pertama dompet baru Anda."
-    },
-    "progress": {
-      "building": "Membangun transaksi…",
-      "signing": "Menandatangani input…",
-      "broadcasting": "Menyiarkan transaksi…",
-      "dontClose": "Jangan tutup tab ini selama penyapuan berlangsung."
-    },
-    "success": {
-      "title": "Migrasi selesai",
-      "sent": "Mengirim {{sats}} sats ke dompet baru Anda (biaya {{fee}} sats).",
-      "viewTx": "Lihat transaksi"
-    },
-    "error": {
-      "title": "Migrasi gagal",
-      "tryAgain": "Coba lagi"
-    },
-    "errors": {
-      "noV1Account": "Tidak dapat mengakses kunci dompet lama.",
-      "noDestination": "Dompet baru Anda belum memiliki alamat penerimaan. Tunggu halaman dompet selesai dimuat dan coba lagi.",
-      "noBlockbook": "Indexer Blockbook belum dikonfigurasi. Migrasi tidak bisa memindai alamat lama Anda.",
-      "noFunds": "Tidak ada dana yang bisa dibelanjakan di alamat lama.",
-      "sweepGeneric": "Migrasi gagal. Silakan coba lagi."
-    },
-    "toast": {
-      "successTitle": "Migrasi selesai",
-      "successDesc": "{{sats}} sats dipindahkan ke dompet baru Anda."
-    }
-  },
-  "walletDoubleTweak": {
-    "seoTitle": "Perbaikan SP Double-tweak",
-    "seoDescription": "Pulihkan silent payment yang terdampar on-chain akibat bug pengiriman sebelumnya dan sapu ke dompet Anda.",
-    "title": "Perbaikan SP Double-tweak",
-    "heading": "Pulihkan silent payment yang terdampar",
-    "subheading": "Versi Agora sebelumnya mengkodekan beberapa output silent-payment ke kunci yang salah, sehingga tidak pernah muncul di dompet Anda. Alat ini memindai ulang rantai untuk output tersebut dan menyapu apa pun yang ditemukan ke dompet Anda.",
-    "back": "Kembali",
-    "loggedOut": "Masuk dengan identitas Nostr yang menerima silent payment tersebut agar bisa dipulihkan.",
-    "unsupported": {
-      "title": "Dompet tidak tersedia",
-      "description": "Pemulihan memerlukan dompet yang bisa menandatangani secara lokal. Masuk dengan nsec Anda untuk melanjutkan."
-    },
-    "noIndexer": {
-      "title": "Tidak ada indexer silent-payment yang dikonfigurasi",
-      "description": "URL indexer BIP-352 diperlukan untuk memindai pembayaran yang terdampar. Atur satu di pengaturan dompet dan coba lagi."
-    },
-    "scan": {
-      "title": "Pindai pembayaran yang terdampar",
-      "description": "Pilih tinggi blok untuk mulai memindai. Pemulihan memeriksa setiap blok dari sana hingga ujung rantai.",
-      "fromHeightLabel": "Tinggi blok awal",
-      "tipHint": "Ujung rantai saat ini: {{tip}}",
-      "start": "Pindai",
-      "cancel": "Batalkan pindaian",
-      "progress": "Memindai blok {{current}} dari {{to}} — {{found}} ditemukan",
-      "tipMissing": "Mencari ujung rantai…"
-    },
-    "noFunds": {
-      "title": "Tidak ada yang perlu dipulihkan",
-      "description": "Tidak ada silent payment yang terdampar ditemukan dalam rentang yang dipindai. Coba tinggi awal yang lebih lama jika Anda mengharapkan dana."
-    },
-    "found": {
-      "title": "Pembayaran terdampar ditemukan",
-      "description": "Output ini dapat disapu kembali ke dompet Anda.",
-      "count": "Output",
-      "recoverable": "Dapat dipulihkan"
-    },
-    "destination": {
-      "title": "Dana akan dikirim ke",
-      "description": "Alamat penerimaan baru di dompet Anda saat ini."
-    },
-    "sweepButton": "Pulihkan dana",
-    "sweeping": "Memulihkan dana Anda…",
-    "dontClose": "Jangan tutup halaman ini sampai pemulihan selesai.",
-    "success": {
-      "title": "Pemulihan selesai",
-      "sent": "{{sats}} sats dipulihkan ke dompet Anda.",
-      "viewTx": "Lihat transaksi"
-    },
-    "error": {
-      "title": "Pemulihan gagal",
-      "tryAgain": "Coba lagi"
-    },
-    "errors": {
-      "noDestination": "Tidak ada alamat tujuan yang tersedia. Buka dompet Anda terlebih dahulu.",
-      "noBlockbook": "Tidak ada server Blockbook yang dikonfigurasi. Atur satu di pengaturan dompet.",
-      "sweepGeneric": "Tidak dapat menyelesaikan penyapuan pemulihan."
-    },
-    "toast": {
-      "successTitle": "Dana dipulihkan",
-      "successDesc": "{{sats}} sats disapu ke dompet Anda."
-    },
-    "footnote": "Ini adalah penyapuan satu arah ke dompet Anda saat ini. Hanya silent payment yang terdampak yang disentuh; tidak ada yang lain berubah."
-  },
-  "spAutoScan": {
-    "scanning": "Memindai… blok {{current}} / {{to}}",
-    "caughtUp": "Sudah mutakhir",
-    "neverScanned": "Belum dipindai",
-    "lastScanned": "Dipindai hingga blok {{height}}",
-    "paused": "Pemindaian otomatis nonaktif",
-    "manualLink": "Opsi pindaian"
   }
 }

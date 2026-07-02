@@ -245,8 +245,8 @@ function AllCampaignsHero({ campaignCount }: AllCampaignsHeroProps) {
               'bg-gradient-to-br from-white/14 via-amber-100/10 to-rose-100/10 hover:from-white/20 hover:via-amber-100/14 hover:to-rose-100/14',
               'backdrop-blur-xl backdrop-saturate-150',
               'border border-white/25 hover:border-white/35',
-              'shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08),0_10px_28px_-12px_hsl(24_85%_45%/0.4)]',
-              'hover:shadow-[inset_0_0_0_1px_rgb(255_255_255/0.12),0_12px_32px_-10px_hsl(24_85%_45%/0.5)]',
+              'shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08),0_10px_28px_-12px_hsl(40_85%_45%/0.4)]',
+              'hover:shadow-[inset_0_0_0_1px_rgb(255_255_255/0.12),0_12px_32px_-10px_hsl(40_85%_45%/0.5)]',
               'motion-safe:transition-colors motion-safe:duration-200',
             )}
           >

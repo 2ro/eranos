@@ -8,7 +8,6 @@ import {
   GuideSteps,
   GuideTLDR,
   OptionGrid,
-  PaymentComparisonTable,
 } from '@/components/guide';
 import { useAppContext } from '@/hooks/useAppContext';
 import { DEFAULT_ACTION_COVERS } from '@/lib/defaultActionCovers';
@@ -59,8 +58,6 @@ function GuideBlockRenderer({ block }: { block: GuideBlock }) {
       return <GuideTLDR block={block} />;
     case 'steps':
       return <GuideSteps block={block} />;
-    case 'paymentComparison':
-      return <PaymentComparisonTable block={block} />;
     case 'callout':
       return <CalloutCard block={block} />;
     case 'optionGrid':

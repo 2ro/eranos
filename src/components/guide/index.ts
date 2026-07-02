@@ -9,4 +9,3 @@ export { GuideProse } from './GuideProse';
 export { GuideSteps } from './GuideSteps';
 export { GuideTLDR } from './GuideTLDR';
 export { OptionGrid } from './OptionGrid';
-export { PaymentComparisonTable } from './PaymentComparisonTable';

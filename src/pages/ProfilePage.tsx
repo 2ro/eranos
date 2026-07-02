@@ -51,8 +51,6 @@ import type { ProfileCampaignStats } from '@/hooks/useProfileCampaignStats';
 import { useVerifierStatement } from '@/hooks/useVerifierStatement';
 import { useActions } from '@/hooks/useActions';
 import type { Action } from '@/hooks/useActions';
-import { useBtcPrice } from '@/hooks/useBtcPrice';
-import { DonateDialog } from '@/components/DonateDialog';
 import {
   ProfileIdentityRail,
   ProfileAvatarBlock,
@@ -762,7 +760,6 @@ interface ProfileTabContentProps {
   isOwnProfile: boolean;
   profileCampaignStats: ProfileCampaignStats;
   allActions: Action[] | undefined;
-  btcPrice: number | undefined;
   campaigns: ParsedCampaign[];
   pledges: Action[];
 }
@@ -779,7 +776,6 @@ function ProfileTabContent({
   isOwnProfile,
   profileCampaignStats,
   allActions,
-  btcPrice,
   campaigns,
   pledges,
 }: ProfileTabContentProps) {
@@ -810,7 +806,6 @@ function ProfileTabContent({
         displayName={displayName}
         isOwnProfile={isOwnProfile}
         pledges={pledges}
-        btcPrice={btcPrice}
         isLoading={!allActions}
       />
     );
@@ -1162,23 +1157,11 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
   const { data: userStats } = useNip85UserStats(pubkey);
   const followersCount = userStats?.followers ?? 0;
 
-  // Agora stat sources: campaigns + raised totals, and pledges count.
+  // Agora stat sources: campaigns and pledges count.
   const profileCampaignStats = useProfileCampaignStats(pubkey);
-  const { data: btcPrice } = useBtcPrice();
   // Pledges (kind 36639) authored by this user. Filters the global pledges
   // list rather than issuing a separate per-author query.
   const { data: allActions } = useActions({ limit: 100 });
-
-  // Donate dialog state. The header "Donate" button (only shown when the
-  // profile has at least one campaign) opens this dialog. When the user
-  // has multiple campaigns the action bar surfaces a dropdown that picks
-  // which campaign to donate to first.
-  const [donateOpen, setDonateOpen] = useState(false);
-  const [donateCampaign, setDonateCampaign] = useState<ParsedCampaign | null>(null);
-  const openDonateForCampaign = useCallback((campaign: ParsedCampaign) => {
-    setDonateCampaign(campaign);
-    setDonateOpen(true);
-  }, []);
 
   const isOwnProfile = user?.pubkey === pubkey;
   const { feedSettings } = useFeedSettings();
@@ -1308,7 +1291,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                   campaigns={profileCampaignStats.campaigns}
                   campaignStats={profileCampaignStats}
                   pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
-                  btcPrice={btcPrice}
                   followersCount={followersCount}
                   followingCount={profileFollowing?.count ?? 0}
                   isFollowing={isFollowing}
@@ -1320,7 +1302,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                   onFollowQROpen={() => setFollowQROpen(true)}
                   onToggleFollow={handleToggleFollow}
                   onTabChange={(id) => handleTabChange(id)}
-                  onDonate={openDonateForCampaign}
                   canFollow={!!user}
                 />
               </aside>
@@ -1343,7 +1324,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                   isOwnProfile={isOwnProfile}
                   profileCampaignStats={profileCampaignStats}
                   allActions={allActions}
-                  btcPrice={btcPrice}
                   campaigns={profileCampaignStats.campaigns}
                   pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
                 />
@@ -1392,8 +1372,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                       onToggleFollow={handleToggleFollow}
                       onMoreMenuOpen={() => setMoreMenuOpen(true)}
                       onFollowQROpen={() => setFollowQROpen(true)}
-                      onchainCampaigns={profileCampaignStats.campaigns.filter((c) => !!c.wallets?.onchain)}
-                      onDonate={openDonateForCampaign}
                     />
                   </div>
 
@@ -1424,16 +1402,11 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                     canFollow={!!user}
                     followersCount={followersCount}
                     followingCount={profileFollowing?.count ?? 0}
-                    totalRaisedSats={profileCampaignStats.totalRaisedSats}
-                    btcPrice={btcPrice}
-                    onchainCampaigns={profileCampaignStats.campaigns.filter((c) => !!c.wallets?.onchain)}
                     onToggleFollow={handleToggleFollow}
                     onMoreMenuOpen={() => setMoreMenuOpen(true)}
                     onFollowQROpen={() => setFollowQROpen(true)}
-                    onDonate={openDonateForCampaign}
                     onFollowersOpen={() => setFollowersModalOpen(true)}
                     onFollowingOpen={() => setFollowingModalOpen(true)}
-                    onTabChange={handleTabChange}
                   />
 
                   {/* Tab bar — sticky to the top of the page scroll once
@@ -1451,7 +1424,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
                       isOwnProfile={isOwnProfile}
                       profileCampaignStats={profileCampaignStats}
                       allActions={allActions}
-                      btcPrice={btcPrice}
                       campaigns={profileCampaignStats.campaigns}
                       pledges={(allActions ?? []).filter((a) => a.pubkey === pubkey)}
                     />
@@ -1495,24 +1467,6 @@ function FollowersListModal({ pubkey, open, onOpenChange, displayName }: Followe
             open={followersModalOpen}
             onOpenChange={setFollowersModalOpen}
             displayName={displayName}
-          />
-        )}
-
-        {/* Donate dialog — driven by the header Donate button and (later)
-            campaign cards / dropdown rows. Resets the active campaign on
-            close so reopening starts fresh. */}
-        {donateCampaign && (
-          <DonateDialog
-            campaign={donateCampaign}
-            open={donateOpen}
-            onOpenChange={(open) => {
-              setDonateOpen(open);
-              if (!open) {
-                // Invalidate donations cache so the new total reflects in stats.
-                queryClient.invalidateQueries({ queryKey: ['campaign-donations', 'events', donateCampaign.aTag] });
-              }
-            }}
-            btcPrice={btcPrice}
           />
         )}
 

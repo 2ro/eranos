@@ -35,7 +35,6 @@ The app may interact with the following third-party services:
 
 - **Nostr relays:** For reading and publishing events
 - **Blossom servers:** For file uploads and media hosting
-- **Lightning Network / NWC:** For processing zap payments, if you choose to use them
 - **NIP-05 providers:** For verifying Nostr addresses
 
 Each of these services is operated independently and may have its own data handling practices.

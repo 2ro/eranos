@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'spot.agora.app',
-  appName: 'Agora',
+  appId: 'fund.eranos.app',
+  appName: 'Eranos',
   webDir: 'dist',
   server: {
     androidScheme: 'https',
@@ -16,7 +16,7 @@ const config: CapacitorConfig = {
   ios: {
     backgroundColor: '#14161f',
     contentInset: 'never',
-    scheme: 'Agora'
+    scheme: 'Eranos'
   },
 };
 

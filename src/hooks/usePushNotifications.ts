@@ -51,7 +51,6 @@ function getOrCreateSubscriptionId(): string {
 const TEMPLATE_ID_TO_PREF_KEY: Record<string, keyof NonNullable<EncryptedSettings['notificationPreferences']>> = {
   reactions: 'reactions',
   reposts: 'reposts',
-  zaps: 'zaps',
   mentions: 'mentions',
   comments: 'comments',
 };

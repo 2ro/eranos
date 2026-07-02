@@ -40,7 +40,6 @@ const FeedSettingsSchema = z.looseObject({
   feedIncludeReposts: z.boolean().optional(),
   feedIncludeGenericReposts: z.boolean().optional(),
   feedIncludeReactions: z.boolean().optional(),
-  feedIncludeZaps: z.boolean().optional(),
   feedIncludeArticles: z.boolean().optional(),
   showArticles: z.boolean().optional(),
   showHighlights: z.boolean().optional(),
@@ -152,30 +151,6 @@ export const AppConfigSchema = z.object({
   lowBandwidthMode: z.boolean(),
   torEnabled: z.boolean(),
   curatorPubkey: z.string().regex(/^[0-9a-f]{64}$/i).optional(),
-  /**
-   * Ordered list of Esplora REST roots tried in failover order. Accepts the
-   * legacy single-string form and normalizes it to a one-element array so
-   * existing localStorage configs keep working.
-   */
-  esploraApis: z.union([
-    z.string().url().transform((s) => [s]),
-    z.array(z.string().url()).min(1),
-  ]),
-  blockbookBaseUrl: z.string().url(),
-  /**
-   * BIP-352 tweak-data indexer URL. Empty string disables silent-payment
-   * scanning. When set, must be a valid http(s) URL with no trailing slash.
-   */
-  bip352IndexerUrl: z.union([
-    z.literal(''),
-    z.string().url(),
-  ]).optional().default(''),
-  /**
-   * Silent-payment scan fetch concurrency. Clamped to [1, 32] at runtime in
-   * `useHdWalletSp`; the schema only enforces a positive integer.
-   */
-  bip352ScanConcurrency: z.number().int().positive().optional(),
-  currencyDisplay: z.enum(['usd', 'sats']).optional(),
   sidebarWidgets: z.array(z.object({
     id: z.string(),
     height: z.number().optional(),
@@ -185,6 +160,9 @@ export const AppConfigSchema = z.object({
   aiModel: z.string().optional(),
   aiSystemPrompt: z.string().optional(),
   translateWorkerUrl: z.string().optional(),
+  goblinPayUrl: z.string().optional(),
+  goblinPayApiToken: z.string().optional(),
+  grinNodeUrl: z.string().optional(),
 });
 
 // ─── BuildConfigSchema (build-time app config) ───────────────────────
@@ -244,7 +222,6 @@ export const EncryptedSettingsSchema = z.looseObject({
   notificationPreferences: z.object({
     reactions: z.boolean().optional(),
     reposts: z.boolean().optional(),
-    zaps: z.boolean().optional(),
     mentions: z.boolean().optional(),
     comments: z.boolean().optional(),
     badges: z.boolean().optional(),

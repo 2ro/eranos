@@ -13,8 +13,6 @@ interface ProfilePledgesTabProps {
   isOwnProfile: boolean;
   /** Pledges authored by this pubkey. Already filtered upstream. */
   pledges: Action[];
-  /** BTC price for sats↔USD conversion in pledge amount labels. */
-  btcPrice: number | undefined;
   /** True while the underlying useActions() query is still in flight. */
   isLoading: boolean;
 }
@@ -24,14 +22,13 @@ interface ProfilePledgesTabProps {
  * mirrors the `/pledges` (`ActionsPage`) directory styling.
  *
  * v1 scope per the design plan: pledges *created* by the user.
- * "Pledges backed" (zapped submissions on others' pledges) is deferred to v2.
+ * "Pledges backed" (backed submissions on others' pledges) is deferred to v2.
  */
 export function ProfilePledgesTab({
   pubkey,
   displayName,
   isOwnProfile,
   pledges,
-  btcPrice,
   isLoading,
 }: ProfilePledgesTabProps) {
   const { t } = useTranslation();
@@ -90,7 +87,7 @@ export function ProfilePledgesTab({
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
             {active.map((pledge) => (
-              <PledgeCard key={pledge.event.id} action={pledge} btcPrice={btcPrice} />
+              <PledgeCard key={pledge.event.id} action={pledge} />
             ))}
           </div>
         </section>
@@ -103,7 +100,7 @@ export function ProfilePledgesTab({
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
             {ended.map((pledge) => (
-              <PledgeCard key={pledge.event.id} action={pledge} btcPrice={btcPrice} isExpired />
+              <PledgeCard key={pledge.event.id} action={pledge} isExpired />
             ))}
           </div>
         </section>

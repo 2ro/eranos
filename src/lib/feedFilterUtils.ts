@@ -37,7 +37,7 @@ const AGORA_NATIVE_KIND_OPTIONS: KindOption[] = [
  *
  * Includes Agora-native kinds plus the existing-NIP kinds Agora foregrounds
  * (campaigns, pledges, communities, posts, articles, events, polls, photos,
- * videos). Excludes social-signal kinds (reactions, reposts, zaps) and
+ * videos). Excludes social-signal kinds (reactions, reposts) and
  * stats snapshots, which users rarely filter on directly.
  */
 export const AGORA_PRESET_KIND_VALUES: readonly string[] = [

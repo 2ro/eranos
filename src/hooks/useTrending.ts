@@ -9,12 +9,10 @@ interface EventStats {
   reposts: number;
   quotes: number;
   reactions: number;
-  zapAmount: number;
-  zapCount: number;
   reactionEmojis: ResolvedEmoji[];
 }
 
-const EMPTY_STATS: EventStats = { replies: 0, reposts: 0, quotes: 0, reactions: 0, zapAmount: 0, zapCount: 0, reactionEmojis: [] };
+const EMPTY_STATS: EventStats = { replies: 0, reposts: 0, quotes: 0, reactions: 0, reactionEmojis: [] };
 
 /** Check whether a kind falls in an addressable range (NIP-33 kinds 30000-39999). */
 function isAddressableKind(kind: number): boolean {
@@ -29,7 +27,7 @@ function getAddrString(event: NostrEvent): string | undefined {
 }
 
 /**
- * Counts engagement (replies, reposts, quotes, reactions, zaps) for a given event.
+ * Counts engagement (replies, reposts, quotes, reactions) for a given event.
  * For addressable events (kinds 30000-39999 + 0, 3), uses NIP-85 kind 30384 (addr stats).
  * For regular events, uses NIP-85 kind 30383 (event stats).
  *
@@ -50,8 +48,6 @@ export function useEventStats(eventId: string | undefined, event?: NostrEvent) {
       reposts: source.data.repostCount,
       quotes: 0,
       reactions: source.data.reactionCount,
-      zapAmount: source.data.zapAmount,
-      zapCount: source.data.zapCount,
       reactionEmojis: [],
     };
   }, [source.data]);

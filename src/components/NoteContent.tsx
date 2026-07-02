@@ -9,7 +9,6 @@ import { useProfileUrl } from '@/hooks/useProfileUrl';
 import { LinkEmbed } from '@/components/LinkEmbed';
 import { EmbeddedNote } from '@/components/EmbeddedNote';
 import { EmbeddedNaddr } from '@/components/EmbeddedNaddr';
-import { LightningInvoiceCard } from '@/components/LightningInvoiceCard';
 import { ProxiedImage } from '@/components/ProxiedImage';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { AudioVisualizer } from '@/components/AudioVisualizer';
@@ -202,8 +201,7 @@ type ContentToken =
   | { type: 'naddr-embed'; addr: AddrCoords; url?: string }
   | { type: 'nostr-link'; id: string; raw: string }
   | { type: 'hashtag'; tag: string; raw: string }
-  | { type: 'relay-link'; url: string }
-  | { type: 'lightning-invoice'; invoice: string };
+  | { type: 'relay-link'; url: string };
 
 /**
  * Regex segment matching a single visual emoji unit, including:
@@ -264,12 +262,10 @@ export function NoteContent({
 }: NoteContentProps) {
   const tokens = useMemo(() => {
     const text = event.content;
-    // Match: BOLT11 invoices | URLs | nostr:-prefixed NIP-19 ids | @-prefixed or bare NIP-19 ids | hashtags
-    // BOLT11: optional "lightning:" prefix + lnbc/lntb/lnbcrt/lntbs + bech32 data (case-insensitive)
+    // Match: URLs | nostr:-prefixed NIP-19 ids | @-prefixed or bare NIP-19 ids | hashtags
     // NIP-19 ids can appear anywhere (with optional @ prefix that gets consumed)
     const regex = new RegExp(
-      '(?:lightning:)?(ln(?:bc|tb|bcrt|tbs)\\d*[munp]?1[023456789acdefghjklmnpqrstuvwxyz]+)'
-      + '|((?:https?|wss?):\\/\\/[^\\s]+)'
+      '((?:https?|wss?):\\/\\/[^\\s]+)'
       + '|nostr:(npub1|note1|nprofile1|nevent1|naddr1)([023456789acdefghjklmnpqrstuvwxyz]+)'
       + '|@?(npub1|note1|nprofile1|nevent1|naddr1)([023456789acdefghjklmnpqrstuvwxyz]+)'
       + `|(${HASHTAG_PATTERN})`,
@@ -283,10 +279,9 @@ export function NoteContent({
 
     while ((match = regex.exec(text)) !== null) {
       let [fullMatch] = match;
-      const bolt11 = match[1];
-      let url = match[2];
-      const hashtag = match[7];
-      const { 3: nostrPrefix, 4: nostrData, 5: barePrefix, 6: bareData } = match;
+      let url = match[1];
+      const hashtag = match[6];
+      const { 2: nostrPrefix, 3: nostrData, 4: barePrefix, 5: bareData } = match;
       const index = match.index;
       hadMatches = true;
 
@@ -295,9 +290,7 @@ export function NoteContent({
         result.push({ type: 'text', value: text.substring(lastIndex, index) });
       }
 
-      if (bolt11) {
-        result.push({ type: 'lightning-invoice', invoice: bolt11.toLowerCase() });
-      } else if (url) {
+      if (url) {
         // Strip common trailing punctuation that's likely not part of the URL
         // This handles cases like "(https://example.com)" or "Check this: https://example.com."
         const trailingPunctMatch = url.match(/^(.*?)([.,;:!?)\]]+)$/);
@@ -496,7 +489,7 @@ export function NoteContent({
     for (let i = 0; i < result.length; i++) {
       const token = result[i];
       const isBlock = token.type === 'image-embed' || token.type === 'media-embed' || token.type === 'link-embed' || token.type === 'nevent-embed'
-        || (token.type === 'naddr-embed' && !token.url) || token.type === 'lightning-invoice';
+        || (token.type === 'naddr-embed' && !token.url);
 
       if (isBlock) {
         // Strip all trailing whitespace from the preceding text token.
@@ -807,11 +800,6 @@ export function NoteContent({
                 {token.url}
               </Link>
             );
-          case 'lightning-invoice':
-            if (disableEmbeds) {
-              return <span key={i} className="text-primary break-all">{token.invoice}</span>;
-            }
-            return <LightningInvoiceCard key={i} invoice={token.invoice} />;
         }
       })}
 

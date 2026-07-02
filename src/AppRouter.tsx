@@ -10,7 +10,6 @@ import { VersionCheck } from "./components/VersionCheck";
 import { MinimizedAudioBar } from "./components/MinimizedAudioBar";
 import { AudioNavigationGuard } from "./components/AudioNavigationGuard";
 import { TorStatusBanner } from "./components/TorStatusBanner";
-import { VenezuelaReliefPopup } from "./components/VenezuelaReliefPopup";
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useProfileUrl } from "./hooks/useProfileUrl";
 import { cn } from "@/lib/utils";
@@ -58,14 +57,7 @@ const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage").then(m 
 const ProfileSettings = lazy(() => import("./pages/ProfileSettings").then(m => ({ default: m.ProfileSettings })));
 const SearchPage = lazy(() => import("./pages/SearchPage").then(m => ({ default: m.SearchPage })));
 const SettingsPage = lazy(() => import("./pages/SettingsPage").then(m => ({ default: m.SettingsPage })));
-const WalletPage = lazy(() => import("./pages/WalletPage").then(m => ({ default: m.WalletPage })));
-const WalletMigrateV1Page = lazy(() => import("./pages/WalletMigrateV1Page").then(m => ({ default: m.WalletMigrateV1Page })));
-const WalletDoubleTweakFixPage = lazy(() => import("./pages/WalletDoubleTweakFixPage").then(m => ({ default: m.WalletDoubleTweakFixPage })));
-const WalletRecoveryPage = lazy(() => import("./pages/WalletRecoveryPage").then(m => ({ default: m.WalletRecoveryPage })));
-const WalletSettingsPage = lazy(() => import("./pages/WalletSettingsPage").then(m => ({ default: m.WalletSettingsPage })));
-const LegacyWalletRecoveryPage = lazy(() => import("./pages/LegacyWalletRecoveryPage").then(m => ({ default: m.LegacyWalletRecoveryPage })));
 const RemoteLoginSuccessPage = lazy(() => import("./pages/RemoteLoginSuccessPage").then(m => ({ default: m.RemoteLoginSuccessPage })));
-const VenezuelaReliefPage = lazy(() => import("./pages/VenezuelaReliefPage").then(m => ({ default: m.VenezuelaReliefPage })));
 
 /** Redirects /profile to the user's canonical profile URL (nip05 or npub). */
 function ProfileRedirect() {
@@ -148,11 +140,6 @@ export function AppRouter() {
       {/* App-wide Tor status banner. Must live inside BrowserRouter — it
           renders a <Link> to the Tor settings, which needs Router context. */}
       <TorStatusBanner />
-      {/* Site-wide Venezuela earthquake relief appeal — shows once per
-          browser session on a fresh load of any route. Lives inside
-          BrowserRouter because it renders <Link>s to the relief page and
-          campaign browse. Remove when the relief response winds down. */}
-      <VenezuelaReliefPopup />
       <OnboardingGate>
         <Routes>
         {/* Narrow layout — `max-w-3xl` center column. The default for
@@ -169,26 +156,9 @@ export function AppRouter() {
           <Route path="/settings/appearance" element={<AppearanceSettingsPage />} />
           <Route path="/settings/language" element={<LanguageSettingsPage />} />
           <Route path="/settings/profile" element={<ProfileSettings />} />
-          <Route path="/settings/wallet" element={<WalletSettingsPage />} />
           <Route path="/settings/notifications" element={<NotificationSettings />} />
           <Route path="/settings/advanced" element={<AdvancedSettingsPage />} />
           <Route path="/settings/network" element={<NetworkSettingsPage />} />
-          <Route path="/wallet" element={<WalletPage />} />
-          <Route path="/wallet/legacy" element={<LegacyWalletRecoveryPage />} />
-          {/* Old nested paths kept as redirects so any existing links / muscle
-              memory still land on the right page. `/wallet/settings` was an
-              intermediate hub that has been replaced by an overflow menu on
-              `/wallet`, so it redirects to the wallet home. `/wallet/backup`
-              is now an in-page dialog opened from that menu, so it also
-              redirects home. */}
-          <Route path="/wallet/settings" element={<Navigate to="/wallet" replace />} />
-          <Route path="/wallet/backup" element={<Navigate to="/wallet" replace />} />
-          <Route path="/wallet/settings/backup" element={<Navigate to="/wallet" replace />} />
-          <Route path="/wallet/settings/legacy" element={<Navigate to="/wallet/legacy" replace />} />
-          <Route path="/wallet/recovery" element={<WalletRecoveryPage />} />
-          <Route path="/wallet/migrate-v1" element={<WalletMigrateV1Page />} />
-          <Route path="/wallet/double-tweak-fix" element={<WalletDoubleTweakFixPage />} />
-          <Route path="/bitcoin" element={<Navigate to="/wallet" replace />} />
           {/* Legacy /help routes redirect to /about so existing links keep
               working. The About page and the two guides themselves live
               under the wide layout below. */}
@@ -246,11 +216,6 @@ export function AppRouter() {
               before the "activist" → "recipient" copy change. Redirect so
               external links and bookmarks still resolve. */}
           <Route path="/about/activists" element={<Navigate to="/about/recipients" replace />} />
-          {/* Dedicated, shareable Venezuela earthquake relief page. Wide
-              layout so its hero spans the viewport like /about. Must be
-              declared above `/:nip19`, which would otherwise swallow this
-              single-segment path. */}
-          <Route path="/venezuela-relief" element={<VenezuelaReliefPage />} />
           {/* NIP-19 route for npub1, note1, naddr1, nevent1, nprofile1.
               Goes through the wide layout because the dispatch may resolve to
               a profile, campaign, action, or community page — all of which

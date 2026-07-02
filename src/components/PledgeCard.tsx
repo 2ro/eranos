@@ -18,7 +18,6 @@ import { cn } from '@/lib/utils';
 
 interface PledgeCardProps {
   action: Action;
-  btcPrice: number | undefined;
   /** Presentation variant for standalone surfaces. Inline note cards use PledgeInlinePreview instead. */
   variant?: 'grid' | 'shelf' | 'rail';
   /** Force an ended badge from a parent that already split active/ended sections. */
@@ -36,7 +35,6 @@ interface PledgeCardProps {
 
 export function PledgeCard({
   action,
-  btcPrice,
   variant = 'grid',
   isExpired,
   showAuthor = false,
@@ -124,13 +122,13 @@ export function PledgeCard({
           {isRail ? (
             <div className="flex items-baseline justify-between gap-2 text-xs">
               <span className="text-muted-foreground uppercase tracking-wide font-semibold">{t('pledges.card.pledged')}</span>
-              <span className="text-foreground font-bold tabular-nums">{formatPledgeAmount(action.bounty, btcPrice)}</span>
+              <span className="text-foreground font-bold tabular-nums">{formatPledgeAmount(action.bounty)}</span>
             </div>
           ) : (
             <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-primary">{t('pledges.card.pledged')}</p>
               <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
-                {formatPledgeAmount(action.bounty, btcPrice)}
+                {formatPledgeAmount(action.bounty)}
               </p>
             </div>
           )}
