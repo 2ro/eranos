@@ -174,12 +174,12 @@
       "subtitle": "İkisini de daha sonra yapabilirsiniz. Bu sadece sonraki adımları size göre uyarlamamıza yardımcı olur.",
       "creator": {
         "title": "Bir kampanya başlatın",
-        "description": "Önemsediğiniz bir dava için Bitcoin toplayın.",
-        "finderNote": "Bağışçılar satoshileri doğrudan cüzdanınıza gönderir."
+        "description": "Önemsediğiniz bir dava için Grin toplayın.",
+        "finderNote": "Bağışçılar GRIN'i doğrudan cüzdanınıza gönderir."
       },
       "donor": {
         "title": "Kampanyalara bağış yapın",
-        "description": "Davaları Bitcoin ile destekleyin.",
+        "description": "Davaları Grin ile destekleyin.",
         "finderNote": "Bağışınız doğrudan kampanya sahibinin cüzdanına gider."
       },
       "verifier": {
@@ -198,7 +198,7 @@
     "secure": {
       "title": "Anahtarınızı kaydedin",
       "subtitle": "Dosyayı indirin ve güvenli bir yerde saklayın. Bir parola yöneticisi işe yarar.",
-      "couplingNote": "Hesabınız ve cüzdanınız bu anahtarı paylaşır. Nostr paylaşımlarınızı imzalar ve Eranos üzerindeki Bitcoin cüzdanınızı açar.",
+      "couplingNote": "Bu anahtar Eranos'taki kimliğinizdir. Nostr paylaşımlarınızı, kampanyalarınızı ve kampanya toplamlarına sayılan bağış makbuzlarını imzalar.",
       "permanenceHeadline": "Bu anahtarı kaybederseniz kurtarmanın bir yolu yoktur.",
       "permanenceBody": "Sıfırlama yok, destek hattı yok, e-posta kurtarma yok. Devam etmeden önce kaydedin.",
       "button": "İndir ve devam et",
@@ -574,7 +574,7 @@
       "seoTitle": "Bağışçı Rehberi",
       "seoDescription": "{{appName}}'da bağışın nasıl işlediği ve gizliliğinizi nasıl koruyacağınız.",
       "title": "Bağışçı Rehberi",
-      "subtitle": "Gerçek Bitcoin, doğrudan gönderim. Tüm süreç tek bir kısa sayfada."
+      "subtitle": "Gerçek Grin, doğrudan gönderim. Tüm süreç tek bir kısa sayfada."
     },
     "recipientGuide": {
       "seoTitle": "Alıcı Rehberi",
@@ -606,13 +606,13 @@
   },
   "about": {
     "seoTitle": "Hakkında",
-    "seoDescription": "{{appName}} nasıl çalışır: Bitcoin ve Nostr aracılığıyla alıcıları durdurulamaz finansmana bağlamak.",
+    "seoDescription": "{{appName}} nasıl çalışır: Grin ve Nostr aracılığıyla alıcıları durdurulamaz finansmana bağlamak.",
     "hero": {
       "eyebrow": "{{appName}} hakkında",
       "headlinePart1": "",
       "headlineAppName": "{{appName}}",
       "headlinePart2": "nasıl çalışır.",
-      "body": "{{appName}}, Nostr ve Bitcoin üzerine kurulu sansüre dayanıklı bir bağış platformudur. Dondurulmuş banka hesapları yok. Kurumsal kapatmalar yok. Sadece davanıza inanan insanlardan doğrudan destek.",
+      "body": "{{appName}}, Nostr ve Grin üzerine kurulu sansüre dayanıklı bir bağış platformudur. Dondurulmuş banka hesapları yok. Kurumsal kapatmalar yok. Sadece davanıza inanan insanlardan doğrudan destek.",
       "trustChips": {
         "decentralized": "Merkeziyetsiz",
         "openSource": "Açık kaynak",
@@ -630,7 +630,7 @@
         "raised": "toplandı",
         "ofGoal": "/ 10.000 $",
         "donorsLine": "247 bağışçı · 12 ülke",
-        "donate": "Bitcoin bağışla"
+        "donate": "Grin bağışla"
       }
     },
     "howItWorks": {
@@ -640,12 +640,12 @@
       "step1": {
         "imageAlt": "Karanlık uzayda yüzen parlak turuncu kriptografik bir anahtar, kendine egemen kimliği simgeliyor",
         "title": "Alıcılar saniyeler içinde kaydolur.",
-        "body": "Banka yok. Belge yok. Onay yok. Bir alıcı {{appName}}'da hesap oluşturduğu anda, dünyanın her yerinden destek almaya hazır bir Bitcoin adresine sahip olur."
+        "body": "Banka yok. Belge yok. Onay yok. Bir alıcı {{appName}}'da hesap oluşturur, kendi Grin cüzdanındaki alım adresini kampanyasına ekler ve dünyanın her yerinden destek kabul edebilir."
       },
       "step2": {
-        "imageAlt": "Karanlık bir dünya haritası üzerinden uçan parlak bir Bitcoin sikkesi, anında sınır ötesi ödemeyi simgeliyor",
-        "title": "Bağışçılar Bitcoin'i doğrudan gönderir.",
-        "body": "Bağışçılar zaten kullandıkları herhangi bir cüzdandan (Cash App, Coinbase, Strike, donanım cüzdanı) doğrudan alıcıya Bitcoin gönderir. {{appName}} paraya hiç dokunmaz. Arada sunucu yok, saklayıcı yok."
+        "imageAlt": "Karanlık bir dünya haritası üzerinden uçan parlak bir Grin sikkesi, anında sınır ötesi ödemeyi simgeliyor",
+        "title": "Bağışçılar Grin'i doğrudan gönderir.",
+        "body": "Bağışçılar herhangi bir Grin cüzdanından öder; ya kampanyanın GoblinPay ödeme sayfası üzerinden ya da doğrudan grin1 Slatepack adresine. {{appName}} paraya hiç dokunmaz. İşlem, bağışçının cüzdanından alıcının cüzdanına gider."
       },
       "step3": {
         "imageAlt": "Avucundan sıcak turuncu ışık yayılan açık bir el, alma ve özgürlüğü simgeliyor",
@@ -661,8 +661,8 @@
         "description": "Eranos nedir, kim yaptı ve ne kadara mal olur."
       },
       "chapter2": {
-        "label": "Bitcoin bağışları",
-        "description": "Ödemeler nasıl çalışır, neden zincir üstü, neden açık, neden bu takaslar."
+        "label": "Grin bağışları",
+        "description": "Ödemeler nasıl çalışır, neden Grin, neler gizli kalır ve takaslar."
       },
       "chapter3": {
         "label": "Nostr hakkında",
@@ -677,8 +677,8 @@
         "imageAlt": "Akşamüstü bir Avrupa şehrinin sokaklarında yürüyen kapüşonlu protestocular, yanan kırmızı meşaleler ve 'FREEDOM' ile 'LIBERTAD' pankartları taşıyor",
         "role": "Bağışçılar için",
         "title": "Bankaların desteklemediği davaları destekleyin.",
-        "description": "Bir ödeme işlemcisinden izin istemeden, dünyanın herhangi bir yerindeki alıcılara ve hareketlere doğrudan Bitcoin gönderin.",
-        "bullet1": "Zaten sahip olduğunuz herhangi bir Bitcoin cüzdanını kullanın.",
+        "description": "Bir ödeme işlemcisinden izin istemeden, dünyanın herhangi bir yerindeki alıcılara ve hareketlere doğrudan Grin gönderin.",
+        "bullet1": "Goblin veya grin-wallet gibi herhangi bir Grin cüzdanından ödeyin.",
         "bullet2": "Bağışlar doğrudan alıcıya ulaşır. Saklayıcı yok, aracı yok.",
         "cta": "Bağışçı Rehberi'ni oku"
       },
@@ -822,7 +822,7 @@
       "errorDescriptionRequired": "Açıklama zorunludur.",
       "errorPledgeRequired": "Taahhüt tutarı zorunludur.",
       "errorPledgeInvalid": "Taahhüt tutarı pozitif bir USD tutarı olmalıdır.",
-      "errorPriceUnavailable": "Taahhüt tutarını hesaplamak için BTC/USD fiyatı bekleniyor.",
+      "errorPriceUnavailable": "Taahhüt tutarını hesaplamak için döviz kuru bekleniyor.",
       "errorCoverInvalid": "Kapak resmi geçerli bir https:// URL'i olmalıdır.",
       "errorDeadlinePast": "Son tarih geçmişte olamaz.",
       "wizard": {
@@ -1226,7 +1226,7 @@
       "seoTitle": "Fon Toplama Kampanyaları",
       "seoDescription": "Dünyayı durdurulamaz finansmana bağlıyoruz.",
       "heroTagline": "Dünyayı<1></1><0>durdurulamaz</0> finansmana bağlıyoruz.",
-      "heroBody": "Bitcoin'i doğrudan dünyanın her yerindeki destekçilerden toplayın. Her bağış cüzdanınıza doğrudan ulaşır; aracı yok, geri ödeme yok, fonlarınızı tutan bir platform yok.",
+      "heroBody": "Grin'i doğrudan dünyanın her yerindeki destekçilerden toplayın. Her bağış doğrudan cüzdanınıza ulaşır; aracı yok, ters ibraz yok, fonlarınızı tutan bir platform yok.",
       "startCampaign": "Kampanya başlat",
       "howItWorks": "Nasıl çalışır",
       "featuredTitle": "Öne çıkan kampanyalar",
@@ -1248,7 +1248,7 @@
       "whyDifferent": {
         "eyebrow": "Neden {{appName}}",
         "title": "Farklı inşa edildi.",
-        "lede": "Bağışçıdan alıcıya doğrudan Bitcoin. Arada platform yok, parayı tutan emanetçi yok, izin gerekmiyor.",
+        "lede": "Bağışçıdan alıcıya doğrudan Grin. Arada platform yok, parayı tutan emanetçi yok, izin gerekmiyor.",
         "block1": {
           "heading": "GoFundMe'den farklı",
           "body": "Hiçbir platform bağışlarınızı donduramaz, iade talep edemez veya politika anlaşmazlıkları nedeniyle kampanyanızı sonlandıramaz. Arada Stripe, Visa veya banka yok; kampanya ortasında sizi kesemezler.",
@@ -1257,8 +1257,8 @@
           "bullet3": "Sıfır platform ücreti"
         },
         "block2": {
-          "heading": "Diğer ‘Bitcoin’ platformlarından farklı",
-          "body": "Arızalanacak veya çevrimdışı kalacak merkezi Lightning node'u, emanetçi ya da LSP yok. Fonlar doğrudan Bitcoin üzerinde kontrol ettiğiniz cüzdana aktarılır. {{appName}} yarın ortadan kaybolsa bile her kampanya çalışmaya devam eder.",
+          "heading": "Diğer kripto platformlarından farklı",
+          "body": "Arızalanacak veya çevrimdışı kalacak emanet cüzdan, barındırılan node ya da ödeme işlemcisi yok. Fonlar Grin zincirinde kontrol ettiğiniz bir cüzdana aktarılır. {{appName}} yarın ortadan kaybolsa bile her kampanya çalışmaya devam eder.",
           "bullet1": "Boşaltılacak veya dondurulacak emanet cüzdan yok",
           "bullet2": "Size ait cüzdana on-chain aktarım",
           "bullet3": "{{appName}} yok olsa bile çalışır"
@@ -1289,7 +1289,7 @@
       "heroKicker": "Kampanyalar",
       "heroHeading": "Her dava,",
       "heroHeadingLine2": "tek bir yerde.",
-      "heroBody": "Nostr'da yayımlanan her bağış kampanyası tek bir yerde toplandı. Ağın tamamına göz atın, sizin için önemli bir dava bulun ve doğrudan Bitcoin ile destekleyin.",
+      "heroBody": "Nostr'da yayımlanan her bağış kampanyası tek bir yerde toplandı. Ağın tamamına göz atın, sizin için önemli bir dava bulun ve doğrudan Grin ile destekleyin.",
       "campaignsCount_one": "ağdaki kampanya",
       "campaignsCount_other": "ağdaki kampanya",
       "verifyCampaigns": "Kampanyaları doğrula"
@@ -1397,7 +1397,7 @@
       "notifications": "Bildirimler",
       "notificationsDesc": "Anlık bildirim tercihleri.",
       "advanced": "Gelişmiş",
-      "advancedDesc": "Cüzdan, sistem ve ileri kullanıcı seçenekleri.",
+      "advancedDesc": "Sistem ve ileri kullanıcı seçenekleri.",
       "organizers": "Organizatörler",
       "organizersDesc": "Ülke akışlarına gönderi sabitleyebilen ülke organizatörleri atayın."
     },
@@ -1436,8 +1436,8 @@
     },
     "advanced": {
       "title": "Gelişmiş",
-      "subtitle": "Cüzdan bağlantıları, sistem yapılandırması ve ileri kullanıcılar için diğer gelişmiş seçenekler.",
-      "intro": "Cüzdan bağlantıları, sistem yapılandırması ve diğer gelişmiş seçenekler.",
+      "subtitle": "Sistem yapılandırması ve ileri kullanıcılar için diğer gelişmiş seçenekler.",
+      "intro": "Sistem yapılandırması ve diğer gelişmiş seçenekler.",
       "torHeading": "Tor",
       "torToggle": "Trafiği Tor üzerinden yönlendir",
       "torToggleDesc": "Daha güçlü gizlilik için Tor ağı üzerinden rölelere bağlanır ve medya yükler. Daha yavaş bir performans ve Tor bağlanırken kısa bir bekleme süresi bekleyin.",
@@ -2070,7 +2070,7 @@
       "heading": "Anahtarınız",
       "extensionBody": "Bir tarayıcı uzantısıyla (NIP-07) giriş yaptınız. Gizli anahtarınız orada saklanır — onu uzantının kendisinden yönetin veya dışa aktarın.",
       "bunkerBody": "Bir uzak imzalayıcıyla (NIP-46) giriş yaptınız. Gizli anahtarınız o imzalayıcıda tutulur ve {{appName}}'dan dışa aktarılamaz.",
-      "explainer": "Bu gizli anahtar {{appName}}'daki hesabınızı kontrol eder. Buna sahip olan herkes sizin adınıza paylaşım yapabilir ve sizi taklit edebilir. Bir parola yöneticisinde ya da yalnızca sizin erişebileceğiniz başka bir yerde saklayın.",
+      "explainer": "Bu gizli anahtar {{appName}}'daki hesabınızı kontrol eder. Buna sahip olan herkes sizin adınıza paylaşım yapabilir, kampanyalarınızı düzenleyebilir ve sizin adınıza yayın yapabilir. Bir parola yöneticisinde ya da yalnızca sizin erişebileceğiniz başka bir yerde saklayın. Grin fonlarınız ayrıdır: bu anahtarda değil, kendi Grin cüzdanınızda ve onun tohum cümlesinde durur.",
       "warning": "Gizli anahtarınızı ASLA kimseyle paylaşmayın. Ekran görüntüsünü almaktan ya da bir parola yöneticisi dışında herhangi bir yere yapıştırmaktan kaçının. Paylaşılırsa, başkaları hesabınıza erişebilir.",
       "aria": "Gizli anahtarınız",
       "copyAria": "Gizli anahtarı kopyala",
@@ -2092,7 +2092,7 @@
         "label": "Eranos Hakkında"
       },
       "payments": {
-        "label": "Eranos'da Bitcoin Bağışları"
+        "label": "Eranos'ta Grin Bağışları"
       },
       "about-nostr": {
         "label": "Nostr Hakkında"
@@ -2105,14 +2105,14 @@
       "what-is-ditto": {
         "question": "{{appName}} nedir?",
         "answer": [
-          "{{appName}}, doğrudan alıcılara — açık ya da gizli — Bitcoin bağışları göndermek için bir platformdur. Arada hiçbir aracı, ödeme işlemcisi ya da dondurulabilecek bir hesap yoktur.",
+          "{{appName}}, Grin bağışlarını doğrudan alıcılara göndermek için bir platformdur. Arada hiçbir aracı, ödeme işlemcisi ya da dondurulabilecek bir hesap yoktur.",
           "{{appName}} Nostr üzerine kuruludur, bu yüzden kimliğiniz bu siteye kilitli değildir — size aittir."
         ]
       },
       "cost-to-use": {
         "question": "{{appName}} ücretli mi?",
         "answer": [
-          "**Hayır.** {{appName}} hiçbir platform ücreti almaz. Bağış yaptığınızda yalnızca madencilere giden Bitcoin ağı ücretini ödersiniz — bize değil."
+          "**Hayır.** {{appName}} hiçbir platform ücreti almaz. Bağış yaptığınızda yalnızca madencilere giden küçücük Grin ağ ücretini ödersiniz, bize değil."
         ]
       },
       "who-made-this": {
@@ -2125,37 +2125,37 @@
         "question": "Buradaki \"sansüre dayanıklı\" ne anlama geliyor?",
         "answer": [
           "Bağışçı ile alıcı arasında hiçbir şirket yer almaz. {{appName}} fonları tutmaz ve adresi donduramaz.",
-          "Bitcoin ağı çalıştığı sürece bağışlar gönderilebilir ve alınabilir. {{appName}}'nın kendisinin çevrimdışı olması bunları durdurmaz."
+          "Grin ağı çalıştığı sürece bağışlar gönderilebilir ve alınabilir. {{appName}}'nın kendisinin çevrimdışı olması bunları durdurmaz."
         ]
       },
       "why-onchain": {
-        "question": "Neden Bitcoin?",
+        "question": "Neden Grin?",
         "answer": [
-          "Bitcoin dünyadaki en yaygın desteklenen ve sansüre en dayanıklı ödeme altyapısıdır. Her Bitcoin cüzdanı bunu gönderebilir.",
-          "{{appName}}'da alıcılar nasıl alacaklarını seçer: maksimum erişim için **açık** (normal bir Bitcoin adresi), izlenemez bağışlar için **gizli** (sessiz ödemeler) ya da her bağışçının cüzdanı doğru yolu otomatik seçsin diye **her ikisi**. Yalnızca tüketici düzeyinde bir Bitcoin uygulaması olan bağışçılar da katkıda bulunabilir; sessiz ödeme cüzdanı olan bağışçılar varsayılan olarak gizlilik elde eder.",
-          "Takas, açık Bitcoin işlemlerinin blok zincirinde görünür olması ve bir madenci ücreti ödemesidir. Bağışçı ve Alıcı rehberleri her iki durumun nasıl yönetileceğini açıklar."
+          "Grin, gizliliği yerleşik olan dijital nakittir. Mimblewimble tasarımı zincire hiçbir adres koymaz ve her tutarı gizler; böylece bağışlar, çoğu kripto paranın bıraktığı herkese açık izi bırakmaz.",
+          "{{appName}}'da kampanyalar Grin'i iki şekilde alır: GoblinPay üzerinden (bir QR taratırsınız ve ödeme, Nostr üzerinden şifrelenmiş bir slatepack olarak kampanyaya ulaşır) ya da herhangi bir Grin cüzdanından doğrudan kampanyanın grin1 Slatepack adresine. Her iki durumda da fonlar kampanyanın kontrol ettiği bir cüzdana iner.",
+          "Kampanya toplamları bu gizlilikten vazgeçmeden dürüst kalır: bir bağışçı ödeme kanıtı yayımlayabilir ve {{appName}} işlemin gerçekten zincir üstünde olduğunu doğrulamak için bunu bir Grin node'una karşı kontrol eder. Kanıt, kimin ödediğini değil, tutarı ve işlem kernel'ini gösterir. Bağışçı ve Alıcı rehberleri ayrıntıları anlatır."
         ]
       },
       "why-not-rotating-addresses": {
-        "question": "{{appName}} neden her bağış için yeni bir adres oluşturmuyor?",
+        "question": "{{appName}} neden bağışları kendi sunucusunda işlemiyor?",
         "answer": [
-          "Bunu yapmak {{appName}}'nın para değiştiren bir aracı olarak hareket etmesini gerektirirdi — önce Bitcoin'in saklayıcısı olup sonra alıcıya iletmek.",
+          "Bunu yapmak {{appName}}'nın para değiştiren bir aracı olarak hareket etmesini gerektirirdi: önce Grin'in saklayıcısı olup sonra alıcıya iletmek.",
           "Bu bizi bir para transfer kuruluşu yapardı, bunun getireceği düzenlemelere tabi olurduk ve tek bir başarısızlık noktası olurduk: {{appName}}'nın sunucusunu kapatın, içinden akan her bağışı kapatmış olursunuz.",
-          "Bunun yerine, her kullanıcının bağış adresi Nostr gizli anahtarından (nsec) — yani giriş yapmak için kullandığınız aynı anahtardan — türetilir. Bağışçılar doğrudan alıcıya gönderir, {{appName}} fonlara hiç dokunmaz ve platformun kendisi kimseyi sansürlemek için kapatılamaz. Bağış başına gizlilik isteyen alıcılar sessiz ödemeleri kabul edebilir; bu da arada para tutan biri olmadan aynı izlenemezliği sağlar."
+          "Bunun yerine bağışlar, bağışçının Grin cüzdanından kampanyanın Grin cüzdanına gider. Her kampanya kendi grin1 Slatepack adresini veya GoblinPay ödeme sayfasını yayımlar, {{appName}} fonlara hiç dokunmaz ve platformun kendisi kimseyi sansürlemek için kapatılamaz. Grin zincire hiçbir adres koymadığı için de bağışlar, arada parayı tutan kimse olmadan varsayılan olarak birbirine bağlanamaz."
         ]
       },
       "why-not-other-crypto": {
-        "question": "Neden Monero veya başka bir kripto para değil?",
+        "question": "Neden Bitcoin, Monero veya başka bir kripto para değil?",
         "answer": [
-          "Bitcoin, en yaygın benimsenmiş kripto paradır. Bu, bağışçıların satın alıp göndermesini ve alıcıların almasını, tutmasını ve harcamasını en kolay olan demektir.",
-          "Monero gibi gizlilik odaklı paralar Bitcoin'den farklı gizlilik takasları sunar, ancak tüketici uygulamalarının çoğunluğunca desteklenmezler ve yerel para birimine geri dönüştürmek daha zordur. Bir bağışın iki tarafından birine önce niş bir kripto parayı edinmesini istemek, {{appName}}'nın koymayacağı bir engeldir. Bitcoin bağışlarının kendisi için, sessiz ödemeler Bitcoin ekosistemini terk etmeden izlenemezlik kullanım durumunu karşılar."
+          "Bitcoin en yaygın benimsenmiş kripto paradır, ancak defteri herkese açıktır: bilinen bir adrese yapılan bağış tutarı, zamanı ve gönderen tarafı sonsuza dek ifşa eder. Üzerine gizlilik eklemek fazladan araçlar, fazladan adımlar ve yanlış yapmanın fazladan yolları demektir. Hassas davalara yapılan bağışlar için bu yanlış bir varsayılandır.",
+          "Grin gizli yolu tek yol yapar. Mimblewimble zincirde hiçbir adres bırakmaz ve her tutarı gizler; bu yüzden bağışçıların güvende olmak için özel araçlara ihtiyacı yoktur. Aynı zamanda Grin'in ödeme kanıtları, bir kampanyanın bağışçılarını ifşa etmeden doğrulanmış, zincir üstünde kontrol edilmiş bir toplam göstermesine olanak tanır. Monero da güçlü gizlilik sunar, ancak Grin'in ödeme kanıtları {{appName}}'nın doğrulanmış bağış modeline uyar ve hafif zinciri doğrulamayı basit tutar."
         ]
       },
       "what-is-nostr": {
         "question": "Nostr nedir?",
         "answer": [
           "Nostr, hesabınızın bir şirkete değil **size** ait olduğu açık bir ağdır. Kimliğiniz, başkasının sunucusundaki bir kullanıcı adı değil, kontrol ettiğiniz bir kriptografik anahtardır.",
-          "{{appName}}'da bağış adresiniz de aynı anahtardan türetilir — Nostr gizli anahtarınız (nsec) Bitcoin cüzdanınızın çekirdeğidir, bu yüzden kimseye kaydolmadan Bitcoin alabilirsiniz."
+          "{{appName}}'da aynı anahtar kampanyalarınızı ve doğrulanmış toplamınızı oluşturan bağış makbuzlarını imzalar; kimliğinizin ve kampanyalarınızın kimseye kaydolmadan Nostr'un her yerinde çalışmasının nedeni budur."
         ]
       },
       "why-login-different": {
@@ -2168,7 +2168,7 @@
       "lose-secret-key": {
         "question": "Gizli anahtarımı kaybedersem ne olur?",
         "answer": [
-          "**\"Parolamı unuttum\" butonu yoktur.** Kimse sizin için sıfırlayamaz. Kaybederseniz, hesabınız — ve bağış adresinizde bekleyen tüm Bitcoin'iniz — sonsuza dek kaybolur.",
+          "**\"Parolamı unuttum\" butonu yoktur.** Kimse sizin için sıfırlayamaz. Kaybederseniz hesabınız ve kampanyalarınız sonsuza dek kaybolur. (Grin fonlarınız, bu anahtardan ayrı olan kendi Grin cüzdanınızda ve onun tohum cümlesinde durur.)",
           "**Gizli anahtarınızı şimdi güvenli bir yere kaydedin.** İpuçları için [Nostr Anahtarlarınızı Yönetmek](https://soapbox.pub/blog/managing-nostr-keys) yazısını okuyun."
         ]
       },
@@ -2206,7 +2206,7 @@
       "vs-mastodon-bluesky": {
         "question": "Nostr, Mastodon veya Bluesky'dan nasıl farklı?",
         "answer": [
-          "Mastodon'da hesabınız belirli bir sunucuda yaşar. Bluesky'da hesapların çoğu tek bir şirkete bağlıdır. Nostr'da kimliğiniz sizin kontrol ettiğiniz bir anahtardır ve bağış adresiniz sizinle birlikte herhangi bir Nostr uygulamasına gider."
+          "Mastodon'da hesabınız belirli bir sunucuda yaşar. Bluesky'da hesapların çoğu tek bir şirkete bağlıdır. Nostr'da kimliğiniz sizin kontrol ettiğiniz bir anahtardır ve profiliniz ile kampanyalarınız sizinle birlikte herhangi bir Nostr uygulamasına gider."
         ]
       },
       "profile-fields": {
@@ -2223,11 +2223,11 @@
     },
     "donor": {
       "tldr": {
-        "lede": "Kampanya sayfasındaki Bitcoin adresine zaten sahip olduğunuz herhangi bir cüzdandan ödeme yapın. Kampanya sessiz ödemeleri kabul ediyorsa ve cüzdanınız bunları destekliyorsa, bağışınız otomatik olarak gizli olur.",
+        "lede": "Herhangi bir Grin cüzdanından bağış yapın: kampanyanın GoblinPay QR kodunu taratın ya da grin1 Slatepack adresine ödeyin. Grin varsayılan olarak gizlidir, bu yüzden bağışınız herkese açık bir iz bırakmaz.",
         "nextActions": [
-          "Herhangi bir Bitcoin cüzdanından ödeyin",
+          "Herhangi bir Grin cüzdanından ödeyin",
           "Aracı yok, bekletme süresi yok",
-          "Gizlilik mi istiyorsunuz? Aşağıyı okuyun"
+          "Varsayılan olarak gizli"
         ]
       },
       "flow": {
@@ -2235,98 +2235,98 @@
         "steps": {
           "openCampaign": {
             "title": "Kampanyayı açın",
-            "body": "Tek bir QR kod görürsünüz. Kampanya her iki seçeneği de kabul ediyorsa, her iki uç noktayı kodlar; cüzdanınız doğru olanı seçer."
+            "body": "Bağışla'ya dokunun ve bir yol seçin. GoblinPay: bir tutar girin, QR kodu bir Goblin cüzdanıyla taratın; ödeme, Nostr üzerinden şifrelenmiş bir slatepack olarak kampanyaya gider ve otomatik olarak onaylanır. Grin adresi: kampanyanın grin1 Slatepack adresine herhangi bir Grin cüzdanından ödeyin; taşımayı cüzdanınız halleder, Tor üzerinden ya da slatepack alışverişiyle."
           },
           "arrivesDirectly": {
             "title": "Doğrudan ulaşır",
-            "body": "Fonlar doğrudan alıcıya uzlaşır. {{appName}} bunları tutmaz veya yönlendirmez ve adres alıcının Nostr gizli anahtarından türetilir."
+            "body": "Fonlar doğrudan kampanyanın cüzdanına aktarılır. {{appName}} bunları tutmaz veya yönlendirmez. Bağışınızın herkese açık kampanya toplamına sayılmasını istiyorsanız, sonrasında ödeme kanıtını veya makbuzu yayımlayın; bu, kimliğinizi değil tutarı gösterir."
           }
         }
       },
       "publicVisible": {
-        "title": "Açık bağışlar zincir üstünde sonsuza dek görünürdür",
-        "body": "Bir **Açık** bağış, kampanyaya bağlı normal bir Bitcoin adresine ulaşır. Herkes adresi arayıp tutarı, zamanı ve gönderim adresinizi görebilir. **Sessiz** bağışlar da zincir üstünde uzlaşır, ancak alıcı taraf kampanyaya bağlanamaz, bu yüzden herkese açık bağışçı listelerinin ve toplamların dışında kalırlar."
+        "title": "Neler herkese açık, neler değil",
+        "body": "Grin zincirinde adres yoktur ve tüm tutarlar gizlidir; bu yüzden dışarıdan bakanlar bir kampanyaya kimin ne kadar bağışladığını göremez. {{appName}}'daki kampanya toplamı yalnızca bağışçıların yayımlamayı seçtiği kanıt ve makbuzlardan oluşur ve her biri yalnızca tutarı ve işlem kernel'ini gösterir."
       },
       "privacy": {
         "heading": "Gizli bağış yapmak",
-        "intro": "Bu adımlar en çok **Açık** bağışlar için önemlidir; çünkü her işlem tek bir adrese kalıcı olarak bağlıdır. **Sessiz** bağışlar alıcı tarafı zaten gizler, bu yüzden risk daha düşüktür. Gönderim cüzdanınız üzerinde hedefli analiz yine de her iki durumda da mümkündür, bu yüzden riskiniz yüksekse bu adımlar yararlıdır. Birini seçin ya da birden fazlasını birleştirin.",
+        "intro": "Zincir üstünde Grin sizi zaten korur: adres yok, tutarlar gizli, herkese açık bağışçı listesi yok. Sizi yine de açığa çıkarabilecek olan, Grin'i nasıl edindiğiniz ve neyi yayımlamayı seçtiğinizdir. Riskiniz yüksekse bu adımlar atmaya değer. Birini seçin ya da birkaçını birleştirin.",
         "options": {
           "nonKyc": {
-            "name": "KYC dışı Bitcoin satın alın",
-            "purpose": "Bitcoin'i kişiden kişiye satın alarak en baştan devlet kimliğinize bağlanmamasını sağlayın. En güçlü gizlilik başlangıç noktası."
+            "name": "Grin'i KYC olmadan edinin",
+            "purpose": "Madencilik yapın ya da kişiden kişiye satın alın; böylece paralar en baştan devlet kimliğinize bağlanmaz."
           },
           "coinjoin": {
-            "name": "Önce coinjoin yapın",
-            "purpose": "Bitcoin'inizi başka insanların paralarıyla karıştırarak çıkışın KYC alımınıza kadar izlenemez olmasını sağlayın. Kampanya yalnızca açık kabul ediyorsa kullanışlıdır."
+            "name": "Herkese açık makbuzu atlayın",
+            "purpose": "Ödeme kanıtı yayımlamak bağışı Nostr kimliğinize bağlar. Yayımlamazsanız bağış sizinle kampanya arasında kalır."
           }
         }
       },
       "consumerApps": {
-        "title": "Tüketici uygulamaları sizi anonim yapamaz",
-        "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance ve PayPal kimliğinizi doğrular. Bağışı nasıl gönderirseniz gönderin, her işlem gerçek kimliğinize bağlı kalır. Kontrol ettiğiniz saklayıcı olmayan bir cüzdan kullanın."
+        "title": "Borsalar kim olduğunuzu bilir",
+        "body": "GRIN listeleyen borsalar kimliğinizi doğrular ve her çekimin kaydını tutar. Herkese açık zincir bağışınızı göstermez, ancak borsa çekiminin nereye gittiğini bilir. Durumunuz için bu önemliyse, önce kontrol ettiğiniz bir cüzdana çekin ve bağışı oradan yapın."
       }
     },
     "recipient": {
       "tldr": {
-        "lede": "Kampanyanızı oluştururken neyi kabul edeceğinizi seçin: Açık, Sessiz ya da her ikisi. Her iki seçenek de saklayıcı değildir. {{appName}} hiçbir zaman fonlarınızı tutmaz.",
+        "lede": "Kontrol ettiğiniz bir Grin cüzdanından bir grin1 Slatepack adresi yayımlayın ya da bir GoblinPay ödeme sayfası kurun. Bağışlar cüzdandan cüzdana ulaşır. {{appName}} fonlarınızı asla tutmaz.",
         "nextActions": [
-          "İki seçeneği karşılaştırın",
-          "Nasıl nakde çevireceğinizi planlayın",
-          "Fonları hızla toplayın"
+          "Bir Grin cüzdanı ve bir adres edinin",
+          "Kampanyanıza ekleyin",
+          "Cüzdanınızın tohum cümlesini yedekleyin"
         ]
       },
       "howReceiving": {
         "heading": "Alma nasıl çalışır",
         "paragraphs": [
-          "{{appName}} bağış adresleriniz Nostr gizli anahtarınızdan (nsec) türetilir — giriş yapmak için kullandığınız aynı anahtar Bitcoin cüzdanınızın çekirdeğidir. Bir kampanya oluşturduğunuzda neyi kabul edeceğinizi seçersiniz:",
-          "**Yalnızca açık ödemeler.** Normal bir Bitcoin adresi. Herkese görünür, her cüzdanla çalışır.",
-          "**Yalnızca sessiz ödemeler.** BIP-352 sessiz ödemeler. Alıcı taraf zincir üstünde izlenemezdir, böylece bağışlar herkese açık bağışçı listelerinin ve toplamların dışında kalır. Bağışçıların göndermek için sessiz ödeme yetenekli bir cüzdana ihtiyacı vardır. Yoksa bağışları geçmez.",
-          "**Her ikisi.** {{appName}} her iki uç noktayı kodlayan tek bir QR kod oluşturur. Sessiz ödeme cüzdanları bunu gizli olarak okur; sıradan cüzdanlar açık adrese öder. Bağışçıların seçim yapmasına gerek kalmaz.",
-          "Her ikisini de kabul etmek genellikle doğru tercihtir: sessiz ödeme cüzdanı kullanan destekçilerden gizli bağışlar alırsınız ve yalnızca tüketici uygulamasında Bitcoin'i olan bağışçılara açık kalırsınız.",
-          "{{appName}} cüzdanınızın içinde bunlar **iki ayrı bakiye** olarak ulaşır — bir **Açık** sekmesi (normal Bitcoin adresiniz) ve bir **Gizli** sekmesi (sessiz ödemeler) — cüzdanın Açık / Gizli sekmelerinde gösterilir. {{appName}} bunları bilinçli olarak kesin biçimde ayrı tutar: iki bakiye asla birlikte harcanamaz. Gizli fonları açık fonlarla tek bir işlemde karıştırmak, izlenemez sessiz ödeme bağışlarınızı zincir üstünde açık adresinize geri bağlar ve var olma nedenleri olan gizliliği yok eder."
+          "{{appName}}'daki bağışlar doğrudan bağışçının Grin cüzdanından sizinkine gider. Bir kampanya oluşturduğunuzda nasıl alacağınızı seçersiniz:",
+          "**Bir grin1 Slatepack adresi.** Her Grin cüzdanı (Goblin, grin-wallet) size bir tane verir. Bağışçılar buna herhangi bir Grin cüzdanından öder; etkileşimli olarak Tor üzerinden ya da slatepack alışverişiyle. Taşımayı cüzdanlar halleder.",
+          "**GoblinPay.** Bağışçıların uygulama içinde ödemesini sağlayan bir ödeme sayfası: bir QR taratırlar ve ödeme, Nostr üzerinden şifrelenmiş ve sarmalanmış bir slatepack olarak size ulaşır; otomatik onay ve sonunda imzalı bir makbuzla.",
+          "**Her ikisi.** Goblin cüzdanı olan bağışçılar tek taramalık akışı kullanır, diğer herkes hangi Grin cüzdanını kullanıyorsa Slatepack adresinize oradan öder. İkisini de sunmak sizi her bağışçıya açık tutar.",
+          "Her iki durumda da gizlilik varsayılandır. Grin'in Mimblewimble tasarımı zincire hiçbir adres koymaz ve her tutarı gizler; bu yüzden bağışlarınız kimsenin gezinebileceği herhangi bir açık defterde asla görünmez.",
+          "Kampanyanızın doğrulanmış toplamı, bir bağışı ödeme kanıtı veya GoblinPay makbuzu yayımlanıp kontrol edildikten sonra sayar: alıcı imzasının doğrulanması ve işlem kernel'inin bir Grin node'una karşı zincir üstünde onaylanmış olması gerekir. Yayımlanan her kanıt tutarı ve kernel'i gösterir, bağışçı hakkında hiçbir şey göstermez."
         ]
       },
       "whatEveryoneSees": {
         "heading": "Herkesin görebildiği",
         "paragraphs": [
-          "Kampanyanız açık ödemeleri kabul ediyorsa, sizi desteklemeyi düşünen herkes adresi arayıp herkese açık bağış geçmişini görebilir.",
-          "Sessiz ödeme bağışları bu kaydın parçası değildir. Dış gözlemcilere görünmezler ve kampanyanın herkese açık toplamlarında gösterilmezler; yeni bağışçılar yalnızca kampanyanın ilerlemesi hakkında yayımladıklarınızı görür."
+          "Ziyaretçiler kampanya sayfanızı, hedefini ve bağışçıların yayımlamayı seçtiği kanıt ve makbuzlardan oluşan doğrulanmış toplamı görür. Bunların her biri bağışçı kimliğini değil, bir tutarı ve bir işlem kernel'ini gösterir.",
+          "Kimse zincir üstünde bakiyenize veya bağış geçmişinize bakamaz. İncelenecek bir adres, okunacak tutarlar yoktur; yayımlanan makbuzların dışında insanlar yalnızca kampanyanın ilerleyişi hakkında paylaştıklarınızı görür."
         ]
       },
       "movePromptly": {
-        "heading": "Bağışları hızlıca taşıyın",
+        "heading": "Cüzdanınız, sorumluluğunuz",
         "steps": {
           "sweep": {
-            "title": "Kontrol ettiğiniz bir cüzdana toplayın",
-            "body": "{{appName}} cüzdanınız zaten öz-saklamalıdır — anahtarları yalnızca siz kontrol edersiniz. Aynı bakiyenin masaüstü veya donanım cüzdanı görünümü için cüzdan menüsünü açın, **Cüzdanı yedekle** seçeneğini seçin ve 24 kelimelik tohumu [Sparrow](https://sparrowwallet.com)'a, [BlueWallet](https://bluewallet.io)'a veya bir donanım cüzdanına (Trezor, Ledger) aktarın. Bunun yerine fonları tamamen farklı bir anahtara taşımak isterseniz — örneğin [Phoenix](https://phoenix.acinq.co) gibi bir Lightning cüzdanına — {{appName}} cüzdanınızdan normal bir Bitcoin işlemi gönderin."
+            "title": "Bağışlar kontrol ettiğiniz bir cüzdana iner",
+            "body": "{{appName}} sizin için asla bir cüzdan çalıştırmaz. Fonlar, adresini veya GoblinPay ödeme sayfasını yayımladığınız Grin cüzdanına ulaşır; yani saklama ilk bağıştan itibaren sizdedir. Bu, sorumluluğun da sizde olduğu anlamına gelir: cüzdanınızın tohum cümlesine sahip olan herkes fonlara sahiptir ve o olmadan fonlar kurtarılamaz."
           },
           "dontSit": {
-            "title": "Fonları tarayıcıda bekletmeyin",
-            "body": "Özellikle yüksek değerli kampanyalar için cüzdanın tohum cümlesini çevrimdışı saklayın (kâğıt, metal yedekleme veya özel bir cihazdaki parola yöneticisi) ve bir donanım cüzdanını değerlendirin. {{appName}}'dan yedeklediğiniz tohum aynı cüzdandır — kelimeleri güvene alın ve soğuk depolamaya kavuşmuş olun."
+            "title": "Tohum cümlesini çevrimdışı yedekleyin",
+            "body": "Özellikle yüksek değerli kampanyalar için Grin cüzdanınızın tohum cümlesini çevrimdışı saklayın (kâğıt, metal yedekleme veya özel bir cihazdaki parola yöneticisi). Tohum, cüzdanın kendisidir: kelimeleri güvene alın, soğuk depolamanız hazır demektir."
           }
         }
       },
       "cashout": {
-        "heading": "Gizli olarak nakde çevirmek",
-        "intro": "Zincir üstünde harcamak, izi önce kırmazsanız bir iz bırakır. Sessiz ödeme bağışlarını izlenemez tutmak için **Gizli** sekmesinden nakde çevirin — önce bir sessiz ödeme cüzdanına gönderin (bir **sp1…** adresi), sonra ileri harcayın; bu adım kampanyanızla sonra gelenler arasındaki bağı kırar. Gizli fonları yeniden kullanılmış veya açık bir adrese göndermeyin, bu onları yeniden bağlar. Aşağıdaki diğer seçenekler de işe yarar ve kendi takasları vardır.",
+        "heading": "Nakde çevirmek",
+        "intro": "Grin'in zinciri bağışlarınızı ifşa etmez; bu yüzden asıl gizlilik kararı, yerel para birimine nasıl çevireceğinizdir. Kimliğinizi doğrulayan her hizmet, üzerinden nakde çevirdiğiniz tutarı bilir. Aşağıdaki seçeneklerin farklı takasları vardır.",
         "options": {
           "coinjoin": {
-            "name": "Coinjoin",
-            "purpose": "Bitcoin'inizi diğer kullanıcıların paralarıyla karıştırın, böylece çıkış girişe geri bağlanamaz."
+            "name": "Borsalar",
+            "purpose": "Fiat paraya giden en basit yol. KYC bekleyin: borsa kimliğinizi ve üzerinden çektiğiniz tutarı öğrenir."
           },
           "peerToPeer": {
             "name": "Kişiden kişiye",
-            "purpose": "Bitcoin'i fiat para birimiyle doğrudan başka bir kişiyle ya da Bisq, HodlHodl veya RoboSats üzerinden bir aracıyla takas edin."
+            "purpose": "Grin'i fiat parayla doğrudan başka bir kişiyle ya da bir tezgah üstü aracı üzerinden takas edin. Arada platform yok."
           },
           "spendDirectly": {
             "name": "Doğrudan harcayın",
-            "purpose": "Önce nakde çevirmeden doğrudan Bitcoin'den hediye kartları (Amazon, Uber, market, seyahat) satın alın."
+            "purpose": "Grin'i, kabul eden satıcı ve hizmetlerde önce nakde çevirmeden para olarak harcayın."
           }
         }
       },
       "tumblers": {
-        "title": "Merkezi karıştırıcılardan kaçının",
-        "body": "Saklayıcı karıştırıcılar paranızı çalabilir, kimin neyi gönderdiğini kayıt altına alabilir ya da kolluk kuvvetlerinin bal tuzakları çıkabilir. Bunun yerine sessiz ödeme adımı veya saklayıcı olmayan bir coinjoin kullanın."
+        "title": "Karıştırıcıya gerek yok",
+        "body": "Grin'de güvenilecek karıştırıcı veya karıştırma hizmeti yoktur ve buna ihtiyacınız da yoktur. Mimblewimble tutarları gizler ve zincirde hiçbir adres bırakmaz; bu yüzden bağışlar varsayılan olarak gizlidir."
       }
     }
   }

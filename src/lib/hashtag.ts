@@ -3,7 +3,7 @@
  * `t` tags from composed posts.
  *
  * Matches `#` followed by a run of Unicode letters, numbers, and underscores,
- * optionally with internal hyphens (e.g. `#70-706`, `#bitcoin-conference`).
+ * optionally with internal hyphens (e.g. `#70-706`, `#grin-conference`).
  * A hashtag must begin and end with a letter/number/underscore — leading or
  * trailing hyphens are excluded so `#nostr-` captures only `#nostr`.
  *

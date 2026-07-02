@@ -3,8 +3,8 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowRight,
-  Bitcoin,
   CircleCheck,
+  HandCoins,
   Gavel,
   HandHeart,
   Handshake,
@@ -32,7 +32,7 @@ const SPONSOR_CONTACT_MAILTO =
  * sub-components, and the canonical Inter-Bold section headings.
  *
  * Three ways to get involved (matching the partnership pitch):
- *   1. Donate to the Seed Fund (BTC or USD)
+ *   1. Donate to the Seed Fund (GRIN or USD)
  *   2. Match donations — individual campaigns, featured campaigns, or a
  *      curated list (e.g. political prisoners, women's sovereignty in Africa)
  *   3. Promote donations to your customer base as a philanthropic initiative
@@ -197,7 +197,7 @@ export function CorporateSponsorshipPage() {
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto items-start">
             <WayCard
-              icon={<Bitcoin className="size-5" />}
+              icon={<HandCoins className="size-5" />}
               kicker={t('corporateSponsorship.ways.seedFund.kicker')}
               title={t('corporateSponsorship.ways.seedFund.title')}
               description={t('corporateSponsorship.ways.seedFund.description', { appName })}

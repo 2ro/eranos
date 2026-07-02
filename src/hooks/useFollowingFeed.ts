@@ -120,7 +120,7 @@ function useFollowedHashtagsFeed(hashtags: string[], kinds: number[], enabled: b
       // Hashtags on Nostr are case-sensitive at the relay level but the UI
       // treats them as case-insensitive. Pass through the same expansion
       // used by the dedicated hashtag page so we don't miss posts that
-      // tag, e.g., `#Bitcoin` instead of `#bitcoin`.
+      // tag, e.g., `#Grin` instead of `#grin`.
       const filterValues = Array.from(new Set(
         hashtags.flatMap((tag) => buildTagFilterValues(tag, '#t')),
       ));

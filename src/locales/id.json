@@ -174,12 +174,12 @@
       "subtitle": "Anda bisa melakukan keduanya nanti. Ini hanya membantu kami menyesuaikan langkah selanjutnya.",
       "creator": {
         "title": "Mulai kampanye",
-        "description": "Galang Bitcoin untuk tujuan yang Anda pedulikan.",
-        "finderNote": "Donatur mengirim sats langsung ke dompet Anda."
+        "description": "Galang Grin untuk tujuan yang Anda pedulikan.",
+        "finderNote": "Donatur mengirim GRIN langsung ke dompet Anda."
       },
       "donor": {
         "title": "Beri donasi untuk kampanye",
-        "description": "Dukung berbagai tujuan dengan Bitcoin.",
+        "description": "Dukung berbagai tujuan dengan Grin.",
         "finderNote": "Donasi Anda langsung masuk ke dompet penyelenggara."
       },
       "verifier": {
@@ -198,7 +198,7 @@
     "secure": {
       "title": "Simpan kunci Anda",
       "subtitle": "Unduh berkas dan simpan di tempat yang aman. Pengelola kata sandi bisa digunakan.",
-      "couplingNote": "Akun dan dompet Anda berbagi kunci ini. Kunci ini menandatangani unggahan Nostr Anda dan membuka dompet Bitcoin Anda di Eranos.",
+      "couplingNote": "Kunci ini adalah identitas Anda di Eranos. Kunci ini menandatangani unggahan Nostr Anda, kampanye Anda, dan tanda terima donasi yang dihitung dalam total kampanye.",
       "permanenceHeadline": "Tidak ada cara untuk memulihkan kunci ini jika hilang.",
       "permanenceBody": "Tidak ada reset, tidak ada saluran dukungan, tidak ada pemulihan lewat email. Simpan sebelum melanjutkan.",
       "button": "Unduh & lanjutkan",
@@ -574,7 +574,7 @@
       "seoTitle": "Panduan Donatur",
       "seoDescription": "Cara kerja donasi di {{appName}} dan cara melindungi privasi Anda.",
       "title": "Panduan Donatur",
-      "subtitle": "Bitcoin asli, dikirim langsung. Seluruh alur dalam satu halaman singkat."
+      "subtitle": "Grin asli, dikirim langsung. Seluruh alur dalam satu halaman singkat."
     },
     "recipientGuide": {
       "seoTitle": "Panduan Penerima",
@@ -606,13 +606,13 @@
   },
   "about": {
     "seoTitle": "Tentang",
-    "seoDescription": "Cara kerja {{appName}}: menghubungkan penerima dengan pendanaan tak terbendung melalui Bitcoin dan Nostr.",
+    "seoDescription": "Cara kerja {{appName}}: menghubungkan penerima dengan pendanaan tak terbendung melalui Grin dan Nostr.",
     "hero": {
       "eyebrow": "Tentang {{appName}}",
       "headlinePart1": "Cara",
       "headlineAppName": "{{appName}}",
       "headlinePart2": "bekerja.",
-      "body": "{{appName}} adalah platform donasi anti-sensor yang dibangun di atas Nostr dan Bitcoin. Tidak ada rekening bank yang dibekukan. Tidak ada penutupan oleh korporasi. Hanya dukungan langsung dari orang-orang yang percaya pada perjuangan Anda.",
+      "body": "{{appName}} adalah platform donasi anti-sensor yang dibangun di atas Nostr dan Grin. Tidak ada rekening bank yang dibekukan. Tidak ada penutupan oleh korporasi. Hanya dukungan langsung dari orang-orang yang percaya pada perjuangan Anda.",
       "trustChips": {
         "decentralized": "Terdesentralisasi",
         "openSource": "Sumber terbuka",
@@ -630,7 +630,7 @@
         "raised": "terkumpul",
         "ofGoal": "dari $10,000",
         "donorsLine": "247 donatur · 12 negara",
-        "donate": "Donasi Bitcoin"
+        "donate": "Donasi Grin"
       }
     },
     "howItWorks": {
@@ -640,12 +640,12 @@
       "step1": {
         "imageAlt": "Kunci kriptografis oranye bercahaya melayang di angkasa gelap, melambangkan identitas yang berdaulat sendiri",
         "title": "Penerima mendaftar dalam hitungan detik.",
-        "body": "Tanpa bank. Tanpa berkas. Tanpa persetujuan. Saat seorang penerima membuat akun di {{appName}}, mereka sudah punya alamat Bitcoin siap menerima dukungan, di mana pun di dunia."
+        "body": "Tanpa bank. Tanpa berkas. Tanpa persetujuan. Seorang penerima membuat akun di {{appName}}, menambahkan alamat penerima dari dompet Grin miliknya sendiri ke kampanyenya, dan bisa menerima dukungan dari mana pun di dunia."
       },
       "step2": {
-        "imageAlt": "Koin Bitcoin bercahaya melayang di udara melintasi peta dunia gelap, melambangkan pembayaran lintas batas seketika",
-        "title": "Donatur mengirim Bitcoin langsung.",
-        "body": "Donatur mengirim Bitcoin dari dompet apa pun yang sudah mereka pakai (Cash App, Coinbase, Strike, dompet perangkat keras) langsung ke penerima. {{appName}} tidak pernah menyentuh uangnya. Tidak ada server di tengah, tidak ada kustodian."
+        "imageAlt": "Koin Grin bercahaya melayang di udara melintasi peta dunia gelap, melambangkan pembayaran lintas batas seketika",
+        "title": "Donatur mengirim Grin langsung.",
+        "body": "Donatur membayar dari dompet Grin apa pun, baik melalui pembayaran GoblinPay milik kampanye maupun langsung ke alamat Slatepack grin1-nya. {{appName}} tidak pernah menyentuh uangnya. Transaksi berjalan dari dompet donatur ke dompet penerima."
       },
       "step3": {
         "imageAlt": "Telapak tangan terbuka dengan cahaya oranye hangat memancar dari telapaknya, melambangkan penerimaan dan agensi",
@@ -661,8 +661,8 @@
         "description": "Apa itu Eranos, siapa yang membangunnya, dan berapa biayanya."
       },
       "chapter2": {
-        "label": "Donasi Bitcoin",
-        "description": "Cara kerja pembayaran, mengapa on-chain, mengapa publik, mengapa konsekuensi ini."
+        "label": "Donasi Grin",
+        "description": "Cara kerja pembayaran, mengapa Grin, apa yang tetap privat, dan berbagai konsekuensinya."
       },
       "chapter3": {
         "label": "Tentang Nostr",
@@ -677,8 +677,8 @@
         "imageAlt": "Pengunjuk rasa berkerudung berbaris di jalan kota Eropa saat senja, memegang flare merah menyala dan spanduk 'FREEDOM' dan 'LIBERTAD'",
         "role": "Untuk Donatur",
         "title": "Dukung perjuangan yang tidak didukung bank.",
-        "description": "Kirim Bitcoin langsung ke penerima dan gerakan di mana pun di dunia, tanpa meminta izin kepada prosesor pembayaran.",
-        "bullet1": "Gunakan dompet Bitcoin apa pun yang sudah Anda miliki.",
+        "description": "Kirim Grin langsung ke penerima dan gerakan di mana pun di dunia, tanpa meminta izin kepada prosesor pembayaran.",
+        "bullet1": "Bayar dari dompet Grin apa pun, seperti Goblin atau grin-wallet.",
         "bullet2": "Donasi mendarat langsung ke penerima. Tanpa kustodian, tanpa perantara.",
         "cta": "Baca Panduan Donatur"
       },
@@ -822,7 +822,7 @@
       "errorDescriptionRequired": "Deskripsi wajib diisi.",
       "errorPledgeRequired": "Jumlah ikrar wajib diisi.",
       "errorPledgeInvalid": "Jumlah ikrar harus berupa nilai USD positif.",
-      "errorPriceUnavailable": "Menunggu harga BTC/USD untuk menghitung jumlah ikrar.",
+      "errorPriceUnavailable": "Menunggu nilai tukar untuk menghitung jumlah janji.",
       "errorCoverInvalid": "Gambar sampul harus berupa URL https:// yang valid.",
       "errorDeadlinePast": "Tenggat tidak boleh di masa lalu.",
       "wizard": {
@@ -1226,7 +1226,7 @@
       "seoTitle": "Penggalangan Dana",
       "seoDescription": "Menghubungkan dunia dengan pendanaan tak terbendung.",
       "heroTagline": "Menghubungkan dunia dengan<1></1>pendanaan <0>tak terbendung.</0>",
-      "heroBody": "Galang Bitcoin langsung dari pendukung di seluruh dunia. Setiap donasi langsung masuk ke dompet Anda, tanpa perantara, tanpa chargeback, dan tanpa platform yang menahan dana Anda.",
+      "heroBody": "Galang Grin langsung dari pendukung di seluruh dunia. Setiap donasi langsung masuk ke dompet Anda, tanpa perantara, tanpa chargeback, dan tanpa platform yang menahan dana Anda.",
       "startCampaign": "Mulai kampanye",
       "howItWorks": "Cara kerjanya",
       "featuredTitle": "Kampanye unggulan",
@@ -1248,7 +1248,7 @@
       "whyDifferent": {
         "eyebrow": "Mengapa {{appName}}",
         "title": "Dibangun berbeda.",
-        "lede": "Bitcoin langsung dari donor ke penerima. Tanpa platform di tengah, tanpa kustodian yang menahan dana, tanpa perlu izin.",
+        "lede": "Grin langsung dari donatur ke penerima. Tanpa platform di tengah, tanpa kustodian yang menahan dana, tanpa perlu izin.",
         "block1": {
           "heading": "Berbeda dari GoFundMe",
           "body": "Tidak ada platform yang bisa membekukan donasi Anda, menuntut pengembalian dana, atau menghentikan kampanye karena perbedaan kebijakan. Tidak ada Stripe, Visa, atau bank di tengah yang bisa memutus akses Anda saat kampanye berjalan.",
@@ -1257,8 +1257,8 @@
           "bullet3": "Nol biaya platform"
         },
         "block2": {
-          "heading": "Berbeda dari platform ‘Bitcoin’ lain",
-          "body": "Tidak ada node Lightning terpusat, kustodian, atau LSP yang bisa gagal atau offline. Dana diselesaikan langsung di Bitcoin ke dompet yang Anda kendalikan. Jika {{appName}} hilang besok, setiap kampanye tetap berjalan.",
+          "heading": "Berbeda dari platform kripto lain",
+          "body": "Tidak ada dompet kustodial, node yang di-hosting, atau prosesor pembayaran yang bisa gagal atau offline. Dana diselesaikan di rantai Grin ke dompet yang Anda kendalikan. Jika {{appName}} hilang besok, setiap kampanye tetap berjalan.",
           "bullet1": "Tidak ada dompet kustodial yang bisa dikuras atau dibekukan",
           "bullet2": "Diselesaikan on-chain ke dompet milik Anda",
           "bullet3": "Tetap berfungsi meski {{appName}} menghilang"
@@ -1275,7 +1275,7 @@
       "heroKicker": "Kampanye",
       "heroHeading": "Setiap aksi,",
       "heroHeadingLine2": "dalam satu tempat.",
-      "heroBody": "Setiap penggalangan dana yang dipublikasikan di Nostr, dikumpulkan dalam satu tempat. Telusuri seluruh jaringan, temukan aksi yang penting bagi Anda, dan dukung langsung dengan Bitcoin.",
+      "heroBody": "Setiap penggalangan dana yang dipublikasikan di Nostr, dikumpulkan dalam satu tempat. Telusuri seluruh jaringan, temukan aksi yang penting bagi Anda, dan dukung langsung dengan Grin.",
       "campaignsCount_one": "kampanye di jaringan",
       "campaignsCount_other": "kampanye di jaringan",
       "searchAriaLabel": "Cari kampanye",
@@ -1397,7 +1397,7 @@
       "notifications": "Notifikasi",
       "notificationsDesc": "Preferensi notifikasi push.",
       "advanced": "Lanjutan",
-      "advancedDesc": "Opsi dompet, sistem, dan pengguna mahir.",
+      "advancedDesc": "Opsi sistem dan pengguna mahir.",
       "organizers": "Organizer",
       "organizersDesc": "Tunjuk organizer negara yang dapat menyematkan unggahan ke feed negara."
     },
@@ -1436,8 +1436,8 @@
     },
     "advanced": {
       "title": "Lanjutan",
-      "subtitle": "Koneksi dompet, konfigurasi sistem, dan opsi lanjutan lainnya untuk pengguna mahir.",
-      "intro": "Koneksi dompet, konfigurasi sistem, dan opsi lanjutan lainnya.",
+      "subtitle": "Konfigurasi sistem dan opsi lanjutan lainnya untuk pengguna mahir.",
+      "intro": "Konfigurasi sistem dan opsi lanjutan lainnya.",
       "torHeading": "Tor",
       "torToggle": "Arahkan lalu lintas melalui Tor",
       "torToggleDesc": "Terhubung ke relay dan memuat media melalui jaringan Tor untuk privasi yang lebih kuat. Performa lebih lambat dan ada jeda singkat saat Tor terhubung.",
@@ -2070,7 +2070,7 @@
       "heading": "Kunci Anda",
       "extensionBody": "Anda masuk dengan ekstensi browser (NIP-07). Kunci rahasia Anda disimpan di sana — kelola atau ekspor dari ekstensi itu sendiri.",
       "bunkerBody": "Anda masuk dengan penandatangan jarak jauh (NIP-46). Kunci rahasia Anda dipegang oleh penandatangan itu dan tidak bisa diekspor dari {{appName}}.",
-      "explainer": "Kunci rahasia ini mengontrol akun Anda di {{appName}}. Siapa pun yang memilikinya bisa memposting dan menyamar sebagai Anda. Simpan di pengelola kata sandi atau tempat lain yang hanya bisa Anda akses.",
+      "explainer": "Kunci rahasia ini mengontrol akun Anda di {{appName}}. Siapa pun yang memilikinya bisa memposting sebagai Anda, mengubah kampanye Anda, dan menerbitkan atas nama Anda. Simpan di pengelola kata sandi atau tempat lain yang hanya bisa Anda akses. Dana Grin Anda terpisah: dana itu berada di dompet Grin Anda sendiri dengan frasa seed-nya, bukan di kunci ini.",
       "warning": "JANGAN PERNAH bagikan kunci rahasia Anda kepada siapa pun. Hindari memotretnya atau menempelnya di tempat selain pengelola kata sandi. Jika dibagikan, orang lain bisa mengakses akun Anda.",
       "aria": "Kunci rahasia Anda",
       "copyAria": "Salin kunci rahasia",
@@ -2092,7 +2092,7 @@
         "label": "Tentang Eranos"
       },
       "payments": {
-        "label": "Donasi Bitcoin di Eranos"
+        "label": "Donasi Grin di Eranos"
       },
       "about-nostr": {
         "label": "Tentang Nostr"
@@ -2105,14 +2105,14 @@
       "what-is-ditto": {
         "question": "Apa itu {{appName}}?",
         "answer": [
-          "{{appName}} adalah platform untuk mengirim donasi Bitcoin — publik atau privat — langsung ke penerima. Tidak ada perantara, tidak ada prosesor pembayaran, dan tidak ada akun yang bisa dibekukan.",
+          "{{appName}} adalah platform untuk mengirim donasi Grin langsung ke penerima. Tidak ada perantara, tidak ada prosesor pembayaran, dan tidak ada akun yang bisa dibekukan.",
           "{{appName}} dibangun di atas Nostr, sehingga identitas Anda tidak terkunci ke situs ini — Andalah yang memilikinya."
         ]
       },
       "cost-to-use": {
         "question": "Apakah {{appName}} berbayar?",
         "answer": [
-          "**Tidak.** {{appName}} tidak mengambil biaya platform. Saat Anda berdonasi, Anda hanya membayar biaya jaringan Bitcoin yang masuk ke penambang — bukan ke kami."
+          "**Tidak.** {{appName}} tidak mengambil biaya platform. Saat Anda berdonasi, Anda hanya membayar biaya jaringan Grin yang sangat kecil yang masuk ke penambang, bukan ke kami."
         ]
       },
       "who-made-this": {
@@ -2125,37 +2125,37 @@
         "question": "Apa yang dimaksud dengan \"anti-sensor\" di sini?",
         "answer": [
           "Tidak ada perusahaan yang berada di antara donatur dan penerima. {{appName}} tidak menahan dana dan tidak bisa membekukan alamat.",
-          "Selama jaringan Bitcoin berjalan, donasi bisa dikirim dan diterima. {{appName}} sendiri offline pun tidak akan menghentikannya."
+          "Selama jaringan Grin berjalan, donasi bisa dikirim dan diterima. {{appName}} sendiri offline pun tidak akan menghentikannya."
         ]
       },
       "why-onchain": {
-        "question": "Mengapa Bitcoin?",
+        "question": "Mengapa Grin?",
         "answer": [
-          "Bitcoin adalah jalur pembayaran yang paling didukung secara luas dan paling anti-sensor di dunia. Setiap dompet Bitcoin bisa mengirimnya.",
-          "Di {{appName}}, penerima memilih cara menerima: **publik** (alamat Bitcoin biasa) untuk jangkauan maksimum, **privat** (silent payments) untuk donasi tak terhubungkan, atau **keduanya** sehingga dompet setiap donatur memilih jalur yang tepat secara otomatis. Donatur yang hanya memiliki aplikasi Bitcoin konsumen masih bisa berkontribusi; donatur dengan dompet silent-payments mendapat privasi secara default.",
-          "Konsekuensinya adalah transaksi Bitcoin publik terlihat di blockchain dan membayar biaya penambang. Panduan Donatur dan Penerima menjelaskan cara menangani keduanya."
+          "Grin adalah uang tunai digital dengan privasi bawaan. Desain Mimblewimble-nya tidak menaruh alamat apa pun di rantai dan menyembunyikan setiap jumlah, sehingga donasi tidak meninggalkan jejak publik seperti kebanyakan mata uang kripto.",
+          "Di {{appName}}, kampanye menerima Grin dengan dua cara: melalui GoblinPay (pindai QR dan pembayaran berjalan ke kampanye sebagai slatepack terenkripsi melalui Nostr) atau langsung ke alamat Slatepack grin1 milik kampanye dari dompet Grin apa pun. Apa pun caranya, dana mendarat di dompet yang dikendalikan oleh kampanye.",
+          "Total kampanye tetap jujur tanpa mengorbankan privasi itu: donatur bisa memublikasikan bukti pembayaran, dan {{appName}} memverifikasinya terhadap node Grin untuk memastikan transaksinya benar-benar ada di rantai. Bukti itu hanya mengungkap jumlah dan kernel transaksi, bukan siapa yang membayar. Panduan Donatur dan Penerima menjelaskan detailnya."
         ]
       },
       "why-not-rotating-addresses": {
-        "question": "Mengapa {{appName}} tidak membuat alamat baru untuk setiap donasi?",
+        "question": "Mengapa {{appName}} tidak memproses donasi di servernya sendiri?",
         "answer": [
-          "Melakukan ini akan mengharuskan {{appName}} bertindak sebagai perantara penukar uang — pertama-tama mengambil kustodi atas Bitcoin dan kemudian meneruskannya ke penerima.",
+          "Melakukan ini akan mengharuskan {{appName}} bertindak sebagai perantara penukar uang, pertama-tama mengambil kustodi atas Grin dan kemudian meneruskannya ke penerima.",
           "Itu akan menjadikan kami pemindah uang, tunduk pada regulasi yang menyertainya, dan titik kegagalan tunggal: matikan server {{appName}} maka Anda mematikan setiap donasi yang mengalir melaluinya.",
-          "Sebaliknya, alamat donasi setiap pengguna diturunkan dari kunci rahasia Nostr (nsec) mereka — kunci yang sama yang Anda gunakan untuk masuk. Donatur mengirim langsung ke penerima, {{appName}} tidak pernah menyentuh dana, dan platform itu sendiri tidak bisa dimatikan untuk menyensor siapa pun. Penerima yang ingin privasi per donasi bisa menerima silent payments, yang memberikan ketakterhubungan yang sama tanpa siapa pun memegang uang di tengah."
+          "Sebaliknya, donasi berjalan dari dompet Grin donatur ke dompet Grin kampanye. Setiap kampanye memublikasikan alamat Slatepack grin1 atau pembayaran GoblinPay miliknya sendiri, {{appName}} tidak pernah menyentuh dana, dan platform itu sendiri tidak bisa dimatikan untuk menyensor siapa pun. Dan karena Grin tidak menaruh alamat di rantai, donasi secara default tak terhubungkan tanpa siapa pun memegang uang di tengah."
         ]
       },
       "why-not-other-crypto": {
-        "question": "Mengapa bukan Monero atau kripto lain?",
+        "question": "Mengapa bukan Bitcoin, Monero, atau mata uang kripto lain?",
         "answer": [
-          "Bitcoin sejauh ini adalah kripto yang paling banyak diadopsi. Itu berarti paling mudah bagi donatur untuk dibeli dan dikirim, dan paling mudah bagi penerima untuk diterima, dipegang, dan dibelanjakan.",
-          "Koin berfokus privasi seperti Monero menawarkan konsekuensi privasi berbeda dari Bitcoin, tetapi tidak didukung oleh sebagian besar aplikasi konsumen dan lebih sulit dikonversi kembali ke mata uang lokal. Meminta salah satu sisi donasi untuk pertama-tama memperoleh kripto khusus adalah hambatan yang tidak akan diletakkan {{appName}}. Untuk donasi Bitcoin sendiri, silent payments mencakup kasus penggunaan ketakterhubungan tanpa meninggalkan ekosistem Bitcoin."
+          "Bitcoin adalah mata uang kripto yang paling banyak diadopsi, tetapi buku besarnya publik: donasi ke alamat yang dikenal mengungkap jumlah, waktu, dan sisi pengirim, selamanya. Menambahkan privasi di atasnya berarti alat tambahan, langkah tambahan, dan lebih banyak cara untuk salah. Untuk donasi ke perjuangan yang sensitif, itu adalah default yang keliru.",
+          "Grin menjadikan jalur privat sebagai satu-satunya jalur. Mimblewimble tidak meninggalkan alamat di rantai dan menyembunyikan setiap jumlah, sehingga donatur tidak butuh perkakas khusus agar aman. Pada saat yang sama, bukti pembayaran Grin memungkinkan kampanye menunjukkan total terverifikasi yang dicek di rantai tanpa mengungkap para donaturnya. Monero juga menawarkan privasi kuat, tetapi bukti pembayaran Grin cocok dengan model donasi terverifikasi {{appName}}, dan rantainya yang ringan membuat verifikasi tetap sederhana."
         ]
       },
       "what-is-nostr": {
         "question": "Apa itu Nostr?",
         "answer": [
           "Nostr adalah jaringan terbuka di mana **Anda** memiliki akun Anda, bukan perusahaan. Identitas Anda adalah kunci kriptografis yang Anda kendalikan, bukan nama pengguna di server orang lain.",
-          "Di {{appName}}, kunci yang sama itu juga adalah dari mana alamat donasi Anda diturunkan — kunci rahasia Nostr (nsec) Anda menjadi benih dompet Bitcoin Anda, itulah mengapa Anda bisa menerima Bitcoin tanpa mendaftar dengan siapa pun."
+          "Di {{appName}}, kunci yang sama itu menandatangani kampanye Anda dan tanda terima donasi yang membangun total terverifikasi Anda, itulah mengapa identitas dan kampanye Anda berfungsi di mana pun di Nostr tanpa mendaftar dengan siapa pun."
         ]
       },
       "why-login-different": {
@@ -2168,7 +2168,7 @@
       "lose-secret-key": {
         "question": "Apa yang terjadi jika saya kehilangan kunci rahasia saya?",
         "answer": [
-          "**Tidak ada tombol \"lupa kata sandi\".** Tidak ada yang bisa menyetelnya ulang untuk Anda. Jika Anda kehilangannya, akun Anda — dan Bitcoin apa pun yang ada di alamat donasi Anda — hilang selamanya.",
+          "**Tidak ada tombol \"lupa kata sandi\".** Tidak ada yang bisa menyetelnya ulang untuk Anda. Jika Anda kehilangannya, akun dan kampanye Anda hilang selamanya. (Dana Grin Anda berada di dompet Grin Anda sendiri dengan frasa seed-nya, yang terpisah dari kunci ini.)",
           "**Simpan kunci rahasia Anda di tempat aman sekarang juga.** Untuk tips, baca [Mengelola Kunci Nostr Anda](https://soapbox.pub/blog/managing-nostr-keys)."
         ]
       },
@@ -2206,7 +2206,7 @@
       "vs-mastodon-bluesky": {
         "question": "Apa beda Nostr dengan Mastodon atau Bluesky?",
         "answer": [
-          "Di Mastodon, akun Anda hidup di server tertentu. Di Bluesky, sebagian besar akun bergantung pada satu perusahaan. Di Nostr, identitas Anda adalah kunci yang Anda kendalikan, dan alamat donasi Anda ikut bersama Anda ke aplikasi Nostr mana pun."
+          "Di Mastodon, akun Anda hidup di server tertentu. Di Bluesky, sebagian besar akun bergantung pada satu perusahaan. Di Nostr, identitas Anda adalah kunci yang Anda kendalikan, dan profil serta kampanye Anda ikut bersama Anda ke aplikasi Nostr mana pun."
         ]
       },
       "profile-fields": {
@@ -2223,11 +2223,11 @@
     },
     "donor": {
       "tldr": {
-        "lede": "Bayar alamat Bitcoin di halaman kampanye dari dompet apa pun yang sudah Anda miliki. Jika kampanye menerima silent payments dan dompet Anda mendukungnya, donasi Anda otomatis privat.",
+        "lede": "Berdonasi dari dompet Grin apa pun: pindai QR GoblinPay milik kampanye, atau bayar alamat Slatepack grin1-nya. Grin privat secara default, jadi donasi Anda tidak meninggalkan jejak publik.",
         "nextActions": [
-          "Bayar dari dompet Bitcoin apa pun",
+          "Bayar dari dompet Grin apa pun",
           "Tanpa perantara, tanpa periode penahanan",
-          "Mau privasi? Baca di bawah"
+          "Privat secara default"
         ]
       },
       "flow": {
@@ -2235,98 +2235,98 @@
         "steps": {
           "openCampaign": {
             "title": "Buka kampanye",
-            "body": "Anda melihat satu kode QR. Jika kampanye menerima kedua opsi, ia mengencode kedua titik; dompet Anda memilih yang tepat."
+            "body": "Ketuk Donasi dan pilih jalur. GoblinPay: masukkan jumlah, pindai QR dengan dompet Goblin, dan pembayaran berjalan ke kampanye sebagai slatepack terenkripsi melalui Nostr, dengan konfirmasi otomatis. Alamat Grin: bayar alamat Slatepack grin1 kampanye dari dompet Grin apa pun; dompet Anda menangani transportasinya, melalui Tor atau dengan bertukar slatepack."
           },
           "arrivesDirectly": {
             "title": "Tiba langsung",
-            "body": "Dana langsung diselesaikan ke penerima. {{appName}} tidak menahan atau merutekannya, dan alamatnya diturunkan dari kunci rahasia Nostr penerima."
+            "body": "Dana langsung diselesaikan ke dompet kampanye. {{appName}} tidak menahan atau merutekannya. Jika Anda ingin pemberian Anda dihitung dalam total publik kampanye, publikasikan bukti pembayaran atau tanda terimanya setelah itu; bukti tersebut mengungkap jumlah, bukan identitas Anda."
           }
         }
       },
       "publicVisible": {
-        "title": "Donasi publik terlihat di on-chain selamanya",
-        "body": "Donasi **Publik** mendarat di alamat Bitcoin biasa yang terikat ke kampanye. Siapa pun bisa mencari alamatnya dan melihat jumlah, waktu, dan alamat pengirim Anda. Donasi **Silent** juga diselesaikan on-chain, tetapi sisi penerima tak terhubungkan ke kampanye sehingga tetap di luar daftar donatur publik dan jumlah total."
+        "title": "Apa yang publik, dan apa yang tidak",
+        "body": "Rantai Grin tidak memiliki alamat dan menyembunyikan semua jumlah, sehingga pengamat luar tidak bisa melihat siapa yang berdonasi ke sebuah kampanye atau berapa banyak. Total kampanye di {{appName}} dibangun hanya dari bukti dan tanda terima yang dipilih donatur untuk dipublikasikan, dan masing-masing hanya mengungkap jumlah dan kernel transaksi."
       },
       "privacy": {
         "heading": "Berdonasi secara privat",
-        "intro": "Langkah-langkah ini paling penting untuk donasi **Publik**, di mana setiap transaksi terikat permanen ke satu alamat. Donasi **Silent** sudah menyembunyikan sisi penerima, sehingga risikonya lebih rendah. Analisis terarah terhadap dompet pengirim Anda tetap mungkin terjadi dengan cara apa pun, jadi jika risiko Anda tinggi, langkah-langkah ini layak diambil. Pilih salah satu, atau gabungkan.",
+        "intro": "Di rantai, Grin sudah melindungi Anda: tanpa alamat, jumlah tersembunyi, tanpa daftar donatur publik. Yang masih bisa mengidentifikasi Anda adalah cara Anda memperoleh Grin dan apa yang Anda pilih untuk dipublikasikan. Jika risiko Anda tinggi, langkah-langkah ini layak diambil. Pilih salah satu, atau gabungkan.",
         "options": {
           "nonKyc": {
-            "name": "Beli Bitcoin non-KYC",
-            "purpose": "Beli Bitcoin peer-to-peer agar tidak terhubung dengan ID pemerintah Anda sejak awal. Titik awal privasi terkuat."
+            "name": "Peroleh Grin tanpa KYC",
+            "purpose": "Tambang sendiri, atau beli peer-to-peer, sehingga koinnya sejak awal tidak terhubung dengan ID pemerintah Anda."
           },
           "coinjoin": {
-            "name": "Coinjoin terlebih dahulu",
-            "purpose": "Campurkan Bitcoin Anda dengan koin orang lain sehingga outputnya tidak bisa dilacak ke pembelian KYC Anda. Berguna saat kampanye hanya menerima publik."
+            "name": "Lewati tanda terima publik",
+            "purpose": "Memublikasikan bukti pembayaran menautkan donasi ke identitas Nostr Anda. Jangan publikasikan, dan donasi tetap menjadi urusan Anda dan kampanye saja."
           }
         }
       },
       "consumerApps": {
-        "title": "Aplikasi konsumen tidak bisa membuat Anda anonim",
-        "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance, dan PayPal semuanya memverifikasi ID Anda. Bagaimanapun Anda mengirim donasi, setiap transaksi tetap terikat ke identitas asli Anda. Gunakan dompet non-kustodial yang Anda kendalikan."
+        "title": "Bursa tahu siapa Anda",
+        "body": "Bursa yang mencantumkan GRIN memverifikasi ID Anda dan menyimpan catatan setiap penarikan. Rantai publik tidak akan menampilkan donasi Anda, tetapi bursa tahu ke mana penarikannya pergi. Jika itu penting bagi situasi Anda, tarik dulu ke dompet yang Anda kendalikan dan berdonasilah dari sana."
       }
     },
     "recipient": {
       "tldr": {
-        "lede": "Pilih apa yang diterima saat Anda membuat kampanye: Publik, Silent, atau keduanya. Kedua opsi bersifat non-kustodial. {{appName}} tidak pernah menahan dana Anda.",
+        "lede": "Publikasikan alamat Slatepack grin1 dari dompet Grin yang Anda kendalikan, atau siapkan pembayaran GoblinPay. Donasi tiba dari dompet ke dompet. {{appName}} tidak pernah menahan dana Anda.",
         "nextActions": [
-          "Bandingkan kedua opsi",
-          "Rencanakan cara Anda akan mencairkan",
-          "Sapu dana segera"
+          "Siapkan dompet Grin dan sebuah alamat",
+          "Tambahkan ke kampanye Anda",
+          "Cadangkan frasa seed dompet Anda"
         ]
       },
       "howReceiving": {
         "heading": "Bagaimana penerimaan bekerja",
         "paragraphs": [
-          "Alamat donasi {{appName}} Anda diturunkan dari kunci rahasia Nostr (nsec) Anda — kunci yang sama yang Anda gunakan untuk masuk menjadi benih dompet Bitcoin Anda. Saat Anda membuat kampanye, Anda memilih apa yang diterima:",
-          "**Hanya pembayaran publik.** Alamat Bitcoin biasa. Terlihat oleh semua orang, berfungsi dengan setiap dompet.",
-          "**Hanya silent payments.** Silent payments BIP-352. Sisi penerima tak terhubungkan di on-chain, sehingga donasi tetap di luar daftar donatur publik dan jumlah total. Donatur perlu dompet yang mendukung silent-payments untuk mengirim. Jika mereka tidak punya, donasi mereka tidak bisa sampai.",
-          "**Keduanya.** {{appName}} membuat satu kode QR yang mengencode kedua titik. Dompet silent-payments membacanya sebagai privat; dompet biasa membayar alamat publik. Donatur tidak perlu memilih.",
-          "Menerima keduanya biasanya pilihan tepat: Anda mendapat donasi privat dari pendukung yang menggunakan dompet silent-payments, dan Anda tetap terbuka bagi donatur yang Bitcoin satu-satunya ada di aplikasi konsumen.",
-          "Di dalam dompet {{appName}} Anda, donasi ini tiba sebagai **dua saldo terpisah** — tab **Publik** (alamat Bitcoin biasa Anda) dan tab **Privat** (silent payments) — yang ditampilkan pada tab Publik / Privat dompet. {{appName}} sengaja memisahkannya secara ketat: kedua saldo tidak pernah bisa dibelanjakan bersama. Mencampur dana privat dengan dana publik dalam satu transaksi akan menautkan donasi silent-payment Anda yang tak terhubungkan kembali ke alamat publik Anda di on-chain dan menghancurkan privasi yang menjadi alasan keberadaannya."
+          "Donasi di {{appName}} berjalan langsung dari dompet Grin donatur ke dompet Anda. Saat membuat kampanye, Anda memilih cara menerima:",
+          "**Alamat Slatepack grin1.** Semua dompet Grin (Goblin, grin-wallet) memberi Anda satu. Donatur membayarnya dari dompet Grin apa pun, secara interaktif melalui Tor atau dengan bertukar slatepack; dompetlah yang menangani transportasinya.",
+          "**GoblinPay.** Pembayaran yang memungkinkan donatur membayar di dalam aplikasi: mereka memindai QR dan pembayaran berjalan kepada Anda sebagai slatepack terenkripsi dan terbungkus rapat melalui Nostr, dengan konfirmasi otomatis dan tanda terima bertanda tangan di akhir.",
+          "**Keduanya.** Donatur dengan dompet Goblin mendapat alur sekali pindai, dan semua orang lain membayar alamat Slatepack Anda dari dompet Grin apa pun yang mereka pakai. Menawarkan keduanya membuat Anda terbuka bagi setiap donatur.",
+          "Privasi adalah default dengan cara mana pun. Desain Mimblewimble Grin tidak menaruh alamat di rantai dan menyembunyikan setiap jumlah, sehingga donasi Anda tidak pernah muncul di buku besar publik mana pun yang bisa ditelusuri orang.",
+          "Total terverifikasi kampanye Anda menghitung sebuah donasi setelah bukti pembayaran atau tanda terima GoblinPay-nya dipublikasikan dan diperiksa: tanda tangan penerima harus terverifikasi, dan kernel transaksinya harus terkonfirmasi di rantai terhadap node Grin. Setiap bukti yang dipublikasikan mengungkap jumlah dan kernel, tidak ada apa pun tentang donaturnya."
         ]
       },
       "whatEveryoneSees": {
         "heading": "Apa yang bisa dilihat semua orang",
         "paragraphs": [
-          "Jika kampanye Anda menerima pembayaran publik, siapa pun yang mempertimbangkan mendukung Anda bisa mencari alamatnya dan melihat riwayat donasi publik.",
-          "Donasi silent-payment bukan bagian dari catatan itu. Mereka tidak terlihat oleh pengamat luar dan tidak muncul dalam jumlah total publik kampanye; donatur baru hanya melihat apa pun yang Anda publikasikan tentang kemajuan kampanye."
+          "Pengunjung melihat halaman kampanye Anda, targetnya, dan total terverifikasi yang dibangun dari bukti dan tanda terima yang dipilih donatur untuk dipublikasikan. Masing-masing mengungkap jumlah dan kernel transaksi, bukan identitas donatur.",
+          "Tidak ada yang bisa memeriksa saldo atau riwayat donasi Anda di rantai. Tidak ada alamat untuk diperiksa dan tidak ada jumlah untuk dibaca; di luar tanda terima yang dipublikasikan, orang hanya melihat apa yang Anda bagikan tentang kemajuan kampanye."
         ]
       },
       "movePromptly": {
-        "heading": "Pindahkan donasi segera",
+        "heading": "Dompet Anda, tanggung jawab Anda",
         "steps": {
           "sweep": {
-            "title": "Sapu ke dompet yang Anda kendalikan",
-            "body": "Dompet {{appName}} Anda sudah self-custodial — Anda, dan hanya Anda, yang mengendalikan kuncinya. Untuk tampilan saldo yang sama di desktop atau dompet perangkat keras, buka menu dompet, pilih **Cadangkan dompet**, dan impor seed 24 kata ke [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), atau dompet perangkat keras (Trezor, Ledger). Jika Anda lebih ingin memindahkan dana ke kunci yang sepenuhnya berbeda — misalnya, ke dompet Lightning seperti [Phoenix](https://phoenix.acinq.co) — kirim transaksi Bitcoin biasa dari dompet {{appName}} Anda."
+            "title": "Donasi mendarat di dompet yang Anda kendalikan",
+            "body": "{{appName}} tidak pernah menjalankan dompet untuk Anda. Dana tiba di dompet Grin yang alamat atau pembayaran GoblinPay-nya Anda publikasikan, jadi kustodi ada di tangan Anda sejak donasi pertama. Itu juga berarti tanggung jawabnya milik Anda: siapa pun yang memegang frasa seed dompet Anda memegang dananya, dan tanpa frasa itu dana tidak bisa dipulihkan."
           },
           "dontSit": {
-            "title": "Jangan diamkan dana di peramban",
-            "body": "Khususnya untuk kampanye bernilai tinggi, simpan frasa seed dompet secara offline (kertas, cadangan logam, atau pengelola kata sandi di perangkat khusus) dan pertimbangkan dompet perangkat keras. Seed yang Anda cadangkan dari {{appName}} adalah dompet yang sama — amankan kata-katanya dan Anda sudah memiliki cold storage."
+            "title": "Cadangkan frasa seed secara offline",
+            "body": "Khususnya untuk kampanye bernilai tinggi, simpan frasa seed dompet Grin Anda secara offline (kertas, cadangan logam, atau pengelola kata sandi di perangkat khusus). Seed itulah dompetnya: amankan kata-katanya dan Anda sudah memiliki cold storage."
           }
         }
       },
       "cashout": {
-        "heading": "Mencairkan secara privat",
-        "intro": "Membelanjakan secara on-chain menciptakan jejak kecuali Anda memutuskannya dulu. Cairkan dari tab **Privat** agar donasi silent-payment tetap tak terhubungkan — kirim ke dompet silent-payments terlebih dahulu (alamat **sp1…**), lalu belanjakan lebih lanjut; lompatan itu memutus tautan antara kampanye Anda dan apa yang datang berikutnya. Jangan kirim dana privat ke alamat yang dipakai ulang atau alamat publik, yang akan menautkannya kembali. Opsi lain di bawah juga berfungsi dan memiliki konsekuensinya sendiri.",
+        "heading": "Mencairkan dana",
+        "intro": "Rantai Grin tidak akan mengungkap donasi Anda, jadi keputusan privasi utamanya adalah cara Anda mengonversi ke mata uang lokal. Layanan mana pun yang memverifikasi ID Anda akan tahu berapa yang Anda cairkan melaluinya. Opsi di bawah memiliki untung-rugi yang berbeda.",
         "options": {
           "coinjoin": {
-            "name": "Coinjoin",
-            "purpose": "Campurkan Bitcoin Anda dengan koin pengguna lain sehingga outputnya tidak bisa dihubungkan kembali ke inputnya."
+            "name": "Bursa",
+            "purpose": "Jalur paling sederhana menuju fiat. Bersiaplah untuk KYC: bursa mengetahui identitas Anda dan jumlah yang Anda cairkan melaluinya."
           },
           "peerToPeer": {
             "name": "Peer-to-peer",
-            "purpose": "Tukar Bitcoin dengan fiat langsung dengan orang lain atau melalui broker di Bisq, HodlHodl, atau RoboSats."
+            "purpose": "Tukar Grin dengan fiat langsung dengan orang lain atau melalui broker over-the-counter. Tanpa platform di tengah."
           },
           "spendDirectly": {
             "name": "Belanjakan langsung",
-            "purpose": "Beli kartu hadiah (Amazon, Uber, bahan makanan, perjalanan) langsung dari Bitcoin tanpa mengonversi ke uang tunai terlebih dahulu."
+            "purpose": "Belanjakan Grin sebagai uang di pedagang dan layanan yang menerimanya, tanpa mengonversi ke uang tunai terlebih dahulu."
           }
         }
       },
       "tumblers": {
-        "title": "Hindari tumbler tersentralisasi",
-        "body": "Mixer kustodial bisa mencuri koin Anda, mencatat siapa mengirim apa, atau ternyata adalah honeypot penegak hukum. Gunakan lompatan silent-payments atau coinjoin non-kustodial sebagai gantinya."
+        "title": "Tidak perlu mixer",
+        "body": "Tidak ada tumbler atau layanan pencampur yang perlu dipercaya di Grin, dan Anda memang tidak membutuhkannya. Mimblewimble menyembunyikan jumlah dan tidak meninggalkan alamat di rantai, sehingga donasi privat secara default."
       }
     }
   }

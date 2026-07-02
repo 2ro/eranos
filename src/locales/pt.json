@@ -174,12 +174,12 @@
       "subtitle": "Você pode fazer os dois depois. Isso só nos ajuda a adaptar os próximos passos.",
       "creator": {
         "title": "Iniciar uma campanha",
-        "description": "Arrecade Bitcoin para uma causa em que você acredita.",
-        "finderNote": "Os doadores enviam sats diretamente para sua carteira."
+        "description": "Arrecade Grin para uma causa que importa para você.",
+        "finderNote": "Doadores enviam GRIN diretamente para a sua carteira."
       },
       "donor": {
         "title": "Doar para campanhas",
-        "description": "Apoie causas com Bitcoin.",
+        "description": "Apoie causas com Grin.",
         "finderNote": "Sua doação vai direto para a carteira do organizador."
       },
       "verifier": {
@@ -198,7 +198,7 @@
     "secure": {
       "title": "Salve sua chave",
       "subtitle": "Baixe o arquivo e guarde em um lugar seguro. Um gerenciador de senhas funciona bem.",
-      "couplingNote": "Sua conta e sua carteira compartilham esta chave. Ela assina suas publicações no Nostr e abre sua carteira Bitcoin no Eranos.",
+      "couplingNote": "Esta chave é a sua identidade no Eranos. Ela assina suas publicações no Nostr, suas campanhas e os recibos de doação que contam para os totais das campanhas.",
       "permanenceHeadline": "Não há como recuperar esta chave se você perdê-la.",
       "permanenceBody": "Sem redefinição, sem suporte, sem recuperação por e-mail. Salve-a antes de continuar.",
       "button": "Baixar e continuar",
@@ -574,7 +574,7 @@
       "seoTitle": "Guia do Doador",
       "seoDescription": "Como as doações funcionam no {{appName}} e como proteger sua privacidade.",
       "title": "Guia do Doador",
-      "subtitle": "Bitcoin de verdade, enviado diretamente. Todo o processo em uma página curta."
+      "subtitle": "Grin de verdade, enviado diretamente. Todo o fluxo em uma página curta."
     },
     "recipientGuide": {
       "seoTitle": "Guia do Beneficiário",
@@ -606,13 +606,13 @@
   },
   "about": {
     "seoTitle": "Sobre",
-    "seoDescription": "Como o {{appName}} funciona: conectando beneficiários a financiamento incontrolável através de Bitcoin e Nostr.",
+    "seoDescription": "Como o {{appName}} funciona: conectando beneficiários a financiamento imparável através de Grin e Nostr.",
     "hero": {
       "eyebrow": "Sobre o {{appName}}",
       "headlinePart1": "Como",
       "headlineAppName": "{{appName}}",
       "headlinePart2": "funciona.",
-      "body": "O {{appName}} é uma plataforma de doações resistente à censura, construída sobre Nostr e Bitcoin. Sem contas bancárias congeladas. Sem desligamentos corporativos. Apenas apoio direto de pessoas que acreditam na sua causa.",
+      "body": "{{appName}} é uma plataforma de doações resistente à censura construída sobre Nostr e Grin. Sem contas bancárias congeladas. Sem encerramentos corporativos. Apenas apoio direto de pessoas que acreditam na sua causa.",
       "trustChips": {
         "decentralized": "Descentralizado",
         "openSource": "Código aberto",
@@ -630,7 +630,7 @@
         "raised": "arrecadados",
         "ofGoal": "de US$ 10.000",
         "donorsLine": "247 doadores · 12 países",
-        "donate": "Doar Bitcoin"
+        "donate": "Doar Grin"
       }
     },
     "howItWorks": {
@@ -640,12 +640,12 @@
       "step1": {
         "imageAlt": "Uma chave criptográfica laranja brilhante flutuando no espaço escuro, simbolizando identidade auto-soberana",
         "title": "Beneficiários se cadastram em segundos.",
-        "body": "Sem banco. Sem papelada. Sem aprovação. No momento em que um beneficiário cria uma conta no {{appName}}, ele tem um endereço Bitcoin pronto para receber apoio, em qualquer lugar do mundo."
+        "body": "Sem banco. Sem burocracia. Sem aprovação. Um beneficiário cria uma conta no {{appName}}, adiciona à sua campanha o endereço de recebimento da sua própria carteira Grin e pode aceitar apoio de qualquer lugar do mundo."
       },
       "step2": {
-        "imageAlt": "Uma moeda Bitcoin brilhante voando pelo ar através de um mapa-múndi escuro, simbolizando pagamento instantâneo transfronteiriço",
-        "title": "Doadores enviam Bitcoin diretamente.",
-        "body": "Doadores enviam Bitcoin de qualquer carteira que já usem (Cash App, Coinbase, Strike, uma carteira de hardware) direto para o beneficiário. O {{appName}} nunca toca no dinheiro. Sem servidor no meio, sem custodiante."
+        "imageAlt": "Uma moeda Grin brilhante voando pelo ar sobre um mapa-múndi escuro, simbolizando um pagamento internacional instantâneo",
+        "title": "Doadores enviam Grin diretamente.",
+        "body": "Doadores pagam de qualquer carteira Grin, seja pelo checkout GoblinPay da campanha ou direto para o endereço Slatepack grin1 dela. O {{appName}} nunca toca no dinheiro. A transação vai da carteira do doador para a carteira do beneficiário."
       },
       "step3": {
         "imageAlt": "Uma mão aberta com luz laranja quente irradiando da palma, simbolizando recebimento e autonomia",
@@ -661,8 +661,8 @@
         "description": "O que é o Eranos, quem o construiu e quanto custa."
       },
       "chapter2": {
-        "label": "Doações em Bitcoin",
-        "description": "Como os pagamentos funcionam, por que on-chain, por que público, por que esses trade-offs."
+        "label": "Doações em Grin",
+        "description": "Como os pagamentos funcionam, por que Grin, o que permanece privado e as contrapartidas."
       },
       "chapter3": {
         "label": "Sobre o Nostr",
@@ -677,8 +677,8 @@
         "imageAlt": "Manifestantes encapuzados marchando por uma rua de cidade europeia ao crepúsculo, segurando sinalizadores vermelhos acesos e faixas 'FREEDOM' e 'LIBERTAD'",
         "role": "Para Doadores",
         "title": "Apoie causas que os bancos não apoiam.",
-        "description": "Envie Bitcoin diretamente para beneficiários e movimentos em qualquer lugar do mundo, sem pedir permissão a um processador de pagamento.",
-        "bullet1": "Use qualquer carteira Bitcoin que você já tem.",
+        "description": "Envie Grin diretamente para beneficiários e movimentos em qualquer lugar do mundo, sem pedir permissão a um processador de pagamentos.",
+        "bullet1": "Pague de qualquer carteira Grin, como Goblin ou grin-wallet.",
         "bullet2": "Doações chegam diretamente ao beneficiário. Sem custodiante, sem intermediário.",
         "cta": "Ler o Guia do Doador"
       },
@@ -822,7 +822,7 @@
       "errorDescriptionRequired": "A descrição é obrigatória.",
       "errorPledgeRequired": "O valor da promessa é obrigatório.",
       "errorPledgeInvalid": "O valor da promessa deve ser um valor positivo em USD.",
-      "errorPriceUnavailable": "Aguardando o preço BTC/USD para calcular o valor da promessa.",
+      "errorPriceUnavailable": "Aguardando a taxa de câmbio para calcular o valor da promessa.",
       "errorCoverInvalid": "A imagem de capa deve ser uma URL https:// válida.",
       "errorDeadlinePast": "O prazo não pode estar no passado.",
       "wizard": {
@@ -1226,7 +1226,7 @@
       "seoTitle": "Arrecadações",
       "seoDescription": "Conectando o mundo a financiamento incontrolável.",
       "heroTagline": "Conectando o mundo a<1></1>financiamento <0>incontrolável.</0>",
-      "heroBody": "Arrecade Bitcoin diretamente de apoiadores do mundo todo. Cada doação é liquidada diretamente para sua carteira, sem intermediários, sem estornos e sem plataforma segurando seus fundos.",
+      "heroBody": "Arrecade Grin diretamente de apoiadores do mundo inteiro. Cada doação é liquidada direto na sua carteira, sem intermediários, sem estornos e sem nenhuma plataforma retendo seus fundos.",
       "startCampaign": "Iniciar uma campanha",
       "howItWorks": "Como funciona",
       "featuredTitle": "Campanhas em destaque",
@@ -1244,7 +1244,7 @@
       "whyDifferent": {
         "eyebrow": "Por que o {{appName}}",
         "title": "Construído diferente.",
-        "lede": "Bitcoin direto do doador ao beneficiário. Sem plataforma no meio, sem custodiante segurando o saco, sem pedir permissão.",
+        "lede": "Grin direto do doador para o beneficiário. Nenhuma plataforma no caminho, nenhum custodiante segurando o dinheiro, nenhuma permissão necessária.",
         "block1": {
           "heading": "Diferente do GoFundMe",
           "body": "Nenhuma plataforma pode congelar suas doações, exigir reembolsos ou encerrar sua campanha por divergências de política. Sem Stripe, sem Visa, sem banco no meio que pode te cortar no meio da campanha.",
@@ -1253,8 +1253,8 @@
           "bullet3": "Zero taxas de plataforma"
         },
         "block2": {
-          "heading": "Diferente de outras plataformas ‘Bitcoin’",
-          "body": "Sem nó Lightning central, custodiante ou LSP para falhar ou ficar offline. Os fundos são liquidados diretamente no Bitcoin em uma carteira que você controla. Se o {{appName}} desaparecesse amanhã, toda campanha continuaria funcionando.",
+          "heading": "Diferente de outras plataformas cripto",
+          "body": "Sem carteira custodial, nó hospedado ou processador de pagamentos para falhar ou sair do ar. Os fundos são liquidados na cadeia do Grin em uma carteira que você controla. Se o {{appName}} desaparecesse amanhã, cada campanha continuaria funcionando.",
           "bullet1": "Sem carteira custodial para drenar ou congelar",
           "bullet2": "Liquida on-chain em uma carteira que você possui",
           "bullet3": "Funciona mesmo se o {{appName}} desaparecer"
@@ -1275,7 +1275,7 @@
       "heroKicker": "Campanhas",
       "heroHeading": "Cada causa,",
       "heroHeadingLine2": "em um só lugar.",
-      "heroBody": "Cada arrecadação publicada no Nostr, reunida em um só lugar. Navegue pela rede inteira, encontre uma causa que importa para você e apoie diretamente com Bitcoin.",
+      "heroBody": "Cada campanha publicada no Nostr, reunida em um só lugar. Navegue por toda a rede, encontre uma causa que importa para você e apoie-a diretamente com Grin.",
       "campaignsCount_one": "campanha na rede",
       "campaignsCount_other": "campanhas na rede",
       "searchAriaLabel": "Pesquisar campanhas",
@@ -1397,7 +1397,7 @@
       "notifications": "Notificações",
       "notificationsDesc": "Preferências de notificação push.",
       "advanced": "Avançado",
-      "advancedDesc": "Carteira, sistema e opções de usuário avançado.",
+      "advancedDesc": "Opções de sistema e para usuários avançados.",
       "organizers": "Organizadores",
       "organizersDesc": "Nomeie organizadores de país que podem fixar publicações nos feeds nacionais."
     },
@@ -1436,8 +1436,8 @@
     },
     "advanced": {
       "title": "Avançado",
-      "subtitle": "Conexões de carteira, configuração de sistema e outras opções avançadas para usuários experientes.",
-      "intro": "Conexões de carteira, configuração de sistema e outras opções avançadas.",
+      "subtitle": "Configuração do sistema e outras opções avançadas para usuários experientes.",
+      "intro": "Configuração do sistema e outras opções avançadas.",
       "torHeading": "Tor",
       "torToggle": "Rotear tráfego pelo Tor",
       "torToggleDesc": "Conecta-se a relays e carrega mídia pela rede Tor para maior privacidade. Espere desempenho mais lento e uma breve espera enquanto o Tor se conecta.",
@@ -2070,7 +2070,7 @@
       "heading": "Sua chave",
       "extensionBody": "Você está conectado com uma extensão de navegador (NIP-07). Sua chave secreta está armazenada lá — gerencie ou exporte-a pela própria extensão.",
       "bunkerBody": "Você está conectado com um assinador remoto (NIP-46). Sua chave secreta é mantida por esse assinador e não pode ser exportada do {{appName}}.",
-      "explainer": "Esta chave secreta controla sua conta no {{appName}} e gera a semente da sua carteira Bitcoin. Qualquer pessoa com ela pode publicar como você E gastar seu Bitcoin. Guarde-a em um gerenciador de senhas ou em outro lugar que só você possa acessar. Se quiser importar a carteira Bitcoin em outro aplicativo, use a frase semente abaixo — ela é mais segura para compartilhar, controla apenas a carteira e não pode ser usada para se passar por você.",
+      "explainer": "Esta chave secreta controla sua conta no {{appName}}. Qualquer pessoa com ela pode publicar como você, editar suas campanhas e publicar em seu nome. Guarde-a em um gerenciador de senhas ou em outro lugar que só você possa acessar. Seus fundos em Grin são separados: eles vivem na sua própria carteira Grin e na frase semente dela, não nesta chave.",
       "warning": "NUNCA compartilhe sua chave secreta com ninguém. Evite tirar capturas de tela ou colá-la em qualquer lugar exceto um gerenciador de senhas. Se compartilhada, outros poderão acessar sua conta.",
       "aria": "Sua chave secreta",
       "copyAria": "Copiar chave secreta",
@@ -2092,7 +2092,7 @@
         "label": "Sobre o Eranos"
       },
       "payments": {
-        "label": "Doações em Bitcoin no Eranos"
+        "label": "Doações em Grin no Eranos"
       },
       "about-nostr": {
         "label": "Sobre o Nostr"
@@ -2105,14 +2105,14 @@
       "what-is-ditto": {
         "question": "O que é o {{appName}}?",
         "answer": [
-          "O {{appName}} é uma plataforma para enviar doações em Bitcoin — públicas ou privadas — diretamente para beneficiários. Não há intermediário, não há processador de pagamento, e não há conta que possa ser congelada.",
+          "{{appName}} é uma plataforma para enviar doações em Grin diretamente aos beneficiários. Não há intermediário, nem processador de pagamentos, nem conta que possa ser congelada.",
           "O {{appName}} é construído sobre o Nostr, então sua identidade não está presa a este site — você é dono dela."
         ]
       },
       "cost-to-use": {
         "question": "O {{appName}} cobra alguma coisa?",
         "answer": [
-          "**Não.** O {{appName}} não cobra taxa de plataforma. Quando você doa, paga apenas a taxa da rede Bitcoin, que vai para os mineradores — não para nós."
+          "**Não.** O {{appName}} não cobra nenhuma taxa de plataforma. Quando você doa, paga apenas a pequena taxa da rede Grin que vai para os mineradores, não para nós."
         ]
       },
       "who-made-this": {
@@ -2125,37 +2125,37 @@
         "question": "O que significa \"resistente à censura\" aqui?",
         "answer": [
           "Nenhuma empresa fica entre um doador e um beneficiário. O {{appName}} não detém os fundos e não pode congelar o endereço.",
-          "Enquanto a rede Bitcoin estiver funcionando, doações podem ser enviadas e recebidas. O {{appName}} ficar offline não as pararia."
+          "Enquanto a rede Grin estiver funcionando, doações podem ser enviadas e recebidas. Se o próprio {{appName}} saísse do ar, isso não as impediria."
         ]
       },
       "why-onchain": {
-        "question": "Por que Bitcoin?",
+        "question": "Por que Grin?",
         "answer": [
-          "Bitcoin é o trilho de pagamento mais amplamente suportado e mais resistente à censura do mundo. Todas as carteiras Bitcoin podem enviá-lo.",
-          "No {{appName}}, beneficiários escolhem como receber: **público** (um endereço Bitcoin comum) para alcance máximo, **privado** (pagamentos silenciosos) para doações inrastreáveis, ou **ambos** para que a carteira de cada doador escolha o caminho certo automaticamente. Doadores que têm apenas um aplicativo Bitcoin de consumo ainda podem contribuir; doadores com uma carteira de pagamentos silenciosos obtêm privacidade por padrão.",
-          "O trade-off é que transações Bitcoin públicas são visíveis na blockchain e pagam uma taxa de minerador. Os guias do Doador e do Beneficiário explicam como lidar com ambos."
+          "Grin é dinheiro digital com privacidade embutida. Seu design Mimblewimble não coloca endereços na cadeia e oculta todos os valores, então as doações não deixam o rastro público que a maioria das criptomoedas deixa.",
+          "No {{appName}}, as campanhas recebem Grin de duas formas: pelo GoblinPay (escaneie um QR e o pagamento viaja até a campanha como um slatepack criptografado via Nostr) ou direto para o endereço Slatepack grin1 da campanha a partir de qualquer carteira Grin. De qualquer forma, os fundos chegam a uma carteira que a campanha controla.",
+          "Os totais das campanhas permanecem honestos sem abrir mão dessa privacidade: um doador pode publicar um comprovante de pagamento, e o {{appName}} o verifica contra um nó Grin para confirmar que a transação está realmente na cadeia. O comprovante revela o valor e o kernel da transação, não quem pagou. Os guias do Doador e do Beneficiário explicam os detalhes."
         ]
       },
       "why-not-rotating-addresses": {
-        "question": "Por que o {{appName}} não gera um novo endereço para cada doação?",
+        "question": "Por que o {{appName}} não processa doações no próprio servidor?",
         "answer": [
-          "Fazer isso exigiria que o {{appName}} atuasse como intermediário de troca de dinheiro — primeiro tomando custódia do Bitcoin e depois encaminhando-o ao beneficiário.",
-          "Isso nos tornaria um transmissor de dinheiro, sujeito às regulamentações que vêm com isso, e um ponto único de falha: desligue o servidor do {{appName}} e você desligou cada doação fluindo por ele.",
-          "Em vez disso, o endereço de doação de cada usuário é derivado de sua chave secreta Nostr (nsec) — a mesma chave com que você inicia sessão. Doadores enviam diretamente ao beneficiário, o {{appName}} nunca toca nos fundos, e a plataforma em si não pode ser desligada para censurar ninguém. Beneficiários que querem privacidade por doação podem aceitar pagamentos silenciosos, que dão a mesma inrastreabilidade sem ninguém segurando o dinheiro no meio."
+          "Fazer isso exigiria que o {{appName}} agisse como um intermediário financeiro, assumindo primeiro a custódia do Grin e depois repassando-o ao beneficiário.",
+          "Isso nos tornaria um transmissor de dinheiro, sujeito às regulações que vêm com isso, e um ponto único de falha: desligue o servidor do {{appName}} e você desligou todas as doações que passam por ele.",
+          "Em vez disso, as doações viajam da carteira Grin do doador para a carteira Grin da campanha. Cada campanha publica seu próprio endereço Slatepack grin1 ou checkout GoblinPay, o {{appName}} nunca toca nos fundos, e a própria plataforma não pode ser desligada para censurar ninguém. E como o Grin não coloca endereços na cadeia, as doações são impossíveis de vincular por padrão, sem ninguém segurando o dinheiro no meio."
         ]
       },
       "why-not-other-crypto": {
-        "question": "Por que não Monero ou outra criptomoeda?",
+        "question": "Por que não Bitcoin, Monero ou outra criptomoeda?",
         "answer": [
-          "Bitcoin é de longe a criptomoeda mais amplamente adotada. Isso significa que é a mais fácil para doadores comprarem e enviarem, e a mais fácil para beneficiários receberem, manterem e gastarem.",
-          "Moedas focadas em privacidade como Monero oferecem trade-offs de privacidade diferentes do Bitcoin, mas não são suportadas pela maioria dos aplicativos de consumo e são mais difíceis de converter de volta para moeda local. Pedir a qualquer lado de uma doação para primeiro adquirir uma criptomoeda de nicho é uma barreira que o {{appName}} não colocará no caminho. Para doações em Bitcoin em si, pagamentos silenciosos cobrem o caso de uso de inrastreabilidade sem sair do ecossistema Bitcoin."
+          "Bitcoin é a criptomoeda mais adotada, mas seu livro-razão é público: uma doação para um endereço conhecido expõe o valor, o horário e o lado remetente, para sempre. Adicionar privacidade por cima significa ferramentas extras, passos extras e mais jeitos de errar. Para doações a causas sensíveis, esse é o padrão errado.",
+          "O Grin torna o caminho privado o único caminho. O Mimblewimble não deixa endereços na cadeia e oculta todos os valores, então doadores não precisam de ferramentas especiais para ficar seguros. Ao mesmo tempo, os comprovantes de pagamento do Grin permitem que uma campanha mostre um total verificado e conferido na cadeia sem expor seus doadores. O Monero também oferece privacidade forte, mas os comprovantes de pagamento do Grin se encaixam no modelo de doações verificadas do {{appName}}, e sua cadeia leve mantém a verificação simples."
         ]
       },
       "what-is-nostr": {
         "question": "O que é Nostr?",
         "answer": [
           "Nostr é uma rede aberta onde **você** é dono da sua conta, não uma empresa. Sua identidade é uma chave criptográfica que você controla, não um nome de usuário no servidor de outra pessoa.",
-          "No {{appName}}, essa mesma chave também é da qual seu endereço de doação é derivado — sua chave secreta Nostr (nsec) semeia sua carteira Bitcoin, e é por isso que você pode receber Bitcoin sem se cadastrar em ninguém."
+          "No {{appName}}, essa mesma chave assina suas campanhas e os recibos de doação que constroem seu total verificado, e é por isso que sua identidade e suas campanhas funcionam em qualquer lugar do Nostr sem se cadastrar em ninguém."
         ]
       },
       "why-login-different": {
@@ -2168,7 +2168,7 @@
       "lose-secret-key": {
         "question": "O que acontece se eu perder minha chave secreta?",
         "answer": [
-          "**Não há botão de \"esqueci minha senha\".** Ninguém pode redefini-la para você. Se você perdê-la, sua conta — e qualquer Bitcoin no seu endereço de doação — está perdida para sempre.",
+          "**Não há botão de \"esqueci minha senha\".** Ninguém pode redefini-la para você. Se você perdê-la, sua conta e suas campanhas estão perdidas para sempre. (Seus fundos em Grin vivem na sua própria carteira Grin e na frase semente dela, que é separada desta chave.)",
           "**Salve sua chave secreta em um lugar seguro agora mesmo.** Para dicas, leia [Gerenciando suas chaves Nostr](https://soapbox.pub/blog/managing-nostr-keys)."
         ]
       },
@@ -2206,7 +2206,7 @@
       "vs-mastodon-bluesky": {
         "question": "Em que o Nostr é diferente do Mastodon ou Bluesky?",
         "answer": [
-          "No Mastodon, sua conta vive em um servidor específico. No Bluesky, a maioria das contas depende de uma empresa. No Nostr, sua identidade é uma chave que você controla, e seu endereço de doação te acompanha em qualquer aplicativo Nostr."
+          "No Mastodon, sua conta vive em um servidor específico. No Bluesky, a maioria das contas depende de uma única empresa. No Nostr, sua identidade é uma chave que você controla, e seu perfil e suas campanhas vão com você para qualquer aplicativo Nostr."
         ]
       },
       "profile-fields": {
@@ -2223,11 +2223,11 @@
     },
     "donor": {
       "tldr": {
-        "lede": "Pague o endereço Bitcoin na página da campanha de qualquer carteira que você já tem. Se a campanha aceita pagamentos silenciosos e sua carteira os suporta, sua doação é privada automaticamente.",
+        "lede": "Doe de qualquer carteira Grin: escaneie o QR do GoblinPay da campanha ou pague para o endereço Slatepack grin1 dela. O Grin é privado por padrão, então sua doação não deixa rastro público.",
         "nextActions": [
-          "Pague de qualquer carteira Bitcoin",
+          "Pague de qualquer carteira Grin",
           "Sem intermediário, sem período de retenção",
-          "Quer privacidade? Leia abaixo"
+          "Privado por padrão"
         ]
       },
       "flow": {
@@ -2235,98 +2235,98 @@
         "steps": {
           "openCampaign": {
             "title": "Abra a campanha",
-            "body": "Você vê um único QR code. Se a campanha aceita ambas as opções, ele codifica ambos os endpoints; sua carteira escolhe o certo."
+            "body": "Toque em Doar e escolha um caminho. GoblinPay: informe um valor, escaneie o QR com uma carteira Goblin, e o pagamento viaja até a campanha como um slatepack criptografado via Nostr, com confirmação automática. Endereço Grin: pague para o endereço Slatepack grin1 da campanha a partir de qualquer carteira Grin; sua carteira cuida do transporte, via Tor ou trocando slatepacks."
           },
           "arrivesDirectly": {
             "title": "Chega diretamente",
-            "body": "Os fundos são liquidados direto para o beneficiário. O {{appName}} não os detém ou roteia, e o endereço é derivado da chave secreta Nostr do beneficiário."
+            "body": "Os fundos são liquidados direto na carteira da campanha. O {{appName}} não os retém nem os encaminha. Se você quiser que sua contribuição conte para o total público da campanha, publique depois o comprovante de pagamento ou o recibo; ele revela o valor, não a sua identidade."
           }
         }
       },
       "publicVisible": {
-        "title": "Doações públicas são visíveis on-chain para sempre",
-        "body": "Uma doação **Pública** chega em um endereço Bitcoin comum vinculado à campanha. Qualquer um pode consultar o endereço e ver o valor, o horário e seu endereço de envio. Doações **Silenciosas** também são liquidadas on-chain, mas o lado de recebimento é inrastreável à campanha, então ficam fora das listas e totais públicos de doadores."
+        "title": "O que é público e o que não é",
+        "body": "A cadeia do Grin não tem endereços e oculta todos os valores, então observadores externos não conseguem ver quem doou para uma campanha nem quanto. O total da campanha no {{appName}} é construído apenas com os comprovantes e recibos que os doadores escolhem publicar, e cada um revela apenas o valor e o kernel da transação."
       },
       "privacy": {
         "heading": "Doando com privacidade",
-        "intro": "Estes passos importam mais para doações **Públicas**, onde cada transação fica permanentemente vinculada a um único endereço. Doações **Silenciosas** já ocultam o lado de recebimento, então o risco é menor. Análise direcionada da sua carteira de envio ainda é possível de qualquer forma, então se seu risco é alto, vale a pena seguir estes passos. Escolha um, ou empilhe-os.",
+        "intro": "Na cadeia, o Grin já protege você: sem endereços, valores ocultos, sem lista pública de doadores. O que ainda pode identificá-lo é como você adquiriu o Grin e o que escolhe publicar. Se o seu risco for alto, estes passos valem a pena. Escolha um, ou combine-os.",
         "options": {
           "nonKyc": {
-            "name": "Compre Bitcoin sem KYC",
-            "purpose": "Compre Bitcoin peer-to-peer para que não fique vinculado ao seu documento de identidade desde o início. Ponto de partida mais forte para privacidade."
+            "name": "Adquira Grin sem KYC",
+            "purpose": "Minere-o, ou compre-o peer-to-peer, para que as moedas não estejam vinculadas ao seu documento de identidade desde o início."
           },
           "coinjoin": {
-            "name": "Coinjoin primeiro",
-            "purpose": "Misture seu Bitcoin com moedas de outras pessoas para que a saída não possa ser rastreada à sua compra com KYC. Útil quando a campanha só aceita público."
+            "name": "Pule o recibo público",
+            "purpose": "Publicar um comprovante de pagamento vincula a doação à sua identidade Nostr. Não o publique, e a doação fica entre você e a campanha."
           }
         }
       },
       "consumerApps": {
-        "title": "Aplicativos de consumo não podem te tornar anônimo",
-        "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance e PayPal todos verificam sua identidade. Não importa como você envie a doação, cada transação permanece vinculada à sua identidade real. Use uma carteira não-custodial que você controla."
+        "title": "Exchanges sabem quem você é",
+        "body": "Exchanges que listam GRIN verificam sua identidade e mantêm registros de cada saque. A cadeia pública não mostrará sua doação, mas a exchange sabe para onde o saque dela foi. Se isso importa na sua situação, saque primeiro para uma carteira que você controla e doe a partir dela."
       }
     },
     "recipient": {
       "tldr": {
-        "lede": "Escolha o que aceitar ao criar sua campanha: Público, Silencioso ou ambos. Qualquer opção é não-custodial. O {{appName}} nunca detém seus fundos.",
+        "lede": "Publique um endereço Slatepack grin1 de uma carteira Grin que você controla, ou configure um checkout GoblinPay. As doações chegam de carteira a carteira. O {{appName}} nunca retém seus fundos.",
         "nextActions": [
-          "Compare as duas opções",
-          "Planeje como você vai sacar",
-          "Mova fundos prontamente"
+          "Obtenha uma carteira Grin e um endereço",
+          "Adicione-o à sua campanha",
+          "Faça backup da frase semente da sua carteira"
         ]
       },
       "howReceiving": {
-        "heading": "Como funciona o recebimento",
+        "heading": "Como o recebimento funciona",
         "paragraphs": [
-          "Seus endereços de doação {{appName}} são derivados da sua chave secreta Nostr (nsec) — a mesma chave com que você inicia sessão semeia sua carteira Bitcoin. Quando você cria uma campanha, escolhe o que aceitar:",
-          "**Apenas pagamentos públicos.** Um endereço Bitcoin comum. Visível para todos, funciona com todas as carteiras.",
-          "**Apenas pagamentos silenciosos.** Pagamentos silenciosos BIP-352. O lado de recebimento é inrastreável on-chain, então doações ficam fora das listas e totais públicos de doadores. Doadores precisam de uma carteira capaz de pagamentos silenciosos para enviar. Se não têm uma, a doação não pode passar.",
-          "**Ambos.** O {{appName}} gera um único QR code que codifica ambos os endpoints. Carteiras de pagamentos silenciosos leem como privado; carteiras comuns pagam o endereço público. Doadores não precisam escolher.",
-          "Aceitar ambos geralmente é a escolha certa: você recebe doações privadas de apoiadores que usam carteira de pagamentos silenciosos, e permanece aberto a doadores cujo único Bitcoin está em um aplicativo de consumo.",
-          "Dentro da sua carteira {{appName}}, esses fundos chegam como **dois saldos separados** — uma aba **Pública** (seu endereço Bitcoin comum) e uma aba **Privada** (pagamentos silenciosos) — exibidos nas abas Pública / Privada da carteira. O {{appName}} os mantém estritamente separados de propósito: os dois saldos nunca podem ser gastos juntos. Misturar fundos privados com públicos em uma única transação vincularia suas doações inrastreáveis de pagamentos silenciosos de volta ao seu endereço público on-chain e destruiria a privacidade que elas existem para oferecer."
+          "As doações no {{appName}} viajam direto da carteira Grin do doador para a sua. Quando você cria uma campanha, escolhe como receber:",
+          "**Um endereço Slatepack grin1.** Qualquer carteira Grin (Goblin, grin-wallet) fornece um. Doadores pagam para ele de qualquer carteira Grin, de forma interativa via Tor ou trocando slatepacks; as carteiras cuidam do transporte.",
+          "**GoblinPay.** Um checkout que permite ao doador pagar dentro do app: ele escaneia um QR e o pagamento viaja até você como um slatepack criptografado e embrulhado (gift wrap) via Nostr, com confirmação automática e um recibo assinado no final.",
+          "**Ambos.** Doadores com uma carteira Goblin ganham o fluxo de um único escaneio, e todos os outros pagam para o seu endereço Slatepack a partir da carteira Grin que usarem. Oferecer os dois mantém você aberto a todos os doadores.",
+          "A privacidade é o padrão de qualquer forma. O design Mimblewimble do Grin não coloca endereços na cadeia e oculta todos os valores, então suas doações nunca aparecem em nenhum livro-razão público que alguém possa consultar.",
+          "O total verificado da sua campanha conta uma doação quando o comprovante de pagamento ou o recibo do GoblinPay dela é publicado e conferido: a assinatura do recebedor precisa ser verificada, e o kernel da transação precisa estar confirmado na cadeia contra um nó Grin. Cada comprovante publicado revela o valor e o kernel, nada sobre o doador."
         ]
       },
       "whatEveryoneSees": {
         "heading": "O que todos podem ver",
         "paragraphs": [
-          "Se sua campanha aceita pagamentos públicos, qualquer um considerando apoiá-lo pode consultar o endereço e ver o histórico público de doações.",
-          "Doações em pagamentos silenciosos não fazem parte desse registro. São invisíveis para observadores externos e não aparecem nos totais públicos da campanha; novos doadores só veem o que você publica sobre o progresso da campanha."
+          "Visitantes veem a página da sua campanha, a meta dela e o total verificado construído com os comprovantes e recibos que os doadores escolheram publicar. Cada um deles revela um valor e um kernel de transação, não a identidade de um doador.",
+          "Ninguém pode consultar seu saldo ou histórico de doações na cadeia. Não há endereço para inspecionar nem valores para ler; além dos recibos publicados, as pessoas veem apenas o que você compartilha sobre o progresso da campanha."
         ]
       },
       "movePromptly": {
-        "heading": "Mova as doações prontamente",
+        "heading": "Sua carteira, sua responsabilidade",
         "steps": {
           "sweep": {
-            "title": "Mova para uma carteira que você controla",
-            "body": "Sua carteira {{appName}} já é de auto-custódia — você, e somente você, controla as chaves. Para uma visão em desktop ou carteira de hardware do mesmo saldo, abra o menu da carteira, escolha **Fazer backup da carteira** e importe a semente de 24 palavras no [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), ou em uma carteira de hardware (Trezor, Ledger). Se preferir mover os fundos para uma chave totalmente diferente — por exemplo, para uma carteira Lightning como a [Phoenix](https://phoenix.acinq.co) — envie uma transação Bitcoin comum a partir da sua carteira {{appName}}."
+            "title": "As doações chegam a uma carteira que você controla",
+            "body": "O {{appName}} nunca opera uma carteira para você. Os fundos chegam na carteira Grin cujo endereço ou checkout GoblinPay você publicou, então a custódia é sua desde a primeira doação. Isso também significa que a responsabilidade é sua: qualquer pessoa que tenha a frase semente da sua carteira tem os fundos, e sem ela os fundos são irrecuperáveis."
           },
           "dontSit": {
-            "title": "Não deixe fundos parados no navegador",
-            "body": "Especialmente para campanhas de alto valor, guarde a frase semente da carteira offline (papel, backup em metal, ou um gerenciador de senhas em um dispositivo dedicado) e considere uma carteira de hardware. A semente que você faz backup no {{appName}} é a mesma carteira — proteja as palavras e você terá armazenamento a frio."
+            "title": "Faça backup da frase semente offline",
+            "body": "Especialmente para campanhas de alto valor, guarde a frase semente da sua carteira Grin offline (papel, backup em metal, ou um gerenciador de senhas em um dispositivo dedicado). A semente é a carteira: proteja as palavras e você tem armazenamento a frio."
           }
         }
       },
       "cashout": {
-        "heading": "Sacando com privacidade",
-        "intro": "Gastar on-chain cria um rastro a menos que você o quebre primeiro. Saque a partir da aba **Privada** para manter as doações de pagamentos silenciosos inrastreáveis — envie primeiro para uma carteira de pagamentos silenciosos (um endereço **sp1…**), depois gaste em seguida; o salto quebra o vínculo entre sua campanha e o que vem depois. Não envie fundos privados para um endereço reutilizado ou público, o que os vincula novamente. As outras opções abaixo também funcionam e têm seus próprios trade-offs.",
+        "heading": "Convertendo em dinheiro",
+        "intro": "A cadeia do Grin não vai expor suas doações, então a principal decisão de privacidade é como você converte para a moeda local. Qualquer serviço que verifique sua identidade saberá o que você converte através dele. As opções abaixo têm contrapartidas diferentes.",
         "options": {
           "coinjoin": {
-            "name": "Coinjoin",
-            "purpose": "Misture seu Bitcoin com moedas de outros usuários para que a saída não possa ser vinculada de volta à entrada."
+            "name": "Exchanges",
+            "purpose": "O caminho mais simples para o dinheiro fiduciário. Espere KYC: a exchange fica sabendo sua identidade e o valor que você converte através dela."
           },
           "peerToPeer": {
             "name": "Peer-to-peer",
-            "purpose": "Negocie Bitcoin por fiat diretamente com outra pessoa ou através de um corretor no Bisq, HodlHodl ou RoboSats."
+            "purpose": "Troque Grin por dinheiro fiduciário diretamente com outra pessoa ou através de um corretor de balcão (OTC). Sem plataforma no meio."
           },
           "spendDirectly": {
             "name": "Gaste diretamente",
-            "purpose": "Compre gift cards (Amazon, Uber, mercado, viagem) direto com Bitcoin sem converter para dinheiro primeiro."
+            "purpose": "Gaste Grin como dinheiro em comércios e serviços que o aceitam, sem antes converter para moeda local."
           }
         }
       },
       "tumblers": {
-        "title": "Evite misturadores centralizados",
-        "body": "Misturadores custodiais podem roubar suas moedas, registrar quem enviou o que ou acabar sendo armadilhas das autoridades. Use um salto para pagamentos silenciosos ou um coinjoin não-custodial em vez disso."
+        "title": "Sem necessidade de mixers",
+        "body": "Não há tumblers nem serviços de mistura em que confiar no Grin, e você não precisa de nenhum. O Mimblewimble oculta os valores e não deixa endereços na cadeia, então as doações são privadas por padrão."
       }
     }
   }

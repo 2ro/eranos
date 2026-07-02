@@ -174,12 +174,12 @@
       "subtitle": "Unaweza kufanya yote mawili baadaye. Hii inatusaidia tu kupanga hatua zinazofuata.",
       "creator": {
         "title": "Anzisha kampeni",
-        "description": "Kusanya Bitcoin kwa lengo unalolijali.",
-        "finderNote": "Wafadhili hutuma sats moja kwa moja kwenye pochi yako."
+        "description": "Kusanya Grin kwa lengo unalolijali.",
+        "finderNote": "Wafadhili hutuma GRIN moja kwa moja kwenye pochi yako."
       },
       "donor": {
         "title": "Changia kampeni",
-        "description": "Saidia malengo kwa Bitcoin.",
+        "description": "Saidia malengo kwa Grin.",
         "finderNote": "Mchango wako huenda moja kwa moja kwenye pochi ya mratibu."
       },
       "verifier": {
@@ -198,7 +198,7 @@
     "secure": {
       "title": "Hifadhi ufunguo wako",
       "subtitle": "Pakua faili na uihifadhi mahali salama. Msimamizi wa nenosiri unafaa vyema.",
-      "couplingNote": "Akaunti yako na pochi yako hushiriki ufunguo huu. Hutia saini machapisho yako ya Nostr na hufungua pochi yako ya Bitcoin kwenye Eranos.",
+      "couplingNote": "Ufunguo huu ndio utambulisho wako kwenye Eranos. Hutia saini machapisho yako ya Nostr, kampeni zako, na risiti za michango zinazohesabiwa katika jumla za kampeni.",
       "permanenceHeadline": "Hakuna njia ya kurejesha ufunguo huu ukiupoteza.",
       "permanenceBody": "Hakuna kuweka upya, hakuna huduma ya msaada, hakuna urejeshaji kwa barua pepe. Uhifadhi kabla ya kuendelea.",
       "button": "Pakua na uendelee",
@@ -574,7 +574,7 @@
       "seoTitle": "Mwongozo wa Mfadhili",
       "seoDescription": "Jinsi kuchangia kunavyofanya kazi kwenye {{appName}} na jinsi ya kulinda faragha yako.",
       "title": "Mwongozo wa Mfadhili",
-      "subtitle": "Bitcoin halisi, inayotumwa moja kwa moja. Mtiririko mzima katika ukurasa mmoja mfupi."
+      "subtitle": "Grin halisi, inayotumwa moja kwa moja. Mtiririko mzima katika ukurasa mmoja mfupi."
     },
     "recipientGuide": {
       "seoTitle": "Mwongozo wa Mpokeaji",
@@ -606,13 +606,13 @@
   },
   "about": {
     "seoTitle": "Kuhusu",
-    "seoDescription": "Jinsi {{appName}} inavyofanya kazi: kuwaunganisha wapokeaji na ufadhili usiozuilika kupitia Bitcoin na Nostr.",
+    "seoDescription": "Jinsi {{appName}} inavyofanya kazi: kuwaunganisha wapokeaji na ufadhili usiozuilika kupitia Grin na Nostr.",
     "hero": {
       "eyebrow": "Kuhusu {{appName}}",
       "headlinePart1": "Jinsi",
       "headlineAppName": "{{appName}}",
       "headlinePart2": "inavyofanya kazi.",
-      "body": "{{appName}} ni jukwaa la michango linalostahimili udhibiti lililojengwa kwenye Nostr na Bitcoin. Hakuna akaunti za benki zilizofungwa. Hakuna kufungwa kwa mashirika. Ni msaada wa moja kwa moja tu kutoka kwa watu wanaoamini lengo lako.",
+      "body": "{{appName}} ni jukwaa la michango linalostahimili udhibiti lililojengwa kwenye Nostr na Grin. Hakuna akaunti za benki zilizofungwa. Hakuna kufungwa kwa mashirika. Ni msaada wa moja kwa moja tu kutoka kwa watu wanaoamini lengo lako.",
       "trustChips": {
         "decentralized": "Iliyogawanywa",
         "openSource": "Chanzo wazi",
@@ -630,7 +630,7 @@
         "raised": "imechangwa",
         "ofGoal": "kati ya $10,000",
         "donorsLine": "wafadhili 247 · nchi 12",
-        "donate": "Changia Bitcoin"
+        "donate": "Changia Grin"
       }
     },
     "howItWorks": {
@@ -640,12 +640,12 @@
       "step1": {
         "imageAlt": "Funguo ya kriptografia ya rangi ya machungwa inayong'aa ikielea kwenye nafasi ya giza, ikiashiria utambulisho wa kujitegemea",
         "title": "Wapokeaji hujisajili kwa sekunde.",
-        "body": "Hakuna benki. Hakuna karatasi. Hakuna idhini. Wakati mwapokeaji anaunda akaunti kwenye {{appName}}, anakuwa na anwani ya Bitcoin tayari kupokea msaada, popote duniani."
+        "body": "Hakuna benki. Hakuna karatasi. Hakuna idhini. Mwapokeaji huunda akaunti kwenye {{appName}}, huongeza anwani ya kupokea kutoka kwa pochi yake mwenyewe ya Grin kwenye kampeni yake, na anaweza kupokea msaada kutoka popote duniani."
       },
       "step2": {
-        "imageAlt": "Sarafu ya Bitcoin inayong'aa ikiruka angani juu ya ramani ya dunia yenye giza, ikiashiria malipo ya papo hapo ya mipaka",
-        "title": "Wafadhili hutuma Bitcoin moja kwa moja.",
-        "body": "Wafadhili hutuma Bitcoin kutoka kwa pochi yoyote wanayotumia tayari (Cash App, Coinbase, Strike, pochi ya kifaa) moja kwa moja kwa mwapokeaji. {{appName}} kamwe haigusi pesa. Hakuna seva katikati, hakuna mhifadhi."
+        "imageAlt": "Sarafu ya Grin inayong'aa ikiruka angani juu ya ramani ya dunia yenye giza, ikiashiria malipo ya papo hapo ya kuvuka mipaka",
+        "title": "Wafadhili hutuma Grin moja kwa moja.",
+        "body": "Wafadhili hulipa kutoka kwa pochi yoyote ya Grin, ama kupitia ukurasa wa malipo wa GoblinPay wa kampeni au moja kwa moja kwenye anwani yake ya Slatepack ya grin1. {{appName}} kamwe haigusi pesa. Muamala huenda kutoka pochi ya mfadhili hadi pochi ya mwapokeaji."
       },
       "step3": {
         "imageAlt": "Mkono wazi wenye mwanga wa rangi ya machungwa unaong'aa kutoka kiganjani, ukiashiria kupokea na uwezo",
@@ -661,8 +661,8 @@
         "description": "Eranos ni nini, nani aliyeijenga, na inagharimu nini."
       },
       "chapter2": {
-        "label": "Michango ya Bitcoin",
-        "description": "Jinsi malipo yanavyofanya kazi, kwa nini katika mnyororo, kwa nini hadharani, kwa nini athari hizi."
+        "label": "Michango ya Grin",
+        "description": "Jinsi malipo yanavyofanya kazi, kwa nini Grin, nini kinabaki faragha, na athari zake."
       },
       "chapter3": {
         "label": "Kuhusu Nostr",
@@ -677,8 +677,8 @@
         "imageAlt": "Waandamanaji waliovaa kofia wakipita barabarani katika mji wa Ulaya jioni, wakishikilia tochi nyekundu zinazowaka na mabango ya 'FREEDOM' na 'LIBERTAD'",
         "role": "Kwa Wafadhili",
         "title": "Unga mkono malengo ambayo benki hawawezi.",
-        "description": "Tuma Bitcoin moja kwa moja kwa wapokeaji na harakati popote duniani, bila kuomba ruhusa kwa mchakataji wa malipo.",
-        "bullet1": "Tumia pochi yoyote ya Bitcoin ulionayo tayari.",
+        "description": "Tuma Grin moja kwa moja kwa wapokeaji na harakati popote duniani, bila kuomba ruhusa kwa mchakataji wa malipo.",
+        "bullet1": "Lipa kutoka kwa pochi yoyote ya Grin, kama Goblin au grin-wallet.",
         "bullet2": "Michango huingia moja kwa moja kwa mwapokeaji. Hakuna mhifadhi, hakuna mpatanishi.",
         "cta": "Soma Mwongozo wa Mfadhili"
       },
@@ -822,7 +822,7 @@
       "errorDescriptionRequired": "Maelezo yanahitajika.",
       "errorPledgeRequired": "Kiasi cha ahadi kinahitajika.",
       "errorPledgeInvalid": "Kiasi cha ahadi kinapaswa kuwa kiasi chanya cha USD.",
-      "errorPriceUnavailable": "Inasubiri bei ya BTC/USD ili kuhesabu kiasi cha ahadi.",
+      "errorPriceUnavailable": "Inasubiri kiwango cha kubadilisha ili kukokotoa kiasi cha ahadi.",
       "errorCoverInvalid": "Picha ya jalada lazima iwe URL halali ya https://.",
       "errorDeadlinePast": "Tarehe ya mwisho haiwezi kuwa iliyopita.",
       "wizard": {
@@ -1226,7 +1226,7 @@
       "seoTitle": "Wakusanyaji wa fedha",
       "seoDescription": "Kuunganisha dunia na ufadhili usiozuilika.",
       "heroTagline": "Kuunganisha dunia na<1></1><0>ufadhili usiozuilika.</0>",
-      "heroBody": "Kusanya Bitcoin moja kwa moja kutoka kwa wafuasi kote duniani. Kila mchango huingia moja kwa moja kwenye pochi yako, bila wapatanishi, bila marejesho, na bila jukwaa kushikilia fedha zako.",
+      "heroBody": "Kusanya Grin moja kwa moja kutoka kwa wafuasi kote duniani. Kila mchango huingia moja kwa moja kwenye pochi yako, bila wapatanishi, bila marejesho, na bila jukwaa kushikilia fedha zako.",
       "startCampaign": "Anza kampeni",
       "howItWorks": "Jinsi inavyofanya kazi",
       "featuredTitle": "Kampeni Maarufu",
@@ -1248,7 +1248,7 @@
       "whyDifferent": {
         "eyebrow": "Kwa nini {{appName}}",
         "title": "Imejengwa tofauti.",
-        "lede": "Bitcoin moja kwa moja kutoka kwa mfadhili hadi mwapokeaji. Hakuna jukwaa katikati, hakuna mtunzaji anayeshikilia fedha, hakuna ruhusa inayohitajika.",
+        "lede": "Grin moja kwa moja kutoka kwa mfadhili hadi mwapokeaji. Hakuna jukwaa katikati, hakuna mtunzaji anayeshikilia fedha, hakuna ruhusa inayohitajika.",
         "block1": {
           "heading": "Tofauti na GoFundMe",
           "body": "Hakuna jukwaa linaloweza kufungia michango yako, kudai marejesho, au kusitisha kampeni yako kwa sababu ya tofauti za sera. Hakuna Stripe, Visa, au benki iliyo katikati inayoweza kukukata wakati kampeni inaendelea.",
@@ -1257,8 +1257,8 @@
           "bullet3": "Ada za jukwaa ni sifuri"
         },
         "block2": {
-          "heading": "Tofauti na majukwaa mengine ya ‘Bitcoin’",
-          "body": "Hakuna node kuu ya Lightning, mtunzaji, au LSP inayoweza kushindwa au kwenda nje ya mtandao. Fedha hukamilika moja kwa moja kwenye Bitcoin hadi pochi unayodhibiti. Ikiwa {{appName}} ingetoweka kesho, kila kampeni ingeendelea kufanya kazi.",
+          "heading": "Tofauti na majukwaa mengine ya kripto",
+          "body": "Hakuna pochi ya mtunzaji, node inayohifadhiwa, au mchakataji wa malipo unaoweza kushindwa au kwenda nje ya mtandao. Fedha hukamilika kwenye mnyororo wa Grin hadi pochi unayodhibiti. Ikiwa {{appName}} ingetoweka kesho, kila kampeni ingeendelea kufanya kazi.",
           "bullet1": "Hakuna pochi ya mtunzaji ya kufilisiwa au kufungiwa",
           "bullet2": "Hukamilika on-chain kwenye pochi yako mwenyewe",
           "bullet3": "Hufanya kazi hata {{appName}} ikitoweka"
@@ -1289,7 +1289,7 @@
       "heroKicker": "Kampeni",
       "heroHeading": "Kila lengo,",
       "heroHeadingLine2": "mahali pamoja.",
-      "heroBody": "Kila kampeni iliyochapishwa kwenye Nostr, imekusanywa mahali pamoja. Vinjari mtandao mzima, pata lengo linalokuhusu, na liunge mkono moja kwa moja kwa Bitcoin.",
+      "heroBody": "Kila kampeni iliyochapishwa kwenye Nostr, imekusanywa mahali pamoja. Vinjari mtandao mzima, pata lengo linalokuhusu, na liunge mkono moja kwa moja kwa Grin.",
       "campaignsCount_one": "kampeni kwenye mtandao",
       "campaignsCount_other": "kampeni kwenye mtandao",
       "verifyCampaigns": "Thibitisha kampeni"
@@ -1397,7 +1397,7 @@
       "notifications": "Arifa",
       "notificationsDesc": "Mapendeleo ya arifa za kusukuma.",
       "advanced": "Ya kina",
-      "advancedDesc": "Pochi, mfumo, na chaguzi za mtumiaji mwenye uwezo.",
+      "advancedDesc": "Chaguzi za mfumo na za mtumiaji mwenye uwezo.",
       "organizers": "Waratibu",
       "organizersDesc": "Teua waratibu wa nchi ambao wanaweza kubandika machapisho kwenye milisho ya nchi."
     },
@@ -1436,8 +1436,8 @@
     },
     "advanced": {
       "title": "Ya kina",
-      "subtitle": "Muunganisho wa pochi, usanidi wa mfumo, na chaguzi zingine za kina kwa watumiaji wenye uwezo.",
-      "intro": "Muunganisho wa pochi, usanidi wa mfumo, na chaguzi zingine za kina.",
+      "subtitle": "Usanidi wa mfumo na chaguzi zingine za kina kwa watumiaji wenye uwezo.",
+      "intro": "Usanidi wa mfumo na chaguzi zingine za kina.",
       "torHeading": "Tor",
       "torToggle": "Peleka trafiki kupitia Tor",
       "torToggleDesc": "Inaunganisha kwenye relei na kupakia midia kupitia mtandao wa Tor kwa faragha zaidi. Tarajia utendaji polepole na kuchelewa kidogo wakati Tor inaunganisha.",
@@ -2070,7 +2070,7 @@
       "heading": "Funguo Yako",
       "extensionBody": "Umeingia kwa kiendelezi cha kivinjari (NIP-07). Funguo yako ya siri imehifadhiwa hapo — simamia au itoe kutoka kwa kiendelezi chenyewe.",
       "bunkerBody": "Umeingia kwa mtia saini wa mbali (NIP-46). Funguo yako ya siri inashikiliwa na mtia saini huyo na haiwezi kutolewa kutoka {{appName}}.",
-      "explainer": "Funguo hii ya siri inadhibiti akaunti yako kwenye {{appName}}. Yeyote mwenye nayo anaweza kuchapisha na kukuiga. Hifadhi katika kidhibiti cha nenosiri au mahali pengine ambapo wewe pekee unaweza kufikia.",
+      "explainer": "Funguo hii ya siri inadhibiti akaunti yako kwenye {{appName}}. Yeyote mwenye nayo anaweza kuchapisha kama wewe, kuhariri kampeni zako, na kuchapisha kwa jina lako. Hifadhi katika kidhibiti cha nenosiri au mahali pengine ambapo wewe pekee unaweza kufikia. Fedha zako za Grin ziko tofauti: ziko kwenye pochi yako mwenyewe ya Grin na kifungu chake cha mbegu, si kwenye funguo hii.",
       "warning": "USIWAHI kushiriki funguo yako ya siri na yeyote. Epuka kuipiga picha au kuibandika popote isipokuwa kidhibiti cha nenosiri. Ikishirikiwa, wengine wataweza kufikia akaunti yako.",
       "aria": "Funguo yako ya siri",
       "copyAria": "Nakili funguo ya siri",
@@ -2092,7 +2092,7 @@
         "label": "Kuhusu Eranos"
       },
       "payments": {
-        "label": "Michango ya Bitcoin kwenye Eranos"
+        "label": "Michango ya Grin kwenye Eranos"
       },
       "about-nostr": {
         "label": "Kuhusu Nostr"
@@ -2105,14 +2105,14 @@
       "what-is-ditto": {
         "question": "{{appName}} ni nini?",
         "answer": [
-          "{{appName}} ni jukwaa la kutuma michango ya Bitcoin — ya umma au ya faragha — moja kwa moja kwa wapokeaji. Hakuna mpatanishi, hakuna mchakataji wa malipo, na hakuna akaunti inayoweza kufungwa.",
+          "{{appName}} ni jukwaa la kutuma michango ya Grin moja kwa moja kwa wapokeaji. Hakuna mpatanishi, hakuna mchakataji wa malipo, na hakuna akaunti inayoweza kufungwa.",
           "{{appName}} imejengwa kwenye Nostr, kwa hivyo utambulisho wako haujafungwa kwenye tovuti hii — wewe ndiye unayemiliki."
         ]
       },
       "cost-to-use": {
         "question": "Je, {{appName}} inagharimu chochote?",
         "answer": [
-          "**Hapana.** {{appName}} haichukui ada ya jukwaa. Unapochangia, unalipa tu ada ya mtandao wa Bitcoin inayoenda kwa wachimba madini — si kwetu sisi."
+          "**Hapana.** {{appName}} haichukui ada ya jukwaa. Unapochangia, unalipa tu ada ndogo sana ya mtandao wa Grin inayoenda kwa wachimbaji, si kwetu sisi."
         ]
       },
       "who-made-this": {
@@ -2125,37 +2125,37 @@
         "question": "\"Inastahimili udhibiti\" inamaanisha nini hapa?",
         "answer": [
           "Hakuna kampuni inayoketi kati ya mfadhili na mwapokeaji. {{appName}} haishiki fedha na haiwezi kufunga anwani.",
-          "Mradi mtandao wa Bitcoin unaendesha, michango inaweza kutumwa na kupokelewa. {{appName}} yenyewe kutokuwepo mtandaoni hakutaizuia."
+          "Mradi mtandao wa Grin unaendesha, michango inaweza kutumwa na kupokelewa. {{appName}} yenyewe kutokuwepo mtandaoni hakutaizuia."
         ]
       },
       "why-onchain": {
-        "question": "Kwa nini Bitcoin?",
+        "question": "Kwa nini Grin?",
         "answer": [
-          "Bitcoin ni reli ya malipo iliyo na uungwaji mkono mkubwa zaidi na inayostahimili udhibiti zaidi duniani. Kila pochi ya Bitcoin inaweza kuituma.",
-          "Kwenye {{appName}}, wapokeaji huchagua jinsi ya kupokea: **ya umma** (anwani ya kawaida ya Bitcoin) kwa ufikiaji wa juu, **ya faragha** (malipo ya kimya) kwa michango isiyounganika, au **zote mbili** ili pochi ya kila mfadhili ichague njia sahihi kiotomatiki. Wafadhili ambao wana programu tu ya watumiaji wa Bitcoin bado wanaweza kuchangia; wafadhili wenye pochi ya malipo ya kimya wanapata faragha kwa chaguo-msingi.",
-          "Athari ni kwamba miamala ya umma ya Bitcoin inaonekana kwenye blockchain na hulipa ada ya mchimba. Miongozo ya Mfadhili na Mwapokeaji inaeleza jinsi ya kushughulikia zote mbili."
+          "Grin ni pesa taslimu ya kidijitali yenye faragha iliyojengwa ndani. Muundo wake wa Mimblewimble hauweki anwani zozote kwenye mnyororo na huficha kila kiasi, kwa hivyo michango haiachi njia ya hadharani kama sarafu nyingi za kidijitali.",
+          "Kwenye {{appName}}, kampeni hupokea Grin kwa njia mbili: kupitia GoblinPay (skani QR na malipo husafiri hadi kwa kampeni kama slatepack iliyosimbwa kupitia Nostr) au moja kwa moja kwenye anwani ya Slatepack ya grin1 ya kampeni kutoka kwa pochi yoyote ya Grin. Kwa njia yoyote, fedha huingia kwenye pochi inayodhibitiwa na kampeni.",
+          "Jumla za kampeni hubaki za kweli bila kupoteza faragha hiyo: mfadhili anaweza kuchapisha uthibitisho wa malipo, na {{appName}} huuhakiki dhidi ya node ya Grin kuthibitisha kwamba muamala upo kweli kwenye mnyororo. Uthibitisho unaonyesha kiasi na kernel ya muamala, si nani aliyelipa. Miongozo ya Mfadhili na Mwapokeaji inaeleza maelezo yote."
         ]
       },
       "why-not-rotating-addresses": {
-        "question": "Kwa nini {{appName}} haizalishi anwani mpya kwa kila mchango?",
+        "question": "Kwa nini {{appName}} haichakati michango kwenye seva yake yenyewe?",
         "answer": [
-          "Kufanya hivi kungehitaji {{appName}} kufanya kama mpatanishi wa kubadilisha pesa — kuchukua ulinzi wa Bitcoin kwanza na kisha kuipeleka kwa mwapokeaji.",
+          "Kufanya hivi kungehitaji {{appName}} kufanya kazi kama mpatanishi wa kubadilisha pesa, kuchukua ulinzi wa Grin kwanza na kisha kuipeleka kwa mwapokeaji.",
           "Hilo lingetufanya kuwa mtumaji wa pesa, chini ya kanuni zinazokuja na hilo, na hatua moja ya kushindwa: funga seva ya {{appName}} na umefunga kila mchango unaopita kupitia.",
-          "Badala yake, anwani ya mchango ya kila mtumiaji inatokana na funguo yake ya siri ya Nostr (nsec) — funguo ile ile unayoingia nayo. Wafadhili hutuma moja kwa moja kwa mwapokeaji, {{appName}} kamwe haigusi fedha, na jukwaa lenyewe haliwezi kuzimwa kudhibiti yeyote. Wapokeaji wanaotaka faragha kwa kila mchango wanaweza kukubali malipo ya kimya, ambayo hutoa kutounganika kuleile bila yeyote kushikilia pesa katikati."
+          "Badala yake, michango husafiri kutoka pochi ya Grin ya mfadhili hadi pochi ya Grin ya kampeni. Kila kampeni huchapisha anwani yake ya Slatepack ya grin1 au ukurasa wake wa malipo wa GoblinPay, {{appName}} kamwe haigusi fedha, na jukwaa lenyewe haliwezi kuzimwa kudhibiti yeyote. Na kwa sababu Grin haiweki anwani kwenye mnyororo, michango haiwezi kuunganishwa kwa chaguo-msingi bila yeyote kushikilia pesa katikati."
         ]
       },
       "why-not-other-crypto": {
-        "question": "Kwa nini si Monero au cryptocurrency nyingine?",
+        "question": "Kwa nini si Bitcoin, Monero, au sarafu nyingine ya kidijitali?",
         "answer": [
-          "Bitcoin ni cryptocurrency iliyo na matumizi makubwa zaidi. Hiyo inamaanisha ni rahisi zaidi kwa wafadhili kununua na kutuma, na rahisi zaidi kwa wapokeaji kupokea, kuhifadhi, na kutumia.",
-          "Sarafu zinazojikita kwenye faragha kama Monero zinatoa athari tofauti za faragha kuliko Bitcoin, lakini hazitumiwi na programu nyingi za watumiaji na ni ngumu zaidi kubadilisha kurudi kwa sarafu ya ndani. Kuomba pande zote mbili za mchango kwanza kupata cryptocurrency ya kiwango kidogo ni kizuizi ambacho {{appName}} haitaweka njiani. Kwa michango ya Bitcoin yenyewe, malipo ya kimya yanafunika kesi ya matumizi ya kutounganika bila kuondoka kwenye mfumo wa Bitcoin."
+          "Bitcoin ni sarafu ya kidijitali iliyo na matumizi makubwa zaidi, lakini leja yake ni ya hadharani: mchango kwa anwani inayojulikana unafichua kiasi, wakati, na upande wa kutuma, milele. Kuongeza faragha juu yake kunamaanisha zana za ziada, hatua za ziada, na njia za ziada za kukosea. Kwa michango kwa malengo nyeti, hiyo ni chaguo-msingi mbaya.",
+          "Grin hufanya njia ya faragha kuwa njia pekee. Mimblewimble haiachi anwani kwenye mnyororo na huficha kila kiasi, kwa hivyo wafadhili hawahitaji zana maalum ili kuwa salama. Wakati huo huo, uthibitisho wa malipo wa Grin huruhusu kampeni kuonyesha jumla iliyothibitishwa na kukaguliwa kwenye mnyororo bila kufichua wafadhili wake. Monero pia inatoa faragha imara, lakini uthibitisho wa malipo wa Grin unafaa mfumo wa michango iliyothibitishwa wa {{appName}}, na mnyororo wake mwepesi hufanya uhakiki kuwa rahisi."
         ]
       },
       "what-is-nostr": {
         "question": "Nostr ni nini?",
         "answer": [
           "Nostr ni mtandao wazi ambapo **wewe** ndiye unayemiliki akaunti yako, si kampuni. Utambulisho wako ni funguo ya kriptografia unayoidhibiti, si jina la mtumiaji kwenye seva ya mtu mwingine.",
-          "Kwenye {{appName}}, funguo hiyo hiyo ndiyo pia anwani yako ya mchango inatokana nayo — funguo yako ya siri ya Nostr (nsec) inapanda pochi yako ya Bitcoin, ndiyo sababu unaweza kupokea Bitcoin bila kujisajilia na yeyote."
+          "Kwenye {{appName}}, funguo hiyo hiyo hutia saini kampeni zako na risiti za michango zinazojenga jumla yako iliyothibitishwa, ndiyo sababu utambulisho wako na kampeni zako zinafanya kazi popote kwenye Nostr bila kujisajili na yeyote."
         ]
       },
       "why-login-different": {
@@ -2168,7 +2168,7 @@
       "lose-secret-key": {
         "question": "Itakuwaje ikiwa nitapoteza funguo yangu ya siri?",
         "answer": [
-          "**Hakuna kitufe cha \"umesahau nenosiri\".** Hakuna anayeweza kuiweka upya kwako. Ukipoteza, akaunti yako — na Bitcoin yoyote iliyo kwenye anwani yako ya mchango — imepotea milele.",
+          "**Hakuna kitufe cha \"umesahau nenosiri\".** Hakuna anayeweza kuiweka upya kwako. Ukipoteza, akaunti yako na kampeni zako zimepotea milele. (Fedha zako za Grin ziko kwenye pochi yako mwenyewe ya Grin na kifungu chake cha mbegu, ambavyo viko tofauti na funguo hii.)",
           "**Hifadhi funguo yako ya siri mahali salama sasa hivi.** Kwa vidokezo, soma [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys)."
         ]
       },
@@ -2206,7 +2206,7 @@
       "vs-mastodon-bluesky": {
         "question": "Nostr inatofautianaje na Mastodon au Bluesky?",
         "answer": [
-          "Kwenye Mastodon, akaunti yako iko kwenye seva maalum. Kwenye Bluesky, akaunti nyingi zinategemea kampuni moja. Kwenye Nostr, utambulisho wako ni funguo unayoidhibiti, na anwani yako ya mchango huenda nawe kwa programu yoyote ya Nostr."
+          "Kwenye Mastodon, akaunti yako iko kwenye seva maalum. Kwenye Bluesky, akaunti nyingi zinategemea kampuni moja. Kwenye Nostr, utambulisho wako ni funguo unayoidhibiti, na wasifu wako na kampeni zako huenda nawe kwa programu yoyote ya Nostr."
         ]
       },
       "profile-fields": {
@@ -2223,11 +2223,11 @@
     },
     "donor": {
       "tldr": {
-        "lede": "Lipa anwani ya Bitcoin kwenye ukurasa wa kampeni kutoka kwa pochi yoyote uliyo nayo. Ikiwa kampeni inakubali malipo ya kimya na pochi yako inayaauni, mchango wako ni wa faragha kiotomatiki.",
+        "lede": "Changia kutoka kwa pochi yoyote ya Grin: skani QR ya GoblinPay ya kampeni, au lipa anwani yake ya Slatepack ya grin1. Grin ina faragha kwa chaguo-msingi, kwa hivyo mchango wako hauachi njia ya hadharani.",
         "nextActions": [
-          "Lipa kutoka kwa pochi yoyote ya Bitcoin",
+          "Lipa kutoka kwa pochi yoyote ya Grin",
           "Hakuna mpatanishi, hakuna kipindi cha kushikilia",
-          "Unataka faragha? Soma hapa chini"
+          "Faragha kwa chaguo-msingi"
         ]
       },
       "flow": {
@@ -2235,98 +2235,98 @@
         "steps": {
           "openCampaign": {
             "title": "Fungua kampeni",
-            "body": "Unaona msimbo mmoja wa QR. Ikiwa kampeni inakubali chaguo zote mbili, inasimba ncha zote mbili; pochi yako huchagua sahihi."
+            "body": "Gusa Changia na uchague njia. GoblinPay: weka kiasi, skani QR kwa pochi ya Goblin, na malipo husafiri hadi kwa kampeni kama slatepack iliyosimbwa kupitia Nostr, na uthibitisho wa kiotomatiki. Anwani ya Grin: lipa anwani ya Slatepack ya grin1 ya kampeni kutoka kwa pochi yoyote ya Grin; pochi yako inashughulikia usafirishaji, kupitia Tor au kwa kubadilishana slatepack."
           },
           "arrivesDirectly": {
             "title": "Inafika moja kwa moja",
-            "body": "Fedha huingia moja kwa moja kwa mwapokeaji. {{appName}} haishiki au kuelekeza, na anwani inatokana na funguo ya siri ya Nostr ya mwapokeaji."
+            "body": "Fedha huingia moja kwa moja kwenye pochi ya kampeni. {{appName}} haishiki wala kuzielekeza. Ikiwa unataka mchango wako uhesabiwe katika jumla ya hadharani ya kampeni, chapisha uthibitisho wa malipo au risiti baadaye; unaonyesha kiasi, si utambulisho wako."
           }
         }
       },
       "publicVisible": {
-        "title": "Michango ya umma inaonekana katika mnyororo milele",
-        "body": "Mchango wa **Umma** huingia kwenye anwani ya kawaida ya Bitcoin iliyounganishwa na kampeni. Yeyote anaweza kuangalia anwani na kuona kiasi, wakati, na anwani yako ya kutuma. Michango ya **Kimya** pia hutua katika mnyororo, lakini upande wa kupokea hauunganiki na kampeni kwa hivyo wanabaki nje ya orodha za wafadhili za umma na jumla."
+        "title": "Nini kiko hadharani, na nini hakiko",
+        "body": "Mnyororo wa Grin hauna anwani na huficha viasi vyote, kwa hivyo watazamaji wa nje hawawezi kuona ni nani aliyechangia kampeni au kiasi gani. Jumla ya kampeni kwenye {{appName}} hujengwa tu kutoka kwa uthibitisho na risiti ambazo wafadhili wamechagua kuchapisha, na kila moja inaonyesha tu kiasi na kernel ya muamala."
       },
       "privacy": {
         "heading": "Kuchangia kwa faragha",
-        "intro": "Hatua hizi ni muhimu zaidi kwa michango ya **Umma**, ambapo kila muamala umeunganishwa milele na anwani moja. Michango ya **Kimya** tayari inaficha upande wa kupokea, kwa hivyo hatari ni ndogo. Uchanganuzi ulioelekezwa wa pochi yako ya kutuma bado unawezekana vyovyote, kwa hivyo ikiwa hatari yako iko juu hatua hizi zinastahili kuchukuliwa. Chagua moja, au zungushe.",
+        "intro": "Kwenye mnyororo, Grin tayari inakulinda: hakuna anwani, viasi vimefichwa, hakuna orodha ya wafadhili ya hadharani. Kinachoweza bado kukutambulisha ni jinsi ulivyopata Grin na kile unachochagua kuchapisha. Ikiwa hatari yako iko juu, hatua hizi zinastahili kuchukuliwa. Chagua moja, au ziunganishe.",
         "options": {
           "nonKyc": {
-            "name": "Nunua Bitcoin isiyo ya KYC",
-            "purpose": "Nunua Bitcoin moja kwa moja kati ya watu ili isiunganishwe na kitambulisho chako cha serikali kwanza. Hatua imara zaidi ya kuanzia faragha."
+            "name": "Pata Grin bila KYC",
+            "purpose": "Ichimbe, au inunue moja kwa moja kati ya watu, ili sarafu zisiunganishwe na kitambulisho chako cha serikali tangu mwanzo."
           },
           "coinjoin": {
-            "name": "Coinjoin kwanza",
-            "purpose": "Changanya Bitcoin yako na sarafu za watu wengine ili matokeo yasiweze kufuatiliwa kwenye ununuzi wako wa KYC. Inafaa wakati kampeni inakubali umma tu."
+            "name": "Ruka risiti ya hadharani",
+            "purpose": "Kuchapisha uthibitisho wa malipo kunaunganisha mchango na utambulisho wako wa Nostr. Usiuchapishe, na mchango unabaki kati yako na kampeni."
           }
         }
       },
       "consumerApps": {
-        "title": "Programu za watumiaji haziwezi kukufanya usiojulikana",
-        "body": "Cash App, Coinbase, Strike, Venmo, Kraken, Binance, na PayPal zote huthibitisha kitambulisho chako. Hata ukitumaje mchango, kila muamala unabaki umeunganishwa na utambulisho wako halisi. Tumia pochi isiyo ya uhifadhi unayoidhibiti."
+        "title": "Soko za kubadilisha sarafu zinajua wewe ni nani",
+        "body": "Soko za kubadilisha sarafu zinazoorodhesha GRIN huthibitisha kitambulisho chako na kuhifadhi rekodi za kila utoaji. Mnyororo wa hadharani hautaonyesha mchango wako, lakini soko linajua utoaji wake ulienda wapi. Ikiwa hilo ni muhimu kwa hali yako, toa kwanza kwenye pochi unayodhibiti kisha changia kutoka hapo."
       }
     },
     "recipient": {
       "tldr": {
-        "lede": "Chagua cha kukubali unapounda kampeni: Umma, Kimya, au zote mbili. Chaguo lolote si la uhifadhi. {{appName}} kamwe haishiki fedha zako.",
+        "lede": "Chapisha anwani ya Slatepack ya grin1 kutoka kwa pochi ya Grin unayodhibiti, au weka ukurasa wa malipo wa GoblinPay. Michango hufika pochi hadi pochi. {{appName}} kamwe haishiki fedha zako.",
         "nextActions": [
-          "Linganisha chaguzi mbili",
-          "Panga jinsi utakavyotoa pesa",
-          "Ondoa fedha haraka"
+          "Pata pochi ya Grin na anwani",
+          "Iongeze kwenye kampeni yako",
+          "Hifadhi nakala ya kifungu cha mbegu cha pochi yako"
         ]
       },
       "howReceiving": {
         "heading": "Jinsi kupokea kunavyofanya kazi",
         "paragraphs": [
-          "Anwani zako za michango za {{appName}} zinatokana na funguo yako ya siri ya Nostr (nsec) — funguo ile ile unayoingia nayo inapanda pochi yako ya Bitcoin. Unapounda kampeni, unachagua cha kukubali:",
-          "**Malipo ya umma pekee.** Anwani ya kawaida ya Bitcoin. Inaonekana kwa kila mtu, inafanya kazi na kila pochi.",
-          "**Malipo ya kimya pekee.** Malipo ya kimya ya BIP-352. Upande wa kupokea hauunganiki katika mnyororo, kwa hivyo michango inabaki nje ya orodha za wafadhili za umma na jumla. Wafadhili wanahitaji pochi yenye uwezo wa malipo ya kimya kutuma. Ikiwa hawana, mchango wao hauwezi kupita.",
-          "**Zote mbili.** {{appName}} hutoa msimbo mmoja wa QR unaosimba ncha zote mbili. Pochi za malipo ya kimya huusoma kama wa faragha; pochi za kawaida hulipa anwani ya umma. Wafadhili hawana haja ya kuchagua.",
-          "Kukubali zote mbili kawaida ndio uamuzi sahihi: unapata michango ya faragha kutoka kwa wafuasi wanaotumia pochi ya malipo ya kimya, na unabaki wazi kwa wafadhili ambao Bitcoin yao pekee iko kwenye programu ya watumiaji.",
-          "Ndani ya pochi yako ya {{appName}}, hizi hufika kama **masalio mawili tofauti** — kichupo cha **Umma** (anwani yako ya kawaida ya Bitcoin) na kichupo cha **Faragha** (malipo ya kimya) — vinavyoonyeshwa kwenye vichupo vya Umma / Faragha vya pochi. {{appName}} huviweka tofauti kabisa kwa makusudi: masalio hayo mawili kamwe hayawezi kutumika pamoja. Kuchanganya fedha za faragha na za umma katika muamala mmoja kungeunganisha tena michango yako ya malipo ya kimya isiyounganika na anwani yako ya umma katika mnyororo na kuharibu faragha waliyo nayo ili kuitoa."
+          "Michango kwenye {{appName}} husafiri moja kwa moja kutoka pochi ya Grin ya mfadhili hadi yako. Unapounda kampeni, unachagua jinsi ya kupokea:",
+          "**Anwani ya Slatepack ya grin1.** Pochi yoyote ya Grin (Goblin, grin-wallet) inakupa moja. Wafadhili huilipa kutoka kwa pochi yoyote ya Grin, kwa kushirikiana kupitia Tor au kwa kubadilishana slatepack; pochi zinashughulikia usafirishaji.",
+          "**GoblinPay.** Ukurasa wa malipo unaowaruhusu wafadhili kulipa ndani ya programu: wanaskani QR na malipo husafiri kwako kama slatepack iliyosimbwa na kufungashwa kupitia Nostr, na uthibitisho wa kiotomatiki na risiti iliyotiwa saini mwishoni.",
+          "**Zote mbili.** Wafadhili wenye pochi ya Goblin wanapata mtiririko wa skani moja, na kila mtu mwingine hulipa anwani yako ya Slatepack kutoka kwa pochi yoyote ya Grin wanayotumia. Kutoa zote mbili kunakuweka wazi kwa kila mfadhili.",
+          "Faragha ni chaguo-msingi kwa njia yoyote. Muundo wa Mimblewimble wa Grin hauweki anwani kwenye mnyororo na huficha kila kiasi, kwa hivyo michango yako kamwe haionekani kwenye leja yoyote ya hadharani ambayo mtu yeyote anaweza kuvinjari.",
+          "Jumla iliyothibitishwa ya kampeni yako huhesabu mchango mara uthibitisho wake wa malipo au risiti ya GoblinPay inapochapishwa na kukaguliwa: saini ya mpokeaji lazima ithibitike, na kernel ya muamala lazima ithibitishwe kwenye mnyororo dhidi ya node ya Grin. Kila uthibitisho uliochapishwa unaonyesha kiasi na kernel, hakuna chochote kuhusu mfadhili."
         ]
       },
       "whatEveryoneSees": {
         "heading": "Kila mtu anaweza kuona nini",
         "paragraphs": [
-          "Ikiwa kampeni yako inakubali malipo ya umma, yeyote anayefikiria kukuunga mkono anaweza kuangalia anwani na kuona historia ya umma ya michango.",
-          "Michango ya malipo ya kimya si sehemu ya rekodi hiyo. Haionekani kwa watazamaji wa nje na haionekani katika jumla za umma za kampeni; wafadhili wapya wanaona tu kile unachochapisha kuhusu maendeleo ya kampeni."
+          "Wageni wanaona ukurasa wa kampeni yako, lengo lake, na jumla iliyothibitishwa iliyojengwa kutoka kwa uthibitisho na risiti ambazo wafadhili walichagua kuchapisha. Kila moja ya hizo inaonyesha kiasi na kernel ya muamala, si utambulisho wa mfadhili.",
+          "Hakuna anayeweza kuangalia salio lako au historia yako ya michango kwenye mnyororo. Hakuna anwani ya kukagua wala viasi vya kusoma; zaidi ya risiti zilizochapishwa, watu wanaona tu kile unachoshiriki kuhusu maendeleo ya kampeni."
         ]
       },
       "movePromptly": {
-        "heading": "Hamisha michango haraka",
+        "heading": "Pochi yako, jukumu lako",
         "steps": {
           "sweep": {
-            "title": "Hamisha kwenye pochi unayoidhibiti",
-            "body": "Pochi yako ya {{appName}} tayari ni ya kujihifadhi — wewe, na wewe tu, unadhibiti funguo. Kwa mtazamo wa kompyuta ya mezani au pochi ya kifaa wa salio lilelile, fungua menyu ya pochi, chagua **Back up wallet**, na ulete kifungu cha maneno 24 cha mbegu katika [Sparrow](https://sparrowwallet.com), [BlueWallet](https://bluewallet.io), au pochi ya kifaa (Trezor, Ledger). Ikiwa ungependelea kuhamisha fedha kwa funguo tofauti kabisa — kwa mfano, kwa pochi ya Lightning kama [Phoenix](https://phoenix.acinq.co) — tuma muamala wa kawaida wa Bitcoin kutoka kwa pochi yako ya {{appName}}."
+            "title": "Michango huingia kwenye pochi unayodhibiti",
+            "body": "{{appName}} kamwe haiendeshi pochi kwa ajili yako. Fedha hufika kwenye pochi ya Grin ambayo anwani yake au ukurasa wake wa malipo wa GoblinPay ulichapisha, kwa hivyo ulinzi ni wako tangu mchango wa kwanza kabisa. Hiyo pia inamaanisha jukumu ni lako: yeyote mwenye kifungu cha mbegu cha pochi yako ana fedha hizo, na bila hicho fedha haziwezi kurejeshwa."
           },
           "dontSit": {
-            "title": "Usikae na fedha katika kivinjari",
-            "body": "Hasa kwa kampeni za thamani kubwa, hifadhi kifungu cha mbegu ya pochi nje ya mtandao (karatasi, hifadhi ya chuma, au msimamizi wa nywila kwenye kifaa maalum) na fikiria pochi ya kifaa. Mbegu unayoihifadhi kutoka kwa {{appName}} ni pochi ileile — linda maneno na utakuwa na hifadhi baridi."
+            "title": "Hifadhi nakala ya kifungu cha mbegu nje ya mtandao",
+            "body": "Hasa kwa kampeni za thamani kubwa, hifadhi kifungu cha mbegu cha pochi yako ya Grin nje ya mtandao (karatasi, hifadhi ya chuma, au kidhibiti cha nenosiri kwenye kifaa maalum). Mbegu ndiyo pochi: linda maneno na utakuwa na hifadhi baridi."
           }
         }
       },
       "cashout": {
-        "heading": "Kutoa pesa kwa faragha",
-        "intro": "Kutumia katika mnyororo huunda njia isipokuwa uvunje kwanza. Toa pesa kutoka kichupo cha **Faragha** ili michango ya malipo ya kimya ibaki isiyounganika — tuma kwanza kwa pochi ya malipo ya kimya (anwani ya **sp1…**), kisha tumia mbele; mruko huvunja kiungo kati ya kampeni yako na kile kinachofuata. Usitume fedha za faragha kwa anwani iliyotumika tena au ya umma, jambo ambalo linaziunganisha tena. Chaguzi zingine hapa chini pia hufanya kazi na zina athari zao.",
+        "heading": "Kutoa pesa",
+        "intro": "Mnyororo wa Grin hautafichua michango yako, kwa hivyo uamuzi mkuu wa faragha ni jinsi unavyobadilisha kuwa sarafu ya ndani. Huduma yoyote inayothibitisha kitambulisho chako itajua kiasi unachotoa kupitia kwake. Chaguzi zilizo hapa chini zina athari tofauti.",
         "options": {
           "coinjoin": {
-            "name": "Coinjoin",
-            "purpose": "Changanya Bitcoin yako na sarafu za watumiaji wengine ili matokeo yasiweze kuunganishwa nyuma na kuingia."
+            "name": "Soko za kubadilisha sarafu",
+            "purpose": "Njia rahisi zaidi ya kupata fedha za kawaida. Tarajia KYC: soko linajua utambulisho wako na kiasi unachotoa kupitia kwake."
           },
           "peerToPeer": {
             "name": "Kati ya watu",
-            "purpose": "Badilishana Bitcoin kwa fiat moja kwa moja na mtu mwingine au kupitia broka kwenye Bisq, HodlHodl, au RoboSats."
+            "purpose": "Badilishana Grin kwa fedha za kawaida moja kwa moja na mtu mwingine au kupitia broka wa nje ya soko. Hakuna jukwaa katikati."
           },
           "spendDirectly": {
             "name": "Itumie moja kwa moja",
-            "purpose": "Nunua kadi za zawadi (Amazon, Uber, vyakula, safari) moja kwa moja kutoka kwa Bitcoin bila kubadilisha kuwa pesa taslimu kwanza."
+            "purpose": "Tumia Grin kama pesa kwa wafanyabiashara na huduma zinazoikubali, bila kubadilisha kuwa pesa taslimu kwanza."
           }
         }
       },
       "tumblers": {
-        "title": "Epuka vichanganyaji vya kati",
-        "body": "Vichanganyaji vya uhifadhi vinaweza kuiba sarafu zako, kuandika ni nani aliyetuma nini, au kuwa mitego ya watekelezaji wa sheria. Tumia mruko wa malipo ya kimya au coinjoin isiyo ya uhifadhi badala yake."
+        "title": "Hakuna haja ya vichanganyaji",
+        "body": "Hakuna vichanganyaji au huduma za kuchanganya za kuamini kwenye Grin, na huhitaji chochote kati ya hizo. Mimblewimble huficha viasi na haiachi anwani kwenye mnyororo, kwa hivyo michango ina faragha kwa chaguo-msingi."
       }
     }
   }

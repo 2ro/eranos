@@ -10,7 +10,6 @@ import {
   ArrowLeft,
   ArrowRight,
   BadgeCheck,
-  Bitcoin,
   Download,
   Eye,
   EyeOff,
@@ -749,7 +748,7 @@ function SecureStep({ nsec, showKey, onToggleShow, onContinue }: SecureStepProps
             <Link2 className="h-4 w-4" />
           </div>
           <div className="w-14 h-14 rounded-full bg-background ring-2 ring-primary/30 flex items-center justify-center shadow-sm">
-            <Bitcoin className="h-7 w-7 text-primary" />
+            <HandCoins className="h-7 w-7 text-primary" />
           </div>
         </div>
         <p className="text-sm text-foreground text-center leading-relaxed">

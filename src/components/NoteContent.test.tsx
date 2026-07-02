@@ -83,7 +83,7 @@ describe('NoteContent', () => {
       created_at: Math.floor(Date.now() / 1000),
       kind: 1,
       tags: [],
-      content: 'This is a post about #nostr and #bitcoin development.',
+      content: 'This is a post about #nostr and #grin development.',
       sig: 'test-sig',
     };
 
@@ -94,12 +94,12 @@ describe('NoteContent', () => {
     );
 
     const nostrHashtag = await screen.findByRole('link', { name: '#nostr' });
-    const bitcoinHashtag = screen.getByRole('link', { name: '#bitcoin' });
+    const grinHashtag = screen.getByRole('link', { name: '#grin' });
     
     expect(nostrHashtag).toBeInTheDocument();
-    expect(bitcoinHashtag).toBeInTheDocument();
+    expect(grinHashtag).toBeInTheDocument();
     expect(nostrHashtag).toHaveAttribute('href', '/t/nostr');
-    expect(bitcoinHashtag).toHaveAttribute('href', '/t/bitcoin');
+    expect(grinHashtag).toHaveAttribute('href', '/t/grin');
   });
 
   it('renders hashtags containing internal hyphens as a single link', async () => {

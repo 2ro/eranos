@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import {
   ArrowRight,
   BadgeCheck,
-  Bitcoin,
   CircleCheck,
   Globe,
   HandHeart,
@@ -231,7 +230,7 @@ export function AboutPage() {
                       to="/"
                       className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm h-10 rounded-md flex items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
                     >
-                      <Bitcoin className="size-4" />
+                      <HandHeart className="size-4" />
                       {t('about.hero.sampleCard.donate')}
                     </Link>
                   </div>

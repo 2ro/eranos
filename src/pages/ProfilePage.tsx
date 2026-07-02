@@ -327,6 +327,9 @@ function FollowingListModal({ pubkeys, open, onOpenChange, displayName }: Follow
 
 
 // ----- Bitcoin QR Modal (mobile) -----
+// Retained interop, not Eranos marketing: legacy Agora clients publish a `$BTC`
+// profile field, and this renders those third-party fields accurately. Eranos
+// itself is Grin-only and offers no way to add such a field.
 
 function BitcoinQRModal({ address }: { address: string }) {
   const { t } = useTranslation();
