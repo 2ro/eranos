@@ -67,6 +67,19 @@ else
     rsvg-convert -h 1024 "$LOGO_WHITE_SVG" -o "$LOGO_WHITE"
 fi
 
+# Orange-fill render, for marks placed on a white/light background (iOS splash).
+LOGO_ORANGE_SVG="$TMPDIR/logo_orange.svg"
+LOGO_ORANGE="$TMPDIR/logo_orange.png"
+sed -e 's/fill="black"/fill="'"$BG_COLOR"'"/g' \
+    -e 's/#000000/'"$BG_COLOR"'/g' \
+    -e 's/#7c52e0/'"$BG_COLOR"'/g' \
+    -e 's/#fcd414/'"$BG_COLOR"'/g' "$SOURCE_SVG" > "$LOGO_ORANGE_SVG"
+if [ "$SVG_RENDERER" = "inkscape" ]; then
+    inkscape --export-type=png --export-filename="$LOGO_ORANGE" -h 1024 "$LOGO_ORANGE_SVG" 2>/dev/null
+else
+    rsvg-convert -h 1024 "$LOGO_ORANGE_SVG" -o "$LOGO_ORANGE"
+fi
+
 # ── Adaptive icon foreground PNGs (transparent bg, white logo, safe-zone padding) ──
 # Content at 47% of canvas to fit within Android's adaptive icon safe zone.
 
@@ -137,11 +150,40 @@ make_legacy_square 192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 # Web logo.png (AppDownloadNudge) uses the same round brand-mark style.
 make_legacy_round 512 public/logo.png
 
+# PWA install icons (manifest.webmanifest "any" + "maskable" purposes).
+make_legacy_round 192 public/icon-192.png
+make_legacy_round 512 public/icon-512.png
+
 make_legacy_round 48  android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
 make_legacy_round 72  android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
 make_legacy_round 96  android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
 make_legacy_round 144 android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
 make_legacy_round 192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+
+# ── Android push-notification status-bar icon (ic_stat_ditto) ──
+# Must be a flat white silhouette on transparent — the OS tints it, any
+# color/gradient gets ignored or looks wrong. Referenced directly by
+# NostrPoller.java / NotificationRelayService.java via R.drawable.ic_stat_ditto.
+
+echo "Generating notification status-bar icon (ic_stat_ditto)..."
+
+make_notification_icon() {
+    local size=$1
+    local content_size=$(echo "$size * 80 / 100" | bc)
+    local dest=$2
+    $MAGICK -size "${size}x${size}" "xc:none" \
+        \( "$LOGO_WHITE" -resize "${content_size}x${content_size}" \) \
+        -gravity center -compose over -composite \
+        "$dest"
+}
+
+for dir in drawable mipmap; do
+    make_notification_icon 24 android/app/src/main/res/${dir}-mdpi/ic_stat_ditto.png
+    make_notification_icon 48 android/app/src/main/res/${dir}-xhdpi/ic_stat_ditto.png
+    make_notification_icon 72 android/app/src/main/res/${dir}-xxhdpi/ic_stat_ditto.png
+    make_notification_icon 96 android/app/src/main/res/${dir}-xxxhdpi/ic_stat_ditto.png
+done
+make_notification_icon 36 android/app/src/main/res/drawable-hdpi/ic_stat_ditto.png
 
 # Update background color
 BACKGROUND_COLOR_FILE="android/app/src/main/res/values/ic_launcher_background.xml"
@@ -169,6 +211,26 @@ if [ -d "$IOS_ICON_DIR" ]; then
     echo -e "  ${GREEN}✓${NC} $IOS_ICON"
 else
     echo -e "  ${YELLOW}Skipped: $IOS_ICON_DIR not found${NC}"
+fi
+
+# ── iOS launch screen (Splash.imageset, 2732x2732, white bg + small mark) ──
+# Referenced by LaunchScreen.storyboard. Ships one image for all 3 scale
+# slots (1x/2x/3x), matching how the project already had it set up.
+
+echo "Generating iOS launch screen..."
+
+IOS_SPLASH_DIR="ios/App/App/Assets.xcassets/Splash.imageset"
+
+if [ -d "$IOS_SPLASH_DIR" ]; then
+    $MAGICK -size "2732x2732" "xc:white" \
+        \( "$LOGO_ORANGE" -resize "160x160" \) \
+        -gravity center -compose over -composite \
+        "$IOS_SPLASH_DIR/splash-2732x2732.png"
+    cp "$IOS_SPLASH_DIR/splash-2732x2732.png" "$IOS_SPLASH_DIR/splash-2732x2732-1.png"
+    cp "$IOS_SPLASH_DIR/splash-2732x2732.png" "$IOS_SPLASH_DIR/splash-2732x2732-2.png"
+    echo -e "  ${GREEN}✓${NC} $IOS_SPLASH_DIR (3 files)"
+else
+    echo -e "  ${YELLOW}Skipped: $IOS_SPLASH_DIR not found${NC}"
 fi
 
 # Cleanup temp files
