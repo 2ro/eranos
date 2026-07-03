@@ -2,12 +2,15 @@ import { Link } from 'react-router-dom';
 
 import { AgoraBoltIcon } from '@/components/icons/AgoraBoltIcon';
 import { Button } from '@/components/ui/button';
+import { useAppContext } from '@/hooks/useAppContext';
 
 interface LandingHeroProps {
   onJoinClick: () => void;
 }
 
 export function LandingHero({ onJoinClick }: LandingHeroProps) {
+  const { config } = useAppContext();
+
   return (
     <div className="landing-hero">
       {/* ── Hero Header ── */}
@@ -17,8 +20,8 @@ export function LandingHero({ onJoinClick }: LandingHeroProps) {
         </div>
 
         <div className="space-y-1 landing-hero-fade" style={{ animationDelay: '80ms' }}>
-          <h1 className="text-2xl sidebar:text-3xl font-black tracking-tight leading-none">
-            ÁGORA
+          <h1 className="text-2xl sidebar:text-3xl font-black tracking-tight leading-none uppercase">
+            {config.appName}
           </h1>
           <p className="text-[11px] sidebar:text-xs uppercase tracking-wider text-muted-foreground font-semibold">
             Power to the people
