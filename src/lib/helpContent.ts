@@ -77,7 +77,6 @@ const FAQ_STRUCTURE: FAQCategoryStructure[] = [
     items: [
       { id: 'what-is-ditto' },
       { id: 'cost-to-use' },
-      { id: 'who-made-this' },
     ],
   },
   {

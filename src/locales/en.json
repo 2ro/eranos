@@ -2218,12 +2218,6 @@
           "**No.** {{appName}} takes no platform fee. When you donate, you pay only the tiny Grin network fee that goes to miners, not to us."
         ]
       },
-      "who-made-this": {
-        "question": "Who made {{appName}}?",
-        "answer": [
-          "{{appName}} is built by [Soapbox](https://soapbox.pub), an open-source team building tools for the Nostr ecosystem, in collaboration with the [World Liberty Congress](https://worldlibertycongress.org/)."
-        ]
-      },
       "censorship-resistance": {
         "question": "What does \"censorship-resistant\" mean here?",
         "answer": [
