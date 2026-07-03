@@ -323,9 +323,13 @@ const DONOR_GUIDE_STRUCTURE: GuideBlockStructure[] = [
         href: 'https://bisq.network',
       },
       {
-        id: 'coinjoin',
-        chips: ['non-custodial', 'breaks history'],
+        id: 'noKycExchange',
+        chips: ['exchange', 'no KYC'],
         href: 'https://nonlogs.io',
+      },
+      {
+        id: 'coinjoin',
+        chips: ['optional step', 'no proof needed'],
       },
     ],
   },
