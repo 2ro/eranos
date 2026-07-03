@@ -2415,15 +2415,11 @@
         "options": {
           "coinjoin": {
             "name": "Exchanges",
-            "purpose": "The simplest path to fiat. Expect KYC: the exchange learns your identity and the amount you cash out through it."
+            "purpose": "A no-KYC exchange like nonlogs.io lets you cash out without an identity check."
           },
           "peerToPeer": {
             "name": "Peer-to-peer",
             "purpose": "Trade Grin for fiat directly with another person or through an over-the-counter broker. No platform in the middle."
-          },
-          "spendDirectly": {
-            "name": "Spend it directly",
-            "purpose": "Spend Grin as money with merchants and services that accept it, without converting to cash first."
           }
         }
       },

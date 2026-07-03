@@ -348,18 +348,13 @@ const RECIPIENT_GUIDE_STRUCTURE: GuideBlockStructure[] = [
     options: [
       {
         id: 'coinjoin',
-        chips: ['non-custodial', 'high privacy'],
-        href: 'https://wasabiwallet.io',
+        chips: ['non-custodial', 'no KYC'],
+        href: 'https://nonlogs.io',
       },
       {
         id: 'peerToPeer',
         chips: ['cash', 'no KYC'],
         href: 'https://bisq.network',
-      },
-      {
-        id: 'spendDirectly',
-        chips: ['skip cash-out', 'instant'],
-        href: 'https://www.bitrefill.com/us/en/',
       },
     ],
   },
