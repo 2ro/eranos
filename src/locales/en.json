@@ -2356,7 +2356,7 @@
         "options": {
           "nonKyc": {
             "name": "Acquire Grin without KYC",
-            "purpose": "Mine it, or buy it peer-to-peer, so the coins aren't linked to your government ID in the first place."
+            "purpose": "Mine it, or buy it peer-to-peer through Bisq or a similar platform, so the coins aren't linked to your government ID in the first place."
           },
           "coinjoin": {
             "name": "Skip the public receipt",
@@ -2365,8 +2365,8 @@
         }
       },
       "consumerApps": {
-        "title": "Exchanges know who you are",
-        "body": "Exchanges that list GRIN verify your ID and keep records of every withdrawal. The public chain won't show your donation, but the exchange knows where its withdrawal went. If that matters for your situation, withdraw to a wallet you control first and donate from there."
+        "title": "Some exchanges know who you are",
+        "body": "Some exchanges that list GRIN verify your ID and keep records of every withdrawal — check before you use one. The public chain won't show your donation, but if the exchange tracks you, it knows where its withdrawal went. If that matters for your situation, withdraw to a wallet you control first and donate from there, or use a no-KYC exchange like nonlogs.io."
       }
     },
     "recipient": {

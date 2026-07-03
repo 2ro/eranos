@@ -325,7 +325,7 @@ const DONOR_GUIDE_STRUCTURE: GuideBlockStructure[] = [
       {
         id: 'coinjoin',
         chips: ['non-custodial', 'breaks history'],
-        href: 'https://wasabiwallet.io',
+        href: 'https://nonlogs.io',
       },
     ],
   },
