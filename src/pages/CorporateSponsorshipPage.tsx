@@ -1,5 +1,4 @@
 import { useSeoMeta } from '@unhead/react';
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowRight,
@@ -14,16 +13,11 @@ import {
   Sparkles,
   Users,
 } from 'lucide-react';
-import { nip19 } from 'nostr-tools';
 import { Link } from 'react-router-dom';
 
 import { useAppContext } from '@/hooks/useAppContext';
-import { TEAM_SOAPBOX_PACK } from '@/lib/helpContent';
+import { ERANOS_NPUB, TEAM_URL } from '@/lib/agoraDefaults';
 import { openUrl } from '@/lib/downloadFile';
-
-/** Where "Get in touch" / "Contact" CTAs send a prospective corporate partner. */
-const SPONSOR_CONTACT_MAILTO =
-  'mailto:hello@soapbox.pub?subject=Agora%20corporate%20sponsorship';
 
 /**
  * The /sponsors page. A landing-style document for companies that want to
@@ -51,17 +45,8 @@ export function CorporateSponsorshipPage() {
 
   const appName = config.appName;
 
-  // In-app link to the Team Soapbox follow pack, via the addressable
-  // /:nip19 route. Encoded once per render (cheap).
-  const teamSoapboxNaddr = useMemo(
-    () =>
-      nip19.naddrEncode({
-        kind: TEAM_SOAPBOX_PACK.kind,
-        pubkey: TEAM_SOAPBOX_PACK.pubkey,
-        identifier: TEAM_SOAPBOX_PACK.identifier,
-      }),
-    [],
-  );
+  // Corporate "get in touch" CTAs route to the team page.
+  const contactTeam = () => void openUrl(TEAM_URL);
 
   return (
     <main className="min-h-screen bg-background">
@@ -121,7 +106,7 @@ export function CorporateSponsorshipPage() {
             <div className="flex flex-wrap gap-3">
               <button
                 type="button"
-                onClick={() => void openUrl(SPONSOR_CONTACT_MAILTO)}
+                onClick={contactTeam}
                 className="group inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 font-semibold h-12 px-6 text-base shadow-lg shadow-primary/25 transition-all motion-safe:hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
               >
                 <Handshake className="size-5" />
@@ -207,7 +192,7 @@ export function CorporateSponsorshipPage() {
                 t('corporateSponsorship.ways.seedFund.bullet3'),
               ]}
               cta={t('corporateSponsorship.ways.seedFund.cta')}
-              onCta={() => void openUrl(SPONSOR_CONTACT_MAILTO)}
+              onCta={contactTeam}
             />
             <WayCard
               icon={<HeartHandshake className="size-5" />}
@@ -220,7 +205,7 @@ export function CorporateSponsorshipPage() {
                 t('corporateSponsorship.ways.matching.bullet3'),
               ]}
               cta={t('corporateSponsorship.ways.matching.cta')}
-              onCta={() => void openUrl(SPONSOR_CONTACT_MAILTO)}
+              onCta={contactTeam}
             />
             <WayCard
               icon={<Megaphone className="size-5" />}
@@ -233,7 +218,7 @@ export function CorporateSponsorshipPage() {
                 t('corporateSponsorship.ways.promote.bullet3'),
               ]}
               cta={t('corporateSponsorship.ways.promote.cta')}
-              onCta={() => void openUrl(SPONSOR_CONTACT_MAILTO)}
+              onCta={contactTeam}
             />
           </div>
         </div>
@@ -285,7 +270,7 @@ export function CorporateSponsorshipPage() {
           </p>
           <button
             type="button"
-            onClick={() => void openUrl(SPONSOR_CONTACT_MAILTO)}
+            onClick={contactTeam}
             className="group inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 font-semibold h-12 px-6 text-base shadow-lg shadow-primary/25 transition-all motion-safe:hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
           >
             <HandHeart className="size-5" />
@@ -296,7 +281,7 @@ export function CorporateSponsorshipPage() {
           <p className="mt-8 text-sm text-muted-foreground">
             {t('corporateSponsorship.cta.followLine')}{' '}
             <Link
-              to={`/${teamSoapboxNaddr}`}
+              to={`/${ERANOS_NPUB}`}
               className="font-medium text-primary hover:underline"
             >
               {t('corporateSponsorship.cta.followLink')}

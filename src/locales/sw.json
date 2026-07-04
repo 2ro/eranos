@@ -691,7 +691,7 @@
         "cta": "Soma Mwongozo wa Mpokeaji"
       },
       "stillStuck": "Bado umekwama?",
-      "followTeam": "Fuata Team Soapbox kwenye Nostr",
+      "followTeam": "Fuata Eranos kwenye Nostr",
       "stillStuckSuffix": ". Tunashughulikia maswali huko."
     }
   },
@@ -2163,14 +2163,14 @@
         "question": "Itakuwaje ikiwa nitapoteza funguo yangu ya siri?",
         "answer": [
           "**Hakuna kitufe cha \"umesahau nenosiri\".** Hakuna anayeweza kuiweka upya kwako. Ukipoteza, akaunti yako na kampeni zako zimepotea milele. (Fedha zako za Grin ziko kwenye pochi yako mwenyewe ya Grin na kifungu chake cha mbegu, ambavyo viko tofauti na funguo hii.)",
-          "**Hifadhi funguo yako ya siri mahali salama sasa hivi.** Kwa vidokezo, soma [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys)."
+          "**Hifadhi funguo yako ya siri mahali salama sasa hivi.** Kwa vidokezo, soma [Managing Your Nostr Keys](https://goblin.st/team)."
         ]
       },
       "manage-secret-key": {
         "question": "Je, naweza kuhifadhi funguo yangu ya siri katika kidhibiti cha nenosiri cha simu yangu?",
         "answer": [
           "Ndiyo. Unaweza kuhifadhi katika kidhibiti cha nenosiri cha kifaa chako (iCloud Keychain, 1Password, Bitwarden, n.k.). Kwenye iPhone, kuihifadhi katika Passwords hukuruhusu kutumia Face ID au Touch ID kuingia.",
-          "Kwa mwongozo kamili, ona [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys)."
+          "Kwa mwongozo kamili, ona [Managing Your Nostr Keys](https://goblin.st/team)."
         ]
       },
       "fyp": {

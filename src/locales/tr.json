@@ -691,7 +691,7 @@
         "cta": "Alıcı Rehberi'ni oku"
       },
       "stillStuck": "Hâlâ takıldınız mı?",
-      "followTeam": "Team Soapbox'ı Nostr'da takip edin",
+      "followTeam": "Eranos'u Nostr'da takip edin",
       "stillStuckSuffix": ". Soruları orada cevaplıyoruz."
     }
   },
@@ -2163,14 +2163,14 @@
         "question": "Gizli anahtarımı kaybedersem ne olur?",
         "answer": [
           "**\"Parolamı unuttum\" butonu yoktur.** Kimse sizin için sıfırlayamaz. Kaybederseniz hesabınız ve kampanyalarınız sonsuza dek kaybolur. (Grin fonlarınız, bu anahtardan ayrı olan kendi Grin cüzdanınızda ve onun tohum cümlesinde durur.)",
-          "**Gizli anahtarınızı şimdi güvenli bir yere kaydedin.** İpuçları için [Nostr Anahtarlarınızı Yönetmek](https://soapbox.pub/blog/managing-nostr-keys) yazısını okuyun."
+          "**Gizli anahtarınızı şimdi güvenli bir yere kaydedin.** İpuçları için [Nostr Anahtarlarınızı Yönetmek](https://goblin.st/team) yazısını okuyun."
         ]
       },
       "manage-secret-key": {
         "question": "Gizli anahtarımı telefonumdaki parola yöneticisine kaydedebilir miyim?",
         "answer": [
           "Evet. Cihazınızın parola yöneticisinde (iCloud Keychain, 1Password, Bitwarden vb.) kaydedebilirsiniz. iPhone'da Parolalar'a kaydetmek, giriş yapmak için Face ID veya Touch ID kullanmanıza olanak tanır.",
-          "Tam rehber için [Nostr Anahtarlarınızı Yönetmek](https://soapbox.pub/blog/managing-nostr-keys) yazısına bakın."
+          "Tam rehber için [Nostr Anahtarlarınızı Yönetmek](https://goblin.st/team) yazısına bakın."
         ]
       },
       "fyp": {

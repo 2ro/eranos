@@ -692,7 +692,7 @@
         "cta": "Read the Recipient Guide"
       },
       "stillStuck": "Still stuck?",
-      "followTeam": "Follow Team Soapbox on Nostr",
+      "followTeam": "Follow Eranos on Nostr",
       "stillStuckSuffix": ". We triage questions there."
     }
   },
@@ -780,7 +780,7 @@
       "body": "Tell us how you'd like to get involved and we'll help you set up the right partnership — Seed Fund gift, matching pool, or a customer campaign.",
       "button": "Contact the {{appName}} team",
       "followLine": "Prefer Nostr?",
-      "followLink": "Follow Team Soapbox",
+      "followLink": "Follow Eranos",
       "followSuffix": " and send us a message."
     }
   },
@@ -2266,14 +2266,14 @@
         "question": "What happens if I lose my secret key?",
         "answer": [
           "**There is no \"forgot password\" button.** Nobody can reset it for you. If you lose it, your account and your campaigns are gone forever. (Your Grin funds live in your own Grin wallet and its seed phrase, which is separate from this key.)",
-          "**Save your secret key somewhere safe right now.** For tips, read [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys)."
+          "**Save your secret key somewhere safe right now.** For tips, read [Managing Your Nostr Keys](https://goblin.st/team)."
         ]
       },
       "manage-secret-key": {
         "question": "Can I save my secret key in my phone's password manager?",
         "answer": [
           "Yes. You can save it in your device's password manager (iCloud Keychain, 1Password, Bitwarden, etc.). On iPhone, saving it in Passwords lets you use Face ID or Touch ID to log in.",
-          "For a full guide, see [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys)."
+          "For a full guide, see [Managing Your Nostr Keys](https://goblin.st/team)."
         ]
       },
       "fyp": {

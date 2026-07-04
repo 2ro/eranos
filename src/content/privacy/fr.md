@@ -49,4 +49,4 @@ Nous pouvons mettre à jour cette politique de confidentialité de temps en temp
 
 ## Contact
 
-Si vous avez des questions concernant cette politique de confidentialité, vous pouvez joindre l'équipe derrière {{appName}} sur [soapbox.pub](https://soapbox.pub).
+Si vous avez des questions concernant cette politique de confidentialité, vous pouvez joindre l'équipe derrière {{appName}} sur [goblin.st/team](https://goblin.st/team).

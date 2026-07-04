@@ -49,4 +49,4 @@ We may update this privacy policy from time to time. Changes will be reflected o
 
 ## Contact
 
-If you have questions about this privacy policy, you can reach the team behind {{appName}} at [soapbox.pub](https://soapbox.pub).
+If you have questions about this privacy policy, you can reach the team behind {{appName}} at [goblin.st/team](https://goblin.st/team).

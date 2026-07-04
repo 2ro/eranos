@@ -2082,7 +2082,7 @@
         "cta": "Verenga Gwaro romugamuchiri"
       },
       "stillStuck": "Wakanamatira here?",
-      "followTeam": "Tevera Team Soapbox paNostr",
+      "followTeam": "Tevera Eranos paNostr",
       "stillStuckSuffix": ". Tinopindura mibvunzo ipapo."
     }
   },
@@ -2163,14 +2163,14 @@
         "question": "Chii chinoitika kana ndikarasa kiyi yangu yakavanzika?",
         "answer": [
           "**Hapana bhatani re\"wakanganwa pasiwedhi\".** Hapana anogona kuiseta zvekare kwauri. Kana wairasa, akaundi yako nemakambeni ako zvaperera nokusingaperi. (Mari yako yeGrin inogara muchikwama chako cheGrin nemutsara wayo weseed, zvakaparadzana nekiyi iyi.)",
-          "**Chengeta kiyi yako yakavanzika kunzvimbo yakachengeteka iye zvino.** Kuti uone mazano, verenga [Kutarisira Makey ako eNostr](https://soapbox.pub/blog/managing-nostr-keys)."
+          "**Chengeta kiyi yako yakavanzika kunzvimbo yakachengeteka iye zvino.** Kuti uone mazano, verenga [Kutarisira Makey ako eNostr](https://goblin.st/team)."
         ]
       },
       "manage-secret-key": {
         "question": "Ndinogona here kuchengeta kiyi yangu yakavanzika muchengeti yemapasiwedhi yefoni yangu?",
         "answer": [
           "Hongu. Unogona kuyichengeta muchengeti yemapasiwedhi yedhivhaisi yako (iCloud Keychain, 1Password, Bitwarden, n.z.v.). PaiPhone, kuyichengeta muPasswords kunokupa mukana wekushandisa Face ID kana Touch ID kupinda.",
-          "Kuti uwane bhuku rakazara, ona [Kutarisira Makey ako eNostr](https://soapbox.pub/blog/managing-nostr-keys)."
+          "Kuti uwane bhuku rakazara, ona [Kutarisira Makey ako eNostr](https://goblin.st/team)."
         ]
       },
       "fyp": {

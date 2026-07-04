@@ -691,7 +691,7 @@
         "cta": "Baca Panduan Penerima"
       },
       "stillStuck": "Masih bingung?",
-      "followTeam": "Ikuti Team Soapbox di Nostr",
+      "followTeam": "Ikuti Eranos di Nostr",
       "stillStuckSuffix": ". Kami menjawab pertanyaan di sana."
     }
   },
@@ -2163,14 +2163,14 @@
         "question": "Apa yang terjadi jika saya kehilangan kunci rahasia saya?",
         "answer": [
           "**Tidak ada tombol \"lupa kata sandi\".** Tidak ada yang bisa menyetelnya ulang untuk Anda. Jika Anda kehilangannya, akun dan kampanye Anda hilang selamanya. (Dana Grin Anda berada di dompet Grin Anda sendiri dengan frasa seed-nya, yang terpisah dari kunci ini.)",
-          "**Simpan kunci rahasia Anda di tempat aman sekarang juga.** Untuk tips, baca [Mengelola Kunci Nostr Anda](https://soapbox.pub/blog/managing-nostr-keys)."
+          "**Simpan kunci rahasia Anda di tempat aman sekarang juga.** Untuk tips, baca [Mengelola Kunci Nostr Anda](https://goblin.st/team)."
         ]
       },
       "manage-secret-key": {
         "question": "Bisakah saya menyimpan kunci rahasia saya di pengelola kata sandi ponsel?",
         "answer": [
           "Ya. Anda bisa menyimpannya di pengelola kata sandi perangkat Anda (iCloud Keychain, 1Password, Bitwarden, dll.). Di iPhone, menyimpannya di Passwords memungkinkan Anda menggunakan Face ID atau Touch ID untuk masuk.",
-          "Untuk panduan lengkap, lihat [Mengelola Kunci Nostr Anda](https://soapbox.pub/blog/managing-nostr-keys)."
+          "Untuk panduan lengkap, lihat [Mengelola Kunci Nostr Anda](https://goblin.st/team)."
         ]
       },
       "fyp": {

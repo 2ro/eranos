@@ -32,6 +32,22 @@ if (decoded.type !== 'naddr') {
 export const VERIFIED_PAGE_PATH = '/verified';
 
 /**
+ * Eranos's own Nostr identity (npub). Used as the "Follow Eranos on Nostr"
+ * support pointer on the About and Corporate Sponsorship pages, rendered
+ * in-app via the `/:nip19` profile route.
+ */
+export const ERANOS_NPUB =
+  'npub1m049skfequeelxy032555eg7w47ff7qvzfc2cahym7xkrsgvmtqsnm9ny6';
+
+/**
+ * The Eranos / Goblin team page. Every user-facing link that used to route
+ * people to the upstream project (soapbox.pub support, contact, source, help
+ * guides) now points here instead. The page is created by the team; use the
+ * URL exactly.
+ */
+export const TEAM_URL = 'https://goblin.st/team';
+
+/**
  * Team Soapbox follow pack (kind 39089). The `p` tags of this pack form the
  * authoritative list of campaign moderators — pubkeys allowed to sign
  * approve / hide labels in the `agora.moderation` namespace (see NIP.md).

@@ -49,4 +49,4 @@ Tinogona kuvandudza mutemo uno wezvakavanzika nguva nenguva. Shanduko dzichaonek
 
 ## Kuonana
 
-Kana uine mibvunzo pamusoro pemutemo uno wezvakavanzika, unogona kubatana neboka riri kumashure kwe{{appName}} pa [soapbox.pub](https://soapbox.pub).
+Kana uine mibvunzo pamusoro pemutemo uno wezvakavanzika, unogona kubatana neboka riri kumashure kwe{{appName}} pa [goblin.st/team](https://goblin.st/team).

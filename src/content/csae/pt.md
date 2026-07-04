@@ -53,7 +53,7 @@ Quando conteúdo ou comportamento CSAE é identificado, o {{appName}} tomará as
 Se você encontrar algum conteúdo no {{appName}} que acredita constituir abuso ou exploração sexual infantil, por favor denuncie imediatamente:
 
 - **Denúncia no aplicativo:** Use o botão de denúncia disponível em qualquer publicação ou perfil de usuário para sinalizar conteúdo para revisão.
-- **Entre em contato conosco diretamente:** Entre em contato com nossa equipe em [soapbox.pub](https://soapbox.pub) com detalhes do conteúdo, incluindo quaisquer IDs de eventos Nostr relevantes ou chaves públicas.
+- **Entre em contato conosco diretamente:** Entre em contato com nossa equipe em [goblin.st/team](https://goblin.st/team) com detalhes do conteúdo, incluindo quaisquer IDs de eventos Nostr relevantes ou chaves públicas.
 - **Denunciar ao NCMEC:** Você também pode arquivar um relatório diretamente com a [NCMEC CyberTipline](https://www.missingkids.org/gethelpnow/cybertipline).
 - **Contatar autoridades policiais:** Se você acredita que uma criança está em perigo imediato, contate sua polícia local ou ligue **911** (EUA) imediatamente.
 
@@ -79,7 +79,7 @@ A natureza descentralizada do Nostr significa que nenhuma entidade única tem co
 
 ## Recursos
 
-Se você acredita que seu conteúdo ou conta foi sinalizado ou bloqueado incorretamente sob esta política, você pode nos contatar em [soapbox.pub](https://soapbox.pub) para solicitar uma revisão. Avaliaremos recursos caso a caso. No entanto, erramos do lado da segurança infantil em todas as decisões, e nossa determinação é final.
+Se você acredita que seu conteúdo ou conta foi sinalizado ou bloqueado incorretamente sob esta política, você pode nos contatar em [goblin.st/team](https://goblin.st/team) para solicitar uma revisão. Avaliaremos recursos caso a caso. No entanto, erramos do lado da segurança infantil em todas as decisões, e nossa determinação é final.
 
 ## Alterações nesta política
 
@@ -87,4 +87,4 @@ Podemos atualizar esta política de segurança infantil à medida que nossas fer
 
 ## Contato
 
-Para dúvidas sobre esta política ou para denunciar conteúdo CSAE, entre em contato com a equipe por trás do {{appName}} em [soapbox.pub](https://soapbox.pub).
+Para dúvidas sobre esta política ou para denunciar conteúdo CSAE, entre em contato com a equipe por trás do {{appName}} em [goblin.st/team](https://goblin.st/team).

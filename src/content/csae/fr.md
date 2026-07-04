@@ -53,7 +53,7 @@ Lorsqu'un contenu ou un comportement CSAE est identifié, {{appName}} prendra le
 Si vous rencontrez sur {{appName}} un contenu que vous pensez constituer un abus sexuel ou une exploitation d'enfants, veuillez le signaler immédiatement :
 
 - **Signalement dans l'application :** Utilisez le bouton de signalement disponible sur toute publication ou profil d'utilisateur pour signaler le contenu pour examen.
-- **Contactez-nous directement :** Contactez notre équipe sur [soapbox.pub](https://soapbox.pub) avec les détails du contenu, y compris tous les ID d'événement Nostr ou clés publiques pertinents.
+- **Contactez-nous directement :** Contactez notre équipe sur [goblin.st/team](https://goblin.st/team) avec les détails du contenu, y compris tous les ID d'événement Nostr ou clés publiques pertinents.
 - **Signaler au NCMEC :** Vous pouvez également déposer un rapport directement auprès de la [NCMEC CyberTipline](https://www.missingkids.org/gethelpnow/cybertipline).
 - **Contacter les forces de l'ordre :** Si vous pensez qu'un enfant est en danger immédiat, contactez immédiatement les forces de l'ordre locales ou appelez le **911** (États-Unis).
 
@@ -79,7 +79,7 @@ La nature décentralisée de Nostr signifie qu'aucune entité unique n'a un cont
 
 ## Recours
 
-Si vous pensez que votre contenu ou votre compte a été signalé ou bloqué à tort en vertu de cette politique, vous pouvez nous contacter sur [soapbox.pub](https://soapbox.pub) pour demander un examen. Nous évaluerons les recours au cas par cas. Cependant, nous penchons du côté de la sécurité des enfants dans toutes les décisions, et notre détermination est définitive.
+Si vous pensez que votre contenu ou votre compte a été signalé ou bloqué à tort en vertu de cette politique, vous pouvez nous contacter sur [goblin.st/team](https://goblin.st/team) pour demander un examen. Nous évaluerons les recours au cas par cas. Cependant, nous penchons du côté de la sécurité des enfants dans toutes les décisions, et notre détermination est définitive.
 
 ## Modifications de cette politique
 
@@ -87,4 +87,4 @@ Nous pouvons mettre à jour cette politique de sécurité des enfants à mesure 
 
 ## Contact
 
-Pour des questions concernant cette politique ou pour signaler du contenu CSAE, contactez l'équipe derrière {{appName}} sur [soapbox.pub](https://soapbox.pub).
+Pour des questions concernant cette politique ou pour signaler du contenu CSAE, contactez l'équipe derrière {{appName}} sur [goblin.st/team](https://goblin.st/team).

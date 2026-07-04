@@ -14,6 +14,7 @@ import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useProfileUrl } from "./hooks/useProfileUrl";
 import { cn } from "@/lib/utils";
 import { openUrl } from "@/lib/downloadFile";
+import { TEAM_URL } from "@/lib/agoraDefaults";
 
 // Critical-path pages: eagerly loaded (landing + fallback)
 import Index from "./pages/Index";
@@ -88,7 +89,7 @@ function SiteFooter() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
         <button
           type="button"
-          onClick={() => void openUrl("https://gitlab.com/soapbox-pub/agora")}
+          onClick={() => void openUrl(TEAM_URL)}
           className="hover:text-foreground motion-safe:transition-colors"
         >
           {t('nav.sourceCode')}

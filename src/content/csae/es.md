@@ -53,7 +53,7 @@ Cuando se identifica contenido o comportamiento de tipo CSAE, {{appName}} tomar�
 Si encuentra cualquier contenido en {{appName}} que considere que constituye abuso o explotación sexual infantil, por favor repórtelo de inmediato:
 
 - **Reporte dentro de la app:** Use el botón de reporte disponible en cualquier publicación o perfil de usuario para señalar el contenido para revisión.
-- **Contáctenos directamente:** Comuníquese con nuestro equipo en [soapbox.pub](https://soapbox.pub) con los detalles del contenido, incluidos cualesquiera identificadores de eventos de Nostr o claves públicas relevantes.
+- **Contáctenos directamente:** Comuníquese con nuestro equipo en [goblin.st/team](https://goblin.st/team) con los detalles del contenido, incluidos cualesquiera identificadores de eventos de Nostr o claves públicas relevantes.
 - **Reporte a NCMEC:** También puede presentar un reporte directamente en la [línea CyberTipline de NCMEC](https://www.missingkids.org/gethelpnow/cybertipline).
 - **Contacte a las autoridades:** Si cree que una persona menor está en peligro inminente, comuníquese con la policía local o llame al **911** (EE. UU.) de inmediato.
 
@@ -79,7 +79,7 @@ La naturaleza descentralizada de Nostr implica que ninguna entidad tiene control
 
 ## Apelaciones
 
-Si cree que su contenido o cuenta ha sido marcado o bloqueado incorrectamente en virtud de esta política, puede ponerse en contacto con nosotros en [soapbox.pub](https://soapbox.pub) para solicitar una revisión. Evaluaremos las apelaciones caso por caso. No obstante, en todas las decisiones priorizamos la seguridad infantil, y nuestra determinación es final.
+Si cree que su contenido o cuenta ha sido marcado o bloqueado incorrectamente en virtud de esta política, puede ponerse en contacto con nosotros en [goblin.st/team](https://goblin.st/team) para solicitar una revisión. Evaluaremos las apelaciones caso por caso. No obstante, en todas las decisiones priorizamos la seguridad infantil, y nuestra determinación es final.
 
 ## Cambios en esta política
 
@@ -87,4 +87,4 @@ Podemos actualizar esta política de seguridad infantil a medida que evolucionan
 
 ## Contacto
 
-Para cuestiones relativas a esta política o para reportar contenido CSAE, contacte al equipo detrás de {{appName}} en [soapbox.pub](https://soapbox.pub).
+Para cuestiones relativas a esta política o para reportar contenido CSAE, contacte al equipo detrás de {{appName}} en [goblin.st/team](https://goblin.st/team).

@@ -691,7 +691,7 @@
         "cta": "प्राप्तकर्ता गाइड पढ़ें"
       },
       "stillStuck": "अब भी अटके हैं?",
-      "followTeam": "Nostr पर Team Soapbox को फ़ॉलो करें",
+      "followTeam": "Nostr पर Eranos को फ़ॉलो करें",
       "stillStuckSuffix": "। हम वहाँ सवालों पर ध्यान देते हैं।"
     }
   },
@@ -2163,14 +2163,14 @@
         "question": "अगर मेरी secret key खो जाए तो क्या होगा?",
         "answer": [
           "**कोई \"forgot password\" बटन नहीं है।** कोई भी इसे आपके लिए रीसेट नहीं कर सकता। अगर आप इसे खो देते हैं, तो आपका अकाउंट और आपके कैंपेन हमेशा के लिए चले जाते हैं। (आपके Grin फंड आपके अपने Grin वॉलेट और उसके seed phrase में रहते हैं, जो इस key से अलग है।)",
-          "**अभी अपनी secret key को कहीं सुरक्षित जगह सेव करें।** सुझावों के लिए, [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys) पढ़ें।"
+          "**अभी अपनी secret key को कहीं सुरक्षित जगह सेव करें।** सुझावों के लिए, [Managing Your Nostr Keys](https://goblin.st/team) पढ़ें।"
         ]
       },
       "manage-secret-key": {
         "question": "क्या मैं अपनी secret key अपने फ़ोन के password manager में सेव कर सकता/सकती हूँ?",
         "answer": [
           "हाँ। आप इसे अपने डिवाइस के password manager में सेव कर सकते हैं (iCloud Keychain, 1Password, Bitwarden, आदि)। iPhone पर, इसे Passwords में सेव करके आप Face ID या Touch ID से लॉग इन कर सकते हैं।",
-          "पूरी गाइड के लिए, [Managing Your Nostr Keys](https://soapbox.pub/blog/managing-nostr-keys) देखें।"
+          "पूरी गाइड के लिए, [Managing Your Nostr Keys](https://goblin.st/team) देखें।"
         ]
       },
       "fyp": {

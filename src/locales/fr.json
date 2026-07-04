@@ -691,7 +691,7 @@
         "cta": "Lire le Guide du bénéficiaire"
       },
       "stillStuck": "Toujours bloqué ?",
-      "followTeam": "Suivez Team Soapbox sur Nostr",
+      "followTeam": "Suivez Eranos sur Nostr",
       "stillStuckSuffix": ". Nous y traitons les questions."
     }
   },
@@ -2163,14 +2163,14 @@
         "question": "Que se passe-t-il si je perds ma clé secrète ?",
         "answer": [
           "**Il n'y a pas de bouton « mot de passe oublié ».** Personne ne peut la réinitialiser pour vous. Si vous la perdez, votre compte et vos campagnes sont perdus pour toujours. (Vos fonds en Grin vivent dans votre propre portefeuille Grin et sa phrase de récupération, qui est distincte de cette clé.)",
-          "**Enregistrez votre clé secrète en lieu sûr dès maintenant.** Pour des conseils, lisez [Gérer vos clés Nostr](https://soapbox.pub/blog/managing-nostr-keys)."
+          "**Enregistrez votre clé secrète en lieu sûr dès maintenant.** Pour des conseils, lisez [Gérer vos clés Nostr](https://goblin.st/team)."
         ]
       },
       "manage-secret-key": {
         "question": "Puis-je enregistrer ma clé secrète dans le gestionnaire de mots de passe de mon téléphone ?",
         "answer": [
           "Oui. Vous pouvez l'enregistrer dans le gestionnaire de mots de passe de votre appareil (iCloud Keychain, 1Password, Bitwarden, etc.). Sur iPhone, l'enregistrer dans Mots de passe vous permet d'utiliser Face ID ou Touch ID pour vous connecter.",
-          "Pour un guide complet, voir [Gérer vos clés Nostr](https://soapbox.pub/blog/managing-nostr-keys)."
+          "Pour un guide complet, voir [Gérer vos clés Nostr](https://goblin.st/team)."
         ]
       },
       "fyp": {

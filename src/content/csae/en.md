@@ -53,7 +53,7 @@ When CSAE content or behavior is identified, {{appName}} will take the following
 If you encounter any content on {{appName}} that you believe constitutes child sexual abuse or exploitation, please report it immediately:
 
 - **In-app reporting:** Use the report button available on any post or user profile to flag content for review.
-- **Contact us directly:** Reach out to our team at [soapbox.pub](https://soapbox.pub) with details of the content, including any relevant Nostr event IDs or public keys.
+- **Contact us directly:** Reach out to our team at [goblin.st/team](https://goblin.st/team) with details of the content, including any relevant Nostr event IDs or public keys.
 - **Report to NCMEC:** You can also file a report directly with the [NCMEC CyberTipline](https://www.missingkids.org/gethelpnow/cybertipline).
 - **Contact law enforcement:** If you believe a child is in immediate danger, contact your local law enforcement or call **911** (US) immediately.
 
@@ -79,7 +79,7 @@ Nostr's decentralized nature means that no single entity has complete control ov
 
 ## Appeals
 
-If you believe your content or account has been incorrectly flagged or blocked under this policy, you may contact us at [soapbox.pub](https://soapbox.pub) to request a review. We will evaluate appeals on a case-by-case basis. However, we err on the side of child safety in all decisions, and our determination is final.
+If you believe your content or account has been incorrectly flagged or blocked under this policy, you may contact us at [goblin.st/team](https://goblin.st/team) to request a review. We will evaluate appeals on a case-by-case basis. However, we err on the side of child safety in all decisions, and our determination is final.
 
 ## Changes to This Policy
 
@@ -87,4 +87,4 @@ We may update this child safety policy as our tools, processes, and the Nostr ec
 
 ## Contact
 
-For questions about this policy or to report CSAE content, contact the team behind {{appName}} at [soapbox.pub](https://soapbox.pub).
+For questions about this policy or to report CSAE content, contact the team behind {{appName}} at [goblin.st/team](https://goblin.st/team).

@@ -2082,7 +2082,7 @@
         "cta": "阅读受款人指南"
       },
       "stillStuck": "还有问题？",
-      "followTeam": "在 Nostr 上关注 Team Soapbox",
+      "followTeam": "在 Nostr 上关注 Eranos",
       "stillStuckSuffix": "。我们在那里处理问题。"
     }
   },
@@ -2163,14 +2163,14 @@
         "question": "如果我丢失了私钥会怎样？",
         "answer": [
           "**没有“忘记密码”按钮。** 没有人能为你重置。如果你弄丢了它，你的账户和你的活动将永远消失。（你的 Grin 资金保存在你自己的 Grin 钱包及其助记词中，与这把密钥是分开的。）",
-          "**现在就把你的私钥保存到安全的地方。** 想了解技巧，请阅读 [管理你的 Nostr 密钥](https://soapbox.pub/blog/managing-nostr-keys)。"
+          "**现在就把你的私钥保存到安全的地方。** 想了解技巧，请阅读 [管理你的 Nostr 密钥](https://goblin.st/team)。"
         ]
       },
       "manage-secret-key": {
         "question": "我可以把私钥保存到手机的密码管理器里吗？",
         "answer": [
           "可以。你可以把它存进设备的密码管理器（iCloud 钥匙串、1Password、Bitwarden 等）。在 iPhone 上，把它存进“密码”应用后，你可以使用 Face ID 或 Touch ID 登录。",
-          "完整指南请参阅 [管理你的 Nostr 密钥](https://soapbox.pub/blog/managing-nostr-keys)。"
+          "完整指南请参阅 [管理你的 Nostr 密钥](https://goblin.st/team)。"
         ]
       },
       "fyp": {

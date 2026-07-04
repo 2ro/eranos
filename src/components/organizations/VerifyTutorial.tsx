@@ -150,7 +150,7 @@ export function VerifyTutorial({
  */
 const DEMO_CAMPAIGN = {
   title: 'Eranos App Development Fund',
-  organizer: 'Team Soapbox',
+  organizer: 'Eranos',
   organizerPicture:
     'https://blossom.primal.net/e93f617f8331509acdddde3df0c1cd23cda1803d92c70815fc96e2d5f8d48ac8.png',
   story: 'Help fund the development of Eranos!',

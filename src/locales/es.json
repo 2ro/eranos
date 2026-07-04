@@ -2082,7 +2082,7 @@
         "cta": "Lee la guía para receptores"
       },
       "stillStuck": "¿Aún tienes dudas?",
-      "followTeam": "Sigue a Team Soapbox en Nostr",
+      "followTeam": "Sigue a Eranos en Nostr",
       "stillStuckSuffix": ". Allí resolvemos preguntas."
     }
   },
@@ -2163,14 +2163,14 @@
         "question": "¿Qué pasa si pierdo mi clave secreta?",
         "answer": [
           "**No hay botón de \"olvidé mi contraseña\".** Nadie puede restablecerla por ti. Si la pierdes, tu cuenta y tus campañas desaparecen para siempre. (Tus fondos en Grin viven en tu propia cartera Grin y su frase semilla, que es independiente de esta clave.)",
-          "**Guarda tu clave secreta en un lugar seguro ahora mismo.** Para consejos, lee [Cómo gestionar tus claves de Nostr](https://soapbox.pub/blog/managing-nostr-keys)."
+          "**Guarda tu clave secreta en un lugar seguro ahora mismo.** Para consejos, lee [Cómo gestionar tus claves de Nostr](https://goblin.st/team)."
         ]
       },
       "manage-secret-key": {
         "question": "¿Puedo guardar mi clave secreta en el gestor de contraseñas de mi teléfono?",
         "answer": [
           "Sí. Puedes guardarla en el gestor de contraseñas de tu dispositivo (Llavero de iCloud, 1Password, Bitwarden, etc.). En iPhone, guardarla en Contraseñas te permite usar Face ID o Touch ID para iniciar sesión.",
-          "Para una guía completa, consulta [Cómo gestionar tus claves de Nostr](https://soapbox.pub/blog/managing-nostr-keys)."
+          "Para una guía completa, consulta [Cómo gestionar tus claves de Nostr](https://goblin.st/team)."
         ]
       },
       "fyp": {

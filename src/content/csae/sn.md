@@ -53,7 +53,7 @@ Kana zvinhu kana maitiro eCSAE awanikwa, {{appName}} ichatora zviito zvinotevera
 Kana ukasangana nezvinhu pa{{appName}} zvaunofunga zvinoumba kushandisa kwepabonde kana kuchinjira kwevana, ndapota zvishumire pakarepo:
 
 - **Kushuma mukati meapp:** Shandisa bhatani rekushuma riripo papost ipi zvayo kana papurofiri yemushandisi kupa chiratidzo kuzvinhu zvekuongororwa.
-- **Tibatei zvakananga:** Bata timu yedu pa[soapbox.pub](https://soapbox.pub) nezvirevo zvezvinhu, kusanganisira chero ma-ID eNostr event kana makey everuzhinji anobatanidzwa.
+- **Tibatei zvakananga:** Bata timu yedu pa[goblin.st/team](https://goblin.st/team) nezvirevo zvezvinhu, kusanganisira chero ma-ID eNostr event kana makey everuzhinji anobatanidzwa.
 - **Shumira NCMEC:** Unogona zvakare kuburitsa shumo zvakananga ne[NCMEC CyberTipline](https://www.missingkids.org/gethelpnow/cybertipline).
 - **Bata vekushandisa mutemo:** Kana uchifunga kuti mwana ari munjodzi yepakarepo, bata vekushandisa mutemo venzvimbo yenyu kana kufona pa**911** (US) pakarepo.
 
@@ -79,7 +79,7 @@ Hunhu hwekusava nenzvimbo huru hweNostr kunoreva kuti hapana boka rimwe rine sim
 
 ## Kukwirira
 
-Kana uchifunga kuti zvinhu zvako kana akaundi yako yakapiwa chiratidzo kana kuvharirwa zvisina kunaka pasi pemutemo uyu, unogona kutibata pa[soapbox.pub](https://soapbox.pub) kukumbira kuongororwa. Tichaongorora kukwirira kunoenderera nedambudziko rega rega. Asi, tinotsigira ruzivo rwekuchengetedza vana muzvese zvatinosarudza, uye sarudzo yedu ndiyo yekupedzisira.
+Kana uchifunga kuti zvinhu zvako kana akaundi yako yakapiwa chiratidzo kana kuvharirwa zvisina kunaka pasi pemutemo uyu, unogona kutibata pa[goblin.st/team](https://goblin.st/team) kukumbira kuongororwa. Tichaongorora kukwirira kunoenderera nedambudziko rega rega. Asi, tinotsigira ruzivo rwekuchengetedza vana muzvese zvatinosarudza, uye sarudzo yedu ndiyo yekupedzisira.
 
 ## Shanduko padzidziso iyi
 
@@ -87,4 +87,4 @@ Tinogona kuvandudza mutemo wekuchengetedza vana uyu sezvo zvishandiso zvedu, mai
 
 ## Kuonana
 
-Kuti uite mibvunzo pamusoro pemutemo uyu kana kushuma zvinhu zveCSAE, bata timu iri kumashure kwe{{appName}} pa[soapbox.pub](https://soapbox.pub).
+Kuti uite mibvunzo pamusoro pemutemo uyu kana kushuma zvinhu zveCSAE, bata timu iri kumashure kwe{{appName}} pa[goblin.st/team](https://goblin.st/team).

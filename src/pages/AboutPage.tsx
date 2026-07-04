@@ -1,5 +1,4 @@
 import { useSeoMeta } from '@unhead/react';
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowRight,
@@ -9,12 +8,11 @@ import {
   HandHeart,
   Megaphone,
 } from 'lucide-react';
-import { nip19 } from 'nostr-tools';
 import { Link } from 'react-router-dom';
 
 import { useAppContext } from '@/hooks/useAppContext';
 import { HelpFAQSection } from '@/components/HelpFAQSection';
-import { TEAM_SOAPBOX_PACK } from '@/lib/helpContent';
+import { ERANOS_NPUB } from '@/lib/agoraDefaults';
 import { cn } from '@/lib/utils';
 
 /**
@@ -46,18 +44,6 @@ export function AboutPage() {
   });
 
   const appName = config.appName;
-
-  // In-app link to the Team Soapbox follow pack, via the addressable
-  // /:nip19 route. Encoded once per render (cheap).
-  const teamSoapboxNaddr = useMemo(
-    () =>
-      nip19.naddrEncode({
-        kind: TEAM_SOAPBOX_PACK.kind,
-        pubkey: TEAM_SOAPBOX_PACK.pubkey,
-        identifier: TEAM_SOAPBOX_PACK.identifier,
-      }),
-    [],
-  );
 
   return (
     <main className="min-h-screen bg-background">
@@ -357,11 +343,11 @@ export function AboutPage() {
           </div>
 
           {/* Page-closing 'Still stuck?' line: quiet pointer to the
-              Team Soapbox follow pack via the in-app /:nip19 route. */}
+              Eranos profile via the in-app /:nip19 route. */}
           <p className="mt-16 text-center text-sm text-muted-foreground">
             {t('about.guides.stillStuck')}{' '}
             <Link
-              to={`/${teamSoapboxNaddr}`}
+              to={`/${ERANOS_NPUB}`}
               className="font-medium text-primary hover:underline"
             >
               {t('about.guides.followTeam')}

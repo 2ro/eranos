@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Info, BookOpen, Shield, Code, ScrollText } from 'lucide-react';
 
 import { AGORA_ORIGIN } from '@/lib/appUrls';
+import { TEAM_URL } from '@/lib/agoraDefaults';
 
 interface LinkFooterProps {
   /** Optional callback fired when an internal (React Router) link is clicked. */
@@ -48,7 +49,7 @@ export function LinkFooter({ onNavigate }: LinkFooterProps) {
         </Link>
 
         <a
-          href="https://gitlab.com/soapbox-pub/agora-3"
+          href={TEAM_URL}
           className={chipClass}
           target="_blank"
           rel="noopener noreferrer"
