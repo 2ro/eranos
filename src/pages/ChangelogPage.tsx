@@ -10,7 +10,7 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { parseChangelog } from '@/lib/changelog';
 import type { ChangelogCategory, ChangelogEntry } from '@/lib/changelog';
 
-const GITLAB_REPO = 'https://gitlab.com/soapbox-pub/ditto';
+const GITHUB_REPO = 'https://github.com/2ro/eranos';
 
 /** Per-category icon + color used as inline list bullets. */
 const CATEGORY_STYLES: Record<ChangelogCategory, { icon: typeof Plus; colorClass: string }> = {
@@ -72,7 +72,7 @@ export function ChangelogPage() {
           <p className="text-sm text-muted-foreground pt-4">{t('policyPages.changelog.empty')}</p>
         ) : (
           <>
-            {isPreRelease && latestVersion && <PreReleaseBanner latestVersion={latestVersion} />}
+            {isPreRelease && latestVersion && <PreReleaseBanner />}
 
             <LatestRelease entry={entries[0]} />
 
@@ -118,7 +118,7 @@ function LatestRelease({ entry }: { entry: ChangelogEntry }) {
     <div className="pt-2 pb-1 px-4">
       {/* Big centered version + date */}
       <a
-        href={`${GITLAB_REPO}/-/releases/v${entry.version}`}
+        href={GITHUB_REPO}
         target="_blank"
         rel="noopener noreferrer"
         className="block text-center text-2xl font-bold tracking-tight hover:underline"
@@ -126,7 +126,7 @@ function LatestRelease({ entry }: { entry: ChangelogEntry }) {
         v{entry.version}
       </a>
       <a
-        href={`${GITLAB_REPO}/-/releases/v${entry.version}`}
+        href={GITHUB_REPO}
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mt-1"
@@ -206,7 +206,7 @@ function ChangelogEntryCard({ entry }: { entry: ChangelogEntry }) {
       {/* Version header */}
       <div className="flex items-center gap-3 px-4 py-3">
         <a
-          href={`${GITLAB_REPO}/-/releases/v${entry.version}`}
+          href={GITHUB_REPO}
           target="_blank"
           rel="noopener noreferrer"
           className="font-semibold text-sm hover:underline"
@@ -214,7 +214,7 @@ function ChangelogEntryCard({ entry }: { entry: ChangelogEntry }) {
           v{entry.version}
         </a>
         <a
-          href={`${GITLAB_REPO}/-/releases/v${entry.version}`}
+          href={GITHUB_REPO}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto"
@@ -270,7 +270,7 @@ function ChangelogEntryCard({ entry }: { entry: ChangelogEntry }) {
 }
 
 /** Banner shown at the top of the changelog for untagged (pre-release) builds. */
-function PreReleaseBanner({ latestVersion }: { latestVersion: string }) {
+function PreReleaseBanner() {
   const { t } = useTranslation();
   return (
     <div className="rounded-2xl border border-dashed border-amber-500/50 bg-amber-50/50 dark:bg-amber-950/20 px-4 py-3 space-y-1.5">
@@ -279,7 +279,7 @@ function PreReleaseBanner({ latestVersion }: { latestVersion: string }) {
         <span className="text-sm font-medium text-amber-800 dark:text-amber-300">{t('policyPages.changelog.preReleaseLabel')}</span>
         {commitSha && buildDate && (
           <a
-            href={`${GITLAB_REPO}/-/commit/${commitSha}`}
+            href={`${GITHUB_REPO}/commit/${commitSha}`}
             target="_blank"
             rel="noopener noreferrer"
             className="ml-auto text-[11px] text-amber-600/70 dark:text-amber-400/70 hover:text-amber-800 dark:hover:text-amber-300 transition-colors"
@@ -291,7 +291,7 @@ function PreReleaseBanner({ latestVersion }: { latestVersion: string }) {
       <p className="text-xs text-amber-700/80 dark:text-amber-400/70">
         {t('policyPages.changelog.preReleaseBody')}{' '}
         <a
-          href={`${GITLAB_REPO}/-/compare/v${latestVersion}...${commitSha || 'main'}`}
+          href={`${GITHUB_REPO}/commits/${commitSha || 'main'}`}
           target="_blank"
           rel="noopener noreferrer"
           className="underline underline-offset-2 hover:text-amber-900 dark:hover:text-amber-200 transition-colors"
