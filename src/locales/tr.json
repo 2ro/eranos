@@ -2115,12 +2115,6 @@
           "**Hayır.** {{appName}} hiçbir platform ücreti almaz. Bağış yaptığınızda yalnızca madencilere giden küçücük Grin ağ ücretini ödersiniz, bize değil."
         ]
       },
-      "who-made-this": {
-        "question": "{{appName}}'yı kim yaptı?",
-        "answer": [
-          "{{appName}}, [Soapbox](https://soapbox.pub) tarafından, Nostr ekosistemi için açık kaynak araçlar geliştiren bir ekiple, [World Liberty Congress](https://worldlibertycongress.org/) işbirliğiyle yapılmıştır."
-        ]
-      },
       "censorship-resistance": {
         "question": "Buradaki \"sansüre dayanıklı\" ne anlama geliyor?",
         "answer": [
@@ -2317,10 +2311,6 @@
           "peerToPeer": {
             "name": "Kişiden kişiye",
             "purpose": "Grin'i fiat parayla doğrudan başka bir kişiyle ya da bir tezgah üstü aracı üzerinden takas edin. Arada platform yok."
-          },
-          "spendDirectly": {
-            "name": "Doğrudan harcayın",
-            "purpose": "Grin'i, kabul eden satıcı ve hizmetlerde önce nakde çevirmeden para olarak harcayın."
           }
         }
       },

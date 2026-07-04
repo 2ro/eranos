@@ -2115,12 +2115,6 @@
           "**لا.** {{appName}} لا يأخذ أي رسوم منصة. عندما تتبرّع فإنك تدفع فقط رسوم شبكة Grin الضئيلة التي تذهب إلى المعدِّنين، لا إلينا."
         ]
       },
-      "who-made-this": {
-        "question": "من صنع {{appName}}؟",
-        "answer": [
-          "{{appName}} مبني بواسطة [Soapbox](https://soapbox.pub)، وهو فريق مفتوح المصدر يبني أدوات لمنظومة Nostr، بالتعاون مع [World Liberty Congress](https://worldlibertycongress.org/)."
-        ]
-      },
       "censorship-resistance": {
         "question": "ماذا تعني \"المقاومة للرقابة\" هنا؟",
         "answer": [
@@ -2317,10 +2311,6 @@
           "peerToPeer": {
             "name": "ندًّا لند",
             "purpose": "بادل Grin بالنقد مباشرةً مع شخص آخر أو عبر وسيط خارج المنصات. لا منصة في المنتصف."
-          },
-          "spendDirectly": {
-            "name": "أنفقه مباشرة",
-            "purpose": "أنفق Grin كنقود لدى التجار والخدمات التي تقبله، دون تحويله إلى نقد أولًا."
           }
         }
       },

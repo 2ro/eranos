@@ -2115,12 +2115,6 @@
           "**Hapana.** {{appName}} haichukui ada ya jukwaa. Unapochangia, unalipa tu ada ndogo sana ya mtandao wa Grin inayoenda kwa wachimbaji, si kwetu sisi."
         ]
       },
-      "who-made-this": {
-        "question": "Nani aliyetengeneza {{appName}}?",
-        "answer": [
-          "{{appName}} imejengwa na [Soapbox](https://soapbox.pub), timu ya chanzo wazi inayotengeneza zana kwa mfumo wa Nostr, kwa ushirikiano na [World Liberty Congress](https://worldlibertycongress.org/)."
-        ]
-      },
       "censorship-resistance": {
         "question": "\"Inastahimili udhibiti\" inamaanisha nini hapa?",
         "answer": [
@@ -2317,10 +2311,6 @@
           "peerToPeer": {
             "name": "Kati ya watu",
             "purpose": "Badilishana Grin kwa fedha za kawaida moja kwa moja na mtu mwingine au kupitia broka wa nje ya soko. Hakuna jukwaa katikati."
-          },
-          "spendDirectly": {
-            "name": "Itumie moja kwa moja",
-            "purpose": "Tumia Grin kama pesa kwa wafanyabiashara na huduma zinazoikubali, bila kubadilisha kuwa pesa taslimu kwanza."
           }
         }
       },

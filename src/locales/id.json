@@ -2115,12 +2115,6 @@
           "**Tidak.** {{appName}} tidak mengambil biaya platform. Saat Anda berdonasi, Anda hanya membayar biaya jaringan Grin yang sangat kecil yang masuk ke penambang, bukan ke kami."
         ]
       },
-      "who-made-this": {
-        "question": "Siapa yang membuat {{appName}}?",
-        "answer": [
-          "{{appName}} dibangun oleh [Soapbox](https://soapbox.pub), tim sumber terbuka yang membangun alat untuk ekosistem Nostr, bekerja sama dengan [World Liberty Congress](https://worldlibertycongress.org/)."
-        ]
-      },
       "censorship-resistance": {
         "question": "Apa yang dimaksud dengan \"anti-sensor\" di sini?",
         "answer": [
@@ -2317,10 +2311,6 @@
           "peerToPeer": {
             "name": "Peer-to-peer",
             "purpose": "Tukar Grin dengan fiat langsung dengan orang lain atau melalui broker over-the-counter. Tanpa platform di tengah."
-          },
-          "spendDirectly": {
-            "name": "Belanjakan langsung",
-            "purpose": "Belanjakan Grin sebagai uang di pedagang dan layanan yang menerimanya, tanpa mengonversi ke uang tunai terlebih dahulu."
           }
         }
       },

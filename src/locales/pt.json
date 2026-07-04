@@ -2115,12 +2115,6 @@
           "**Não.** O {{appName}} não cobra nenhuma taxa de plataforma. Quando você doa, paga apenas a pequena taxa da rede Grin que vai para os mineradores, não para nós."
         ]
       },
-      "who-made-this": {
-        "question": "Quem criou o {{appName}}?",
-        "answer": [
-          "O {{appName}} é construído pela [Soapbox](https://soapbox.pub), uma equipe de código aberto que constrói ferramentas para o ecossistema Nostr, em colaboração com o [World Liberty Congress](https://worldlibertycongress.org/)."
-        ]
-      },
       "censorship-resistance": {
         "question": "O que significa \"resistente à censura\" aqui?",
         "answer": [
@@ -2317,10 +2311,6 @@
           "peerToPeer": {
             "name": "Peer-to-peer",
             "purpose": "Troque Grin por dinheiro fiduciário diretamente com outra pessoa ou através de um corretor de balcão (OTC). Sem plataforma no meio."
-          },
-          "spendDirectly": {
-            "name": "Gaste diretamente",
-            "purpose": "Gaste Grin como dinheiro em comércios e serviços que o aceitam, sem antes converter para moeda local."
           }
         }
       },

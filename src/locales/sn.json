@@ -2115,12 +2115,6 @@
           "**Aiwa.** {{appName}} haitori mari yepuratifomu. Paunopa chipo, unobhadhara chete mari shoma yenetiweki yeGrin inoenda kuvachera, kwete kwatiri."
         ]
       },
-      "who-made-this": {
-        "question": "Ndiani akagadzira {{appName}}?",
-        "answer": [
-          "{{appName}} yakavakwa ne[Soapbox](https://soapbox.pub), boka rakavhura kodhi rinogadzira maturusi enzvimbo yeNostr, vachishanda pamwe ne[World Liberty Congress](https://worldlibertycongress.org/)."
-        ]
-      },
       "censorship-resistance": {
         "question": "\"Kushinga kucensorship\" pano kunorevei?",
         "answer": [
@@ -2317,10 +2311,6 @@
           "peerToPeer": {
             "name": "Peer-to-peer",
             "purpose": "Tsinhanisa Grin nefiat zvakananga neumwe munhu kana kuburikidza nebroker. Hapana puratifomu pakati."
-          },
-          "spendDirectly": {
-            "name": "Ishandise zvakananga",
-            "purpose": "Shandisa Grin semari kuvatengesi nemasevhisi anoigamuchira, pasina kutanga washandura kuita mari."
           }
         }
       },

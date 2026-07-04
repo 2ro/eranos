@@ -2115,12 +2115,6 @@
           "**不需要。** {{appName}} 不收取任何平台费。当你捐款时，你只需支付极少的 Grin 网络费，这笔费用归矿工所有，而不是给我们。"
         ]
       },
-      "who-made-this": {
-        "question": "{{appName}} 是谁开发的？",
-        "answer": [
-          "{{appName}} 由 [Soapbox](https://soapbox.pub) 构建——一个为 Nostr 生态系统打造工具的开源团队，与 [世界自由大会（World Liberty Congress）](https://worldlibertycongress.org/) 合作完成。"
-        ]
-      },
       "censorship-resistance": {
         "question": "这里所说的“抗审查”是什么意思？",
         "answer": [
@@ -2317,10 +2311,6 @@
           "peerToPeer": {
             "name": "点对点交易",
             "purpose": "直接与另一个人交易，或通过场外经纪人把 Grin 兑换成法币。没有平台居中。"
-          },
-          "spendDirectly": {
-            "name": "直接消费",
-            "purpose": "在接受 Grin 的商家和服务处直接把它当钱花，无需先兑换成现金。"
           }
         }
       },

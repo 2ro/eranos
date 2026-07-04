@@ -2115,12 +2115,6 @@
           "**नहीं।** {{appName}} कोई प्लेटफ़ॉर्म फ़ीस नहीं लेता। जब आप डोनेट करते हैं, तो आप केवल Grin नेटवर्क की मामूली फ़ीस देते हैं जो miners को जाती है, हमें नहीं।"
         ]
       },
-      "who-made-this": {
-        "question": "{{appName}} किसने बनाया?",
-        "answer": [
-          "{{appName}} को [Soapbox](https://soapbox.pub) ने बनाया है, जो Nostr ecosystem के लिए टूल बनाने वाली एक ओपन-सोर्स टीम है, [World Liberty Congress](https://worldlibertycongress.org/) के साथ मिलकर।"
-        ]
-      },
       "censorship-resistance": {
         "question": "यहाँ \"सेंसरशिप-प्रतिरोधी\" का क्या मतलब है?",
         "answer": [
@@ -2317,10 +2311,6 @@
           "peerToPeer": {
             "name": "Peer-to-peer",
             "purpose": "किसी दूसरे व्यक्ति के साथ सीधे या किसी over-the-counter broker के ज़रिए Grin को fiat में बदलें। बीच में कोई प्लेटफ़ॉर्म नहीं।"
-          },
-          "spendDirectly": {
-            "name": "इसे सीधे ख़र्च करें",
-            "purpose": "Grin को पैसे की तरह उन merchants और सेवाओं के साथ ख़र्च करें जो इसे स्वीकार करते हैं, बिना पहले cash में बदले।"
           }
         }
       },

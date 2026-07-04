@@ -2115,12 +2115,6 @@
           "**Non.** {{appName}} ne prélève aucun frais de plateforme. Quand vous donnez, vous ne payez que les minuscules frais du réseau Grin, qui vont aux mineurs, pas à nous."
         ]
       },
-      "who-made-this": {
-        "question": "Qui a créé {{appName}} ?",
-        "answer": [
-          "{{appName}} est construite par [Soapbox](https://soapbox.pub), une équipe open-source qui développe des outils pour l'écosystème Nostr, en collaboration avec le [World Liberty Congress](https://worldlibertycongress.org/)."
-        ]
-      },
       "censorship-resistance": {
         "question": "Que signifie « résistant à la censure » ici ?",
         "answer": [
@@ -2317,10 +2311,6 @@
           "peerToPeer": {
             "name": "Pair-à-pair",
             "purpose": "Échangez du Grin contre de la monnaie fiat directement avec une autre personne ou via un courtier de gré à gré. Aucune plateforme au milieu."
-          },
-          "spendDirectly": {
-            "name": "Dépensez-le directement",
-            "purpose": "Dépensez le Grin comme de l'argent auprès des commerçants et services qui l'acceptent, sans le convertir d'abord en espèces."
           }
         }
       },

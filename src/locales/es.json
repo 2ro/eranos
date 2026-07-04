@@ -2115,12 +2115,6 @@
           "**No.** {{appName}} no cobra ninguna comisión de plataforma. Cuando donas, pagas solo la pequeña comisión de la red Grin que va a los mineros, no a nosotros."
         ]
       },
-      "who-made-this": {
-        "question": "¿Quién creó {{appName}}?",
-        "answer": [
-          "{{appName}} está hecho por [Soapbox](https://soapbox.pub), un equipo de código abierto que crea herramientas para el ecosistema Nostr, en colaboración con el [World Liberty Congress](https://worldlibertycongress.org/)."
-        ]
-      },
       "censorship-resistance": {
         "question": "¿Qué significa aquí \"resistente a la censura\"?",
         "answer": [
@@ -2317,10 +2311,6 @@
           "peerToPeer": {
             "name": "De persona a persona",
             "purpose": "Intercambia Grin por dinero fiat directamente con otra persona o a través de un intermediario extrabursátil (OTC). Sin plataforma en medio."
-          },
-          "spendDirectly": {
-            "name": "Gástalo directamente",
-            "purpose": "Gasta Grin como dinero con comercios y servicios que lo acepten, sin convertirlo antes a efectivo."
           }
         }
       },
