@@ -124,6 +124,7 @@ export function NotificationSettings() {
   const { settings, updateSettings } = useEncryptedSettings();
   const {
     enabled: pushHookEnabled,
+    supported: pushHookSupported,
     enable: enablePush,
     disable: disablePush,
     syncPreferences: syncPushPreferences,
@@ -239,7 +240,10 @@ export function NotificationSettings() {
     return <Navigate to="/settings" replace />;
   }
 
-  const isSupported = isNative || 'Notification' in window;
+  // On web, push also requires the push hook to report support. Web Push is
+  // disabled in this relay-only build (no nostr-push server), so the toggle is
+  // disabled and the "unsupported" note is shown instead of a silent no-op.
+  const isSupported = isNative || ('Notification' in window && pushHookSupported);
   const isDenied = !isNative && permission === 'denied';
 
   return (

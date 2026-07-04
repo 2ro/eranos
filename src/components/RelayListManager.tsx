@@ -19,6 +19,15 @@ import { useToast } from '@/hooks/useToast';
 import { APP_RELAYS } from '@/lib/appRelays';
 import { cn } from '@/lib/utils';
 
+/**
+ * Relay-only build: Eranos talks to our relay exclusively (App.tsx pins
+ * useAppRelays:true / useUserRelays:false). The "Your Relays" section is the
+ * escape hatch that would let a user add and enable foreign relays, so it is
+ * hidden here. Flip to `true` to restore the personal-relay UI. The section
+ * itself is kept intact — only its visibility is gated.
+ */
+const SHOW_USER_RELAYS = false;
+
 interface Relay {
   url: string;
   read: boolean;
@@ -342,7 +351,8 @@ export function RelayListManager() {
         </div>
       </div>
 
-      {/* User Relays Section */}
+      {/* User Relays Section — hidden in the relay-only build (escape hatch). */}
+      {SHOW_USER_RELAYS && (
       <div className="pb-4 pt-4">
         <div className="px-3 space-y-3">
           <div className="flex items-center justify-between">
@@ -477,6 +487,7 @@ export function RelayListManager() {
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }

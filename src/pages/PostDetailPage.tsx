@@ -118,6 +118,15 @@ const BOOK_REVIEW_KIND = 31985;
 /** NIP-62 Request to Vanish. */
 const VANISH_KIND = 62;
 
+/**
+ * Relay-only build: Eranos talks to our relay exclusively. The "Try another
+ * relay" fallback on the not-found screen lets a user dial an arbitrary
+ * foreign relay to hunt for a missing event, which is federation we don't
+ * allow here. Hidden (not deleted) — flip to `true` to restore it. Not-found
+ * simply degrades to showing the event details without the manual retry UI.
+ */
+const ALLOW_MANUAL_RELAY_RETRY = false;
+
 /** Map a kind number to a human-readable shell title for the loading state. */
 function shellTitleForKind(kind?: number): string {
   if (!kind) return "Loading...";
@@ -699,7 +708,8 @@ function EventNotFound({
           {authorPubkey && <AuthorHintRow pubkey={authorPubkey} />}
         </div>
 
-        {/* Collapsible relay retry */}
+        {/* Collapsible relay retry — hidden in the relay-only build (foreign-relay escape hatch). */}
+        {ALLOW_MANUAL_RELAY_RETRY && (
         <Collapsible open={retryOpen} onOpenChange={setRetryOpen}>
           <CollapsibleTrigger asChild>
             <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors w-full">
@@ -744,6 +754,7 @@ function EventNotFound({
             )}
           </CollapsibleContent>
         </Collapsible>
+        )}
       </div>
     </div>
   );

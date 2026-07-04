@@ -18,10 +18,10 @@ import { nip19 } from 'nostr-tools';
  *   kind:       39089 (NIP-51 follow pack)
  *   pubkey:     932614571afcbad4d17a191ee281e39eebbb41b93fac8fd87829622aeb112f4d
  *   identifier: gllbeu7itctq
- *   relays:     wss://relay.primal.net
+ *   relays:     (none — relay hint stripped so resolving never dials out)
  */
 const VERIFIED_FOLLOW_PACK_NADDR =
-  'naddr1qqxxwmrvvfjh2dmfw33hgugpzemhxue69uhhyetvv9ujuurjd9kkzmpwdejhgq3qjvnpg4c6ljadf5t6ry0w9q0rnm4mksde87kglkrc993z46c39axsxpqqqzvtzxrjurt';
+  'naddr1qvzqqqyckypzpyexz3t34l966ngh5xg7u2q788hthdqmj0av3lv8s2tz9t43zt6dqqxxwmrvvfjh2dmfw33hgug6vm8ku';
 
 const decoded = nip19.decode(VERIFIED_FOLLOW_PACK_NADDR);
 if (decoded.type !== 'naddr') {

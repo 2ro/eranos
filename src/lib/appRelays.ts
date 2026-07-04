@@ -1,19 +1,33 @@
 import type { RelayMetadata } from '@/contexts/AppContext';
 
-/** Relay used for NIP-50 search, trending, and streaming queries. */
-export const DITTO_RELAY = 'wss://relay.ditto.pub/';
+/**
+ * The project's own relay — the ONLY relay Eranos talks to. No federation with
+ * foreign relays. Change this single constant to swap the relay (e.g. to
+ * wss://nrelay.us-ea.st/); everything below and APP_RELAYS derive from it.
+ */
+export const OUR_RELAY = 'wss://relay.floonet.dev/';
 
-/** All Ditto relays used for search, trending, and streaming queries. */
-export const DITTO_RELAYS: string[] = [
-  'wss://relay.ditto.pub/',
-  'wss://relay.dreamith.to/',
-];
+/**
+ * Relay used for NIP-50 search, trending, and streaming queries.
+ * Pinned to our relay — search/trending degrade to whatever it returns rather
+ * than dialing out to foreign search relays.
+ */
+export const DITTO_RELAY = OUR_RELAY;
 
-/** Relay used for kind 34236 addressable short video events, used by divine */
-export const DIVINE_RELAY = 'wss://divine.video/';
+/** Search/trending/streaming relay set — pinned to our relay only. */
+export const DITTO_RELAYS: string[] = [OUR_RELAY];
 
-/** Relay used for Zapstore app metadata (kind 32267) and releases (kind 30063). */
-export const ZAPSTORE_RELAY = 'wss://relay.zapstore.dev';
+/**
+ * Relay formerly used for kind 34236 addressable short video events (divine).
+ * Pinned to our relay so video resolution never dials out.
+ */
+export const DIVINE_RELAY = OUR_RELAY;
+
+/**
+ * Relay formerly used for Zapstore app metadata (kind 32267) and releases
+ * (kind 30063). Pinned to our relay so zapstore lookups never dial out.
+ */
+export const ZAPSTORE_RELAY = OUR_RELAY;
 
 /** Normalize a relay URL for deduplication (lowercase, strip trailing slash). */
 function normalizeUrl(url: string): string {
@@ -26,7 +40,7 @@ function normalizeUrl(url: string): string {
  */
 export const APP_RELAYS: RelayMetadata = {
   relays: [
-    { url: 'wss://nrelay.us-ea.st/', read: true, write: true },
+    { url: OUR_RELAY, read: true, write: true },
   ],
   updatedAt: 0,
 };

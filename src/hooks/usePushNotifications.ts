@@ -18,18 +18,29 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { NostrPushClient, serializePushSubscription, urlBase64ToUint8Array } from '@/lib/nostrPush';
 import { NOTIFICATION_TEMPLATES } from '@/lib/notificationTemplates';
 import type { EncryptedSettings } from '@/hooks/useEncryptedSettings';
+import { OUR_RELAY } from '@/lib/appRelays';
 
 // ─── Config ───────────────────────────────────────────────────────────────────
+
+/**
+ * Web Push is disabled. It requires an external nostr-push RPC server, and our
+ * relay-only deployment runs no such server, so the feature can never work
+ * here. We hard-disable it (see `supported` below) rather than pointing the RPC
+ * channel at foreign relays. The hook still exports the full interface so its
+ * UI consumers (NotificationSettings) render a graceful "unsupported" state
+ * instead of crashing.
+ */
+const PUSH_ENABLED = false;
 
 const SERVER_PUBKEY: string = import.meta.env.VITE_NOSTR_PUSH_PUBKEY ?? '';
 const DOMAIN = typeof window !== 'undefined' ? window.location.hostname : '';
 
-/** Relays used for the RPC channel to nostr-push. */
-const RPC_RELAYS = [
-  'wss://relay.ditto.pub/',
-  'wss://relay.primal.net/',
-  'wss://relay.damus.io/',
-];
+/**
+ * Relays for the (disabled) nostr-push RPC channel. Pinned to our relay so no
+ * foreign relay is ever dialed; unused in practice because PUSH_ENABLED gates
+ * the mount effect off before any connection is attempted.
+ */
+const RPC_RELAYS = [OUR_RELAY];
 
 // localStorage keys
 const VAPID_KEY_CACHE = 'ditto-push-vapid-key';
@@ -75,6 +86,7 @@ interface UsePushNotificationsReturn {
 
 export function usePushNotifications(): UsePushNotificationsReturn {
   const supported =
+    PUSH_ENABLED &&
     typeof window !== 'undefined' &&
     'serviceWorker' in navigator &&
     'PushManager' in window &&
