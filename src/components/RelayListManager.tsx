@@ -20,13 +20,12 @@ import { APP_RELAYS } from '@/lib/appRelays';
 import { cn } from '@/lib/utils';
 
 /**
- * Relay-only build: Eranos talks to our relay exclusively (App.tsx pins
- * useAppRelays:true / useUserRelays:false). The "Your Relays" section is the
- * escape hatch that would let a user add and enable foreign relays, so it is
- * hidden here. Flip to `true` to restore the personal-relay UI. The section
- * itself is kept intact — only its visibility is gated.
+ * Federated build: the "Your Relays" section lets a user add and enable their
+ * own relays alongside the app default. Shown. Content from any relay is still
+ * subject to the Grin-only policy (grinOnlyPolicy.ts). Flip to `false` to hide
+ * the personal-relay UI again; the section itself is gated, not deleted.
  */
-const SHOW_USER_RELAYS = false;
+const SHOW_USER_RELAYS = true;
 
 interface Relay {
   url: string;

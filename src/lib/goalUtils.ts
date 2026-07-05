@@ -5,7 +5,15 @@ import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 // ── Kind constant ─────────────────────────────────────────────────────────────
 
-/** NIP-75 fundraising goal (kind 9041, regular event). */
+/**
+ * NIP-75 fundraising goal (kind 9041, regular event).
+ *
+ * DEAD CODE (Grin-only federation): kind 9041 is a Lightning money-rail kind
+ * now dropped at feed ingest / NoteCard render by grinOnlyPolicy.ts, so
+ * parseGoalEvent / formatSats no longer surface in the UI. Kept (not deleted)
+ * to keep the revert diff small — removal ripples through GoalCard,
+ * useGoalDisplay, and several call sites.
+ */
 const GOAL_KIND = 9041;
 
 function normalizeRelayUrl(value: string | undefined): string | undefined {
