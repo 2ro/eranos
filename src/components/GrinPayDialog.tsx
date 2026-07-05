@@ -99,7 +99,7 @@ function PayQR({ value }: { value: string }) {
   return (
     <div className="flex justify-center">
       <div className="rounded-2xl bg-white p-3 shadow-sm">
-        <QRCodeCanvas value={value} size={224} level="M" className="h-auto w-full max-w-56" />
+        <QRCodeCanvas value={value} size={224} level="H" logo className="h-auto w-full max-w-56" />
       </div>
     </div>
   );
