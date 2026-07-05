@@ -9,6 +9,7 @@ import { CAMPAIGN_KIND } from '@/lib/campaign';
 import { getEnabledFeedKinds } from '@/lib/extraKinds';
 import { getPaginationCursor, isRepostKind, parseRepostContent, shouldHideFeedEvent, type FeedItem } from '@/lib/feedUtils';
 import { isEventMuted } from '@/lib/muteHelpers';
+import { violatesGrinOnly } from '@/lib/grinOnlyPolicy';
 
 const AGORA_PAGE_SIZE = 25;
 const PLEDGE_KIND = 36639;
@@ -240,6 +241,7 @@ export function useAgoraFeed(enabled: boolean, options?: UseAgoraFeedOptions) {
         .filter((event) => {
           if (seen.has(event.id)) return false;
           seen.add(event.id);
+          if (violatesGrinOnly(event)) return false;
           if (muteItems.length > 0 && isEventMuted(event, muteItems)) return false;
           if (shouldFilterEvent(event)) return false;
           return true;

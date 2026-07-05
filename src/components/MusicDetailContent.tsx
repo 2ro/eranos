@@ -17,6 +17,7 @@ import { useEventStats } from '@/hooks/useTrending';
 import { useComments } from '@/hooks/useComments';
 import { useMuteList } from '@/hooks/useMuteList';
 import { isEventMuted } from '@/lib/muteHelpers';
+import { violatesGrinOnly } from '@/lib/grinOnlyPolicy';
 import { getDisplayName } from '@/lib/getDisplayName';
 import { formatTime } from '@/lib/formatTime';
 import { formatNumber } from '@/lib/formatNumber';
@@ -71,8 +72,9 @@ function TrackDetail({ event }: { event: NostrEvent }) {
   const { data: commentsData, isLoading: commentsLoading } = useComments(event, 500);
   const comments = useMemo(() => {
     const top = commentsData?.topLevelComments ?? [];
-    if (muteItems.length === 0) return top;
-    return top.filter((r) => !isEventMuted(r, muteItems));
+    return top.filter(
+      (r) => !violatesGrinOnly(r) && (muteItems.length === 0 || !isEventMuted(r, muteItems)),
+    );
   }, [commentsData?.topLevelComments, muteItems]);
 
   const hashtags = event.tags.filter(([n]) => n === 't').map(([, v]) => v);

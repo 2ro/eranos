@@ -7,6 +7,7 @@ import { getEnabledFeedKinds } from '@/lib/extraKinds';
 import { isRepostKind } from '@/lib/feedUtils';
 import { isReplyEvent } from '@/lib/nostrEvents';
 import { isEventMuted } from '@/lib/muteHelpers';
+import { violatesGrinOnly } from '@/lib/grinOnlyPolicy';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import { DITTO_RELAYS } from '@/lib/appRelays';
 import { nip19 } from 'nostr-tools';
@@ -483,6 +484,7 @@ export function useStreamPosts(query: string, options: StreamPostsOptions) {
 
   // Shared predicate for client-side filtering (mute, content, search, media, author, etc.)
   const matchesFilters = useCallback((event: NostrEvent) => {
+    if (violatesGrinOnly(event)) return false;
     if (muteItems.length > 0 && isEventMuted(event, muteItems)) return false;
     if (shouldFilterEvent(event)) return false;
     if (resolvedAuthorPubkeys) {

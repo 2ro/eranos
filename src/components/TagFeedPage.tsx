@@ -17,6 +17,7 @@ import { isRepostKind } from '@/lib/feedUtils';
 import { buildTagFilterValues } from '@/lib/tagFilterValues';
 import { PageHeader } from '@/components/PageHeader';
 import { isEventMuted } from '@/lib/muteHelpers';
+import { violatesGrinOnly } from '@/lib/grinOnlyPolicy';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 
 interface TagFeedPageProps {
@@ -100,8 +101,10 @@ export function TagFeedPage({
   });
 
   const filteredEvents = useMemo(() => {
-    if (!events || muteItems.length === 0) return events;
-    return events.filter((e) => !isEventMuted(e, muteItems));
+    if (!events) return events;
+    return events.filter(
+      (e) => !violatesGrinOnly(e) && (muteItems.length === 0 || !isEventMuted(e, muteItems)),
+    );
   }, [events, muteItems]);
 
   return (

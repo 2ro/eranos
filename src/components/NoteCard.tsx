@@ -49,6 +49,7 @@ import { FoundLogContent } from "@/components/FoundLogContent";
 import { GeocacheContent } from "@/components/GeocacheContent";
 import { GitRepoCard } from "@/components/GitRepoCard";
 import { GoalCard } from "@/components/GoalCard";
+import { violatesGrinOnly } from "@/lib/grinOnlyPolicy";
 import { NsiteCard } from "@/components/NsiteCard";
 import { ImageGallery } from "@/components/ImageGallery";
 import { CardsIcon } from "@/components/icons/CardsIcon";
@@ -542,6 +543,12 @@ export const NoteCard = memo(function NoteCard({
   const hashtags = isVine
     ? event.tags.filter(([n]) => n === "t").map(([, v]) => v)
     : [];
+
+  // Grin-only policy: never render dropped Bitcoin/Lightning money-rail kinds
+  // (zaps, zap goals). Belt-and-suspenders with the ingest-level drop.
+  if (violatesGrinOnly(event)) {
+    return null;
+  }
 
   // Filter out deprecated/junk kind 30000 events
   if (isDeprecatedFollowSet(event)) {
