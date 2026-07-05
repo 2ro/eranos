@@ -2,7 +2,9 @@
 
 Power to the people.
 
-Eranos is a Nostr client focused on community ownership, expressive identity, and censorship resistance. This repository is the Eranos-branded app, a Grin-only fork of Agora (itself built from the Ditto codebase). All Bitcoin and Lightning payment rails have been removed; Grin payments land in a later phase.
+Eranos is a Nostr client focused on community ownership, expressive identity, and censorship resistance. This repository is the Eranos-branded app, a Grin-only fork of Agora (itself built from the Ditto codebase). It federates with the wider Nostr network - the search, labels, video, and zapstore routes are all live - with `relay.floonet.dev` as its home relay.
+
+A mechanical Grin-only content policy runs at the edge: it drops the zap event kinds (9041, 9734, 9735) and redacts Lightning money-rail tokens (bolt11, lnurl, and `lightning:` URIs) from posts and DMs while keeping the rest of the message. Grin slatepacks and the Grin campaign kinds (33863, 36639, 3414) pass through untouched. Talking about bitcoin is never filtered - only the Lightning money rail is redacted. Web push is disabled.
 
 **[eranos.fund](https://eranos.fund)** | **Upstream: [Agora](https://gitlab.com/soapbox-pub/agora-3)**
 
@@ -15,6 +17,7 @@ Eranos is a Nostr client focused on community ownership, expressive identity, an
 ## Features
 
 - **Community-first social client**: notes, articles, comments, reposts, reactions, and rich event rendering
+- **Grin-only content policy**: federates with foreign relays but drops the Lightning zap kinds and redacts Lightning payment tokens, leaving Grin campaigns, slatepacks, and ordinary discussion (including talk about bitcoin) untouched
 - **Theming system**: built-in presets + custom color/font/background themes that can be shared as events
 - **Private messaging**: NIP-04 and NIP-17 direct messages
 - **Mobile app shell**: Capacitor-powered Android/iOS wrappers
