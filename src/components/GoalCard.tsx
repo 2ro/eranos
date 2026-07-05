@@ -18,6 +18,13 @@ interface GoalCardProps {
  * Displays the goal target, recipient info, deadline, and community link.
  * The raised tally is intentionally omitted — the Grin tally arrives in a
  * later phase.
+ *
+ * DEAD CODE (Grin-only federation): kind 9041 NIP-75 goals are Lightning money
+ * rails and are now dropped at feed ingest and at the NoteCard render guard by
+ * grinOnlyPolicy.ts, so these render paths are unreachable in practice. Left in
+ * place (not deleted) because removal ripples across PostDetailPage,
+ * useGoalDisplay, kindLabels, extraKinds, NotificationsPage, and CommentContext;
+ * see grinOnlyPolicy.ts.
  */
 export function GoalCard({ event }: GoalCardProps) {
   const goal = useMemo(() => parseGoalEvent(event), [event]);

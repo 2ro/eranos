@@ -21,6 +21,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import { useNotifications, type GroupedNotificationItem, type NotificationItem } from '@/hooks/useNotifications';
 import { useMuteList } from '@/hooks/useMuteList';
 import { isEventMuted } from '@/lib/muteHelpers';
+import { violatesGrinOnly } from '@/lib/grinOnlyPolicy';
 import { genUserName } from '@/lib/genUserName';
 import { nip19 } from 'nostr-tools';
 import { isReplyEvent } from '@/lib/nostrEvents';
@@ -207,6 +208,10 @@ export function NotificationsPage() {
 
   const filteredGroups = useMemo(() => {
     let filtered = groupedItems;
+    // Drop Bitcoin/Lightning money-rail notifications (zaps, zap goals) entirely.
+    filtered = filtered.filter((group) =>
+      group.actors.every((item) => !violatesGrinOnly(item.event)),
+    );
     // Filter out notifications from muted users/content
     if (muteItems.length > 0) {
       filtered = filtered.filter((group) =>

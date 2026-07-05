@@ -119,13 +119,12 @@ const BOOK_REVIEW_KIND = 31985;
 const VANISH_KIND = 62;
 
 /**
- * Relay-only build: Eranos talks to our relay exclusively. The "Try another
- * relay" fallback on the not-found screen lets a user dial an arbitrary
- * foreign relay to hunt for a missing event, which is federation we don't
- * allow here. Hidden (not deleted) — flip to `true` to restore it. Not-found
- * simply degrades to showing the event details without the manual retry UI.
+ * Federated build: the "Try another relay" fallback on the not-found screen
+ * lets a user dial another relay to hunt for a missing event. Shown. Flip to
+ * `false` to hide it (the not-found screen then degrades to showing event
+ * details without the manual retry UI); the control is gated, not deleted.
  */
-const ALLOW_MANUAL_RELAY_RETRY = false;
+const ALLOW_MANUAL_RELAY_RETRY = true;
 
 /** Map a kind number to a human-readable shell title for the loading state. */
 function shellTitleForKind(kind?: number): string {

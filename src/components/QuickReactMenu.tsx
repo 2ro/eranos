@@ -114,10 +114,11 @@ export function QuickReactMenu({
       : { content: displayEmoji };
     const prevStats = queryClient.getQueryData<Nip85EventStats | null>(statsKey);
     if (prevStats) {
-      queryClient.setQueryData<Nip85EventStats | null>(statsKey, {
+      const nextStats: Nip85EventStats = {
         ...prevStats,
         reactionCount: prevStats.reactionCount + 1,
-      });
+      };
+      queryClient.setQueryData<Nip85EventStats | null>(statsKey, nextStats);
     }
 
     queryClient.setQueryData<ResolvedEmoji>(['user-reaction', eventId], resolvedEmoji);

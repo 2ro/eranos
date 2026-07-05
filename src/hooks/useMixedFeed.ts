@@ -10,6 +10,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useMuteList } from '@/hooks/useMuteList';
 import { getPaginationCursor, shouldHideFeedEvent, isRepostKind } from '@/lib/feedUtils';
 import { isEventMuted } from '@/lib/muteHelpers';
+import { violatesGrinOnly } from '@/lib/grinOnlyPolicy';
 import { parseRepostContent } from '@/lib/feedUtils';
 
 /**
@@ -185,6 +186,7 @@ export function useMixedFeed(mode: FeedMode, enabled: boolean) {
       const key = item.repostedBy ? `repost-${item.repostedBy}-${item.event.id}` : item.event.id;
       if (!key) return;
       if (shouldHideFeedEvent(item.event)) return;
+      if (violatesGrinOnly(item.event)) return;
       if (muteItems.length > 0 && isEventMuted(item.event, muteItems)) return;
       const existing = seen.get(key);
       if (!existing || item.sortTimestamp > existing.sortTimestamp) {

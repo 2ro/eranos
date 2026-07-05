@@ -52,10 +52,11 @@ export function RepostMenu({ event, children }: RepostMenuProps) {
     // Optimistically update stats cache immediately
     const prevStats = queryClient.getQueryData<Nip85EventStats | null>(statsKey);
     if (prevStats) {
-      queryClient.setQueryData<Nip85EventStats | null>(statsKey, {
+      const nextStats: Nip85EventStats = {
         ...prevStats,
         repostCount: prevStats.repostCount + 1,
-      });
+      };
+      queryClient.setQueryData<Nip85EventStats | null>(statsKey, nextStats);
     }
 
     // Optimistically mark as reposted
@@ -114,10 +115,11 @@ export function RepostMenu({ event, children }: RepostMenuProps) {
     // Optimistically update stats cache
     const prevStats = queryClient.getQueryData<Nip85EventStats | null>(statsKey);
     if (prevStats) {
-      queryClient.setQueryData<Nip85EventStats | null>(statsKey, {
+      const nextStats: Nip85EventStats = {
         ...prevStats,
         repostCount: Math.max(0, prevStats.repostCount - 1),
-      });
+      };
+      queryClient.setQueryData<Nip85EventStats | null>(statsKey, nextStats);
     }
 
     // Optimistically mark as not reposted

@@ -6,6 +6,7 @@ import type { NostrEvent, NostrFilter, NostrSigner } from '@nostrify/nostrify';
 import { useCurrentUser } from './useCurrentUser';
 import { useNostrPublish } from './useNostrPublish';
 import { useAppContext } from './useAppContext';
+import { sanitizeText } from '@/lib/grinOnlyPolicy';
 
 /** NIP-04 encrypted direct message kind. */
 export const DM_KIND = 4;
@@ -512,7 +513,9 @@ async function decryptMessage({
     peer,
     outgoing,
     createdAt: event.created_at,
-    content,
+    // Redact Lightning money-rail tokens before the decrypted DM reaches the
+    // UI; the message text is otherwise preserved (Grin slatepacks untouched).
+    content: content === null ? null : sanitizeText(content),
     event,
   };
 }

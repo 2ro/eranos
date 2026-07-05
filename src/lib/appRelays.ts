@@ -8,26 +8,23 @@ import type { RelayMetadata } from '@/contexts/AppContext';
 export const OUR_RELAY = 'wss://relay.floonet.dev/';
 
 /**
- * Relay used for NIP-50 search, trending, and streaming queries.
- * Pinned to our relay — search/trending degrade to whatever it returns rather
- * than dialing out to foreign search relays.
+ * Relay used for NIP-50 search, trending, and streaming queries. Foreign relay:
+ * federation is open, and the Grin-only content policy (grinOnlyPolicy.ts)
+ * filters Bitcoin/Lightning money rails out of whatever it returns.
  */
-export const DITTO_RELAY = OUR_RELAY;
+export const DITTO_RELAY = 'wss://relay.ditto.pub/';
 
-/** Search/trending/streaming relay set — pinned to our relay only. */
-export const DITTO_RELAYS: string[] = [OUR_RELAY];
+/** All Ditto relays used for search, trending, and streaming queries. */
+export const DITTO_RELAYS: string[] = [
+  'wss://relay.ditto.pub/',
+  'wss://relay.dreamith.to/',
+];
 
-/**
- * Relay formerly used for kind 34236 addressable short video events (divine).
- * Pinned to our relay so video resolution never dials out.
- */
-export const DIVINE_RELAY = OUR_RELAY;
+/** Relay used for kind 34236 addressable short video events, used by divine. */
+export const DIVINE_RELAY = 'wss://divine.video/';
 
-/**
- * Relay formerly used for Zapstore app metadata (kind 32267) and releases
- * (kind 30063). Pinned to our relay so zapstore lookups never dial out.
- */
-export const ZAPSTORE_RELAY = OUR_RELAY;
+/** Relay used for Zapstore app metadata (kind 32267) and releases (kind 30063). */
+export const ZAPSTORE_RELAY = 'wss://relay.zapstore.dev';
 
 /** Normalize a relay URL for deduplication (lowercase, strip trailing slash). */
 function normalizeUrl(url: string): string {

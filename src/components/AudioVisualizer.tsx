@@ -81,7 +81,7 @@ export function AudioVisualizer({
     const primaryGlow  = `hsl(${primaryHsl} / 0.55)`;
 
     const analyser = analyserRef.current;
-    let dataArray: Uint8Array | null = null;
+    let dataArray: Uint8Array<ArrayBuffer> | null = null;
     if (analyser && isPlaying) {
       dataArray = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteTimeDomainData(dataArray);
