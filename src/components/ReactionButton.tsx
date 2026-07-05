@@ -91,10 +91,11 @@ export function ReactionButton({
     // Optimistic update: clear reaction and decrement count
     queryClient.setQueryData(['user-reaction', eventId], null);
     if (prevStats) {
-      queryClient.setQueryData<Nip85EventStats | null>(statsKey, {
+      const nextStats: Nip85EventStats = {
         ...prevStats,
         reactionCount: Math.max(0, prevStats.reactionCount - 1),
-      });
+      };
+      queryClient.setQueryData<Nip85EventStats | null>(statsKey, nextStats);
     }
 
     publishEvent(
@@ -176,10 +177,11 @@ export function ReactionButton({
             const prevStats = queryClient.getQueryData<Nip85EventStats | null>(statsKey);
             queryClient.setQueryData(['user-reaction', eventId], { content: '❤️' });
             if (prevStats) {
-              queryClient.setQueryData<Nip85EventStats | null>(statsKey, {
+              const nextStats: Nip85EventStats = {
                 ...prevStats,
                 reactionCount: prevStats.reactionCount + 1,
-              });
+              };
+              queryClient.setQueryData<Nip85EventStats | null>(statsKey, nextStats);
             }
             publishEvent(
               {
