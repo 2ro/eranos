@@ -39,6 +39,10 @@ deploy.sh
 # Build-time configuration
 ditto.json
 
+# Local agent tooling — never commit
+.claude/
+.agents/
+
 # Android build outputs and sensitive files
 *.aab
 resources/
